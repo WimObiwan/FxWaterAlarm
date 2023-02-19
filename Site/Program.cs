@@ -1,7 +1,13 @@
+using Core;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("appsettings.Local.json", false);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddWaterAlarmCore(builder.Configuration, typeof(Program).Assembly);
 
 var app = builder.Build();
 

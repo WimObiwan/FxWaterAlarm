@@ -1,45 +1,5 @@
 ﻿@page
-@using System.Globalization
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
-    var sensorPercent = 55;
-    var sensorTimestamp = DateTime.Now;
-}
-
-<p>
-    <svg id="fillGauge" width="97%" height="200" onclick=""></svg>
-</p>
-<p>
-    <div style="text-align: center;" >
-        <time>@sensorTimestamp.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)</time>
-    </div>
-</p>
-
-@section Scripts
-{
-    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-    <script src="~/js/Index.js"></script>
-    <script>
-        var config = liquidFillGaugeDefaultSettings();
-        
-        config.circleColor = "#1ca3ec"
-        config.textColor = "#74ccf4"
-        config.waveTextColor = "#bbeeff"
-        config.waveColor = "#1ca3ec"
-        config.warningThreshold = .4;
-        config.waveCount = 4;
-        config.waveRiseTime = 60;
-        config.waveAnimateTime = 6000;
-        config.displayPercent = true;
-        config.maxValue = 100;
-        
-        var gauge = loadLiquidFillGauge("fillGauge", @sensorPercent, config);
-        
-        $("time").each(function (elem) {
-                var utctimeval = $(this).html();
-                var date = new Date(utctimeval);
-                $(this).html(date.toLocaleString());
-        })
-    </script>
 }
