@@ -2,7 +2,7 @@ using Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("appsettings.Local.json", false);
+builder.Configuration.AddJsonFile("appsettings.Local.json", true);
 
 // Add services to the container.
 builder.Services.AddRazorPages();

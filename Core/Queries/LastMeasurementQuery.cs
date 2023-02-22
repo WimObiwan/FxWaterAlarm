@@ -1,4 +1,3 @@
-using System.Dynamic;
 using Core.Entities;
 using Core.Repository;
 
@@ -17,7 +16,7 @@ public class LastMeasurementQuery : ILastMeasurementQuery
     {
         _measurementRepository = measurementRepository;
     }
-    
+
     public async Task<Measurement?> Get(string devEui)
     {
         return await _measurementRepository.GetLast(devEui);

@@ -1,7 +1,6 @@
 ﻿using CommandLine;
 using Core;
 using Core.Queries;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,20 +10,9 @@ using Serilog;
 using Serilog.Events;
 
 namespace Console;
+
 internal class Program
 {
-    [Verb("Help", HelpText = "Shows help about WaterAlarm Console.")]
-    private class HelpOptions
-    {
-    }
-
-    [Verb("QueryLast", HelpText = "Query last measurement.")]
-    private class QueryLastOptions
-    {
-        [Option('d',"deveui", Required = true, HelpText = "Device 'DevEUI' (Device Extended Unique Identifier)")]
-        public string DevEui { get; set; } = default!;
-    }
-
     private static async Task<int> Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
@@ -99,7 +87,7 @@ internal class Program
             })
             .UseStartup<Startup>();
     }
-    
+
     private static Task<int> RunHelp()
     {
         return Task.FromResult(0);
@@ -118,12 +106,24 @@ internal class Program
                 options.DevEui);
             return 1;
         }
-        
+
         logger.LogInformation("{DevEui} {Timestamp} {DistanceMm} {BatV} {RssiDbm}",
             result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
         System.Console.WriteLine("{0} {1} {2} {3} {4}",
             result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
-        
+
         return 0;
+    }
+
+    [Verb("Help", HelpText = "Shows help about WaterAlarm Console.")]
+    private class HelpOptions
+    {
+    }
+
+    [Verb("QueryLast", HelpText = "Query last measurement.")]
+    private class QueryLastOptions
+    {
+        [Option('d', "deveui", Required = true, HelpText = "Device 'DevEUI' (Device Extended Unique Identifier)")]
+        public string DevEui { get; } = default!;
     }
 }
