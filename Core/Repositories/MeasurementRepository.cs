@@ -2,7 +2,7 @@ using Core.Entities;
 using Microsoft.Extensions.Options;
 using Vibrant.InfluxDB.Client;
 
-namespace Core.Repository;
+namespace Core.Repositories;
 
 public class MeasurementInfluxOptions
 {

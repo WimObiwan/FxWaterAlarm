@@ -1,3 +1,4 @@
+using Console.Commands;
 using Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,8 +16,9 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        // services.AddDbContext<WaterAlarmDbContext>(options =>
-        //     options.UseSqlite(_configuration.GetConnectionString("WaterAlarmDB")));
+        services.AddScoped<ICommandLineEngine, CommandLineEngine>();
+        services.AddScoped<IConsoleCommand, AccountConsoleCommand>();
+        services.AddScoped<IConsoleCommand, SensorConsoleCommand>();
 
         services.AddWaterAlarmCore(_configuration, typeof(Program).Assembly);
     }

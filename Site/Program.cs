@@ -6,10 +6,13 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", true);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddControllers();
 
 builder.Services.AddWaterAlarmCore(builder.Configuration, typeof(Program).Assembly);
 
 var app = builder.Build();
+
+app.MigrateWaterAlarmDb();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -27,5 +30,6 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapControllers();
 
 app.Run();

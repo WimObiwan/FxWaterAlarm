@@ -1,5 +1,5 @@
 using Core.Entities;
-using Core.Repository;
+using Core.Repositories;
 
 namespace Core.Queries;
 

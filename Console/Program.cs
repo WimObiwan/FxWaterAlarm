@@ -23,18 +23,13 @@ internal class Program
 
         try
         {
-            using var host = CreateHostBuilder(args).Build();
-            var versionInfo = host.Services.GetRequiredService<IVersionInfo>();
+            using var host = CreateHostBuilder().Build();
             var logger = host.Services.GetRequiredService<ILogger<Program>>();
+            host.MigrateWaterAlarmDb();
+
+            var versionInfo = host.Services.GetRequiredService<IVersionInfo>();
             logger.LogInformation("Version {Version}, running on {DotNetCoreVersion}", versionInfo.Version,
                 versionInfo.DotNetCoreVersion);
-
-            // var serviceProvider = host.Services.GetRequiredService<IServiceProvider>();
-            // using (var scope = serviceProvider.CreateScope())
-            // {
-            //     var waterAlarmDbContext = scope.ServiceProvider.GetRequiredService<WaterAlarmDbContext>();
-            //     await waterAlarmDbContext.Database.MigrateAsync();
-            // }
 
             using (SentrySdk.Init(o =>
                    {
@@ -44,15 +39,24 @@ internal class Program
             {
                 try
                 {
-                    return await Parser.Default
-                        .ParseArguments<
-                            HelpOptions,
-                            QueryLastOptions
-                        >(args)
-                        .MapResult(
-                            (HelpOptions _) => RunHelp(),
-                            (QueryLastOptions o) => QueryLast(host, o),
-                            _ => Task.FromResult(1));
+                    var engine = host.Services.GetRequiredService<ICommandLineEngine>();
+                    return await engine.Execute(args);
+
+                    // return await Parser.Default
+                    //     .ParseArguments<
+                    //         HelpOptions,
+                    //         QueryLastMeasurementOptions,
+                    //         CreateAccountOptions,
+                    //         QueryAccountsOptions,
+                    //         CreateSensorOptions
+                    //     >(args)
+                    //     .MapResult(
+                    //         (HelpOptions _) => RunHelp(),
+                    //         (QueryLastMeasurementOptions o) => QueryLastMeasurement(host, o),
+                    //         (CreateAccountOptions o) => CreateAccount(host, o),
+                    //         (QueryAccountsOptions o) => QueryAccounts(host, o),
+                    //         (CreateSensorOptions o) => CreateSensor(host, o),
+                    //         _ => Task.FromResult(1));
                 }
                 catch (Exception x)
                 {
@@ -72,18 +76,14 @@ internal class Program
         }
     }
 
-    private static IHostBuilder CreateHostBuilder(string[] args)
+    private static IHostBuilder CreateHostBuilder()
     {
-        return Host.CreateDefaultBuilder(args)
+        return Host.CreateDefaultBuilder()
             .UseSerilog()
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
                 config
-                    //.SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
-                    .AddJsonFile("appsettings.json", false, false)
-                    .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", true, false)
-                    .AddJsonFile("appsettings.Local.json", true, false)
-                    .AddEnvironmentVariables();
+                    .AddJsonFile("appsettings.Local.json", true, false);
             })
             .UseStartup<Startup>();
     }
@@ -93,7 +93,7 @@ internal class Program
         return Task.FromResult(0);
     }
 
-    private static async Task<int> QueryLast(IHost host, QueryLastOptions options)
+    private static async Task<int> QueryLastMeasurement(IHost host, QueryLastMeasurementOptions options)
     {
         var logger = host.Services.GetRequiredService<ILogger<Program>>();
 
@@ -115,15 +115,14 @@ internal class Program
         return 0;
     }
 
-    [Verb("Help", HelpText = "Shows help about WaterAlarm Console.")]
-    private class HelpOptions
-    {
-    }
+    // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 
-    [Verb("QueryLast", HelpText = "Query last measurement.")]
-    private class QueryLastOptions
+    [Verb("QueryLastMeasurement", HelpText = "Query last measurement.")]
+    private class QueryLastMeasurementOptions
     {
         [Option('d', "deveui", Required = true, HelpText = "Device 'DevEUI' (Device Extended Unique Identifier)")]
-        public string DevEui { get; } = default!;
+        public string DevEui { get; set; } = default!;
     }
+
+    // ReSharper restore AutoPropertyCanBeMadeGetOnly.Local
 }
