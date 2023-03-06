@@ -23,6 +23,9 @@ namespace Core.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("CreationTimestamp")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -41,7 +44,7 @@ namespace Core.Migrations
                     b.HasIndex("Uid")
                         .IsUnique();
 
-                    b.ToTable("Accounts", (string)null);
+                    b.ToTable("Account", (string)null);
                 });
 
             modelBuilder.Entity("Core.Entities.AccountSensor", b =>
@@ -51,6 +54,9 @@ namespace Core.Migrations
 
                     b.Property<int>("SensorId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreateTimestamp")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("AccountId", "SensorId");
 
@@ -64,6 +70,9 @@ namespace Core.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreateTimestamp")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("DevEui")
                         .IsRequired()

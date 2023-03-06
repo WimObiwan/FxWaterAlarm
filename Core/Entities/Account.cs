@@ -8,6 +8,7 @@ public class Account
     public required Guid Uid { get; init; }
     public required string Email { get; init; }
     public string? Name { get; set; }
+    public required DateTime CreationTimestamp { get; init; }
     public IReadOnlyCollection<AccountSensor> AccountSensors => _accountSensors.AsReadOnly();
     public IReadOnlyCollection<Sensor> Sensors => _sensors.AsReadOnly();
 
@@ -17,7 +18,8 @@ public class Account
             new AccountSensor
             {
                 Account = this,
-                Sensor = sensor
+                Sensor = sensor,
+                CreateTimestamp = DateTime.UtcNow
             });
     }
 }

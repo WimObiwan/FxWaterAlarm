@@ -24,9 +24,10 @@ public class CreateSensorCommandHandler : IRequestHandler<CreateSensorCommand>
         var sensor = new Sensor
         {
             Uid = request.Uid,
-            DevEui = request.DevEui
+            DevEui = request.DevEui,
+            CreateTimestamp = DateTime.UtcNow
         };
         _dbContext.Sensors.Add(sensor);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

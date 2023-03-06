@@ -19,31 +19,66 @@ public class AccountConsoleCommand : IConsoleCommand
 
     public Command GetCommandLineCommand()
     {
-        var listSubCommand = new Command("list", "List accounts.");
-        listSubCommand.SetHandler(List);
+        var command = new Command("account", "Account actions.");
+        command.AddCommand(GetListSubCommand());
+        command.AddCommand(GetCreateSubCommand());
+        command.AddCommand(GetAddSensorSubCommand());
+        return command;
+    }
 
-        var createSubCommand = new Command("create", "Create account.");
+    private Command GetAddSensorSubCommand()
+    {
+        var subCommand = new Command("addsensor", "Add sensor to account.");
+
+        var accountIdOption = new Option<Guid>(new[] { "-a", "--accountid" }, "Account identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(accountIdOption);
+
+        var sensorIdOption = new Option<Guid>(new[] { "-s", "--sensorid" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(sensorIdOption);
+
+        subCommand.SetHandler(
+            AddSensor,
+            accountIdOption, sensorIdOption);
+
+        return subCommand;
+    }
+
+    private Command GetCreateSubCommand()
+    {
+        var subCommand = new Command("create", "Create account.");
+
         var createIdOption = new Option<Guid?>(new[] { "-i", "--id" }, "Account identifier");
-        createSubCommand.AddOption(createIdOption);
+        subCommand.AddOption(createIdOption);
+
         var createEmailOption = new Option<string>(new[] { "-e", "--email" }, "Account email address")
         {
             IsRequired = true
         };
-        createSubCommand.AddOption(createEmailOption);
+        subCommand.AddOption(createEmailOption);
+
         var createNameOption = new Option<string?>(new[] { "-n", "--name" }, "Account name");
-        createSubCommand.AddOption(createNameOption);
-        // createSubCommand.SetHandler(
-        //     async (createIdOptionValue, createEmailOptionValue, createNameOptionValue) =>
-        //         await Create(createIdOptionValue, createEmailOptionValue, createNameOptionValue),
-        //     createIdOption, createEmailOption, createNameOption);
-        createSubCommand.SetHandler(
+        subCommand.AddOption(createNameOption);
+
+        subCommand.SetHandler(
             Create,
             createIdOption, createEmailOption, createNameOption);
 
-        var command = new Command("account", "Account actions.");
-        command.AddCommand(listSubCommand);
-        command.AddCommand(createSubCommand);
-        return command;
+        return subCommand;
+    }
+
+    private Command GetListSubCommand()
+    {
+        var subCommand = new Command("list", "List accounts.");
+
+        subCommand.SetHandler(List);
+
+        return subCommand;
     }
 
     private async Task List()
@@ -69,6 +104,18 @@ public class AccountConsoleCommand : IConsoleCommand
                 Uid = uid,
                 Email = email,
                 Name = name
+            });
+
+        System.Console.WriteLine("{0}", uid);
+    }
+
+    private async Task AddSensor(Guid accountId, Guid sensorId)
+    {
+        await _mediator.Send(
+            new AddSensorToAccountCommand
+            {
+                AccountUid = accountId,
+                SensorUid = sensorId
             });
     }
 }

@@ -19,25 +19,39 @@ public class SensorConsoleCommand : IConsoleCommand
 
     public Command GetCommandLineCommand()
     {
-        var listSubCommand = new Command("list", "List sensors.");
-        listSubCommand.SetHandler(List);
+        var command = new Command("sensor", "Sensor actions.");
+        command.AddCommand(GetListSubCommand());
+        command.AddCommand(GetCreateSubCommand());
+        return command;
+    }
 
-        var createSubCommand = new Command("create", "Create sensor.");
+    private Command GetListSubCommand()
+    {
+        var subCommand = new Command("list", "List sensors.");
+
+        subCommand.SetHandler(List);
+
+        return subCommand;
+    }
+
+    private Command GetCreateSubCommand()
+    {
+        var subCommand = new Command("create", "Create sensor.");
+
         var createIdOption = new Option<Guid?>(new[] { "-i", "--id" }, "Sensor identifier");
-        createSubCommand.AddOption(createIdOption);
+        subCommand.AddOption(createIdOption);
+
         var createDevEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor DevEui")
         {
             IsRequired = true
         };
-        createSubCommand.AddOption(createDevEuiOption);
-        createSubCommand.SetHandler(
+        subCommand.AddOption(createDevEuiOption);
+
+        subCommand.SetHandler(
             Create,
             createIdOption, createDevEuiOption);
 
-        var command = new Command("sensor", "Sensor actions.");
-        command.AddCommand(listSubCommand);
-        command.AddCommand(createSubCommand);
-        return command;
+        return subCommand;
     }
 
     private async Task List()
@@ -63,5 +77,7 @@ public class SensorConsoleCommand : IConsoleCommand
                 Uid = uid,
                 DevEui = devEui
             });
+
+        System.Console.WriteLine("{0}", uid);
     }
 }

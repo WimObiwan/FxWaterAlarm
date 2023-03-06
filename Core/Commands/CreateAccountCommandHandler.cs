@@ -26,7 +26,8 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand>
         {
             Uid = request.Uid,
             Email = request.Email,
-            Name = request.Name
+            Name = request.Name,
+            CreationTimestamp = DateTime.UtcNow
         };
         _dbContext.Accounts.Add(account);
         await _dbContext.SaveChangesAsync(cancellationToken);

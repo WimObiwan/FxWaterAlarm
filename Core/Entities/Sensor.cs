@@ -8,6 +8,7 @@ public class Sensor
     public int Id { get; } = 0;
     public required Guid Uid { get; init; }
     public required string DevEui { get; init; }
+    public required DateTime CreateTimestamp { get; init; }
     public IReadOnlyCollection<AccountSensor> AccountSensors => _accountSensors.AsReadOnly();
     public IReadOnlyCollection<Account> Accounts => _accounts.AsReadOnly();
 }

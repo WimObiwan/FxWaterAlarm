@@ -12,18 +12,19 @@ namespace Core.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Accounts",
+                name: "Account",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Uid = table.Column<Guid>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true)
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    CreationTimestamp = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Accounts", x => x.Id);
+                    table.PrimaryKey("PK_Account", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -33,7 +34,8 @@ namespace Core.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Uid = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DevEui = table.Column<string>(type: "TEXT", nullable: false)
+                    DevEui = table.Column<string>(type: "TEXT", nullable: false),
+                    CreateTimestamp = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -45,15 +47,16 @@ namespace Core.Migrations
                 columns: table => new
                 {
                     AccountId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SensorId = table.Column<int>(type: "INTEGER", nullable: false)
+                    SensorId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreateTimestamp = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AccountSensor", x => new { x.AccountId, x.SensorId });
                     table.ForeignKey(
-                        name: "FK_AccountSensor_Accounts_AccountId",
+                        name: "FK_AccountSensor_Account_AccountId",
                         column: x => x.AccountId,
-                        principalTable: "Accounts",
+                        principalTable: "Account",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -65,14 +68,14 @@ namespace Core.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Accounts_Email",
-                table: "Accounts",
+                name: "IX_Account_Email",
+                table: "Account",
                 column: "Email",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Accounts_Uid",
-                table: "Accounts",
+                name: "IX_Account_Uid",
+                table: "Account",
                 column: "Uid",
                 unique: true);
 
@@ -95,7 +98,7 @@ namespace Core.Migrations
                 name: "AccountSensor");
 
             migrationBuilder.DropTable(
-                name: "Accounts");
+                name: "Account");
 
             migrationBuilder.DropTable(
                 name: "Sensor");
