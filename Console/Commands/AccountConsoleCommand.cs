@@ -22,31 +22,31 @@ public class AccountConsoleCommand : IConsoleCommand
         var command = new Command("account", "Account actions.");
         command.AddCommand(GetListSubCommand());
         command.AddCommand(GetCreateSubCommand());
+        command.AddCommand(GetUpdateSubCommand());
         command.AddCommand(GetAddSensorSubCommand());
         return command;
     }
 
-    private Command GetAddSensorSubCommand()
+    private Command GetListSubCommand()
     {
-        var subCommand = new Command("addsensor", "Add sensor to account.");
+        var subCommand = new Command("list", "List accounts.");
 
-        var accountIdOption = new Option<Guid>(new[] { "-a", "--accountid" }, "Account identifier")
-        {
-            IsRequired = true
-        };
-        subCommand.AddOption(accountIdOption);
-
-        var sensorIdOption = new Option<Guid>(new[] { "-s", "--sensorid" }, "Sensor identifier")
-        {
-            IsRequired = true
-        };
-        subCommand.AddOption(sensorIdOption);
-
-        subCommand.SetHandler(
-            AddSensor,
-            accountIdOption, sensorIdOption);
+        subCommand.SetHandler(List);
 
         return subCommand;
+    }
+
+    private async Task List()
+    {
+        var results = await _mediator.Send(new AccountsQuery());
+
+        foreach (var result in results)
+        {
+            _logger.LogInformation("{Id} {Uid} {Name} {Email}",
+                result.Id, result.Uid, result.Name, result.Email);
+            System.Console.WriteLine("{0} {1} {2}",
+                result.Uid, result.Name, result.Email);
+        }
     }
 
     private Command GetCreateSubCommand()
@@ -72,28 +72,6 @@ public class AccountConsoleCommand : IConsoleCommand
         return subCommand;
     }
 
-    private Command GetListSubCommand()
-    {
-        var subCommand = new Command("list", "List accounts.");
-
-        subCommand.SetHandler(List);
-
-        return subCommand;
-    }
-
-    private async Task List()
-    {
-        var results = await _mediator.Send(new AccountsQuery());
-
-        foreach (var result in results)
-        {
-            _logger.LogInformation("{Id} {Uid} {Name} {Email}",
-                result.Id, result.Uid, result.Name, result.Email);
-            System.Console.WriteLine("{0} {1} {2}",
-                result.Uid, result.Name, result.Email);
-        }
-    }
-
     private async Task Create(Guid? id, string email, string? name)
     {
         var uid = id ?? Guid.NewGuid();
@@ -107,6 +85,65 @@ public class AccountConsoleCommand : IConsoleCommand
             });
 
         System.Console.WriteLine("{0}", uid);
+    }
+    
+    private Command GetUpdateSubCommand()
+    {
+        var subCommand = new Command("update", "Update account.");
+
+        var createIdOption = new Option<Guid>(new[] { "-i", "--id" }, "Account identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(createIdOption);
+
+        var createEmailOption = new Option<string?>(new[] { "-e", "--email" }, "Account email address");
+        subCommand.AddOption(createEmailOption);
+
+        var createNameOption = new Option<string?>(new[] { "-n", "--name" }, "Account name");
+        subCommand.AddOption(createNameOption);
+
+        subCommand.SetHandler(
+            Update,
+            createIdOption, createEmailOption, createNameOption);
+
+        return subCommand;
+    }
+
+    private async Task Update(Guid uid, string? email, string? name)
+    {
+        await _mediator.Send(
+            new UpdateAccountCommand
+            {
+                Uid = uid,
+                Email = string.IsNullOrEmpty(email) ? null : new Tuple<bool, string>(true, email),
+                Name = name == null ? null : new Tuple<bool, string?>(true, name)
+            });
+
+        System.Console.WriteLine("{0}", uid);
+    }
+
+    private Command GetAddSensorSubCommand()
+    {
+        var subCommand = new Command("addsensor", "Add sensor to account.");
+
+        var accountIdOption = new Option<Guid>(new[] { "-a", "--accountid" }, "Account identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(accountIdOption);
+
+        var sensorIdOption = new Option<Guid>(new[] { "-s", "--sensorid" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(sensorIdOption);
+
+        subCommand.SetHandler(
+            AddSensor,
+            accountIdOption, sensorIdOption);
+
+        return subCommand;
     }
 
     private async Task AddSensor(Guid accountId, Guid sensorId)

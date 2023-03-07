@@ -23,9 +23,8 @@ public class AddSensorToAccountCommandHandler : IRequestHandler<AddSensorToAccou
     public async Task Handle(AddSensorToAccountCommand request, CancellationToken cancellationToken)
     {
         var account =
-            await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Uid == request.AccountUid, cancellationToken);
-        if (account == null)
-            throw new AccountNotFoundException("The account cannot be found.") { Uid = request.AccountUid };
+            await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Uid == request.AccountUid, cancellationToken)
+            ?? throw new AccountNotFoundException("The account cannot be found.") { Uid = request.AccountUid };
         await _dbContext.Entry(account).Collection(a => a.AccountSensors).LoadAsync(cancellationToken);
         var sensor = await _dbContext.Sensors.SingleOrDefaultAsync(a => a.Uid == request.SensorUid, cancellationToken);
         if (sensor == null)

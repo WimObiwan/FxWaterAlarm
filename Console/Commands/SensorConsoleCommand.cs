@@ -34,6 +34,19 @@ public class SensorConsoleCommand : IConsoleCommand
         return subCommand;
     }
 
+    private async Task List()
+    {
+        var results = await _mediator.Send(new SensorsQuery());
+
+        foreach (var result in results)
+        {
+            _logger.LogInformation("{Id} {Uid} {DevEui}",
+                result.Id, result.Uid, result.DevEui);
+            System.Console.WriteLine("{0} {1}",
+                result.Uid, result.DevEui);
+        }
+    }
+
     private Command GetCreateSubCommand()
     {
         var subCommand = new Command("create", "Create sensor.");
@@ -52,19 +65,6 @@ public class SensorConsoleCommand : IConsoleCommand
             createIdOption, createDevEuiOption);
 
         return subCommand;
-    }
-
-    private async Task List()
-    {
-        var results = await _mediator.Send(new SensorsQuery());
-
-        foreach (var result in results)
-        {
-            _logger.LogInformation("{Id} {Uid} {DevEui}",
-                result.Id, result.Uid, result.DevEui);
-            System.Console.WriteLine("{0} {1}",
-                result.Uid, result.DevEui);
-        }
     }
 
     private async Task Create(Guid? id, string devEui)
