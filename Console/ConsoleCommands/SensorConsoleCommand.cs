@@ -4,7 +4,7 @@ using Core.Queries;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Console.Commands;
+namespace Console.ConsoleCommands;
 
 public class SensorConsoleCommand : IConsoleCommand
 {
@@ -51,7 +51,7 @@ public class SensorConsoleCommand : IConsoleCommand
     {
         var subCommand = new Command("create", "Create sensor.");
 
-        var createIdOption = new Option<Guid?>(new[] { "-i", "--id" }, "Sensor identifier");
+        var createIdOption = new Option<Guid?>(new[] { "-i", "--si", "--sensorid" }, "Sensor identifier");
         subCommand.AddOption(createIdOption);
 
         var createDevEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor DevEui")

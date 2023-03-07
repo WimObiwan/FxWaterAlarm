@@ -4,7 +4,7 @@ using Core.Queries;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Console.Commands;
+namespace Console.ConsoleCommands;
 
 public class AccountConsoleCommand : IConsoleCommand
 {
@@ -53,7 +53,7 @@ public class AccountConsoleCommand : IConsoleCommand
     {
         var subCommand = new Command("create", "Create account.");
 
-        var createIdOption = new Option<Guid?>(new[] { "-i", "--id" }, "Account identifier");
+        var createIdOption = new Option<Guid?>(new[] { "-i", "--ai", "--accountid" }, "Account identifier");
         subCommand.AddOption(createIdOption);
 
         var createEmailOption = new Option<string>(new[] { "-e", "--email" }, "Account email address")
@@ -86,12 +86,12 @@ public class AccountConsoleCommand : IConsoleCommand
 
         System.Console.WriteLine("{0}", uid);
     }
-    
+
     private Command GetUpdateSubCommand()
     {
         var subCommand = new Command("update", "Update account.");
 
-        var createIdOption = new Option<Guid>(new[] { "-i", "--id" }, "Account identifier")
+        var createIdOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
         {
             IsRequired = true
         };
@@ -127,13 +127,13 @@ public class AccountConsoleCommand : IConsoleCommand
     {
         var subCommand = new Command("addsensor", "Add sensor to account.");
 
-        var accountIdOption = new Option<Guid>(new[] { "-a", "--accountid" }, "Account identifier")
+        var accountIdOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
         {
             IsRequired = true
         };
         subCommand.AddOption(accountIdOption);
 
-        var sensorIdOption = new Option<Guid>(new[] { "-s", "--sensorid" }, "Sensor identifier")
+        var sensorIdOption = new Option<Guid>(new[] { "-s", "--si", "--sensorid" }, "Sensor identifier")
         {
             IsRequired = true
         };

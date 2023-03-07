@@ -1,4 +1,4 @@
-using Console.Commands;
+using Console.ConsoleCommands;
 using Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
