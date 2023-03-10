@@ -20,6 +20,10 @@ public class AccountEntityTypeConfiguration : IEntityTypeConfiguration<Account>
             .IsUnique();
 
         builder
+            .HasIndex(e => e.Link)
+            .IsUnique();
+
+        builder
             .HasMany(a => a.Sensors)
             .WithMany(s => s.Accounts)
             .UsingEntity<AccountSensor>(

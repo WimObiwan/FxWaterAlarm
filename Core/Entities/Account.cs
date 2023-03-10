@@ -9,6 +9,7 @@ public class Account
     public required string Email { get; set; }
     public string? Name { get; set; }
     public required DateTime CreationTimestamp { get; init; }
+    public string? Link { get; set; }
     public IReadOnlyCollection<AccountSensor> AccountSensors => _accountSensors.AsReadOnly();
     public IReadOnlyCollection<Sensor> Sensors => _sensors.AsReadOnly();
 
