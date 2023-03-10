@@ -51,18 +51,18 @@ public class SensorConsoleCommand : IConsoleCommand
     {
         var subCommand = new Command("create", "Create sensor.");
 
-        var createIdOption = new Option<Guid?>(new[] { "-i", "--si", "--sensorid" }, "Sensor identifier");
-        subCommand.AddOption(createIdOption);
+        var idOption = new Option<Guid?>(new[] { "-i", "--si", "--sensorid" }, "Sensor identifier");
+        subCommand.AddOption(idOption);
 
-        var createDevEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor DevEui")
+        var devEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor DevEui")
         {
             IsRequired = true
         };
-        subCommand.AddOption(createDevEuiOption);
+        subCommand.AddOption(devEuiOption);
 
         subCommand.SetHandler(
             Create,
-            createIdOption, createDevEuiOption);
+            idOption, devEuiOption);
 
         return subCommand;
     }

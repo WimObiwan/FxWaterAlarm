@@ -42,10 +42,9 @@ public class AccountConsoleCommand : IConsoleCommand
 
         foreach (var result in results)
         {
-            _logger.LogInformation("{Id} {Uid} {Name} {Email}",
-                result.Id, result.Uid, result.Name, result.Email);
-            System.Console.WriteLine("{0} {1} {2}",
-                result.Uid, result.Name, result.Email);
+            _logger.LogInformation("Account: {Id} {Uid} {Name} {Email} {Link}",
+                result.Id, result.Uid, result.Name, result.Email, result.Link);
+            System.Console.WriteLine($"{result.Uid} {result.Name} {result.Email} {result.Link}");
         }
     }
 
@@ -53,21 +52,21 @@ public class AccountConsoleCommand : IConsoleCommand
     {
         var subCommand = new Command("create", "Create account.");
 
-        var createIdOption = new Option<Guid?>(new[] { "-i", "--ai", "--accountid" }, "Account identifier");
-        subCommand.AddOption(createIdOption);
+        var idOption = new Option<Guid?>(new[] { "-i", "--ai", "--accountid" }, "Account identifier");
+        subCommand.AddOption(idOption);
 
-        var createEmailOption = new Option<string>(new[] { "-e", "--email" }, "Account email address")
+        var emailOption = new Option<string>(new[] { "-e", "--email" }, "Account email address")
         {
             IsRequired = true
         };
-        subCommand.AddOption(createEmailOption);
+        subCommand.AddOption(emailOption);
 
-        var createNameOption = new Option<string?>(new[] { "-n", "--name" }, "Account name");
-        subCommand.AddOption(createNameOption);
+        var nameOption = new Option<string?>(new[] { "-n", "--name" }, "Account name");
+        subCommand.AddOption(nameOption);
 
         subCommand.SetHandler(
             Create,
-            createIdOption, createEmailOption, createNameOption);
+            idOption, emailOption, nameOption);
 
         return subCommand;
     }
@@ -91,21 +90,21 @@ public class AccountConsoleCommand : IConsoleCommand
     {
         var subCommand = new Command("update", "Update account.");
 
-        var createIdOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
+        var idOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
         {
             IsRequired = true
         };
-        subCommand.AddOption(createIdOption);
+        subCommand.AddOption(idOption);
 
-        var createEmailOption = new Option<string?>(new[] { "-e", "--email" }, "Account email address");
-        subCommand.AddOption(createEmailOption);
+        var emailOption = new Option<string?>(new[] { "-e", "--email" }, "Account email address");
+        subCommand.AddOption(emailOption);
 
-        var createNameOption = new Option<string?>(new[] { "-n", "--name" }, "Account name");
-        subCommand.AddOption(createNameOption);
+        var nameOption = new Option<string?>(new[] { "-n", "--name" }, "Account name");
+        subCommand.AddOption(nameOption);
 
         subCommand.SetHandler(
             Update,
-            createIdOption, createEmailOption, createNameOption);
+            idOption, emailOption, nameOption);
 
         return subCommand;
     }
