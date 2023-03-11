@@ -1,5 +1,6 @@
 using System.CommandLine;
 using Core.Commands;
+using Core.Entities;
 using Core.Queries;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -21,6 +22,7 @@ public class AccountConsoleCommand : IConsoleCommand
     {
         var command = new Command("account", "Account actions.");
         command.AddCommand(GetListSubCommand());
+        command.AddCommand(GetReadSubCommand());
         command.AddCommand(GetReadByLinkSubCommand());
         command.AddCommand(GetCreateSubCommand());
         command.AddCommand(GetUpdateSubCommand());
@@ -50,6 +52,56 @@ public class AccountConsoleCommand : IConsoleCommand
         }
     }
 
+    private Command GetReadSubCommand()
+    {
+        var subCommand = new Command("read", "Read account.");
+
+        var idOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account id")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(idOption);
+
+        subCommand.SetHandler(
+            Read,
+            idOption);
+
+        return subCommand;
+    }
+
+    private async Task Read(Guid id)
+    {
+        var account = await _mediator.Send(
+            new ReadAccountQuery
+            {
+                Uid = id
+            });
+
+        ShowAccount(account);
+    }
+
+    private void ShowAccount(Account? account)
+    {
+        if (account == null)
+        {
+            System.Console.WriteLine("Account not found");
+        }
+        else
+        {
+            System.Console.WriteLine($"Account uid: {account.Uid}");
+            System.Console.WriteLine($"  - Email:   {account.Email}");
+            System.Console.WriteLine($"  - Name:    {account.Name}");
+            System.Console.WriteLine($"  - Link:    {account.Link}");
+            System.Console.WriteLine($"  - Create:  {account.CreationTimestamp}");
+            System.Console.WriteLine($"  - Sensors: {account.AccountSensors.Count}");
+            foreach (var accountSensor in account.AccountSensors)
+            {
+                System.Console.WriteLine($"    - Uid:     {accountSensor.Sensor.Uid}");
+                System.Console.WriteLine($"      - DevEui:  {accountSensor.Sensor.DevEui}");
+            }
+        }
+    }
+
     private Command GetReadByLinkSubCommand()
     {
         var subCommand = new Command("readbylink", "Read account by link.");
@@ -69,16 +121,13 @@ public class AccountConsoleCommand : IConsoleCommand
 
     private async Task ReadByLink(string link)
     {
-        var result = await _mediator.Send(
+        var account = await _mediator.Send(
             new ReadAccountByLinkQuery
             {
                 Link = link
             });
 
-        if (result == null)
-            System.Console.WriteLine("Account not found");
-        else
-            System.Console.WriteLine($"Account uid: {result.Uid}");
+        ShowAccount(account);
     }
 
     private Command GetCreateSubCommand()
