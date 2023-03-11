@@ -93,12 +93,13 @@ public class AccountConsoleCommand : IConsoleCommand
             System.Console.WriteLine($"  - Name:    {account.Name}");
             System.Console.WriteLine($"  - Link:    {account.Link}");
             System.Console.WriteLine($"  - Create:  {account.CreationTimestamp}");
-            System.Console.WriteLine($"  - Sensors: {account.AccountSensors.Count}");
-            foreach (var accountSensor in account.AccountSensors)
-            {
-                System.Console.WriteLine($"    - Uid:     {accountSensor.Sensor.Uid}");
-                System.Console.WriteLine($"      - DevEui:  {accountSensor.Sensor.DevEui}");
-            }
+            System.Console.WriteLine($"  - Sensors: {account.AccountSensors?.Count}");
+            if (account.AccountSensors != null)
+                foreach (var accountSensor in account.AccountSensors)
+                {
+                    System.Console.WriteLine($"    - Uid:     {accountSensor.Sensor.Uid}");
+                    System.Console.WriteLine($"      - DevEui:  {accountSensor.Sensor.DevEui}");
+                }
         }
     }
 

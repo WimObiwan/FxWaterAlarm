@@ -21,6 +21,10 @@ public class ReadAccountByLinkQueryHandler : IRequestHandler<ReadAccountByLinkQu
 
     public async Task<Account?> Handle(ReadAccountByLinkQuery request, CancellationToken cancellationToken)
     {
-        return await _dbContext.Accounts.Where(a => a.Link == request.Link).SingleOrDefaultAsync(cancellationToken);
+        return await _dbContext.Accounts
+            .Where(a => a.Link == request.Link)
+            .Include(a => a.AccountSensors)
+            .ThenInclude(as2 => as2.Sensor)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 }
