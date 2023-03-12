@@ -5,7 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", true);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(o =>
+        o.Conventions
+            .AddPageRoute("/Sensor", "/s/{SensorLink}")
+);
 builder.Services.AddControllers();
 
 builder.Services.AddWaterAlarmCore(builder.Configuration, typeof(Program).Assembly);
