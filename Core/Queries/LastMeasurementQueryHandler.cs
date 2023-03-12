@@ -20,6 +20,6 @@ public class LastMeasurementQueryHandler : IRequestHandler<LastMeasurementQuery,
 
     public async Task<Measurement?> Handle(LastMeasurementQuery request, CancellationToken cancellationToken)
     {
-        return await _measurementRepository.GetLast(request.DevEui);
+        return await _measurementRepository.GetLast(request.DevEui, cancellationToken);
     }
 }

@@ -15,7 +15,7 @@ public class MeasurementInfluxOptions
 
 public interface IMeasurementRepository
 {
-    Task<Measurement?> GetLast(string devEui);
+    Task<Measurement?> GetLast(string devEui, CancellationToken cancellationToken);
 }
 
 public class MeasurementRepository : IMeasurementRepository
@@ -27,12 +27,13 @@ public class MeasurementRepository : IMeasurementRepository
         _options = options.Value;
     }
 
-    public async Task<Measurement?> GetLast(string devEui)
+    public async Task<Measurement?> GetLast(string devEui, CancellationToken cancellationToken)
     {
         using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
         var result = await influxClient.ReadAsync<Record>("wateralarm",
             "SELECT * FROM waterlevel WHERE DevEUI = $devEui GROUP BY * ORDER BY DESC LIMIT 1",
-            new { devEui });
+            new { devEui },
+            cancellationToken);
         var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
         var record = series?.Rows?.FirstOrDefault();
         if (series == null || record == null)
