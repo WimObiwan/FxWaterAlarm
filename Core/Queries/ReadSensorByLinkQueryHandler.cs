@@ -7,7 +7,8 @@ namespace Core.Queries;
 
 public class ReadSensorByLinkQuery : IRequest<Sensor?>
 {
-    public required string Link { get; init; }
+    public required string SensorLink { get; init; }
+    public string? AccountLink { get; init; }
 }
 
 public class ReadSensorByLinkQueryHandler : IRequestHandler<ReadSensorByLinkQuery, Sensor?>
@@ -22,7 +23,9 @@ public class ReadSensorByLinkQueryHandler : IRequestHandler<ReadSensorByLinkQuer
     public async Task<Sensor?> Handle(ReadSensorByLinkQuery request, CancellationToken cancellationToken)
     {
         return await _dbContext.Sensors
-            .Where(s => s.Link == request.Link || s.DevEui == request.Link)
+            .Where(s => 
+                (s.Link == request.SensorLink || s.DevEui == request.SensorLink)
+                && (request.AccountLink == null || s.Accounts.Any(a => a.Link == request.AccountLink)))
             .SingleOrDefaultAsync(cancellationToken);
     }
 }

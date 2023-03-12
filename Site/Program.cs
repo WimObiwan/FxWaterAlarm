@@ -8,6 +8,7 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", true);
 builder.Services.AddRazorPages(o =>
         o.Conventions
             .AddPageRoute("/Sensor", "/s/{SensorLink}")
+            .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
 );
 builder.Services.AddControllers();
 

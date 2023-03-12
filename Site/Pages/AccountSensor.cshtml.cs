@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Site.Pages;
 
-public class Sensor : PageModel
+public class AccountSensor : PageModel
 {
-    private readonly ILastMeasurementQuery _lastMeasurementQuery;
     private readonly IMediator _mediator;
+    private readonly ILastMeasurementQuery _lastMeasurementQuery;
 
-    public Sensor(IMediator mediator, ILastMeasurementQuery lastMeasurementQuery)
+    public AccountSensor(IMediator mediator, ILastMeasurementQuery lastMeasurementQuery)
     {
         _mediator = mediator;
         _lastMeasurementQuery = lastMeasurementQuery;
@@ -20,11 +20,12 @@ public class Sensor : PageModel
 
     public double? LevelPrc { get; private set; }
 
-    public async Task OnGet(string sensorLink)
+    public async Task OnGet(string accountLink, string sensorLink)
     {
         var sensor = await _mediator.Send(new ReadSensorByLinkQuery
         {
-            SensorLink = sensorLink
+            SensorLink = sensorLink,
+            AccountLink = accountLink
         });
 
         if (sensor == null)
