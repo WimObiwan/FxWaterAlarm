@@ -228,7 +228,7 @@ public class AccountConsoleCommand : IConsoleCommand
     private async Task SetLink(Guid uid, string? link)
     {
         await _mediator.Send(
-            new RegenerateLinkAccountCommand
+            new RegenerateAccountLinkCommand
             {
                 AccountUid = uid,
                 Link = link
