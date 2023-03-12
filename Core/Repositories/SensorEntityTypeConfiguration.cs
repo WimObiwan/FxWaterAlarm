@@ -14,5 +14,9 @@ public class SensorEntityTypeConfiguration : IEntityTypeConfiguration<Sensor>
 
         builder.HasIndex(e => e.Uid)
             .IsUnique();
+
+        builder
+            .HasIndex(e => e.Link)
+            .IsUnique();
     }
 }
