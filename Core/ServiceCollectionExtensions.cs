@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Core.Commands;
-using Core.Queries;
 using Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,8 +14,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddWaterAlarmCore(this IServiceCollection services, IConfiguration configuration,
         Assembly assembly)
     {
-        services.AddScoped<ILastMeasurementQuery, LastMeasurementQuery>();
-
         services.AddMediatR(o => { o.RegisterServicesFromAssembly(typeof(CreateAccountCommandHandler).Assembly); });
 
         services.Configure<MeasurementInfluxOptions>(configuration.GetSection(MeasurementInfluxOptions.Position));

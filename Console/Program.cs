@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using Core;
 using Core.Queries;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -97,8 +98,9 @@ internal class Program
     {
         var logger = host.Services.GetRequiredService<ILogger<Program>>();
 
-        var query = host.Services.GetRequiredService<ILastMeasurementQuery>();
-        var result = await query.Get(options.DevEui);
+        var mediator = host.Services.GetRequiredService<IMediator>();
+        var result = await mediator.Send(
+            new LastMeasurementQuery { DevEui = options.DevEui });
 
         if (result == null)
         {
