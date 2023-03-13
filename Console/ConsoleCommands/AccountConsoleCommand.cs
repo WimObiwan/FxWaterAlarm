@@ -28,6 +28,7 @@ public class AccountConsoleCommand : IConsoleCommand
         command.AddCommand(GetUpdateSubCommand());
         command.AddCommand(GetSetLinkSubCommand());
         command.AddCommand(GetAddSensorSubCommand());
+        command.AddCommand(GetUpdateSensorSubCommand());
         return command;
     }
 
@@ -267,6 +268,52 @@ public class AccountConsoleCommand : IConsoleCommand
             {
                 AccountUid = accountId,
                 SensorUid = sensorId
+            });
+    }
+
+    private Command GetUpdateSensorSubCommand()
+    {
+        var subCommand = new Command("updatesensor", "Update sensor from account.");
+
+        var accountIdOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(accountIdOption);
+
+        var sensorIdOption = new Option<Guid>(new[] { "-s", "--si", "--sensorid" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(sensorIdOption);
+
+        var nameOption = new Option<string?>(new[] { "-n", "--name" }, "Name");
+        subCommand.AddOption(nameOption);
+        var distanceEmptyMmOption = new Option<int?>(new[] { "-e", "--de", "--distanceempty" }, "Distance empty in mm");
+        subCommand.AddOption(distanceEmptyMmOption);
+        var distanceFullMmOption = new Option<int?>(new[] { "-f", "--df", "--distancefull" }, "Distance full in mm");
+        subCommand.AddOption(distanceFullMmOption);
+        var capacityLOption = new Option<int?>(new[] { "-c", "--capacity" }, "Capacity in liter");
+        subCommand.AddOption(capacityLOption);
+
+        subCommand.SetHandler(
+            UpdateSensor,
+            accountIdOption, sensorIdOption, nameOption, distanceEmptyMmOption, distanceFullMmOption, capacityLOption);
+
+        return subCommand;
+    }
+
+    private async Task UpdateSensor(Guid accountId, Guid sensorId, string? name, int? distanceEmptyMm, int? distanceFullMm, int? capacityL)
+    {
+        await _mediator.Send(
+            new UpdateAccountSensorCommand()
+            {
+                AccountUid = accountId,
+                SensorUid = sensorId,
+                Name = name == null ? null : new Tuple<bool, string?>(true, name == "" ? null : name),
+                DistanceMmEmpty = distanceEmptyMm == null ? null : new Tuple<bool, int?>(true, distanceEmptyMm == 0 ? null : distanceEmptyMm),
+                DistanceMmFull = distanceFullMm == null ? null : new Tuple<bool, int?>(true, distanceFullMm == 0 ? null : distanceFullMm),
+                CapacityL = capacityL == null ? null : new Tuple<bool, int?>(true, capacityL == 0 ? null : capacityL),
             });
     }
 }

@@ -7,6 +7,7 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", true);
 // Add services to the container.
 builder.Services.AddRazorPages(o =>
     o.Conventions
+        .AddPageRoute("/Sensor", "/sensor/{SensorLink}")
         .AddPageRoute("/Sensor", "/s/{SensorLink}")
         .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
 );

@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Queries;
 
-public class ReadSensorByLinkQuery : IRequest<Sensor?>
+public class ReadSensorByLinkQuery : IRequest<AccountSensor?>
 {
     public required string SensorLink { get; init; }
     public string? AccountLink { get; init; }
 }
 
-public class ReadSensorByLinkQueryHandler : IRequestHandler<ReadSensorByLinkQuery, Sensor?>
+public class ReadSensorByLinkQueryHandler : IRequestHandler<ReadSensorByLinkQuery, AccountSensor?>
 {
     private readonly WaterAlarmDbContext _dbContext;
 
@@ -20,12 +20,18 @@ public class ReadSensorByLinkQueryHandler : IRequestHandler<ReadSensorByLinkQuer
         _dbContext = dbContext;
     }
 
-    public async Task<Sensor?> Handle(ReadSensorByLinkQuery request, CancellationToken cancellationToken)
+    public async Task<AccountSensor?> Handle(ReadSensorByLinkQuery request, CancellationToken cancellationToken)
     {
-        return await _dbContext.Sensors
-            .Where(s => 
-                (s.Link == request.SensorLink || s.DevEui == request.SensorLink)
-                && (request.AccountLink == null || s.Accounts.Any(a => a.Link == request.AccountLink)))
+        var query = _dbContext.Sensors
+            .Where(s => s.Link == request.SensorLink || s.DevEui == request.SensorLink)
+            .SelectMany(s => s.AccountSensors);
+
+        if (request.AccountLink != null)
+            query = query.Where(as2 => as2.Account.Link == request.AccountLink);
+
+        return await query
+            .Include(as2 => as2.Account)
+            .Include(as2 => as2.Sensor)
             .SingleOrDefaultAsync(cancellationToken);
     }
 }
