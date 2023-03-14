@@ -20,3 +20,7 @@ html {
 body {
     margin-bottom: 60px;
 }
+
+.grayout {
+    opacity: 0.6;
+}

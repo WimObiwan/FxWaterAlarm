@@ -8,6 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="GitInfo" Version="3.0.4">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
@@ -24,4 +28,12 @@
         <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
+    <Target Name="_SetVersion" BeforeTargets="GetAssemblyVersion;GenerateNuspec;GetPackageContents">
+        <PropertyGroup>
+            <Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)$(GitSemVerDashLabel)+$(GitBranch).$(GitCommit)</Version>
+            <PackageVersion>$(Version)</PackageVersion>
+            <InformationalVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitCommits)$(GitSemVerDashLabel)+$(GitBranch).$(GitCommit) $(GitCommitDate)</InformationalVersion>
+        </PropertyGroup>
+    </Target>
+    
 </Project>
