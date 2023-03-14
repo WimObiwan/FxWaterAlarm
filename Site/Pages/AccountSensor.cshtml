@@ -7,6 +7,10 @@
 
 @if (Model.LastMeasurement != null)
 {
+    @if (Model.AccountSensorEntity?.Name != null)
+    {
+        <div style="text-align: center; font-size: xx-large; text-decoration: underline; line-height: 200%;">@Model.AccountSensorEntity?.Name</div>
+    }
     @if (Model.LevelPrc.HasValue)
     {
     <div>
@@ -34,11 +38,11 @@
                 @if (Model.AccountSensorEntity.CapacityL.HasValue)
                 {
                     <div>Capacity: @Model.AccountSensorEntity.CapacityL.Value liter</div>
-                }
-                @if (Model.ResolutionL.HasValue)
-                {
-                    <div>Resolution: @(System.Math.Round(Model.ResolutionL.Value, 2)) liter (1 mm)</div>
-                }
+                    }
+                    @if (Model.ResolutionL.HasValue)
+                    {
+                        <div>Resolution: @Math.Round(Model.ResolutionL.Value, 2) liter (1 mm)</div>
+                    }
                 @if (Model.AccountSensorEntity.DistanceMmFull.HasValue && Model.AccountSensorEntity.DistanceMmEmpty.HasValue)
                 {
                     <div>Distance Full: @Model.AccountSensorEntity.DistanceMmFull.Value mm</div>

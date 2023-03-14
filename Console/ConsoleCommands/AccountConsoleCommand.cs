@@ -303,17 +303,22 @@ public class AccountConsoleCommand : IConsoleCommand
         return subCommand;
     }
 
-    private async Task UpdateSensor(Guid accountId, Guid sensorId, string? name, int? distanceEmptyMm, int? distanceFullMm, int? capacityL)
+    private async Task UpdateSensor(Guid accountId, Guid sensorId, string? name, int? distanceEmptyMm,
+        int? distanceFullMm, int? capacityL)
     {
         await _mediator.Send(
-            new UpdateAccountSensorCommand()
+            new UpdateAccountSensorCommand
             {
                 AccountUid = accountId,
                 SensorUid = sensorId,
                 Name = name == null ? null : new Tuple<bool, string?>(true, name == "" ? null : name),
-                DistanceMmEmpty = distanceEmptyMm == null ? null : new Tuple<bool, int?>(true, distanceEmptyMm == 0 ? null : distanceEmptyMm),
-                DistanceMmFull = distanceFullMm == null ? null : new Tuple<bool, int?>(true, distanceFullMm == 0 ? null : distanceFullMm),
-                CapacityL = capacityL == null ? null : new Tuple<bool, int?>(true, capacityL == 0 ? null : capacityL),
+                DistanceMmEmpty = distanceEmptyMm == null
+                    ? null
+                    : new Tuple<bool, int?>(true, distanceEmptyMm == 0 ? null : distanceEmptyMm),
+                DistanceMmFull = distanceFullMm == null
+                    ? null
+                    : new Tuple<bool, int?>(true, distanceFullMm == 0 ? null : distanceFullMm),
+                CapacityL = capacityL == null ? null : new Tuple<bool, int?>(true, capacityL == 0 ? null : capacityL)
             });
     }
 }

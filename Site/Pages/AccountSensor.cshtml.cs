@@ -31,25 +31,27 @@ public class AccountSensor : PageModel
 
         if (AccountSensorEntity != null)
         {
-            LastMeasurement = await _mediator.Send(new LastMeasurementQuery { DevEui = AccountSensorEntity.Sensor.DevEui });
+            LastMeasurement = await _mediator.Send(new LastMeasurementQuery
+                { DevEui = AccountSensorEntity.Sensor.DevEui });
             if (LastMeasurement != null)
             {
                 if (AccountSensorEntity.DistanceMmEmpty.HasValue && AccountSensorEntity.DistanceMmFull.HasValue)
                 {
                     var levelFraction
-                         = ((double)AccountSensorEntity.DistanceMmEmpty.Value - LastMeasurement.DistanceMm)
-                               / (AccountSensorEntity.DistanceMmEmpty.Value - AccountSensorEntity.DistanceMmFull.Value);
+                        = ((double)AccountSensorEntity.DistanceMmEmpty.Value - LastMeasurement.DistanceMm)
+                          / (AccountSensorEntity.DistanceMmEmpty.Value - AccountSensorEntity.DistanceMmFull.Value);
                     LevelPrc = levelFraction * 100.0;
                     if (AccountSensorEntity.CapacityL.HasValue)
                     {
                         WaterL = levelFraction * AccountSensorEntity.CapacityL.Value;
-                        ResolutionL = 
-                            1.0 / (AccountSensorEntity.DistanceMmEmpty.Value - AccountSensorEntity.DistanceMmFull.Value) 
+                        ResolutionL =
+                            1.0 / (AccountSensorEntity.DistanceMmEmpty.Value - AccountSensorEntity.DistanceMmFull.Value)
                             * AccountSensorEntity.CapacityL.Value;
                     }
                     else
+                    {
                         WaterL = null;
-                    
+                    }
                 }
                 else
                 {

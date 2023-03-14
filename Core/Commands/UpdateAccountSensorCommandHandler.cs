@@ -9,6 +9,7 @@ public class UpdateAccountSensorCommand : IRequest
 {
     public required Guid AccountUid { get; init; }
     public required Guid SensorUid { get; init; }
+    public Tuple<bool, string?>? Name { get; init; }
     public Tuple<bool, int?>? DistanceMmEmpty { get; init; }
     public Tuple<bool, int?>? DistanceMmFull { get; init; }
     public Tuple<bool, int?>? CapacityL { get; init; }
@@ -30,8 +31,11 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
                 .Where(a => a.Uid == request.AccountUid)
                 .SelectMany(a => a.AccountSensors)
                 .SingleOrDefaultAsync(as2 => as2.Sensor.Uid == request.SensorUid, cancellationToken)
-            ?? throw new AccountNotFoundException("The account or sensor cannot be found.") { Uid = request.AccountUid };
+            ?? throw new AccountNotFoundException("The account or sensor cannot be found.")
+                { Uid = request.AccountUid };
 
+        if (request.Name is { Item1: true })
+            account.Name = request.Name.Item2;
         if (request.DistanceMmEmpty is { Item1: true })
             account.DistanceMmEmpty = request.DistanceMmEmpty.Item2;
         if (request.DistanceMmFull is { Item1: true })
