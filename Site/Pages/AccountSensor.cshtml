@@ -35,7 +35,13 @@
                 @if (Model.LastMeasurement != null)
                 {
                     <div>Distance: @Model.LastMeasurement.DistanceMm mm</div>
-                    <div>RSSI: @Model.LastMeasurement.RssiDbm dBm</div>
+                    <div>
+                        RSSI: @Model.LastMeasurement.RssiDbm dBm
+                        @if (Model.RssiPrc.HasValue)
+                        {
+                            @: - @Math.Round(Model.RssiPrc.Value, 0)%
+                        }
+                    </div>
                 }
                 @if (Model.AccountSensorEntity != null)
                 {
