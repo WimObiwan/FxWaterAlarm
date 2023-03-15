@@ -21,6 +21,7 @@ public class AccountSensor : PageModel
     public double? WaterL { get; private set; }
     public double? ResolutionL { get; private set; }
     public double? RssiPrc { get; private set; }
+    public double? BatteryPrc { get; private set; }
 
     public async Task OnGet(string accountLink, string sensorLink)
     {
@@ -37,8 +38,10 @@ public class AccountSensor : PageModel
             if (LastMeasurement != null)
             {
                 // -150 = 0%  --> -100 = 80%
-                
+
                 RssiPrc = (LastMeasurement.RssiDbm + 150.0) / 60.0 * 80.0;
+                BatteryPrc = (LastMeasurement.BatV - 3.0) / 0.325 * 100.0;
+
                 if (AccountSensorEntity.DistanceMmEmpty.HasValue && AccountSensorEntity.DistanceMmFull.HasValue)
                 {
                     var levelFraction

@@ -32,6 +32,7 @@
                 <time>@Model.LastMeasurement.Timestamp.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)</time>
             }
             <div class="grayout">
+                <div>DevEui: @Model.AccountSensorEntity?.Sensor.DevEui</div>
                 @if (Model.LastMeasurement != null)
                 {
                     <div>Distance: @Model.LastMeasurement.DistanceMm mm</div>
@@ -40,6 +41,13 @@
                         @if (Model.RssiPrc.HasValue)
                         {
                             @: - @Math.Round(Model.RssiPrc.Value, 0)%
+                        }
+                    </div>
+                    <div>
+                        Battery: @Model.LastMeasurement.BatV V
+                        @if (Model.BatteryPrc.HasValue)
+                        {
+                            @: - @Math.Round(Model.BatteryPrc.Value, 0)%
                         }
                     </div>
                 }
