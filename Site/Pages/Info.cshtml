@@ -1,0 +1,17 @@
+@page
+@model Info
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+<table style="display: block">
+    <tr><td>RequestHost</td><td>@Model.RequestHost</td></tr>
+    <tr><td>Server</td><td>@Model.Server</td></tr>
+    <tr><td>Version</td><td>@Model.Version</td></tr>
+    <tr><td>OsVersion</td><td>@Model.OsVersion</td></tr>
+    <tr><td>DotNetVersion</td><td>@Model.DotNetVersion</td></tr>
+    <tr><td>UserAuthId</td><td>@Model.UserAuthId</td></tr>
+    <tr><td>Culture</td><td>@System.Globalization.CultureInfo.CurrentCulture.Name</td></tr>
+    <tr><td>UICulture</td><td>@System.Globalization.CultureInfo.CurrentUICulture.Name</td></tr>
+</table>
