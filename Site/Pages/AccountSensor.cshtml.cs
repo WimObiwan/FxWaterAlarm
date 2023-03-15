@@ -55,21 +55,7 @@ public class AccountSensor : PageModel
                             1.0 / (AccountSensorEntity.DistanceMmEmpty.Value - AccountSensorEntity.DistanceMmFull.Value)
                             * AccountSensorEntity.CapacityL.Value;
                     }
-                    else
-                    {
-                        WaterL = null;
-                    }
                 }
-                else
-                {
-                    LevelPrc = null;
-                    WaterL = null;
-                }
-            }
-            else
-            {
-                LevelPrc = null;
-                WaterL = null;
             }
         }
     }
