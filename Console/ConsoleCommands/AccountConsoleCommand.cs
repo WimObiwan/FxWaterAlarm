@@ -2,6 +2,7 @@ using System.CommandLine;
 using Core.Commands;
 using Core.Entities;
 using Core.Queries;
+using Core.Util;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -199,8 +200,8 @@ public class AccountConsoleCommand : IConsoleCommand
             new UpdateAccountCommand
             {
                 Uid = uid,
-                Email = string.IsNullOrEmpty(email) ? null : new Tuple<bool, string>(true, email),
-                Name = name == null ? null : new Tuple<bool, string?>(true, name)
+                Email = Optional.From(email),
+                Name = Optional.From(name)
             });
 
         System.Console.WriteLine("{0}", uid);
@@ -311,14 +312,10 @@ public class AccountConsoleCommand : IConsoleCommand
             {
                 AccountUid = accountId,
                 SensorUid = sensorId,
-                Name = name == null ? null : new Tuple<bool, string?>(true, name == "" ? null : name),
-                DistanceMmEmpty = distanceEmptyMm == null
-                    ? null
-                    : new Tuple<bool, int?>(true, distanceEmptyMm == 0 ? null : distanceEmptyMm),
-                DistanceMmFull = distanceFullMm == null
-                    ? null
-                    : new Tuple<bool, int?>(true, distanceFullMm == 0 ? null : distanceFullMm),
-                CapacityL = capacityL == null ? null : new Tuple<bool, int?>(true, capacityL == 0 ? null : capacityL)
+                Name = Optional.From(name),
+                DistanceMmEmpty = Optional.From(distanceEmptyMm),
+                DistanceMmFull = Optional.From(distanceFullMm),
+                CapacityL = Optional.From(capacityL)
             });
     }
 }

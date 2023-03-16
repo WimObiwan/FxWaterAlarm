@@ -1,5 +1,6 @@
 using Core.Exceptions;
 using Core.Repositories;
+using Core.Util;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +10,10 @@ public record UpdateAccountSensorCommand : IRequest
 {
     public required Guid AccountUid { get; init; }
     public required Guid SensorUid { get; init; }
-    public Tuple<bool, string?>? Name { get; init; }
-    public Tuple<bool, int?>? DistanceMmEmpty { get; init; }
-    public Tuple<bool, int?>? DistanceMmFull { get; init; }
-    public Tuple<bool, int?>? CapacityL { get; init; }
+    public Optional<string> Name { get; init; }
+    public Optional<int?> DistanceMmEmpty { get; init; }
+    public Optional<int?> DistanceMmFull { get; init; }
+    public Optional<int?> CapacityL { get; init; }
 }
 
 public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSensorCommand>
@@ -34,14 +35,14 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
             ?? throw new AccountNotFoundException("The account or sensor cannot be found.")
                 { Uid = request.AccountUid };
 
-        if (request.Name is { Item1: true })
-            account.Name = request.Name.Item2;
-        if (request.DistanceMmEmpty is { Item1: true })
-            account.DistanceMmEmpty = request.DistanceMmEmpty.Item2;
-        if (request.DistanceMmFull is { Item1: true })
-            account.DistanceMmFull = request.DistanceMmFull.Item2;
-        if (request.CapacityL is { Item1: true })
-            account.CapacityL = request.CapacityL.Item2;
+        if (request.Name is { Specified: true })
+            account.Name = request.Name.Value;
+        if (request.DistanceMmEmpty is { Specified: true })
+            account.DistanceMmEmpty = request.DistanceMmEmpty.Value;
+        if (request.DistanceMmFull is { Specified: true })
+            account.DistanceMmFull = request.DistanceMmFull.Value;
+        if (request.CapacityL is { Specified: true })
+            account.CapacityL = request.CapacityL.Value;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
