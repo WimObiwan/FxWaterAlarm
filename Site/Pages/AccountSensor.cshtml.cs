@@ -40,7 +40,7 @@ public class AccountSensor : PageModel
                 // -150 = 0%  --> -100 = 80%
 
                 RssiPrc = (LastMeasurement.RssiDbm + 150.0) / 60.0 * 80.0;
-                BatteryPrc = (LastMeasurement.BatV - 3.0) / 0.325 * 100.0;
+                BatteryPrc = (LastMeasurement.BatV - 3.0) / 0.335 * 100.0;
 
                 if (AccountSensorEntity.DistanceMmEmpty.HasValue && AccountSensorEntity.DistanceMmFull.HasValue)
                 {
