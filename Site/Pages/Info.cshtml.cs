@@ -15,10 +15,6 @@ public class Info : PageModel
     public string? DotNetVersion { get; set; }
     public string? UserAuthId { get; set; }
 
-    public Info()
-    {
-    }
-    
     public void OnGet()
     {
         RequestHost = HttpContext.Request.Host.ToString();

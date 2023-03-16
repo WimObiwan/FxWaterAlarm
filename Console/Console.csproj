@@ -35,5 +35,5 @@
             <InformationalVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitCommits)$(GitSemVerDashLabel)+$(GitBranch).$(GitCommit) $(GitCommitDate)</InformationalVersion>
         </PropertyGroup>
     </Target>
-    
+
 </Project>
