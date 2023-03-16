@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Commands;
 
-public class CreateSensorCommand : IRequest
+public record CreateSensorCommand : IRequest
 {
     public required Guid Uid { get; init; }
     public required string DevEui { get; init; }

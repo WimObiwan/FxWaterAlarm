@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Commands;
 
-public class CreateAccountCommand : IRequest
+public record CreateAccountCommand : IRequest
 {
     public required Guid Uid { get; init; }
     public required string Email { get; init; }

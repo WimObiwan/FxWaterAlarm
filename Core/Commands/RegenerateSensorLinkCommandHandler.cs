@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Commands;
 
-public class RegenerateSensorLinkCommand : IRequest
+public record RegenerateSensorLinkCommand : IRequest
 {
     public required Guid SensorUid { get; init; }
     public string? Link { get; init; }

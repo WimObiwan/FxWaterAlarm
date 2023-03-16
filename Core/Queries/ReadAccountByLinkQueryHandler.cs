@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Queries;
 
-public class ReadAccountByLinkQuery : IRequest<Account?>
+public record ReadAccountByLinkQuery : IRequest<Account?>
 {
     public required string Link { get; init; }
 }

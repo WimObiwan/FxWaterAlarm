@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Commands;
 
-public class AddSensorToAccountCommand : IRequest
+public record AddSensorToAccountCommand : IRequest
 {
     public required Guid AccountUid { get; init; }
     public required Guid SensorUid { get; init; }

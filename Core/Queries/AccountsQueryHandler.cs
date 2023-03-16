@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Queries;
 
-public class AccountsQuery : IRequest<List<Account>>
+public record AccountsQuery : IRequest<List<Account>>
 {
 }
 

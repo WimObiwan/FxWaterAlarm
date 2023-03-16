@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Queries;
 
-public class SensorsQuery : IRequest<List<Sensor>>
+public record SensorsQuery : IRequest<List<Sensor>>
 {
 }
 

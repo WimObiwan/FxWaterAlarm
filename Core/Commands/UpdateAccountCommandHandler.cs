@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Commands;
 
-public class UpdateAccountCommand : IRequest
+public record UpdateAccountCommand : IRequest
 {
     public required Guid Uid { get; init; }
     public Tuple<bool, string>? Email { get; init; }

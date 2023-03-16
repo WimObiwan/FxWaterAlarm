@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Queries;
 
-public class ReadAccountQuery : IRequest<Account?>
+public record ReadAccountQuery : IRequest<Account?>
 {
     public required Guid Uid { get; init; }
 }

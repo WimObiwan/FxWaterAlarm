@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Commands;
 
-public class RegenerateAccountLinkCommand : IRequest
+public record RegenerateAccountLinkCommand : IRequest
 {
     public required Guid AccountUid { get; init; }
     public string? Link { get; init; }

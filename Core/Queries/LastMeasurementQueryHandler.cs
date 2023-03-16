@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Core.Queries;
 
-public class LastMeasurementQuery : IRequest<Measurement?>
+public record LastMeasurementQuery : IRequest<Measurement?>
 {
     public required string DevEui { get; init; }
 }

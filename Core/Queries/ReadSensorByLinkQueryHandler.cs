@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Queries;
 
-public class ReadSensorByLinkQuery : IRequest<AccountSensor?>
+public record ReadSensorByLinkQuery : IRequest<AccountSensor?>
 {
     public required string SensorLink { get; init; }
     public string? AccountLink { get; init; }
