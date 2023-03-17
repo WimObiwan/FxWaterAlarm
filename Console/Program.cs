@@ -1,7 +1,5 @@
 ﻿using CommandLine;
 using Core;
-using Core.Queries;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

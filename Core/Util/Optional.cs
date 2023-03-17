@@ -7,10 +7,10 @@ public static class Optional
     public static Optional<T> From<T>(T? value, T nullValue)
     {
         if (value == null)
-            return new(false, default);
+            return new Optional<T>(false, default);
         if (value.Equals(nullValue))
-            return new(true, default);
-        return new(true, value);
+            return new Optional<T>(true, default);
+        return new Optional<T>(true, value);
     }
 
     public static Optional<string> From(string? value)

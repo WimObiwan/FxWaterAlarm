@@ -50,11 +50,12 @@ public class MeasurementRepository : IMeasurementRepository
         };
     }
 
-    public async Task<Measurement[]> Get(string devEui, DateTime from, DateTime? till, CancellationToken cancellationToken)
+    public async Task<Measurement[]> Get(string devEui, DateTime from, DateTime? till,
+        CancellationToken cancellationToken)
     {
         string query;
         object parameters;
-        
+
         if (till.HasValue)
         {
             query =
@@ -69,7 +70,7 @@ public class MeasurementRepository : IMeasurementRepository
         }
 
         using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
-        InfluxResultSet<Record> result = await influxClient.ReadAsync<Record>("wateralarm", query, parameters,
+        var result = await influxClient.ReadAsync<Record>("wateralarm", query, parameters,
             cancellationToken);
 
         var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
@@ -86,6 +87,8 @@ public class MeasurementRepository : IMeasurementRepository
         return record ?? throw new InvalidOperationException("Sensor database return no data");
     }
 
+    // ReSharper disable UnusedAutoPropertyAccessor.Local
+
     private class Record
     {
         [InfluxTimestamp] public DateTime Timestamp { get; set; }
@@ -98,4 +101,6 @@ public class MeasurementRepository : IMeasurementRepository
 
         [InfluxField("RSSI")] public int Rssi { get; set; }
     }
+
+    // ReSharper restore UnusedAutoPropertyAccessor.Local
 }

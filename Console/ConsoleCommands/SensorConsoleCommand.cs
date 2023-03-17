@@ -136,7 +136,7 @@ public class SensorConsoleCommand : IConsoleCommand
     private async Task ReadLastMeasurement(string devEui)
     {
         var result = await _mediator.Send(
-            new LastMeasurementQuery()
+            new LastMeasurementQuery
             {
                 DevEui = devEui
             });
@@ -156,7 +156,7 @@ public class SensorConsoleCommand : IConsoleCommand
 
     private Command ReadMeasurementsSubCommand()
     {
-        var subCommand = new Command("readmeasurements", "Read last measurement.");
+        var subCommand = new Command("readmeasurements", "Read measurements.");
 
         var devEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor identifier")
         {
@@ -185,7 +185,7 @@ public class SensorConsoleCommand : IConsoleCommand
     private async Task ReadMeasurements(string devEui, DateTime from, DateTime? till)
     {
         var results = await _mediator.Send(
-            new MeasurementsQuery()
+            new MeasurementsQuery
             {
                 DevEui = devEui,
                 From = from,
