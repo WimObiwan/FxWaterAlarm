@@ -1,4 +1,4 @@
-using CommandLine;
+﻿using CommandLine;
 using Core;
 using Core.Queries;
 using MediatR;
@@ -42,22 +42,6 @@ internal class Program
                 {
                     var engine = host.Services.GetRequiredService<ICommandLineEngine>();
                     return await engine.Execute(args);
-
-                    // return await Parser.Default
-                    //     .ParseArguments<
-                    //         HelpOptions,
-                    //         QueryLastMeasurementOptions,
-                    //         CreateAccountOptions,
-                    //         QueryAccountsOptions,
-                    //         CreateSensorOptions
-                    //     >(args)
-                    //     .MapResult(
-                    //         (HelpOptions _) => RunHelp(),
-                    //         (QueryLastMeasurementOptions o) => QueryLastMeasurement(host, o),
-                    //         (CreateAccountOptions o) => CreateAccount(host, o),
-                    //         (QueryAccountsOptions o) => QueryAccounts(host, o),
-                    //         (CreateSensorOptions o) => CreateSensor(host, o),
-                    //         _ => Task.FromResult(1));
                 }
                 catch (Exception x)
                 {
