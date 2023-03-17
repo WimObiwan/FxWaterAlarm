@@ -1,4 +1,4 @@
-﻿using CommandLine;
+using CommandLine;
 using Core;
 using Core.Queries;
 using MediatR;
@@ -92,29 +92,6 @@ internal class Program
     private static Task<int> RunHelp()
     {
         return Task.FromResult(0);
-    }
-
-    private static async Task<int> QueryLastMeasurement(IHost host, QueryLastMeasurementOptions options)
-    {
-        var logger = host.Services.GetRequiredService<ILogger<Program>>();
-
-        var mediator = host.Services.GetRequiredService<IMediator>();
-        var result = await mediator.Send(
-            new LastMeasurementQuery { DevEui = options.DevEui });
-
-        if (result == null)
-        {
-            logger.LogWarning("No measurement found for DevEui {DevEui}",
-                options.DevEui);
-            return 1;
-        }
-
-        logger.LogInformation("{DevEui} {Timestamp} {DistanceMm} {BatV} {RssiDbm}",
-            result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
-        System.Console.WriteLine("{0} {1} {2} {3} {4}",
-            result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
-
-        return 0;
     }
 
     // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local

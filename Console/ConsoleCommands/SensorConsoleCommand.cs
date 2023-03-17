@@ -23,6 +23,7 @@ public class SensorConsoleCommand : IConsoleCommand
         command.AddCommand(ListSubCommand());
         command.AddCommand(CreateSubCommand());
         command.AddCommand(SetLinkSubCommand());
+        command.AddCommand(ReadLastMeasurementSubCommand());
         return command;
     }
 
@@ -112,5 +113,43 @@ public class SensorConsoleCommand : IConsoleCommand
             });
 
         System.Console.WriteLine("{0}", uid);
+    }
+
+    private Command ReadLastMeasurementSubCommand()
+    {
+        var subCommand = new Command("readlastmeasurement", "Read last measurement.");
+
+        var devEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(devEuiOption);
+
+        subCommand.SetHandler(
+            ReadLastMeasurement,
+            devEuiOption);
+
+        return subCommand;
+    }
+
+    private async Task ReadLastMeasurement(string devEui)
+    {
+        var result = await _mediator.Send(
+            new LastMeasurementQuery()
+            {
+                DevEui = devEui
+            });
+
+        if (result == null)
+        {
+            _logger.LogWarning("No measurement found for DevEui {DevEui}",
+                devEui);
+            return;
+        }
+
+        _logger.LogInformation("{DevEui} {Timestamp} {DistanceMm} {BatV} {RssiDbm}",
+            result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
+        System.Console.WriteLine("{0} {1} {2} {3} {4}",
+            result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
     }
 }
