@@ -25,6 +25,7 @@ public class SensorConsoleCommand : IConsoleCommand
         command.AddCommand(SetLinkSubCommand());
         command.AddCommand(ReadLastMeasurementSubCommand());
         command.AddCommand(ReadMeasurementsSubCommand());
+        command.AddCommand(ReadMeasurementTrendsSubCommand());
         return command;
     }
 
@@ -199,5 +200,48 @@ public class SensorConsoleCommand : IConsoleCommand
             System.Console.WriteLine("{0} {1} {2} {3} {4}",
                 result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
         }
+    }
+
+    private Command ReadMeasurementTrendsSubCommand()
+    {
+        var subCommand = new Command("readmeasurementtrends", "Read last measurement.");
+
+        var devEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(devEuiOption);
+
+        var timestampOption = new Option<DateTime[]>(new[] { "-t", "--timestamps" }, "Timestamps")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(timestampOption);
+
+        subCommand.SetHandler(
+            ReadMeasurementTrends,
+            devEuiOption,
+            timestampOption);
+
+        return subCommand;
+    }
+
+    private async Task ReadMeasurementTrends(string devEui, IEnumerable<DateTime> timestamps)
+    {
+        var results = await _mediator.Send(
+            new MeasurementTrendsQuery
+            {
+                DevEui = devEui,
+                Timestamps = timestamps
+            });
+
+        foreach (var result in results)
+            if (result != null)
+            {
+                _logger.LogInformation("{DevEui} {Timestamp} {DistanceMm} {BatV} {RssiDbm}",
+                    result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
+                System.Console.WriteLine("{0} {1} {2} {3} {4}",
+                    result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
+            }
     }
 }

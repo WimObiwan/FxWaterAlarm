@@ -17,6 +17,9 @@ public interface IMeasurementRepository
 {
     Task<Measurement?> GetLast(string devEui, CancellationToken cancellationToken);
     Task<Measurement[]> Get(string devEui, DateTime from, DateTime? till, CancellationToken cancellationToken);
+
+    Task<Measurement?[]> GetTrends(string devEui, IEnumerable<DateTime> timestamps,
+        CancellationToken cancellationToken);
 }
 
 public class MeasurementRepository : IMeasurementRepository
@@ -85,6 +88,35 @@ public class MeasurementRepository : IMeasurementRepository
             }).ToArray();
 
         return record ?? throw new InvalidOperationException("Sensor database return no data");
+    }
+
+    public async Task<Measurement?[]> GetTrends(string devEui, IEnumerable<DateTime> timestamps,
+        CancellationToken cancellationToken)
+    {
+        return await Task.WhenAll(timestamps.Select(t => GetLastBefore(devEui, t, cancellationToken)));
+    }
+
+    public async Task<Measurement?> GetLastBefore(string devEui, DateTime timestamp,
+        CancellationToken cancellationToken)
+    {
+        using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
+        var result = await influxClient.ReadAsync<Record>("wateralarm",
+            "SELECT * FROM waterlevel WHERE DevEUI = $devEui AND time <= $before GROUP BY * ORDER BY DESC LIMIT 1",
+            new { devEui, before = timestamp },
+            cancellationToken);
+        var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
+        var record = series?.Rows?.FirstOrDefault();
+        if (series == null || record == null)
+            return null;
+
+        return new Measurement
+        {
+            DevEui = (string)series.GroupedTags["DevEUI"],
+            Timestamp = record.Timestamp,
+            DistanceMm = record.Distance,
+            BatV = record.BatV,
+            RssiDbm = record.Rssi
+        };
     }
 
     // ReSharper disable UnusedAutoPropertyAccessor.Local
