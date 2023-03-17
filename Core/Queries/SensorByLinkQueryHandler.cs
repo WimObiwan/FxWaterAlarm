@@ -5,22 +5,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Queries;
 
-public record ReadSensorByLinkQuery : IRequest<AccountSensor?>
+public record SensorByLinkQuery : IRequest<AccountSensor?>
 {
     public required string SensorLink { get; init; }
     public string? AccountLink { get; init; }
 }
 
-public class ReadSensorByLinkQueryHandler : IRequestHandler<ReadSensorByLinkQuery, AccountSensor?>
+public class SensorByLinkQueryHandler : IRequestHandler<SensorByLinkQuery, AccountSensor?>
 {
     private readonly WaterAlarmDbContext _dbContext;
 
-    public ReadSensorByLinkQueryHandler(WaterAlarmDbContext dbContext)
+    public SensorByLinkQueryHandler(WaterAlarmDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<AccountSensor?> Handle(ReadSensorByLinkQuery request, CancellationToken cancellationToken)
+    public async Task<AccountSensor?> Handle(SensorByLinkQuery request, CancellationToken cancellationToken)
     {
         var query = _dbContext.Sensors
             .Where(s => s.Link == request.SensorLink || s.DevEui == request.SensorLink)

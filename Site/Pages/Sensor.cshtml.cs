@@ -16,7 +16,7 @@ public class Sensor : PageModel
 
     public async Task<IActionResult> OnGet(string sensorLink)
     {
-        var accountSensor = await _mediator.Send(new ReadSensorByLinkQuery
+        var accountSensor = await _mediator.Send(new SensorByLinkQuery
         {
             SensorLink = sensorLink
         });

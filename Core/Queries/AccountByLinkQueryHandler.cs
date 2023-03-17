@@ -5,24 +5,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Queries;
 
-public record ReadAccountQuery : IRequest<Account?>
+public record AccountByLinkQuery : IRequest<Account?>
 {
-    public required Guid Uid { get; init; }
+    public required string Link { get; init; }
 }
 
-public class ReadAccountQueryHandler : IRequestHandler<ReadAccountQuery, Account?>
+public class AccountByLinkQueryHandler : IRequestHandler<AccountByLinkQuery, Account?>
 {
     private readonly WaterAlarmDbContext _dbContext;
 
-    public ReadAccountQueryHandler(WaterAlarmDbContext dbContext)
+    public AccountByLinkQueryHandler(WaterAlarmDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<Account?> Handle(ReadAccountQuery request, CancellationToken cancellationToken)
+    public async Task<Account?> Handle(AccountByLinkQuery request, CancellationToken cancellationToken)
     {
         return await _dbContext.Accounts
-            .Where(a => a.Uid == request.Uid)
+            .Where(a => a.Link == request.Link)
             .Include(a => a.AccountSensors)
             .ThenInclude(as2 => as2.Sensor)
             .SingleOrDefaultAsync(cancellationToken);
