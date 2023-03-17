@@ -16,6 +16,7 @@ public class MeasurementInfluxOptions
 public interface IMeasurementRepository
 {
     Task<Measurement?> GetLast(string devEui, CancellationToken cancellationToken);
+    Task<Measurement[]> Get(string devEui, DateTime from, DateTime? till, CancellationToken cancellationToken);
 }
 
 public class MeasurementRepository : IMeasurementRepository
@@ -47,6 +48,42 @@ public class MeasurementRepository : IMeasurementRepository
             BatV = record.BatV,
             RssiDbm = record.Rssi
         };
+    }
+
+    public async Task<Measurement[]> Get(string devEui, DateTime from, DateTime? till, CancellationToken cancellationToken)
+    {
+        string query;
+        object parameters;
+        
+        if (till.HasValue)
+        {
+            query =
+                "SELECT * FROM waterlevel WHERE DevEUI = $devEui AND time >= $from AND time <= $till GROUP BY * ORDER BY DESC LIMIT 1000";
+            parameters = new { devEui, from, till };
+        }
+        else
+        {
+            query =
+                "SELECT * FROM waterlevel WHERE DevEUI = $devEui AND time >= $from GROUP BY * ORDER BY DESC LIMIT 1000";
+            parameters = new { devEui, from };
+        }
+
+        using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
+        InfluxResultSet<Record> result = await influxClient.ReadAsync<Record>("wateralarm", query, parameters,
+            cancellationToken);
+
+        var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
+        var record = series?.Rows?.Select(record =>
+            new Measurement
+            {
+                DevEui = (string)series.GroupedTags["DevEUI"],
+                Timestamp = record.Timestamp,
+                DistanceMm = record.Distance,
+                BatV = record.BatV,
+                RssiDbm = record.Rssi
+            }).ToArray();
+
+        return record ?? throw new InvalidOperationException("Sensor database return no data");
     }
 
     private class Record
