@@ -22,18 +22,18 @@ public class AccountConsoleCommand : IConsoleCommand
     public Command GetCommandLineCommand()
     {
         var command = new Command("account", "Account actions.");
-        command.AddCommand(GetListSubCommand());
-        command.AddCommand(GetReadSubCommand());
-        command.AddCommand(GetReadByLinkSubCommand());
-        command.AddCommand(GetCreateSubCommand());
-        command.AddCommand(GetUpdateSubCommand());
-        command.AddCommand(GetSetLinkSubCommand());
-        command.AddCommand(GetAddSensorSubCommand());
-        command.AddCommand(GetUpdateSensorSubCommand());
+        command.AddCommand(ListSubCommand());
+        command.AddCommand(ReadSubCommand());
+        command.AddCommand(ReadByLinkSubCommand());
+        command.AddCommand(CreateSubCommand());
+        command.AddCommand(UpdateSubCommand());
+        command.AddCommand(SetLinkSubCommand());
+        command.AddCommand(AddSensorSubCommand());
+        command.AddCommand(UpdateSensorSubCommand());
         return command;
     }
 
-    private Command GetListSubCommand()
+    private Command ListSubCommand()
     {
         var subCommand = new Command("list", "List accounts.");
 
@@ -54,7 +54,7 @@ public class AccountConsoleCommand : IConsoleCommand
         }
     }
 
-    private Command GetReadSubCommand()
+    private Command ReadSubCommand()
     {
         var subCommand = new Command("read", "Read account.");
 
@@ -74,7 +74,7 @@ public class AccountConsoleCommand : IConsoleCommand
     private async Task Read(Guid id)
     {
         var account = await _mediator.Send(
-            new ReadAccountQuery
+            new AccountQuery
             {
                 Uid = id
             });
@@ -105,7 +105,7 @@ public class AccountConsoleCommand : IConsoleCommand
         }
     }
 
-    private Command GetReadByLinkSubCommand()
+    private Command ReadByLinkSubCommand()
     {
         var subCommand = new Command("readbylink", "Read account by link.");
 
@@ -125,7 +125,7 @@ public class AccountConsoleCommand : IConsoleCommand
     private async Task ReadByLink(string link)
     {
         var account = await _mediator.Send(
-            new ReadAccountByLinkQuery
+            new AccountByLinkQuery
             {
                 Link = link
             });
@@ -133,7 +133,7 @@ public class AccountConsoleCommand : IConsoleCommand
         ShowAccount(account);
     }
 
-    private Command GetCreateSubCommand()
+    private Command CreateSubCommand()
     {
         var subCommand = new Command("create", "Create account.");
 
@@ -171,7 +171,7 @@ public class AccountConsoleCommand : IConsoleCommand
         System.Console.WriteLine("{0}", uid);
     }
 
-    private Command GetUpdateSubCommand()
+    private Command UpdateSubCommand()
     {
         var subCommand = new Command("update", "Update account.");
 
@@ -207,7 +207,7 @@ public class AccountConsoleCommand : IConsoleCommand
         System.Console.WriteLine("{0}", uid);
     }
 
-    private Command GetSetLinkSubCommand()
+    private Command SetLinkSubCommand()
     {
         var subCommand = new Command("setlink", "Set link.");
 
@@ -239,7 +239,7 @@ public class AccountConsoleCommand : IConsoleCommand
         System.Console.WriteLine("{0}", uid);
     }
 
-    private Command GetAddSensorSubCommand()
+    private Command AddSensorSubCommand()
     {
         var subCommand = new Command("addsensor", "Add sensor to account.");
 
@@ -272,7 +272,7 @@ public class AccountConsoleCommand : IConsoleCommand
             });
     }
 
-    private Command GetUpdateSensorSubCommand()
+    private Command UpdateSensorSubCommand()
     {
         var subCommand = new Command("updatesensor", "Update sensor from account.");
 

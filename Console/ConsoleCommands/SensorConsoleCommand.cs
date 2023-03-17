@@ -20,13 +20,13 @@ public class SensorConsoleCommand : IConsoleCommand
     public Command GetCommandLineCommand()
     {
         var command = new Command("sensor", "Sensor actions.");
-        command.AddCommand(GetListSubCommand());
-        command.AddCommand(GetCreateSubCommand());
-        command.AddCommand(GetSetLinkSubCommand());
+        command.AddCommand(ListSubCommand());
+        command.AddCommand(CreateSubCommand());
+        command.AddCommand(SetLinkSubCommand());
         return command;
     }
 
-    private Command GetListSubCommand()
+    private Command ListSubCommand()
     {
         var subCommand = new Command("list", "List sensors.");
 
@@ -48,7 +48,7 @@ public class SensorConsoleCommand : IConsoleCommand
         }
     }
 
-    private Command GetCreateSubCommand()
+    private Command CreateSubCommand()
     {
         var subCommand = new Command("create", "Create sensor.");
 
@@ -82,7 +82,7 @@ public class SensorConsoleCommand : IConsoleCommand
         System.Console.WriteLine("{0}", uid);
     }
 
-    private Command GetSetLinkSubCommand()
+    private Command SetLinkSubCommand()
     {
         var subCommand = new Command("setlink", "Set link.");
 
