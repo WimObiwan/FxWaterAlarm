@@ -1,4 +1,6 @@
+using System.Globalization;
 using Core;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +35,19 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+var supportedCultures = new List<CultureInfo>
+{
+    new("nl-BE"),
+    new("en-BE")
+};
+var options = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("nl-BE"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+app.UseRequestLocalization(options);
 
 app.MapRazorPages();
 app.MapControllers();
