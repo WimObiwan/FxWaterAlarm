@@ -148,10 +148,10 @@ public class MeasurementRepository : IMeasurementRepository
 
         [InfluxField("last_batV")] public double BatV { get; set; }
 
-        [InfluxField("min_distance")] public int MinDistance { get; set; }
-        [InfluxField("mean_distance")] public int MeanDistance { get; set; }
-        [InfluxField("max_distance")] public int MaxDistance { get; set; }
-        [InfluxField("last_distance")] public int LastDistance { get; set; }
+        [InfluxField("min_distance")] public int? MinDistance { get; set; }
+        [InfluxField("mean_distance")] public int? MeanDistance { get; set; }
+        [InfluxField("max_distance")] public int? MaxDistance { get; set; }
+        [InfluxField("last_distance")] public int? LastDistance { get; set; }
 
         [InfluxField("last_RSSI")] public int Rssi { get; set; }
     }
