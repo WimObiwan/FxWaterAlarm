@@ -1,7 +1,6 @@
 using Core.Entities;
 using Microsoft.Extensions.Options;
 using Vibrant.InfluxDB.Client;
-using Vibrant.InfluxDB.Client.Rows;
 
 namespace Core.Repositories;
 

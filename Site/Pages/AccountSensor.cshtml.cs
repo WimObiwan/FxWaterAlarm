@@ -21,7 +21,7 @@ public class MeasurementDistance
     {
         get
         {
-            if (DistanceMm.HasValue && (_accountSensor is { DistanceMmEmpty: not null, DistanceMmFull: not null }))
+            if (DistanceMm.HasValue && _accountSensor is { DistanceMmEmpty: not null, DistanceMmFull: not null })
                 return ((double)_accountSensor.DistanceMmEmpty.Value - DistanceMm.Value)
                        / ((double)_accountSensor.DistanceMmEmpty.Value - _accountSensor.DistanceMmFull.Value);
             return null;
