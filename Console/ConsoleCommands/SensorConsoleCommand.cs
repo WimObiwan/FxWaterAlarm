@@ -196,9 +196,9 @@ public class SensorConsoleCommand : IConsoleCommand
         foreach (var result in results)
         {
             _logger.LogInformation("{DevEui} {Timestamp} {DistanceMm} {BatV} {RssiDbm}",
-                result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
+                result.DevEui, result.Timestamp, result.LastDistanceMm, result.BatV, result.RssiDbm);
             System.Console.WriteLine("{0} {1} {2} {3} {4}",
-                result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
+                result.DevEui, result.Timestamp, result.LastDistanceMm, result.BatV, result.RssiDbm);
         }
     }
 

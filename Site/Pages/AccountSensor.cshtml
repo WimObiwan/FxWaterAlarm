@@ -11,7 +11,7 @@
     {
         <div style="text-align: center; font-size: xx-large; text-decoration: underline; line-height: 200%;">@Model.AccountSensorEntity?.Name</div>
     }
-    @if (Model.LevelPrc.HasValue)
+    @if (Model.LastMeasurement.Distance.LevelFraction.HasValue)
     {
         <div>
             <svg id="fillGauge" width="100%" height="200" onclick=""></svg>
@@ -19,13 +19,13 @@
     }
     <div>
         <div style="text-align: center;">
-            @if (Model.LevelPrc.HasValue)
+            @if (Model.LastMeasurement.Distance.RealLevelFraction.HasValue)
             {
-                <div style="font-size: xx-large">@Math.Round(Model.LevelPrc.Value, 1)%</div>
+                <div style="font-size: xx-large">@Math.Round(Model.LastMeasurement.Distance.RealLevelFraction.Value * 100.0, 1)%</div>
             }
-            @if (Model.WaterL.HasValue)
+            @if (Model.LastMeasurement.Distance.WaterL.HasValue)
             {
-                <div style="font-size: xx-large">@Math.Round(Model.WaterL.Value, 0) liter</div>
+                <div style="font-size: xx-large">@Math.Round(Model.LastMeasurement.Distance.WaterL.Value, 0) liter</div>
             }
             @if (Model.LastMeasurement != null)
             {
@@ -35,20 +35,14 @@
                 <div>DevEui: @Model.AccountSensorEntity?.Sensor.DevEui</div>
                 @if (Model.LastMeasurement != null)
                 {
-                    <div>Distance: @Model.LastMeasurement.DistanceMm mm</div>
+                    <div>Distance: @Model.LastMeasurement.Distance.DistanceMm mm</div>
                     <div>
                         RSSI: @Model.LastMeasurement.RssiDbm dBm
-                        @if (Model.RssiPrc.HasValue)
-                        {
-                            @: - @Math.Round(Model.RssiPrc.Value, 0)%
-                        }
+                        - @Math.Round(Model.LastMeasurement.RssiPrc, 0)%
                     </div>
                     <div>
                         Battery: @Model.LastMeasurement.BatV V
-                        @if (Model.BatteryPrc.HasValue)
-                        {
-                            @: - @Math.Round(Model.BatteryPrc.Value, 0)%
-                        }
+                        - @Math.Round(Model.LastMeasurement.BatteryPrc, 0)%
                     </div>
                 }
                 @if (Model.AccountSensorEntity != null)
@@ -67,6 +61,13 @@
                         <div>Distance Empty: @Model.AccountSensorEntity.DistanceMmEmpty.Value mm</div>
                     }
                 }
+
+                @if (Model.Measurements != null)
+                {
+                    <div width="300" height="200">
+                        <canvas id="mychart" width="300" height="200"></canvas>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -83,7 +84,7 @@ else
     <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script src="~/js/SensorPage.js"></script>
 
-    @if (Model.LastMeasurement != null && Model.LevelPrc.HasValue)
+    @if (Model.LastMeasurement != null && Model.LastMeasurement.Distance.LevelFraction.HasValue)
     {
         <script>
             var config = liquidFillGaugeDefaultSettings();
@@ -99,13 +100,84 @@ else
             config.displayPercent = true;
             config.maxValue = 100;
 
-            var gauge = loadLiquidFillGauge("fillGauge", @Math.Round(Model.LevelPrc.Value), config);
+            var gauge = loadLiquidFillGauge("fillGauge", @Math.Round(Model.LastMeasurement.Distance.LevelFraction.Value * 100.0), config);
         
             $("time").each(function (elem) {
                     var utctimeval = $(this).html();
                     var date = new Date(utctimeval);
                     $(this).html(date.toLocaleString());
             })
+
+        </script>
+    }
+
+    @if (Model.Measurements != null)
+    {
+        <script>
+            var ctx = document.getElementById('mychart').getContext('2d'); //get the context (canvas)
+
+            var config = {     
+                //configure the chart
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.Measurements.Select(m => m.Timestamp.ToLocalTime().ToString("g")))),
+                    datasets: [
+                    {
+                        label: "Min",
+                        backgroundColor: 'rgba(55, 173, 221,  0.2)',
+                        borderColor: 'rgba(55, 173, 221, 0.0)',
+                        fill: false,  //no fill here
+                        tension: 0.4,
+                        data: @Html.Raw(Json.Serialize(Model.Measurements.Select(m => m.MaxDistance.WaterL)))
+                    },
+                    {
+                        label: "Max",
+                        backgroundColor: 'rgba(55, 173, 221, 0.2)',
+                        borderColor: 'rgba(55, 173, 221, 0.0)',
+                        fill: '-1', //fill until previous dataset
+                        tension: 0.4,
+                        data: @Html.Raw(Json.Serialize(Model.Measurements.Select(m => m.MinDistance.WaterL)))
+                    },
+                    {
+                        label: "Average",
+                        borderColor: 'rgba(55, 173, 221, 0.3)',
+                        fill: false,
+                        tension: 0.4,
+                        data: @Html.Raw(Json.Serialize(Model.Measurements.Select(m => m.MeanDistance.WaterL)))
+                    },
+                    {
+                        label: "Last",
+                        borderColor: 'rgba(55, 173, 221, 1.0)',
+                        fill: false,
+                        tension: 0.4,
+                        data: @Html.Raw(Json.Serialize(Model.Measurements.Select(m => m.LastDistance.WaterL)))
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    spanGaps: false,
+                    elements: {
+                        line: {
+                            tension: 0.000001
+                        }
+                    },
+                    plugins: {
+                        filler: {
+                            propagate: false
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                autoSkip: false
+                            }
+                        }]
+                    }
+                }
+            };
+            var chart = new Chart(ctx, config);        
         </script>
     }
 }
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
