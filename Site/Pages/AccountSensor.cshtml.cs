@@ -9,21 +9,21 @@ public class MeasurementDistance
 {
     private readonly Core.Entities.AccountSensor _accountSensor;
 
-    public MeasurementDistance(double distanceMm, Core.Entities.AccountSensor accountSensor)
+    public MeasurementDistance(int? distanceMm, Core.Entities.AccountSensor accountSensor)
     {
         DistanceMm = distanceMm;
         _accountSensor = accountSensor;
     }
 
-    public double DistanceMm { get; }
+    public int? DistanceMm { get; }
 
     public double? RealLevelFraction
     {
         get
         {
-            if (_accountSensor is { DistanceMmEmpty: not null, DistanceMmFull: not null })
-                return (_accountSensor.DistanceMmEmpty.Value - DistanceMm)
-                       / (_accountSensor.DistanceMmEmpty.Value - _accountSensor.DistanceMmFull.Value);
+            if (DistanceMm.HasValue && (_accountSensor is { DistanceMmEmpty: not null, DistanceMmFull: not null }))
+                return ((double)_accountSensor.DistanceMmEmpty.Value - DistanceMm.Value)
+                       / ((double)_accountSensor.DistanceMmEmpty.Value - _accountSensor.DistanceMmFull.Value);
             return null;
         }
     }
