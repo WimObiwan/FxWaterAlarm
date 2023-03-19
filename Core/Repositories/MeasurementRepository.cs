@@ -77,7 +77,7 @@ public class MeasurementRepository : IMeasurementRepository
         var result = await influxClient.ReadAsync<RecordAgg>("wateralarm", query, parameters,
             cancellationToken);
 
-        var test = await influxClient.ReadAsync<DynamicInfluxRow>("wateralarm", query, parameters, cancellationToken);
+        //var test = await influxClient.ReadAsync<DynamicInfluxRow>("wateralarm", query, parameters, cancellationToken);
 
         var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
         var record = series?.Rows?.Select(record =>
