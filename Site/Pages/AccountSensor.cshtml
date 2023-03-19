@@ -1,36 +1,21 @@
 @page
-@using System.Globalization
 @model AccountSensor
+
 @{
     ViewData["Title"] = "Home page";
 }
 
-@if (Model.LastMeasurement != null)
-{
+<div style="text-align: center;">
     @if (Model.AccountSensorEntity?.Name != null)
     {
         <div style="text-align: center; font-size: xx-large; text-decoration: underline; line-height: 200%;">@Model.AccountSensorEntity?.Name</div>
     }
-    @if (Model.LastMeasurement.Distance.LevelFraction.HasValue)
+
+    @if (Model.LastMeasurement != null)
     {
+        @await Component.InvokeAsync("Waterlevel", new { measurementEx = Model.LastMeasurement })
+
         <div>
-            <svg id="fillGauge" width="100%" height="200" onclick=""></svg>
-        </div>
-    }
-    <div>
-        <div style="text-align: center;">
-            @if (Model.LastMeasurement.Distance.RealLevelFraction.HasValue)
-            {
-                <div style="font-size: xx-large">@Math.Round(Model.LastMeasurement.Distance.RealLevelFraction.Value * 100.0, 1)%</div>
-            }
-            @if (Model.LastMeasurement.Distance.WaterL.HasValue)
-            {
-                <div style="font-size: xx-large">@Math.Round(Model.LastMeasurement.Distance.WaterL.Value, 0) liter</div>
-            }
-            @if (Model.LastMeasurement != null)
-            {
-                <time>@Model.LastMeasurement.Timestamp.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)</time>
-            }
             <div class="grayout">
                 <div>DevEui: @Model.AccountSensorEntity?.Sensor.DevEui</div>
                 @if (Model.LastMeasurement != null)
@@ -70,47 +55,15 @@
                 }
             </div>
         </div>
-    </div>
-}
-else
-{
-    <div style="text-align: center;">
+    }
+    else
+    {
         <div style="text-align: center; font-size: xx-large">No sensor found with the specified Id.</div>
-    </div>
-}
+    }
+</div>
 
 @section Scripts
 {
-    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-    <script src="~/js/SensorPage.js"></script>
-
-    @if (Model.LastMeasurement != null && Model.LastMeasurement.Distance.LevelFraction.HasValue)
-    {
-        <script>
-            var config = liquidFillGaugeDefaultSettings();
-            
-            config.circleColor = "#1ca3ec"
-            config.textColor = "#74ccf4"
-            config.waveTextColor = "#bbeeff"
-            config.waveColor = "#1ca3ec"
-            config.warningThreshold = .4;
-            config.waveCount = 4;
-            config.waveRiseTime = 60;
-            config.waveAnimateTime = 6000;
-            config.displayPercent = true;
-            config.maxValue = 100;
-
-            var gauge = loadLiquidFillGauge("fillGauge", @Math.Round(Model.LastMeasurement.Distance.LevelFraction.Value * 100.0), config);
-        
-            $("time").each(function (elem) {
-                    var utctimeval = $(this).html();
-                    var date = new Date(utctimeval);
-                    $(this).html(date.toLocaleString());
-            })
-
-        </script>
-    }
-
     @if (Model.Measurements != null)
     {
         <script>
