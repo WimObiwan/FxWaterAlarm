@@ -97,44 +97,6 @@ public class MeasurementAggEx
     public double RssiDbm => _measurement.RssiDbm;
     public double RssiPrc => (_measurement.RssiDbm + 150.0) / 60.0 * 80.0;
     public double BatteryPrc => (_measurement.BatV - 3.0) / 0.335 * 100.0;
-
-    public double? LastRealLevelFraction
-    {
-        get
-        {
-            if (_accountSensor is { DistanceMmEmpty: not null, DistanceMmFull: not null })
-                return ((double)_accountSensor.DistanceMmEmpty.Value - _measurement.LastDistanceMm)
-                       / (_accountSensor.DistanceMmEmpty.Value - _accountSensor.DistanceMmFull.Value);
-            return null;
-        }
-    }
-
-    public double? LevelFraction
-    {
-        get
-        {
-            var realLevelFraction = LastRealLevelFraction;
-            if (!realLevelFraction.HasValue)
-                return null;
-            if (realLevelFraction.Value > 1.0)
-                return 1.0;
-            if (realLevelFraction.Value < 0.0)
-                return 0.0;
-            return realLevelFraction;
-        }
-    }
-
-    public double? WaterL
-    {
-        get
-        {
-            var levelFraction = LevelFraction;
-            if (levelFraction != null && _accountSensor.CapacityL.HasValue)
-                return levelFraction.Value * _accountSensor.CapacityL.Value;
-
-            return null;
-        }
-    }
 }
 
 public class AccountSensor : PageModel
