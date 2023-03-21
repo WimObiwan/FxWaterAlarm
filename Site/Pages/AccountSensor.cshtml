@@ -1,4 +1,5 @@
 @page
+@using Microsoft.EntityFrameworkCore
 @model AccountSensor
 
 @{
@@ -15,19 +16,58 @@
     {
         @await Component.InvokeAsync("Waterlevel", new { measurementEx = Model.LastMeasurement })
 
-        @await Component.InvokeAsync("MeasurementDetails", new
-               {
-                   accountSensor = Model.AccountSensorEntity, measurementEx = Model.LastMeasurement
-               })
-        
-        @if (Model.Measurements != null)
+        <ul class="nav nav-tabs">
+            @* <li class="nav-item dropdown"> *@
+            @*     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Dropdown</a> *@
+            @*     <ul class="dropdown-menu"> *@
+            @*         <li><a class="dropdown-item" href="#">Action</a></li> *@
+            @*         <li><a class="dropdown-item" href="#">Another action</a></li> *@
+            @*         <li><a class="dropdown-item" href="#">Something else here</a></li> *@
+            @*         <li><hr class="dropdown-divider"></li> *@
+            @*         <li><a class="dropdown-item" href="#">Separated link</a></li> *@
+            @*     </ul> *@
+            @* </li> *@
+            <li class="nav-item">
+                @if (Model.PageType == AccountSensor.PageTypeEnum.Graph)
+                {
+                    <a class="nav-link active" aria-current="page" href="?page=graph">Graph</a>
+                }
+                else
+                {
+                    <a class="nav-link" href="?page=graph">Graph</a>
+                }
+            </li>
+            <li class="nav-item">
+                @if (Model.PageType == AccountSensor.PageTypeEnum.Details)
+                {
+                    <a class="nav-link active" aria-current="page" href="?page=details">Details</a>
+                }
+                else
+                {
+                    <a class="nav-link" href="?page=details">Details</a>
+                }
+            </li>
+        </ul>
+
+        @if (Model.PageType == AccountSensor.PageTypeEnum.Details)
         {
-            <div style="width: 100%; height: 40vh">
-                @await Component.InvokeAsync("MeasurementsGraph", new
-                       {
-                           Model.Measurements
-                       })
-            </div>
+            @await Component.InvokeAsync("MeasurementDetails", new
+                   {
+                       accountSensor = Model.AccountSensorEntity, measurementEx = Model.LastMeasurement
+                   })
+        }
+        
+        @if (Model.PageType == AccountSensor.PageTypeEnum.Graph)
+        {
+            @if (Model.Measurements != null)
+            {
+                <div style="width: 100%; height: 40vh">
+                    @await Component.InvokeAsync("MeasurementsGraph", new
+                           {
+                               Model.Measurements
+                           })
+                </div>
+            }
         }
     }
     else

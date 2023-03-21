@@ -1,6 +1,7 @@
 using Core.Entities;
 using Core.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Site.Pages;
@@ -101,6 +102,12 @@ public class MeasurementAggEx
 
 public class AccountSensor : PageModel
 {
+    public enum PageTypeEnum
+    {
+        Graph,
+        Details
+    }
+
     private readonly IMediator _mediator;
 
     public AccountSensor(IMediator mediator)
@@ -110,13 +117,14 @@ public class AccountSensor : PageModel
 
     public MeasurementEx? LastMeasurement { get; private set; }
     public MeasurementAggEx[]? Measurements { get; private set; }
-
-    public double? ResolutionL { get; private set; }
-
     public Core.Entities.AccountSensor? AccountSensorEntity { get; private set; }
 
-    public async Task OnGet(string accountLink, string sensorLink)
+    public PageTypeEnum PageType { get; private set; }
+
+    public async Task OnGet(string accountLink, string sensorLink, [FromQuery] PageTypeEnum page = PageTypeEnum.Graph)
     {
+        PageType = page;
+
         AccountSensorEntity = await _mediator.Send(new SensorByLinkQuery
         {
             SensorLink = sensorLink,
@@ -129,14 +137,15 @@ public class AccountSensor : PageModel
                 { DevEui = AccountSensorEntity.Sensor.DevEui });
             if (lastMeasurement != null) LastMeasurement = new MeasurementEx(lastMeasurement, AccountSensorEntity);
 
-            Measurements = (await _mediator.Send(new MeasurementsQuery
-                {
-                    DevEui = AccountSensorEntity.Sensor.DevEui,
-                    From = DateTime.UtcNow.AddDays(-7.0)
-                }))
-                .OrderBy(m => m.Timestamp)
-                .Select(m => new MeasurementAggEx(m, AccountSensorEntity))
-                .ToArray();
+            if (PageType == PageTypeEnum.Graph)
+                Measurements = (await _mediator.Send(new MeasurementsQuery
+                    {
+                        DevEui = AccountSensorEntity.Sensor.DevEui,
+                        From = DateTime.UtcNow.AddDays(-7.0)
+                    }))
+                    .OrderBy(m => m.Timestamp)
+                    .Select(m => new MeasurementAggEx(m, AccountSensorEntity))
+                    .ToArray();
         }
     }
 }
