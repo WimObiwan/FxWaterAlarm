@@ -163,12 +163,6 @@ public class AccountSensor : PageModel
 
         if (AccountSensorEntity != null)
         {
-            if (AccountSensorEntity.DistanceMmEmpty.HasValue && AccountSensorEntity.DistanceMmFull.HasValue &&
-                AccountSensorEntity.CapacityL.HasValue)
-                ResolutionL =
-                    1.0 / (AccountSensorEntity.DistanceMmEmpty.Value - AccountSensorEntity.DistanceMmFull.Value)
-                    * AccountSensorEntity.CapacityL.Value;
-
             var lastMeasurement = await _mediator.Send(new LastMeasurementQuery
                 { DevEui = AccountSensorEntity.Sensor.DevEui });
             if (lastMeasurement != null) LastMeasurement = new MeasurementEx(lastMeasurement, AccountSensorEntity);

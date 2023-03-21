@@ -10,4 +10,14 @@ public class AccountSensor
     public int? DistanceMmEmpty { get; set; }
     public int? DistanceMmFull { get; set; }
     public int? CapacityL { get; set; }
+    public double? ResolutionL
+    {
+        get
+        {
+            if (!DistanceMmEmpty.HasValue || !DistanceMmFull.HasValue || !CapacityL.HasValue)
+                return null;
+            
+            return 1.0 / (DistanceMmEmpty.Value - DistanceMmFull.Value) * CapacityL.Value;
+        }
+    }
 }

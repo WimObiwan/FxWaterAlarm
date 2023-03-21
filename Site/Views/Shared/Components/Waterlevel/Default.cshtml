@@ -1,8 +1,12 @@
 @model Site.Pages.MeasurementEx
 
+@{
+  var uniqueId = Guid.NewGuid().ToString("N");
+}
+
 <div>
     <div>
-        <svg id="fillGauge-@Model.DevEui" width="100%" height="200" onclick=""></svg>
+        <svg id="fillGauge-@uniqueId" width="100%" height="200" onclick=""></svg>
     </div>
 
     @{
@@ -41,6 +45,6 @@
         config.displayPercent = true;
         config.maxValue = 100;
 
-        var gauge = loadLiquidFillGauge("fillGauge-@Model.DevEui", @Math.Round(Model.Distance.LevelFraction.Value * 100.0), config);
+        var gauge = loadLiquidFillGauge("fillGauge-@uniqueId", @Math.Round(Model.Distance.LevelFraction.Value * 100.0), config);
     </script>
 }
