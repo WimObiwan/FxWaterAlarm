@@ -22,6 +22,7 @@
                 backgroundColor: 'rgba(55, 173, 221,  0.2)',
                 borderColor: 'rgba(55, 173, 221, 0.0)',
                 fill: false,  //no fill here
+                cubicInterpolationMode: 'monotone',
                 tension: 0.4,
                 data: @Html.Raw(Json.Serialize(Model.Select(m => m.MaxDistance.WaterL)))
             },
@@ -30,6 +31,7 @@
                 backgroundColor: 'rgba(55, 173, 221, 0.2)',
                 borderColor: 'rgba(55, 173, 221, 0.0)',
                 fill: '-1', //fill until previous dataset
+                cubicInterpolationMode: 'monotone',
                 tension: 0.4,
                 data: @Html.Raw(Json.Serialize(Model.Select(m => m.MinDistance.WaterL)))
             },
@@ -37,6 +39,7 @@
                 label: "Average",
                 borderColor: 'rgba(55, 173, 221, 0.3)',
                 fill: false,
+                cubicInterpolationMode: 'monotone',
                 tension: 0.4,
                 data: @Html.Raw(Json.Serialize(Model.Select(m => m.MeanDistance.WaterL)))
             },
@@ -44,6 +47,7 @@
                 label: "Last",
                 borderColor: 'rgba(55, 173, 221, 1.0)',
                 fill: false,
+                cubicInterpolationMode: 'monotone',
                 tension: 0.4,
                 data: @Html.Raw(Json.Serialize(Model.Select(m => m.LastDistance.WaterL)))
             }]
