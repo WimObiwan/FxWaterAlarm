@@ -104,7 +104,10 @@ public class AccountSensor : PageModel
 {
     public enum PageTypeEnum
     {
-        Graph,
+        Graph6H,
+        Graph24H,
+        Graph7D,
+        Graph3M,
         Details
     }
 
@@ -121,7 +124,7 @@ public class AccountSensor : PageModel
 
     public PageTypeEnum PageType { get; private set; }
 
-    public async Task OnGet(string accountLink, string sensorLink, [FromQuery] PageTypeEnum page = PageTypeEnum.Graph)
+    public async Task OnGet(string accountLink, string sensorLink, [FromQuery] PageTypeEnum page = PageTypeEnum.Graph7D)
     {
         PageType = page;
 
@@ -137,11 +140,29 @@ public class AccountSensor : PageModel
                 { DevEui = AccountSensorEntity.Sensor.DevEui });
             if (lastMeasurement != null) LastMeasurement = new MeasurementEx(lastMeasurement, AccountSensorEntity);
 
-            if (PageType == PageTypeEnum.Graph)
+            Tuple<TimeSpan, TimeSpan?>? period = null;
+            switch (PageType)
+            {
+                case PageTypeEnum.Graph6H:
+                    period = Tuple.Create<TimeSpan, TimeSpan?>(TimeSpan.FromHours(6), TimeSpan.FromMinutes(20));
+                    break;
+                case PageTypeEnum.Graph24H:
+                    period = Tuple.Create<TimeSpan, TimeSpan?>(TimeSpan.FromDays(1), TimeSpan.FromHours(1));
+                    break;
+                case PageTypeEnum.Graph7D:
+                    period = Tuple.Create<TimeSpan, TimeSpan?>(TimeSpan.FromDays(7), TimeSpan.FromHours(6));
+                    break;
+                case PageTypeEnum.Graph3M:
+                    period = Tuple.Create<TimeSpan, TimeSpan?>(TimeSpan.FromDays(90), TimeSpan.FromDays(7));
+                    break;
+            }
+
+            if (period != null)
                 Measurements = (await _mediator.Send(new MeasurementsQuery
                     {
                         DevEui = AccountSensorEntity.Sensor.DevEui,
-                        From = DateTime.UtcNow.AddDays(-7.0)
+                        From = DateTime.UtcNow.Add(-period.Item1),
+                        Interval = period.Item2
                     }))
                     .OrderBy(m => m.Timestamp)
                     .Select(m => new MeasurementAggEx(m, AccountSensorEntity))

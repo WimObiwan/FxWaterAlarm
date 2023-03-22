@@ -16,35 +16,44 @@
         @await Component.InvokeAsync("Waterlevel", new { measurementEx = Model.LastMeasurement })
 
         <ul class="nav nav-tabs">
-            @* <li class="nav-item dropdown"> *@
-            @*     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Dropdown</a> *@
-            @*     <ul class="dropdown-menu"> *@
-            @*         <li><a class="dropdown-item" href="#">Action</a></li> *@
-            @*         <li><a class="dropdown-item" href="#">Another action</a></li> *@
-            @*         <li><a class="dropdown-item" href="#">Something else here</a></li> *@
-            @*         <li><hr class="dropdown-divider"></li> *@
-            @*         <li><a class="dropdown-item" href="#">Separated link</a></li> *@
-            @*     </ul> *@
-            @* </li> *@
-            <li class="nav-item">
-                @if (Model.PageType == AccountSensor.PageTypeEnum.Graph)
+            @{
+                string PageTypeMenu(AccountSensor.PageTypeEnum modelPageType, AccountSensor.PageTypeEnum menuPageType)
                 {
-                    <a class="nav-link active" aria-current="page" href="?page=graph">Graph</a>
+                    if (modelPageType == menuPageType)
+                    {
+                        return @"class=""nav-link active"" aria-current=""page""";
+                    }
+                    return @"class=""nav-link""";
                 }
-                else
+
+                string PageTypeSubMenu(AccountSensor.PageTypeEnum modelPageType, AccountSensor.PageTypeEnum menuPageType)
                 {
-                    <a class="nav-link" href="?page=graph">Graph</a>
+                    if (modelPageType == menuPageType)
+                    {
+                        return @"class=""dropdown-item active""";
+                    }
+                    return @"class=""dropdown-item""";
                 }
+            }
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Graph</a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph6H)) href="?page=graph6h">Graph 6h</a>
+                    </li>
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph24H)) href="?page=graph24h">Graph 24h</a>
+                    </li>
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph7D)) href="?page=graph7d">Graph 7d</a>
+                    </li>
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph3M)) href="?page=graph3m">Graph 3m</a>
+                    </li>
+                </ul>
             </li>
             <li class="nav-item">
-                @if (Model.PageType == AccountSensor.PageTypeEnum.Details)
-                {
-                    <a class="nav-link active" aria-current="page" href="?page=details">Details</a>
-                }
-                else
-                {
-                    <a class="nav-link" href="?page=details">Details</a>
-                }
+                <a @Html.Raw(PageTypeMenu(Model.PageType, AccountSensor.PageTypeEnum.Details)) href="?page=details">Details</a>
             </li>
         </ul>
 
@@ -55,18 +64,15 @@
                        accountSensor = Model.AccountSensorEntity, measurementEx = Model.LastMeasurement
                    })
         }
-        
-        @if (Model.PageType == AccountSensor.PageTypeEnum.Graph)
+
+        @if (Model.Measurements != null)
         {
-            @if (Model.Measurements != null)
-            {
-                <div style="width: 100%; height: 40vh">
-                    @await Component.InvokeAsync("MeasurementsGraph", new
-                           {
-                               Model.Measurements
-                           })
-                </div>
-            }
+            <div style="width: 100%; height: 40vh">
+                @await Component.InvokeAsync("MeasurementsGraph", new
+                       {
+                           Model.Measurements
+                       })
+            </div>
         }
     }
     else

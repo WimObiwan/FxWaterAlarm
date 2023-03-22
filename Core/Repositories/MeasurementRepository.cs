@@ -16,7 +16,9 @@ public class MeasurementInfluxOptions
 public interface IMeasurementRepository
 {
     Task<Measurement?> GetLast(string devEui, CancellationToken cancellationToken);
-    Task<MeasurementAgg[]> Get(string devEui, DateTime from, DateTime? till, CancellationToken cancellationToken);
+
+    Task<MeasurementAgg[]> Get(string devEui, DateTime from, DateTime? till, TimeSpan? interval,
+        CancellationToken cancellationToken);
 
     Task<Measurement?[]> GetTrends(string devEui, IEnumerable<DateTime> timestamps,
         CancellationToken cancellationToken);
@@ -53,24 +55,48 @@ public class MeasurementRepository : IMeasurementRepository
         };
     }
 
-    public async Task<MeasurementAgg[]> Get(string devEui, DateTime from, DateTime? till,
+    public async Task<MeasurementAgg[]> Get(string devEui, DateTime from, DateTime? till, TimeSpan? interval,
         CancellationToken cancellationToken)
     {
-        string query;
         object parameters;
 
+        string tillFilterText;
         if (till.HasValue)
         {
-            query =
-                "SELECT MIN(*), MEAN(*), MAX(*), LAST(*) FROM waterlevel WHERE DevEUI = $devEui AND time >= $from AND time <= $till GROUP BY *, time(3h) ORDER BY DESC LIMIT 1000";
+            tillFilterText = "time <= $till ";
             parameters = new { devEui, from, till };
         }
         else
         {
-            query =
-                "SELECT MIN(*), MEAN(*), MAX(*), LAST(*) FROM waterlevel WHERE DevEUI = $devEui AND time >= $from GROUP BY *, time(3h)  ORDER BY DESC LIMIT 1000";
+            tillFilterText = "";
             parameters = new { devEui, from };
         }
+
+        string selectText;
+        string intervalText;
+        if (!interval.HasValue || interval < TimeSpan.FromMinutes(1))
+        {
+            selectText = "*";
+            intervalText = "";
+        }
+        else
+        {
+            selectText = "MIN(*), MEAN(*), MAX(*), LAST(*)";
+            if (interval < TimeSpan.FromHours(1))
+                intervalText = $", time({60 / (60 / (int)interval.Value.TotalMinutes)}m)";
+            else if (interval < TimeSpan.FromDays(1))
+                intervalText = $", time({24 / (24 / (int)interval.Value.TotalHours)}h)";
+            else
+                intervalText = $", time({(int)interval.Value.TotalDays}d)";
+        }
+
+        var query = "SELECT "
+                    + selectText
+                    + " FROM waterlevel WHERE DevEUI = $devEui AND time >= $from "
+                    + tillFilterText
+                    + "GROUP BY *"
+                    + intervalText
+                    + " ORDER BY DESC LIMIT 1000";
 
         using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
         var result = await influxClient.ReadAsync<RecordAgg>("wateralarm", query, parameters,
