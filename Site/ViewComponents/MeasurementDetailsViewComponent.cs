@@ -1,18 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Site.Pages;
+using AccountSensor = Core.Entities.AccountSensor;
 
 namespace Site.ViewComponents;
 
 public class MeasurementDetailsModel
 {
     public required MeasurementEx? MeasurementEx { get; init; }
-    public required Core.Entities.AccountSensor AccountSensor { get; init; }
+    public required AccountSensor AccountSensor { get; init; }
 }
 
 public class MeasurementDetailsViewComponent : ViewComponent
 {
     public async Task<IViewComponentResult> InvokeAsync(
-        Core.Entities.AccountSensor accountSensor, MeasurementEx? measurementEx)
+        AccountSensor accountSensor, MeasurementEx? measurementEx)
     {
         var model = new MeasurementDetailsModel
         {
