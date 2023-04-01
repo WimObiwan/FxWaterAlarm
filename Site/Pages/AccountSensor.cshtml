@@ -2,7 +2,7 @@
 @model AccountSensor
 
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = Model.AccountSensorEntity?.Name ?? Model.AccountSensorEntity?.Sensor.DevEui ?? "Sensor";
 }
 
 <div style="text-align: center;">
