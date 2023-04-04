@@ -33,11 +33,11 @@ builder.Services.Configure<RequestLocalizationOptions>(o =>
 builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
 
 builder.Services.AddRazorPages(o =>
-    o.Conventions
-        .AddPageRoute("/Sensor", "/sensor/{SensorLink}")
-        .AddPageRoute("/Sensor", "/s/{SensorLink}")
-        .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
-)
+        o.Conventions
+            .AddPageRoute("/Sensor", "/sensor/{SensorLink}")
+            .AddPageRoute("/Sensor", "/s/{SensorLink}")
+            .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
+    )
     .AddViewLocalization();
 builder.Services.AddControllers();
 

@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="appsettings.Local.json" />
-        <None Include="wwwroot\js\Index.js" />
+        <None Include="appsettings.Local.json"/>
+        <None Include="wwwroot\js\Index.js"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Core\Core.csproj" />
+        <ProjectReference Include="..\Core\Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -20,40 +20,40 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Resources\Pages\Index.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Index.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Pages\AccountSensor.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>AccountSensor.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Resources\Views\Shared\Components\MeasurementDetails\Default.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Default.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Pages\Index.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Index.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Pages\AccountSensor.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>AccountSensor.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Views\Shared\Components\MeasurementDetails\Default.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Default.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Resources\Pages\Index.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Index.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Pages\AccountSensor.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>AccountSensor.resx</DependentUpon>
-      </Compile>
-      <Compile Update="Resources\Views\Shared\Components\MeasurementDetails\Default.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Default.resx</DependentUpon>
-      </Compile>
+        <Compile Update="Resources\Pages\Index.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Index.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Pages\AccountSensor.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>AccountSensor.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Views\Shared\Components\MeasurementDetails\Default.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Default.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
 </Project>

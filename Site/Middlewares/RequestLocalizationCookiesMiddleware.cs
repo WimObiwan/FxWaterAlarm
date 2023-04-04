@@ -10,12 +10,10 @@ public static class RequestLocalizationCookiesMiddlewareExtensions
         app.UseMiddleware<RequestLocalizationCookiesMiddleware>();
         return app;
     }
-} 
+}
 
 public class RequestLocalizationCookiesMiddleware : IMiddleware
 {
-    private CookieRequestCultureProvider? Provider { get; }
-
     public RequestLocalizationCookiesMiddleware(IOptions<RequestLocalizationOptions> requestLocalizationOptions)
     {
         Provider =
@@ -26,7 +24,9 @@ public class RequestLocalizationCookiesMiddleware : IMiddleware
                 .Cast<CookieRequestCultureProvider>()
                 .FirstOrDefault();
     }
-    
+
+    private CookieRequestCultureProvider? Provider { get; }
+
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         if (Provider != null)
@@ -34,7 +34,6 @@ public class RequestLocalizationCookiesMiddleware : IMiddleware
             var feature = context.Features.Get<IRequestCultureFeature>();
 
             if (feature != null)
-            {
                 // remember culture across request
                 context.Response
                     .Cookies
@@ -42,7 +41,6 @@ public class RequestLocalizationCookiesMiddleware : IMiddleware
                         Provider.CookieName,
                         CookieRequestCultureProvider.MakeCookieValue(feature.RequestCulture)
                     );
-            }
         }
 
         await next(context);
