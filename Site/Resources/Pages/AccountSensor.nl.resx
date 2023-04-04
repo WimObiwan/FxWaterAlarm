@@ -1,0 +1,41 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="No sensor found with the specified Id." xml:space="preserve">
+        <value>Geen sensor gevonden met de opgegeven code.</value>
+    </data>
+    <data name="Graph" xml:space="preserve">
+        <value>Grafiek</value>
+        <comment>Graph</comment>
+    </data>
+    <data name="Graph 6h" xml:space="preserve">
+        <value>Grafiek 6h</value>
+        <comment>Graph 6h</comment>
+    </data>
+    <data name="Graph 24h" xml:space="preserve">
+        <value>Grafiek 24h</value>
+        <comment>Graph 24h</comment>
+    </data>
+    <data name="Graph 7d" xml:space="preserve">
+        <value>Grafiek 7d</value>
+        <comment>Graph 7d</comment>
+    </data>
+    <data name="Graph 3m" xml:space="preserve">
+        <value>Grafiek 3m</value>
+        <comment>Graph 3m</comment>
+    </data>
+    <data name="Details" xml:space="preserve">
+        <value>Details</value>
+        <comment>Details</comment>
+    </data>
+</root>

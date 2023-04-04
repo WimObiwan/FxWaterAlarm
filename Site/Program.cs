@@ -1,18 +1,44 @@
 using System.Globalization;
 using Core;
 using Microsoft.AspNetCore.Localization;
+using Site.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.Local.json", true);
 
 // Add services to the container.
+builder.Services.AddLocalization(o =>
+    o.ResourcesPath = "Resources"
+);
+
+var supportedCultures = new List<CultureInfo>
+{
+    new("nl-BE"),
+    new("en-BE"),
+    new("nl"),
+    new("en")
+};
+
+builder.Services.Configure<RequestLocalizationOptions>(o =>
+{
+    o.DefaultRequestCulture = new RequestCulture("nl-BE");
+    o.SupportedCultures = supportedCultures;
+    o.SupportedUICultures = supportedCultures;
+    o.ApplyCurrentCultureToResponseHeaders = true;
+    o.FallBackToParentCultures = true;
+    o.FallBackToParentUICultures = true;
+});
+
+builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
+
 builder.Services.AddRazorPages(o =>
     o.Conventions
         .AddPageRoute("/Sensor", "/sensor/{SensorLink}")
         .AddPageRoute("/Sensor", "/s/{SensorLink}")
         .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
-);
+)
+    .AddViewLocalization();
 builder.Services.AddControllers();
 
 builder.Services.AddWaterAlarmCore(builder.Configuration, typeof(Program).Assembly);
@@ -32,22 +58,12 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseRequestLocalization();
+app.UseRequestLocalizationCookies();
+
 app.UseRouting();
 
 app.UseAuthorization();
-
-var supportedCultures = new List<CultureInfo>
-{
-    new("nl-BE"),
-    new("en-BE")
-};
-var options = new RequestLocalizationOptions
-{
-    DefaultRequestCulture = new RequestCulture("nl-BE"),
-    SupportedCultures = supportedCultures,
-    SupportedUICultures = supportedCultures
-};
-app.UseRequestLocalization(options);
 
 app.MapRazorPages();
 app.MapControllers();

@@ -1,5 +1,7 @@
 @page
+@using Microsoft.AspNetCore.Mvc.Localization
 @model AccountSensor
+@inject IViewLocalizer Loc
 
 @{
     ViewData["Title"] = Model.AccountSensorEntity?.Name ?? Model.AccountSensorEntity?.Sensor.DevEui ?? "Sensor";
@@ -36,24 +38,24 @@
                 }
             }
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Graph</a>
+                <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Graph"]</a>
                 <ul class="dropdown-menu">
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph6H)) href="?page=graph6h">Graph 6h</a>
+                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph6H)) href="?page=graph6h">@Loc["Graph 6h"]</a>
                     </li>
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph24H)) href="?page=graph24h">Graph 24h</a>
+                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph24H)) href="?page=graph24h">@Loc["Graph 24h"]</a>
                     </li>
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph7D)) href="?page=graph7d">Graph 7d</a>
+                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph7D)) href="?page=graph7d">@Loc["Graph 7d"]</a>
                     </li>
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph3M)) href="?page=graph3m">Graph 3m</a>
+                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph3M)) href="?page=graph3m">@Loc["Graph 3m"]</a>
                     </li>
                 </ul>
             </li>
             <li class="nav-item">
-                <a @Html.Raw(PageTypeMenu(Model.PageType, AccountSensor.PageTypeEnum.Details)) href="?page=details">Details</a>
+                <a @Html.Raw(PageTypeMenu(Model.PageType, AccountSensor.PageTypeEnum.Details)) href="?page=details">@Loc["Details"]</a>
             </li>
         </ul>
 
@@ -77,6 +79,6 @@
     }
     else
     {
-        <div style="text-align: center; font-size: xx-large">No sensor found with the specified Id.</div>
+        <div style="text-align: center; font-size: xx-large">@Loc["No sensor found with the specified Id."]</div>
     }
 </div>

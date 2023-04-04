@@ -1,4 +1,6 @@
+@using Microsoft.AspNetCore.Mvc.Localization
 @model Site.ViewComponents.MeasurementDetailsModel
+@inject IViewLocalizer Loc
 
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
@@ -8,27 +10,27 @@
     <div>DevEui: @Model.AccountSensor.Sensor.DevEui</div>
     @if (Model.MeasurementEx != null)
     {
-        <div>Distance: @Model.MeasurementEx.Distance.DistanceMm mm</div>
+        <div>@Loc["Distance"]: @Model.MeasurementEx.Distance.DistanceMm mm</div>
         <div>
-            RSSI: @Model.MeasurementEx.RssiDbm dBm
+            @Loc["RSSI"]: @Model.MeasurementEx.RssiDbm dBm
             - @Math.Round(Model.MeasurementEx.RssiPrc, 0)%
         </div>
         <div>
-            Battery: @Model.MeasurementEx.BatV V
+            @Loc["Battery"]: @Model.MeasurementEx.BatV V
             - @Math.Round(Model.MeasurementEx.BatteryPrc, 0)%
         </div>
     }
     @if (Model.AccountSensor.CapacityL.HasValue)
     {
-        <div>Capacity: @Model.AccountSensor.CapacityL.Value liter</div>
+        <div>@Loc["Capacity"]: @Model.AccountSensor.CapacityL.Value liter</div>
     }
     @if (Model.AccountSensor.ResolutionL.HasValue)
     {
-        <div>Resolution: @Math.Round(Model.AccountSensor.ResolutionL.Value, 2) liter (1 mm)</div>
+        <div>@Loc["Resolution"]: @Math.Round(Model.AccountSensor.ResolutionL.Value, 2) @Loc["liter (1 mm)"]</div>
     }
     @if (Model.AccountSensor is { DistanceMmFull: not null,DistanceMmEmpty: not null })
     {
-        <div>Distance Full: @Model.AccountSensor.DistanceMmFull.Value mm</div>
-        <div>Distance Empty: @Model.AccountSensor.DistanceMmEmpty.Value mm</div>
+        <div>@Loc["Distance Full"]: @Model.AccountSensor.DistanceMmFull.Value mm</div>
+        <div>@Loc["Distance Empty"]: @Model.AccountSensor.DistanceMmEmpty.Value mm</div>
     }
 </div>
