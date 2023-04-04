@@ -37,24 +37,26 @@
             },
             {
                 label: "Average",
-                borderColor: 'rgba(55, 173, 221, 0.3)',
-                fill: false,
-                cubicInterpolationMode: 'monotone',
-                tension: 0.4,
-                data: @Html.Raw(Json.Serialize(Model.Select(m => m.MeanDistance.WaterL)))
-            },
-            {
-                label: "Last",
                 borderColor: 'rgba(55, 173, 221, 1.0)',
                 fill: false,
                 cubicInterpolationMode: 'monotone',
                 tension: 0.4,
-                data: @Html.Raw(Json.Serialize(Model.Select(m => m.LastDistance.WaterL)))
-            }]
+                data: @Html.Raw(Json.Serialize(Model.Select(m => m.MeanDistance.WaterL)))
+            }
+            // ,
+            // {
+            //     label: "Last",
+            //     borderColor: 'rgba(55, 173, 221, 0.3)',
+            //     fill: false,
+            //     cubicInterpolationMode: 'monotone',
+            //     tension: 0.4,
+            //     data: @Html.Raw(Json.Serialize(Model.Select(m => m.LastDistance.WaterL)))
+            // }
+            ]
         },
         options: {
             maintainAspectRatio: false,
-            spanGaps: false,
+            spanGaps: true,
             elements: {
                 line: {
                     tension: 0.000001
