@@ -39,7 +39,7 @@
         <comment>LiveDemo</comment>
     </data>
     <data name="LiveDemoText" xml:space="preserve">
-        <value>&lt;a href="/a/demo/s/i5WOmUdoO0"&gt;Live demo&lt;/a&gt; containing real measured data.</value>
+        <value>&lt;a href="/demo"&gt;Live demo&lt;/a&gt; containing real measured data.</value>
         <comment>LiveDemoText</comment>
     </data>
     <data name="Schema" xml:space="preserve">
