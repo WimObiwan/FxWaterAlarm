@@ -82,3 +82,13 @@
         <div style="text-align: center; font-size: xx-large">@Loc["No sensor found with the specified Id."]</div>
     }
 </div>
+
+@section Scripts {
+    @if (Model.LastMeasurement is {} lastMeasurement)
+    {
+        var next = lastMeasurement.Timestamp.AddSeconds(20 * 60 + 5).ToLocalTime();
+        <script>
+            refreshAt(@next.Hour, @next.Minute, @next.Second)
+        </script>
+    }
+}
