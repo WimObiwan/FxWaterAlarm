@@ -7,7 +7,7 @@ namespace Site.Pages;
 
 public class Demo : PageModel
 {
-    public async Task<IActionResult> OnGet()
+    public IActionResult OnGet()
     {
         return Redirect($"/a/demo/s/i5WOmUdoO0");
     }
