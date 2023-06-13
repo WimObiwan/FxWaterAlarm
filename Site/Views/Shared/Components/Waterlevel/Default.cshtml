@@ -44,6 +44,8 @@
         config.waveAnimateTime = 6000;
         config.displayPercent = true;
         config.maxValue = 100;
+        config.valueCountUp = false;
+        config.waveRise = false;
 
         var gauge = loadLiquidFillGauge("fillGauge-@uniqueId", @Math.Round(Model.Distance.LevelFraction.Value * 100.0), config);
     </script>
