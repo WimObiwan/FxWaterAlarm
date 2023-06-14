@@ -1,0 +1,48 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model Site.ViewComponents.TrendModel
+@inject IViewLocalizer Loc
+
+@{
+    var uniqueId = Guid.NewGuid().ToString("N");
+}
+
+<table class="table grayout">
+    <thead>
+    <tr>
+        <th scope="col">@Loc["Period"]</th>
+        <th scope="col">@Loc["Change"]</th>
+        <th scope="col">@Loc["Rate"]</th>
+        <th scope="col">@Loc["Time till empty"]</th>
+        <th scope="col">@Loc["Time till full"]</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th scope="row">@Loc["1 hour"]</th>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <th scope="row">@Loc["6 hours"]</th>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <th scope="row">@Loc["24 hours"]</th>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <th scope="row">@Loc["7 days"]</th>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <th scope="row">@Loc["30 days"]</th>
+        <td></td>
+        <td></td>
+    </tr>
+    </tbody>
+</table>

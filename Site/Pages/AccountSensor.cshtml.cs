@@ -108,6 +108,7 @@ public class AccountSensor : PageModel
         Graph24H,
         Graph7D,
         Graph3M,
+        Trend,
         Details
     }
 

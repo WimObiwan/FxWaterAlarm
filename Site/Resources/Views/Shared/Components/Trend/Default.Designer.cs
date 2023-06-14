@@ -7,28 +7,28 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Site.Resources.Pages {
+namespace Site.Resources.Views.Shared.Components.Trend {
     using System;
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class AccountSensor {
+    internal class Default {
         
         private static System.Resources.ResourceManager resourceMan;
         
         private static System.Globalization.CultureInfo resourceCulture;
         
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AccountSensor() {
+        internal Default() {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Site.Resources.Pages.AccountSensor", typeof(AccountSensor).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Site.Resources.Views.Shared.Components.Trend.Default", typeof(Default).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -45,51 +45,33 @@ namespace Site.Resources.Pages {
             }
         }
         
-        internal static string No_sensor_found_with_the_specified_Id_ {
+        internal static string Period {
             get {
-                return ResourceManager.GetString("No sensor found with the specified Id.", resourceCulture);
+                return ResourceManager.GetString("Period", resourceCulture);
             }
         }
         
-        internal static string Graph {
+        internal static string Change {
             get {
-                return ResourceManager.GetString("Graph", resourceCulture);
+                return ResourceManager.GetString("Change", resourceCulture);
             }
         }
         
-        internal static string Graph_6h {
+        internal static string Rate {
             get {
-                return ResourceManager.GetString("Graph 6h", resourceCulture);
+                return ResourceManager.GetString("Rate", resourceCulture);
             }
         }
         
-        internal static string Graph_24h {
+        internal static string Time_till_empty {
             get {
-                return ResourceManager.GetString("Graph 24h", resourceCulture);
+                return ResourceManager.GetString("Time till empty", resourceCulture);
             }
         }
         
-        internal static string Graph_7d {
+        internal static string Time_till_full {
             get {
-                return ResourceManager.GetString("Graph 7d", resourceCulture);
-            }
-        }
-        
-        internal static string Graph_3m {
-            get {
-                return ResourceManager.GetString("Graph 3m", resourceCulture);
-            }
-        }
-        
-        internal static string Details {
-            get {
-                return ResourceManager.GetString("Details", resourceCulture);
-            }
-        }
-        
-        internal static string Trend {
-            get {
-                return ResourceManager.GetString("Trend", resourceCulture);
+                return ResourceManager.GetString("Time till full", resourceCulture);
             }
         }
     }
