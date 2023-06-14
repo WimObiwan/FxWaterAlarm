@@ -19,18 +19,34 @@
 
         <ul class="nav nav-tabs">
             @{
-                string PageTypeMenu(AccountSensor.PageTypeEnum modelPageType, AccountSensor.PageTypeEnum menuPageType)
+                bool IsPageTypeGraph()
                 {
-                    if (modelPageType == menuPageType)
+                    return Model.PageType == AccountSensor.PageTypeEnum.Graph3M || Model.PageType == AccountSensor.PageTypeEnum.Graph7D
+                           || Model.PageType == AccountSensor.PageTypeEnum.Graph24H || Model.PageType == AccountSensor.PageTypeEnum.Graph6H;
+                }
+                
+                string PageTypeDropDownMenu()
+                {
+                    if (IsPageTypeGraph())
                     {
-                        return @"class=""nav-link active"" aria-current=""page""";
+                        return @$"class=""nav-link dropdown-toggle active""";
+                    }
+                    return @"class=""nav-link dropdown-toggle""";
+                }
+
+                string PageTypeMenu(AccountSensor.PageTypeEnum menuPageType, bool dropdownToggle = false)
+                {
+                    var dropdownToggleText = dropdownToggle ? "dropdown-toggle " : "";
+                    if (Model.PageType == menuPageType)
+                    {
+                        return @$"class=""nav-link {dropdownToggleText}active"" aria-current=""page""";
                     }
                     return @"class=""nav-link""";
                 }
 
-                string PageTypeSubMenu(AccountSensor.PageTypeEnum modelPageType, AccountSensor.PageTypeEnum menuPageType)
+                string PageTypeSubMenu(AccountSensor.PageTypeEnum menuPageType)
                 {
-                    if (modelPageType == menuPageType)
+                    if (Model.PageType == menuPageType)
                     {
                         return @"class=""dropdown-item active""";
                     }
@@ -38,19 +54,19 @@
                 }
             }
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Graph"]</a>
+                <a  @Html.Raw(PageTypeDropDownMenu()) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Graph"]</a>
                 <ul class="dropdown-menu">
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph6H)) href="?page=graph6h">@Loc["Graph 6h"]</a>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph6H)) href="?page=graph6h">@Loc["Graph 6h"]</a>
                     </li>
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph24H)) href="?page=graph24h">@Loc["Graph 24h"]</a>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph24H)) href="?page=graph24h">@Loc["Graph 24h"]</a>
                     </li>
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph7D)) href="?page=graph7d">@Loc["Graph 7d"]</a>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph7D)) href="?page=graph7d">@Loc["Graph 7d"]</a>
                     </li>
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(Model.PageType, AccountSensor.PageTypeEnum.Graph3M)) href="?page=graph3m">@Loc["Graph 3m"]</a>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph3M)) href="?page=graph3m">@Loc["Graph 3m"]</a>
                     </li>
                 </ul>
             </li>
