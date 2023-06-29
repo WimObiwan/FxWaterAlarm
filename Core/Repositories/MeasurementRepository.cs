@@ -118,7 +118,7 @@ public class MeasurementRepository : IMeasurementRepository
                 RssiDbm = record.Rssi
             }).ToArray();
 
-        return record ?? throw new InvalidOperationException("Sensor database return no data");
+        return record ?? Array.Empty<MeasurementAgg>();
     }
 
     public async Task<Measurement?[]> GetTrends(string devEui, IEnumerable<DateTime> timestamps,
