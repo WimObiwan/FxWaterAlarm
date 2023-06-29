@@ -1,5 +1,6 @@
 ﻿@using System.Reflection
-@using Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IConfiguration Config
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +12,18 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/Site.styles.css" asp-append-version="true"/>
+    
+    @if (Config["GoogleAnalytics"] is {} googleAnalytics)
+    {
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-QJTVPL3P9K"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '@googleAnalytics');
+        </script>
+    }
 </head>
 <body>
 <header>
