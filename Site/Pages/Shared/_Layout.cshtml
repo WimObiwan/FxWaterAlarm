@@ -1,5 +1,7 @@
 ﻿@using System.Reflection
+@using Microsoft.AspNetCore.Mvc.Localization
 @inject IConfiguration Config
+@inject IViewLocalizer Loc
 
 <!DOCTYPE html>
 <html lang="en">
@@ -24,30 +26,54 @@
         gtag('config', '@googleAnalytics');
         </script>
     }
+    <script>
+    function replaceQueryParam(param, newval, search)
+    {
+        var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
+        var query = search.replace(regex, "$1").replace(/&$/, '');
+        return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
+    }
+
+    function addOrUpdateUrlParam(name, value)
+    {
+        window.location = window.location.pathname + replaceQueryParam(name,  value,  window.location.search);
+    }
+    </script>
 </head>
 <body>
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container">
-            <a class="navbar-brand" asp-area="" asp-page="/Index">WaterAlarm</a>
+            @* <a class="navbar-brand" asp-area="" asp-page="/Index">WaterAlarm</a> *@
+            <div class="navbar-brand">WaterAlarm</div>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            @* <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between"> *@
-            @*     <ul class="navbar-nav flex-grow-1"> *@
-            @*         <li class="nav-item"> *@
-            @*             <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a> *@
-            @*         </li> *@
-            @*     </ul> *@
-            @* </div> *@
-            <div class="navbar-collapse collapse d-sm-inline-flex flex-row-reverse justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
+
+            <div class="navbar-collapse collapse d-sm-inline-flex flex-row justify-content-between">
+                <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="?culture=nl-BE">nl</a>
+                        <a class="nav-link" target="_blank" href="https://blog.wateralarm.be">@Loc["News blog"]</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="?culture=en-BE">en</a>
+                </ul>
+            </div>
+            
+            <div class="navbar-collapse collapse d-sm-inline-flex flex-row-reverse justify-content-between">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            @Loc["Language"]
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="addOrUpdateUrlParam('culture', 'nl-BE'); return false;">nl</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="addOrUpdateUrlParam('culture', 'en-BE'); return false;">en</a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>

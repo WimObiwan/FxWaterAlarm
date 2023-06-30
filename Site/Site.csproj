@@ -44,6 +44,14 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Default.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Pages\Shared\_Layout.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>_Layout.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Pages\Shared\_Layout.nl.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>_Layout.nl.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -71,6 +79,11 @@
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
           <DependentUpon>Default.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Pages\Shared\_Layout.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>_Layout.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 
