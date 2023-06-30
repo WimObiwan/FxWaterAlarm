@@ -1,9 +1,42 @@
 @using Microsoft.AspNetCore.Mvc.Localization
+@using Site.Pages
 @model Site.ViewComponents.TrendModel
 @inject IViewLocalizer Loc
 
 @{
-    var uniqueId = Guid.NewGuid().ToString("N");
+    string FormatLiter(TrendMeasurementEx? trendMeasurement)
+    {
+        if (trendMeasurement?.DifferenceWaterL is {} valLiter)
+            return $"{Math.Round(valLiter, 0):+#;-#;0} {Loc["liter"].Value}";
+        return "";
+    }
+
+    string FormatLiterPerDay(TrendMeasurementEx? trendMeasurement)
+    {
+        if (trendMeasurement?.DifferenceWaterLPerDay is {} valLiterPerDay)
+            return $"{Math.Round(valLiterPerDay, 0):+#;-#;0} {Loc["liter/day"].Value}";
+        return "";
+    }
+    
+    string FormatTimeTill(TimeSpan? timeTill)
+    {
+        if (!(timeTill is {} timeTill2))
+            return "";
+        if (timeTill2 <= TimeSpan.Zero)
+            return "";
+        int hours = (int)Math.Ceiling(timeTill2.TotalHours);
+        if (hours <= 1)
+            return Loc["< 1 hour"].Value;
+        if (hours < 24)
+            return $"{hours} {Loc["hours"].Value}";
+        if (hours < 24 * 10)
+            return $"{hours / 24.0:N2} {Loc["days"].Value}";
+        if (hours < 24 * 30)
+            return $"{hours / 24.0:N1} {Loc["days"].Value}";
+        if (hours < 24 * 30 * 3)
+            return $"{hours / 24.0 / 30.0:N2} {Loc["months"].Value}";
+        return Loc["> 3 months"].Value;
+    }
 }
 
 <table class="table grayout">
@@ -19,30 +52,38 @@
     <tbody>
     <tr>
         <th scope="row">@Loc["1 hour"]</th>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>@FormatLiter(Model.TrendMeasurement1H)</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
     </tr>
     <tr>
         <th scope="row">@Loc["6 hours"]</th>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>@FormatLiter(Model.TrendMeasurement6H)</td>
+        <td>@FormatLiterPerDay(Model.TrendMeasurement6H)</td>
+        <td>-</td>
+        <td>-</td>
     </tr>
     <tr>
         <th scope="row">@Loc["24 hours"]</th>
-        <td></td>
-        <td></td>
+        <td>@FormatLiter(Model.TrendMeasurement24H)</td>
+        <td>@FormatLiterPerDay(Model.TrendMeasurement24H)</td>
+        <td>@FormatTimeTill(Model.TrendMeasurement24H?.TimeTillEmpty)</td>
+        <td>@FormatTimeTill(Model.TrendMeasurement24H?.TimeTillFull)</td>
     </tr>
     <tr>
         <th scope="row">@Loc["7 days"]</th>
-        <td></td>
-        <td></td>
+        <td>@FormatLiter(Model.TrendMeasurement7D)</td>
+        <td>@FormatLiterPerDay(Model.TrendMeasurement7D)</td>
+        <td>@FormatTimeTill(Model.TrendMeasurement7D?.TimeTillEmpty)</td>
+        <td>@FormatTimeTill(Model.TrendMeasurement7D?.TimeTillFull)</td>
     </tr>
     <tr>
         <th scope="row">@Loc["30 days"]</th>
-        <td></td>
-        <td></td>
+        <td>@FormatLiter(Model.TrendMeasurement30D)</td>
+        <td>@FormatLiterPerDay(Model.TrendMeasurement30D)</td>
+        <td>@FormatTimeTill(Model.TrendMeasurement30D?.TimeTillEmpty)</td>
+        <td>@FormatTimeTill(Model.TrendMeasurement30D?.TimeTillFull)</td>
     </tr>
     </tbody>
 </table>

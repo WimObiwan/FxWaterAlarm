@@ -55,4 +55,32 @@
         <value>30 dagen</value>
         <comment>30 days</comment>
     </data>
+    <data name="liter" xml:space="preserve">
+        <value>liter</value>
+        <comment>liter</comment>
+    </data>
+    <data name="liter/day" xml:space="preserve">
+        <value>l/dag</value>
+        <comment>liter/day</comment>
+    </data>
+    <data name="&lt; 1 hour" xml:space="preserve">
+        <value>&lt; 1 uur</value>
+        <comment>&lt; 1 hour</comment>
+    </data>
+    <data name="hours" xml:space="preserve">
+        <value>uren</value>
+        <comment>hours</comment>
+    </data>
+    <data name="days" xml:space="preserve">
+        <value>dagen</value>
+        <comment>days</comment>
+    </data>
+    <data name="months" xml:space="preserve">
+        <value>maanden</value>
+        <comment>months</comment>
+    </data>
+    <data name="&gt; 3 months" xml:space="preserve">
+        <value>&gt; 3 maanden</value>
+        <comment>&gt; 3 months</comment>
+    </data>
 </root>

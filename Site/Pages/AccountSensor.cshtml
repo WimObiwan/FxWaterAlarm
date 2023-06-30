@@ -90,7 +90,11 @@
         {
             @await Component.InvokeAsync("Trend", new
                    {
-                       //accountSensor = Model.AccountSensorEntity, measurementEx = Model.LastMeasurement
+                       trendMeasurement1H = Model.TrendMeasurement1H, 
+                       trendMeasurement6H = Model.TrendMeasurement6H, 
+                       trendMeasurement24H = Model.TrendMeasurement24H, 
+                       trendMeasurement7D = Model.TrendMeasurement7D, 
+                       trendMeasurement30D = Model.TrendMeasurement30D
                    })
         }
 

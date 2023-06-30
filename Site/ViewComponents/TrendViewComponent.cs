@@ -6,19 +6,29 @@ namespace Site.ViewComponents;
 
 public class TrendModel
 {
-    // public required MeasurementEx? MeasurementEx { get; init; }
-    // public required AccountSensor AccountSensor { get; init; }
+    public required TrendMeasurementEx? TrendMeasurement1H { get; init; }
+    public required TrendMeasurementEx? TrendMeasurement6H { get; init; }
+    public required TrendMeasurementEx? TrendMeasurement24H { get; init; }
+    public required TrendMeasurementEx? TrendMeasurement7D { get; init; }
+    public required TrendMeasurementEx? TrendMeasurement30D { get; init; }
 }
 
 public class TrendViewComponent : ViewComponent
 {
     public async Task<IViewComponentResult> InvokeAsync(
-        /*AccountSensor accountSensor, MeasurementEx? measurementEx*/)
+        TrendMeasurementEx? trendMeasurement1H,
+        TrendMeasurementEx? trendMeasurement6H,
+        TrendMeasurementEx? trendMeasurement24H,
+        TrendMeasurementEx? trendMeasurement7D,
+        TrendMeasurementEx? trendMeasurement30D)
     {
         var model = new TrendModel
         {
-            // MeasurementEx = measurementEx,
-            // AccountSensor = accountSensor
+            TrendMeasurement1H = trendMeasurement1H,
+            TrendMeasurement6H = trendMeasurement6H,
+            TrendMeasurement24H = trendMeasurement24H,
+            TrendMeasurement7D = trendMeasurement7D,
+            TrendMeasurement30D = trendMeasurement30D
         };
         return await Task.FromResult(View(model));
     }

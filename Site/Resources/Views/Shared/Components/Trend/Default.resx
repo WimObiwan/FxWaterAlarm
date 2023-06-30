@@ -63,4 +63,32 @@
         <value>30 days</value>
         <comment>30 days</comment>
     </data>
+    <data name="liter" xml:space="preserve">
+        <value>liter</value>
+        <comment>liter</comment>
+    </data>
+    <data name="liter/day" xml:space="preserve">
+        <value>l/day</value>
+        <comment>liter/day</comment>
+    </data>
+    <data name="&lt; 1 hour" xml:space="preserve">
+        <value>&lt; 1 hour</value>
+        <comment>&lt; 1 hour</comment>
+    </data>
+    <data name="hours" xml:space="preserve">
+        <value>hours</value>
+        <comment>hours</comment>
+    </data>
+    <data name="days" xml:space="preserve">
+        <value>days</value>
+        <comment>days</comment>
+    </data>
+    <data name="months" xml:space="preserve">
+        <value>months</value>
+        <comment>months</comment>
+    </data>
+    <data name="&gt; 3 months" xml:space="preserve">
+        <value>&gt; 3 months</value>
+        <comment>&gt; 3 months</comment>
+    </data>
 </root>

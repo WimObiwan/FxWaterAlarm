@@ -74,5 +74,47 @@ namespace Site.Resources.Views.Shared.Components.Trend {
                 return ResourceManager.GetString("Time till full", resourceCulture);
             }
         }
+        
+        internal static string liter {
+            get {
+                return ResourceManager.GetString("liter", resourceCulture);
+            }
+        }
+        
+        internal static string liter_day {
+            get {
+                return ResourceManager.GetString("liter/day", resourceCulture);
+            }
+        }
+        
+        internal static string ___1_hour {
+            get {
+                return ResourceManager.GetString("< 1 hour", resourceCulture);
+            }
+        }
+        
+        internal static string hours {
+            get {
+                return ResourceManager.GetString("hours", resourceCulture);
+            }
+        }
+        
+        internal static string days {
+            get {
+                return ResourceManager.GetString("days", resourceCulture);
+            }
+        }
+        
+        internal static string months {
+            get {
+                return ResourceManager.GetString("months", resourceCulture);
+            }
+        }
+        
+        internal static string ___3_months {
+            get {
+                return ResourceManager.GetString("> 3 months", resourceCulture);
+            }
+        }
     }
 }
