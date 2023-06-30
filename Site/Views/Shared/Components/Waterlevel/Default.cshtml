@@ -1,4 +1,6 @@
+@using Microsoft.AspNetCore.Mvc.Localization
 @model Site.Pages.MeasurementEx
+@inject IViewLocalizer Loc
 
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
@@ -21,7 +23,7 @@
     }
     @if (waterL.HasValue)
     {
-        <div style="font-size: xx-large">@Math.Round(waterL.Value, 0) liter</div>
+        <div style="font-size: xx-large">@Math.Round(waterL.Value, 0) @Loc["liter"]</div>
     }
     <div>@timestamp.ToLocalTime().ToString("G")</div>
 </div>

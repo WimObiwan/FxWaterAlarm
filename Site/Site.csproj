@@ -36,6 +36,14 @@
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>Default.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Views\Shared\Components\Trend\Default.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Default.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Views\Shared\Components\Waterlevel\Default.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Default.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -54,6 +62,20 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Default.resx</DependentUpon>
         </Compile>
+        <Compile Update="Resources\Views\Shared\Components\Trend\Default.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Default.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Views\Shared\Components\Waterlevel\Default.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Default.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\Shared\Components\Trend\Default.cshtml" />
     </ItemGroup>
 
 </Project>

@@ -212,7 +212,7 @@ public class SensorConsoleCommand : IConsoleCommand
         };
         subCommand.AddOption(devEuiOption);
 
-        var timestampOption = new Option<DateTime[]>(new[] { "-t", "--timestamps" }, "Timestamps")
+        var timestampOption = new Option<DateTime>(new[] { "-t", "--timestamp" }, "Timestamp")
         {
             IsRequired = true
         };
@@ -226,22 +226,21 @@ public class SensorConsoleCommand : IConsoleCommand
         return subCommand;
     }
 
-    private async Task ReadMeasurementTrends(string devEui, IEnumerable<DateTime> timestamps)
+    private async Task ReadMeasurementTrends(string devEui, DateTime timestamp)
     {
-        var results = await _mediator.Send(
-            new MeasurementTrendsQuery
+        var result = await _mediator.Send(
+            new MeasurementLastBeforeQuery()
             {
                 DevEui = devEui,
-                Timestamps = timestamps
+                Timestamp = timestamp
             });
 
-        foreach (var result in results)
-            if (result != null)
-            {
-                _logger.LogInformation("{DevEui} {Timestamp} {DistanceMm} {BatV} {RssiDbm}",
-                    result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
-                System.Console.WriteLine("{0} {1} {2} {3} {4}",
-                    result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
-            }
+        if (result != null)
+        {
+            _logger.LogInformation("{DevEui} {Timestamp} {DistanceMm} {BatV} {RssiDbm}",
+                result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
+            System.Console.WriteLine("{0} {1} {2} {3} {4}",
+                result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
+        }
     }
 }

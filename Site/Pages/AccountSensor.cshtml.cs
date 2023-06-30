@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Core.Entities;
 using Core.Queries;
 using MediatR;
@@ -68,6 +69,7 @@ public class MeasurementEx
         _accountSensor = accountSensor;
     }
 
+    public Core.Entities.AccountSensor AccountSensor => _accountSensor;
     public string DevEui => _measurement.DevEui;
     public DateTime Timestamp => _measurement.Timestamp;
     public MeasurementDistance Distance => new(_measurement.DistanceMm, _accountSensor);
@@ -100,6 +102,40 @@ public class MeasurementAggEx
     public double BatteryPrc => (_measurement.BatV - 3.0) / 0.335 * 100.0;
 }
 
+public class TrendMeasurementEx
+{
+    private readonly TimeSpan _timeSpan;
+    private readonly MeasurementEx _measurementEx;
+    private readonly MeasurementEx _trendMeasurementEx;
+
+    public TrendMeasurementEx(TimeSpan timeSpan, Measurement trend, MeasurementEx measurementEx)
+    {
+        _timeSpan = timeSpan;
+        _measurementEx = measurementEx;
+        _trendMeasurementEx = new MeasurementEx(trend, measurementEx.AccountSensor);
+    }
+
+    public double? DifferenceWaterL => 
+        _measurementEx.Distance.WaterL.HasValue && _trendMeasurementEx.Distance.WaterL.HasValue 
+            ? _measurementEx.Distance.WaterL.Value - _trendMeasurementEx.Distance.WaterL.Value
+            : null;
+
+    public double? DifferenceWaterLPerDay =>
+        DifferenceWaterL.HasValue ? DifferenceWaterL.Value / _timeSpan.TotalDays : null;
+
+    public TimeSpan? TimeTillEmpty => 
+        _measurementEx.Distance.WaterL.HasValue && _trendMeasurementEx.Distance.WaterL.HasValue 
+                                                && _measurementEx.Distance.WaterL.Value < _trendMeasurementEx.Distance.WaterL.Value
+            ? _measurementEx.Distance.WaterL.Value / (_trendMeasurementEx.Distance.WaterL.Value - _measurementEx.Distance.WaterL.Value) * _timeSpan
+            : null;
+    
+    public TimeSpan? TimeTillFull => 
+        _measurementEx.Distance.WaterL.HasValue && _trendMeasurementEx.Distance.WaterL.HasValue 
+                                                && _measurementEx.Distance.WaterL.Value > _trendMeasurementEx.Distance.WaterL.Value
+            ? (_measurementEx.AccountSensor.CapacityL - _measurementEx.Distance.WaterL.Value) / (_measurementEx.Distance.WaterL.Value - _trendMeasurementEx.Distance.WaterL.Value) * _timeSpan
+            : null;
+}
+
 public class AccountSensor : PageModel
 {
     public enum PageTypeEnum
@@ -108,6 +144,7 @@ public class AccountSensor : PageModel
         Graph24H,
         Graph7D,
         Graph3M,
+        Trend,
         Details
     }
 
@@ -120,6 +157,11 @@ public class AccountSensor : PageModel
 
     public MeasurementEx? LastMeasurement { get; private set; }
     public MeasurementAggEx[]? Measurements { get; private set; }
+    public TrendMeasurementEx? TrendMeasurement1H { get; private set; }
+    public TrendMeasurementEx? TrendMeasurement6H { get; private set; }
+    public TrendMeasurementEx? TrendMeasurement24H { get; private set; }
+    public TrendMeasurementEx? TrendMeasurement7D { get; private set; }
+    public TrendMeasurementEx? TrendMeasurement30D { get; private set; }
     public Core.Entities.AccountSensor? AccountSensorEntity { get; private set; }
 
     public PageTypeEnum PageType { get; private set; }
@@ -155,6 +197,16 @@ public class AccountSensor : PageModel
                 case PageTypeEnum.Graph3M:
                     period = Tuple.Create<TimeSpan, TimeSpan?>(TimeSpan.FromDays(90), TimeSpan.FromDays(7));
                     break;
+                case PageTypeEnum.Trend:
+                    if (LastMeasurement != null)
+                    {
+                        TrendMeasurement1H = await GetTrendMeasurement(TimeSpan.FromHours(1), LastMeasurement);
+                        TrendMeasurement6H = await GetTrendMeasurement(TimeSpan.FromHours(6), LastMeasurement);
+                        TrendMeasurement24H = await GetTrendMeasurement(TimeSpan.FromHours(24), LastMeasurement);
+                        TrendMeasurement7D = await GetTrendMeasurement(TimeSpan.FromDays(7), LastMeasurement);
+                        TrendMeasurement30D = await GetTrendMeasurement(TimeSpan.FromDays(30), LastMeasurement);
+                    }
+                    break;
             }
 
             if (period != null)
@@ -168,5 +220,18 @@ public class AccountSensor : PageModel
                     .Select(m => new MeasurementAggEx(m, AccountSensorEntity))
                     .ToArray();
         }
+    }
+
+    private async Task<TrendMeasurementEx?> GetTrendMeasurement(TimeSpan timeSpan, MeasurementEx lastMeasurement)
+    {
+        var trendMeasurement = await _mediator.Send(
+            new MeasurementLastBeforeQuery
+            {
+                DevEui = lastMeasurement.AccountSensor.Sensor.DevEui,
+                Timestamp = lastMeasurement.Timestamp.Add(-timeSpan)
+            });
+        if (trendMeasurement == null)
+            return null;
+        return new TrendMeasurementEx(timeSpan, trendMeasurement, lastMeasurement);        
     }
 }

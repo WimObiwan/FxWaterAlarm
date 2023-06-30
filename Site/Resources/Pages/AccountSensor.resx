@@ -51,4 +51,8 @@
         <value>Details</value>
         <comment>Details</comment>
     </data>
+    <data name="Trend" xml:space="preserve">
+        <value>Trend</value>
+        <comment>Trend</comment>
+    </data>
 </root>

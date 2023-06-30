@@ -20,7 +20,7 @@ public interface IMeasurementRepository
     Task<MeasurementAgg[]> Get(string devEui, DateTime from, DateTime? till, TimeSpan? interval,
         CancellationToken cancellationToken);
 
-    Task<Measurement?[]> GetTrends(string devEui, IEnumerable<DateTime> timestamps,
+    Task<Measurement?> GetLastBefore(string devEui, DateTime dateTime,
         CancellationToken cancellationToken);
 }
 
@@ -118,13 +118,7 @@ public class MeasurementRepository : IMeasurementRepository
                 RssiDbm = record.Rssi
             }).ToArray();
 
-        return record ?? throw new InvalidOperationException("Sensor database return no data");
-    }
-
-    public async Task<Measurement?[]> GetTrends(string devEui, IEnumerable<DateTime> timestamps,
-        CancellationToken cancellationToken)
-    {
-        return await Task.WhenAll(timestamps.Select(t => GetLastBefore(devEui, t, cancellationToken)));
+        return record ?? Array.Empty<MeasurementAgg>();
     }
 
     public async Task<Measurement?> GetLastBefore(string devEui, DateTime timestamp,
