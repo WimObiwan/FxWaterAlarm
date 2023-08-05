@@ -117,7 +117,11 @@
 @section Scripts {
     @if (Model.LastMeasurement is {} lastMeasurement)
     {
-        var next = lastMeasurement.Timestamp.AddSeconds(20 * 60 + 5).ToLocalTime();
+        // Refresh every 20 minutes
+        const int refreshIntervalMinutes = 20;
+        int nextRefreshMinutes = ((int)(DateTime.UtcNow - lastMeasurement.Timestamp).TotalMinutes / refreshIntervalMinutes + 1) * refreshIntervalMinutes;
+        var next = lastMeasurement.Timestamp.AddSeconds(nextRefreshMinutes * 60 + 5).ToLocalTime();
+
         <script>
             refreshAt(@next.Hour, @next.Minute, @next.Second)
         </script>
