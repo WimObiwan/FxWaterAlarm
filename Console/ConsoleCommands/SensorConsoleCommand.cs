@@ -155,9 +155,34 @@ public class SensorConsoleCommand : IConsoleCommand
             result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
     }
 
+    private Command ReadMeasurementsSubCommand()
+    {
+        var subCommand = new Command("readmeasurements", "Read measurements.");
+
+        var devEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(devEuiOption);
+
+        var fromOption = new Option<DateTime?>(new[] { "-f", "--from" }, "From date");
+        subCommand.AddOption(fromOption);
+
+        var tillOption = new Option<DateTime?>(new[] { "-t", "--till" }, "Till date");
+        subCommand.AddOption(tillOption);
+
+        subCommand.SetHandler(
+            ReadMeasurements,
+            devEuiOption,
+            fromOption,
+            tillOption);
+
+        return subCommand;
+    }
+
     private Command ReadAggregatedMeasurementsSubCommand()
     {
-        var subCommand = new Command("readaggregatedmeasurements", "Read measurements.");
+        var subCommand = new Command("readaggregatedmeasurements", "Read aggregated measurements.");
 
         var devEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor identifier")
         {
@@ -185,6 +210,25 @@ public class SensorConsoleCommand : IConsoleCommand
             tillOption);
 
         return subCommand;
+    }
+
+    private async Task ReadMeasurements(string devEui, DateTime? from, DateTime? till)
+    {
+        var results = await _mediator.Send(
+            new MeasurementsQuery
+            {
+                DevEui = devEui,
+                From = from,
+                Till = till
+            });
+
+        foreach (var result in results)
+        {
+            _logger.LogInformation("{DevEui} {Timestamp} {DistanceMm} {BatV} {RssiDbm}",
+                result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
+            System.Console.WriteLine("{0} {1} {2} {3} {4}",
+                result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
+        }
     }
 
     private async Task ReadAggregatedMeasurements(string devEui, TimeSpan interval, DateTime? from, DateTime? till)

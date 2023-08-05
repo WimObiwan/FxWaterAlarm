@@ -1,5 +1,7 @@
+using System.Text;
 using Core.Entities;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Vibrant.InfluxDB.Client;
 
 namespace Core.Repositories;
@@ -16,6 +18,9 @@ public class MeasurementInfluxOptions
 public interface IMeasurementRepository
 {
     Task<Measurement?> GetLast(string devEui, CancellationToken cancellationToken);
+
+    Task<Measurement[]> Get(string devEui, DateTime? from, DateTime? till,
+        CancellationToken cancellationToken);
 
     Task<AggregatedMeasurement[]> GetAggregated(string devEui, DateTime? from, DateTime? till, TimeSpan interval,
         CancellationToken cancellationToken);
@@ -55,32 +60,40 @@ public class MeasurementRepository : IMeasurementRepository
         };
     }
 
+    public async Task<Measurement[]> Get(string devEui, DateTime? from, DateTime? till,
+        CancellationToken cancellationToken)
+    {
+        (string filterText, object parameters) = GetFilter(devEui, from, till);
+
+        var query = "SELECT"
+                    + " *"
+                    + " FROM waterlevel"
+                    + filterText
+                    + " GROUP BY *"
+                    + " ORDER BY DESC LIMIT 1000";
+
+        using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
+        var result = await influxClient.ReadAsync<Record>("wateralarm", query, parameters,
+            cancellationToken);
+
+        var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
+        var record = series?.Rows?.Select(record =>
+            new Measurement
+            {
+                DevEui = (string)series.GroupedTags["DevEUI"],
+                Timestamp = record.Timestamp,
+                DistanceMm = record.Distance,
+                BatV = record.BatV,
+                RssiDbm = record.Rssi
+            }).ToArray();
+
+        return record ?? Array.Empty<Measurement>();
+    }
+
     public async Task<AggregatedMeasurement[]> GetAggregated(string devEui, DateTime? from, DateTime? till, TimeSpan interval,
         CancellationToken cancellationToken)
     {
-        object parameters;
-
-        string filterText;
-        if (from.HasValue && till.HasValue)
-        {
-            filterText = " AND time >= $from AND time < $till";
-            parameters = new { devEui, from, till };
-        }
-        else if (from.HasValue)
-        {
-            filterText = " AND time >= $from";
-            parameters = new { devEui, from };
-        }
-        else if (till.HasValue)
-        {
-            filterText = " AND time < $till";
-            parameters = new { devEui, till };
-        }
-        else
-        {
-            filterText = "";
-            parameters = new { devEui };
-        }
+        (string filterText, object parameters) = GetFilter(devEui, from, till);
 
         string intervalText;
         if (interval < TimeSpan.FromHours(1))
@@ -92,7 +105,7 @@ public class MeasurementRepository : IMeasurementRepository
 
         var query = "SELECT "
                     + " MIN(*), MEAN(*), MAX(*), LAST(*)"
-                    + " FROM waterlevel WHERE DevEUI = $devEui"
+                    + " FROM waterlevel"
                     + filterText
                     + " GROUP BY *"
                     + intervalText
@@ -101,8 +114,6 @@ public class MeasurementRepository : IMeasurementRepository
         using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
         var result = await influxClient.ReadAsync<RecordAgg>("wateralarm", query, parameters,
             cancellationToken);
-
-        //var test = await influxClient.ReadAsync<DynamicInfluxRow>("wateralarm", query, parameters, cancellationToken);
 
         var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
         var record = series?.Rows?.Select(record =>
@@ -119,6 +130,30 @@ public class MeasurementRepository : IMeasurementRepository
             }).ToArray();
 
         return record ?? Array.Empty<AggregatedMeasurement>();
+    }
+
+    private (string, object) GetFilter(string devEui, DateTime? from, DateTime? till)
+    {
+        StringBuilder filterText = new();
+        Dictionary<string, object> parameters = new();
+
+        filterText.Append(" WHERE");
+        filterText.Append(" DevEUI = $devEui");
+        parameters.Add("devEui", devEui);
+        
+        if (from.HasValue)
+        {
+            filterText.Append(" AND time >= $from");
+            parameters.Add("from", from.Value);
+        }
+        
+        if (till.HasValue)
+        {
+            filterText.Append(" AND time < $till");
+            parameters.Add("till", till.Value);
+        }
+
+        return (filterText.ToString(), parameters);
     }
 
     public async Task<Measurement?> GetLastBefore(string devEui, DateTime timestamp,

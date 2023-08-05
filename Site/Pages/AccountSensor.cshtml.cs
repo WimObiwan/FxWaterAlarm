@@ -1,7 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Text;
 using Core.Entities;
 using Core.Queries;
 using MediatR;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -220,6 +223,94 @@ public class AccountSensor : PageModel
                     .Select(m => new MeasurementAggEx(m, AccountSensorEntity))
                     .ToArray();
         }
+    }
+
+    public async Task<IActionResult> OnGetExportCsv(string accountLink, string sensorLink)
+    {
+        // https://swimburger.net/blog/dotnet/create-zip-files-on-http-request-without-intermediate-files-using-aspdotnet-mvc-razor-pages-and-endpoints#better-mvc
+        
+        Response.ContentType = "text/csv";
+        Response.Headers.Add("Content-Disposition", "attachment; filename=\"Export.csv\"");
+
+        
+        await using TextWriter textWriter = new StreamWriter(Response.BodyWriter.AsStream());
+        var accountSensorEntity = await _mediator.Send(new SensorByLinkQuery
+        {
+            SensorLink = sensorLink,
+            AccountLink = accountLink
+        });
+
+        if (accountSensorEntity == null)
+            return NotFound();
+
+        {
+            StringBuilder sb = new();
+            sb
+                .Append('"').Append("DevEui").Append('"')
+                .Append(',')
+                .Append('"').Append("Timestamp").Append('"')
+                .Append(',')
+                .Append('"').Append("DistanceMm").Append('"')
+                .Append(',')
+                .Append('"').Append("BatV").Append('"')
+                .Append(',')
+                .Append('"').Append("RssiDbm").Append('"')
+                .Append(',')
+                .Append('"').Append("LevelPrc").Append('"')
+                .Append(',')
+                .Append('"').Append("WaterL").Append('"')
+                .Append(',')
+                .Append('"').Append("BatteryPrc").Append('"')
+                .Append(',')
+                .Append('"').Append("RssiPrc").Append('"')
+                ;
+            await textWriter.WriteLineAsync(sb.ToString());
+        }
+
+        DateTime from = DateTime.UtcNow.AddYears(-1);
+        DateTime? last = null;
+        while (true)
+        {
+            var result = await _mediator.Send(new MeasurementsQuery
+            {
+                DevEui = accountSensorEntity.Sensor.DevEui,
+                From = from,
+                Till = last
+            });
+
+            if (result.Length == 0)
+                break;
+
+            foreach (var record in result)
+            {
+                MeasurementEx measurementEx = new(record, accountSensorEntity);
+                StringBuilder sb = new();
+                sb
+                    .Append('"').Append(measurementEx.DevEui).Append('"')
+                    .Append(',')
+                    .Append('"').Append(measurementEx.Timestamp.ToString("yyyy-M-d HH:mm:ss")).Append('"')
+                    .Append(',')
+                    .Append(measurementEx.Distance.DistanceMm)
+                    .Append(',')
+                    .Append(measurementEx.BatV.ToString(CultureInfo.InvariantCulture))
+                    .Append(',')
+                    .Append(measurementEx.RssiDbm.ToString(CultureInfo.InvariantCulture))
+                    .Append(',')
+                    .Append(measurementEx.Distance.LevelFraction?.ToString(CultureInfo.InvariantCulture))
+                    .Append(',')
+                    .Append(measurementEx.Distance.WaterL?.ToString(CultureInfo.InvariantCulture))
+                    .Append(',')
+                    .Append(measurementEx.BatteryPrc.ToString(CultureInfo.InvariantCulture))
+                    .Append(',')
+                    .Append(measurementEx.RssiPrc.ToString(CultureInfo.InvariantCulture))
+                    ;
+                await textWriter.WriteLineAsync(sb.ToString());
+            }
+
+            last = result[^1].Timestamp;
+        }
+
+        return new EmptyResult();
     }
 
     private async Task<TrendMeasurementEx?> GetTrendMeasurement(TimeSpan timeSpan, MeasurementEx lastMeasurement)
