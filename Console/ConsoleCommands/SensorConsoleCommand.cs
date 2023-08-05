@@ -24,7 +24,7 @@ public class SensorConsoleCommand : IConsoleCommand
         command.AddCommand(CreateSubCommand());
         command.AddCommand(SetLinkSubCommand());
         command.AddCommand(ReadLastMeasurementSubCommand());
-        command.AddCommand(ReadMeasurementsSubCommand());
+        command.AddCommand(ReadAggregatedMeasurementsSubCommand());
         command.AddCommand(ReadMeasurementTrendsSubCommand());
         return command;
     }
@@ -155,9 +155,9 @@ public class SensorConsoleCommand : IConsoleCommand
             result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
     }
 
-    private Command ReadMeasurementsSubCommand()
+    private Command ReadAggregatedMeasurementsSubCommand()
     {
-        var subCommand = new Command("readmeasurements", "Read measurements.");
+        var subCommand = new Command("readaggregatedmeasurements", "Read measurements.");
 
         var devEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor identifier")
         {
@@ -165,32 +165,37 @@ public class SensorConsoleCommand : IConsoleCommand
         };
         subCommand.AddOption(devEuiOption);
 
-        var fromOption = new Option<DateTime>(new[] { "-f", "--from" }, "From")
+        var intervalOption = new Option<TimeSpan>(new[] { "-i", "--interval" }, "Interval duration")
         {
             IsRequired = true
         };
+        subCommand.AddOption(intervalOption);
+
+        var fromOption = new Option<DateTime?>(new[] { "-f", "--from" }, "From date");
         subCommand.AddOption(fromOption);
 
         var tillOption = new Option<DateTime?>(new[] { "-t", "--till" }, "Till date");
         subCommand.AddOption(tillOption);
 
         subCommand.SetHandler(
-            ReadMeasurements,
+            ReadAggregatedMeasurements,
             devEuiOption,
+            intervalOption,
             fromOption,
             tillOption);
 
         return subCommand;
     }
 
-    private async Task ReadMeasurements(string devEui, DateTime from, DateTime? till)
+    private async Task ReadAggregatedMeasurements(string devEui, TimeSpan interval, DateTime? from, DateTime? till)
     {
         var results = await _mediator.Send(
-            new MeasurementsQuery
+            new AggregatedMeasurementsQuery
             {
                 DevEui = devEui,
                 From = from,
-                Till = till
+                Till = till,
+                Interval = interval
             });
 
         foreach (var result in results)

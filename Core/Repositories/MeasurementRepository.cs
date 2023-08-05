@@ -17,7 +17,7 @@ public interface IMeasurementRepository
 {
     Task<Measurement?> GetLast(string devEui, CancellationToken cancellationToken);
 
-    Task<MeasurementAgg[]> Get(string devEui, DateTime from, DateTime? till, TimeSpan? interval,
+    Task<AggregatedMeasurement[]> GetAggregated(string devEui, DateTime? from, DateTime? till, TimeSpan interval,
         CancellationToken cancellationToken);
 
     Task<Measurement?> GetLastBefore(string devEui, DateTime dateTime,
@@ -55,46 +55,46 @@ public class MeasurementRepository : IMeasurementRepository
         };
     }
 
-    public async Task<MeasurementAgg[]> Get(string devEui, DateTime from, DateTime? till, TimeSpan? interval,
+    public async Task<AggregatedMeasurement[]> GetAggregated(string devEui, DateTime? from, DateTime? till, TimeSpan interval,
         CancellationToken cancellationToken)
     {
         object parameters;
 
-        string tillFilterText;
-        if (till.HasValue)
+        string filterText;
+        if (from.HasValue && till.HasValue)
         {
-            tillFilterText = "time <= $till ";
+            filterText = " AND time >= $from AND time < $till";
             parameters = new { devEui, from, till };
         }
-        else
+        else if (from.HasValue)
         {
-            tillFilterText = "";
+            filterText = " AND time >= $from";
             parameters = new { devEui, from };
         }
-
-        string selectText;
-        string intervalText;
-        if (!interval.HasValue || interval < TimeSpan.FromMinutes(1))
+        else if (till.HasValue)
         {
-            selectText = "*";
-            intervalText = "";
+            filterText = " AND time < $till";
+            parameters = new { devEui, till };
         }
         else
         {
-            selectText = "MIN(*), MEAN(*), MAX(*), LAST(*)";
-            if (interval < TimeSpan.FromHours(1))
-                intervalText = $", time({60 / (60 / (int)interval.Value.TotalMinutes)}m)";
-            else if (interval < TimeSpan.FromDays(1))
-                intervalText = $", time({24 / (24 / (int)interval.Value.TotalHours)}h)";
-            else
-                intervalText = $", time({(int)interval.Value.TotalDays}d)";
+            filterText = "";
+            parameters = new { devEui };
         }
 
+        string intervalText;
+        if (interval < TimeSpan.FromHours(1))
+            intervalText = $", time({60 / (60 / (int)interval.TotalMinutes)}m)";
+        else if (interval < TimeSpan.FromDays(1))
+            intervalText = $", time({24 / (24 / (int)interval.TotalHours)}h)";
+        else
+            intervalText = $", time({(int)interval.TotalDays}d)";
+
         var query = "SELECT "
-                    + selectText
-                    + " FROM waterlevel WHERE DevEUI = $devEui AND time >= $from "
-                    + tillFilterText
-                    + "GROUP BY *"
+                    + " MIN(*), MEAN(*), MAX(*), LAST(*)"
+                    + " FROM waterlevel WHERE DevEUI = $devEui"
+                    + filterText
+                    + " GROUP BY *"
                     + intervalText
                     + " ORDER BY DESC LIMIT 1000";
 
@@ -106,7 +106,7 @@ public class MeasurementRepository : IMeasurementRepository
 
         var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
         var record = series?.Rows?.Select(record =>
-            new MeasurementAgg
+            new AggregatedMeasurement
             {
                 DevEui = (string)series.GroupedTags["DevEUI"],
                 Timestamp = record.Timestamp,
@@ -118,7 +118,7 @@ public class MeasurementRepository : IMeasurementRepository
                 RssiDbm = record.Rssi
             }).ToArray();
 
-        return record ?? Array.Empty<MeasurementAgg>();
+        return record ?? Array.Empty<AggregatedMeasurement>();
     }
 
     public async Task<Measurement?> GetLastBefore(string devEui, DateTime timestamp,

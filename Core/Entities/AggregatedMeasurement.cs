@@ -1,6 +1,6 @@
 namespace Core.Entities;
 
-public class MeasurementAgg
+public class AggregatedMeasurement
 {
     public required string DevEui { get; init; }
     public DateTime Timestamp { get; init; }
