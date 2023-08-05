@@ -1,7 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Text;
 using Core.Entities;
 using Core.Queries;
 using MediatR;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -82,24 +85,24 @@ public class MeasurementEx
 public class MeasurementAggEx
 {
     private readonly Core.Entities.AccountSensor _accountSensor;
-    private readonly MeasurementAgg _measurement;
+    private readonly AggregatedMeasurement _aggregatedMeasurement;
 
-    public MeasurementAggEx(MeasurementAgg measurement, Core.Entities.AccountSensor accountSensor)
+    public MeasurementAggEx(AggregatedMeasurement aggregatedMeasurement, Core.Entities.AccountSensor accountSensor)
     {
-        _measurement = measurement;
+        _aggregatedMeasurement = aggregatedMeasurement;
         _accountSensor = accountSensor;
     }
 
-    public string DevEui => _measurement.DevEui;
-    public DateTime Timestamp => _measurement.Timestamp;
-    public MeasurementDistance MinDistance => new(_measurement.MinDistanceMm, _accountSensor);
-    public MeasurementDistance MeanDistance => new(_measurement.MeanDistanceMm, _accountSensor);
-    public MeasurementDistance MaxDistance => new(_measurement.MaxDistanceMm, _accountSensor);
-    public MeasurementDistance LastDistance => new(_measurement.LastDistanceMm, _accountSensor);
-    public double BatV => _measurement.BatV;
-    public double RssiDbm => _measurement.RssiDbm;
-    public double RssiPrc => (_measurement.RssiDbm + 150.0) / 60.0 * 80.0;
-    public double BatteryPrc => (_measurement.BatV - 3.0) / 0.335 * 100.0;
+    public string DevEui => _aggregatedMeasurement.DevEui;
+    public DateTime Timestamp => _aggregatedMeasurement.Timestamp;
+    public MeasurementDistance MinDistance => new(_aggregatedMeasurement.MinDistanceMm, _accountSensor);
+    public MeasurementDistance MeanDistance => new(_aggregatedMeasurement.MeanDistanceMm, _accountSensor);
+    public MeasurementDistance MaxDistance => new(_aggregatedMeasurement.MaxDistanceMm, _accountSensor);
+    public MeasurementDistance LastDistance => new(_aggregatedMeasurement.LastDistanceMm, _accountSensor);
+    public double BatV => _aggregatedMeasurement.BatV;
+    public double RssiDbm => _aggregatedMeasurement.RssiDbm;
+    public double RssiPrc => (_aggregatedMeasurement.RssiDbm + 150.0) / 60.0 * 80.0;
+    public double BatteryPrc => (_aggregatedMeasurement.BatV - 3.0) / 0.335 * 100.0;
 }
 
 public class TrendMeasurementEx
@@ -182,20 +185,20 @@ public class AccountSensor : PageModel
                 { DevEui = AccountSensorEntity.Sensor.DevEui });
             if (lastMeasurement != null) LastMeasurement = new MeasurementEx(lastMeasurement, AccountSensorEntity);
 
-            Tuple<TimeSpan, TimeSpan?>? period = null;
+            Tuple<TimeSpan, TimeSpan>? period = null;
             switch (PageType)
             {
                 case PageTypeEnum.Graph6H:
-                    period = Tuple.Create<TimeSpan, TimeSpan?>(TimeSpan.FromHours(6), TimeSpan.FromMinutes(20));
+                    period = Tuple.Create(TimeSpan.FromHours(6), TimeSpan.FromMinutes(20));
                     break;
                 case PageTypeEnum.Graph24H:
-                    period = Tuple.Create<TimeSpan, TimeSpan?>(TimeSpan.FromDays(1), TimeSpan.FromHours(1));
+                    period = Tuple.Create(TimeSpan.FromDays(1), TimeSpan.FromHours(1));
                     break;
                 case PageTypeEnum.Graph7D:
-                    period = Tuple.Create<TimeSpan, TimeSpan?>(TimeSpan.FromDays(7), TimeSpan.FromHours(6));
+                    period = Tuple.Create(TimeSpan.FromDays(7), TimeSpan.FromHours(6));
                     break;
                 case PageTypeEnum.Graph3M:
-                    period = Tuple.Create<TimeSpan, TimeSpan?>(TimeSpan.FromDays(90), TimeSpan.FromDays(7));
+                    period = Tuple.Create(TimeSpan.FromDays(90), TimeSpan.FromDays(7));
                     break;
                 case PageTypeEnum.Trend:
                     if (LastMeasurement != null)
@@ -210,7 +213,7 @@ public class AccountSensor : PageModel
             }
 
             if (period != null)
-                Measurements = (await _mediator.Send(new MeasurementsQuery
+                Measurements = (await _mediator.Send(new AggregatedMeasurementsQuery
                     {
                         DevEui = AccountSensorEntity.Sensor.DevEui,
                         From = DateTime.UtcNow.Add(-period.Item1),
@@ -220,6 +223,94 @@ public class AccountSensor : PageModel
                     .Select(m => new MeasurementAggEx(m, AccountSensorEntity))
                     .ToArray();
         }
+    }
+
+    public async Task<IActionResult> OnGetExportCsv(string accountLink, string sensorLink)
+    {
+        // https://swimburger.net/blog/dotnet/create-zip-files-on-http-request-without-intermediate-files-using-aspdotnet-mvc-razor-pages-and-endpoints#better-mvc
+        
+        Response.ContentType = "text/csv";
+        Response.Headers.Add("Content-Disposition", "attachment; filename=\"Export.csv\"");
+
+        
+        await using TextWriter textWriter = new StreamWriter(Response.BodyWriter.AsStream());
+        var accountSensorEntity = await _mediator.Send(new SensorByLinkQuery
+        {
+            SensorLink = sensorLink,
+            AccountLink = accountLink
+        });
+
+        if (accountSensorEntity == null)
+            return NotFound();
+
+        {
+            StringBuilder sb = new();
+            sb
+                .Append('"').Append("DevEui").Append('"')
+                .Append(',')
+                .Append('"').Append("Timestamp").Append('"')
+                .Append(',')
+                .Append('"').Append("DistanceMm").Append('"')
+                .Append(',')
+                .Append('"').Append("BatV").Append('"')
+                .Append(',')
+                .Append('"').Append("RssiDbm").Append('"')
+                .Append(',')
+                .Append('"').Append("LevelPrc").Append('"')
+                .Append(',')
+                .Append('"').Append("WaterL").Append('"')
+                .Append(',')
+                .Append('"').Append("BatteryPrc").Append('"')
+                .Append(',')
+                .Append('"').Append("RssiPrc").Append('"')
+                ;
+            await textWriter.WriteLineAsync(sb.ToString());
+        }
+
+        DateTime from = DateTime.UtcNow.AddYears(-1);
+        DateTime? last = null;
+        while (true)
+        {
+            var result = await _mediator.Send(new MeasurementsQuery
+            {
+                DevEui = accountSensorEntity.Sensor.DevEui,
+                From = from,
+                Till = last
+            });
+
+            if (result.Length == 0)
+                break;
+
+            foreach (var record in result)
+            {
+                MeasurementEx measurementEx = new(record, accountSensorEntity);
+                StringBuilder sb = new();
+                sb
+                    .Append('"').Append(measurementEx.DevEui).Append('"')
+                    .Append(',')
+                    .Append('"').Append(measurementEx.Timestamp.ToString("yyyy-M-d HH:mm:ss")).Append('"')
+                    .Append(',')
+                    .Append(measurementEx.Distance.DistanceMm)
+                    .Append(',')
+                    .Append(measurementEx.BatV.ToString(CultureInfo.InvariantCulture))
+                    .Append(',')
+                    .Append(measurementEx.RssiDbm.ToString(CultureInfo.InvariantCulture))
+                    .Append(',')
+                    .Append(measurementEx.Distance.LevelFraction?.ToString(CultureInfo.InvariantCulture))
+                    .Append(',')
+                    .Append(measurementEx.Distance.WaterL?.ToString(CultureInfo.InvariantCulture))
+                    .Append(',')
+                    .Append(measurementEx.BatteryPrc.ToString(CultureInfo.InvariantCulture))
+                    .Append(',')
+                    .Append(measurementEx.RssiPrc.ToString(CultureInfo.InvariantCulture))
+                    ;
+                await textWriter.WriteLineAsync(sb.ToString());
+            }
+
+            last = result[^1].Timestamp;
+        }
+
+        return new EmptyResult();
     }
 
     private async Task<TrendMeasurementEx?> GetTrendMeasurement(TimeSpan timeSpan, MeasurementEx lastMeasurement)
