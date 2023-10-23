@@ -7,7 +7,14 @@
 }
 
 <div class="grayout">
-    <div>DevEui: @Model.AccountSensor.Sensor.DevEui</div>
+    <div>
+        DevEui:
+        <span id="devEui">@Model.AccountSensor.Sensor.DevEui</span>
+        &nbsp;
+        <button type="button" class="btn btn-clipboard" title="Copy to clipboard" data-clipboard data-clipboard-target="#devEui">
+            <i class="bi bi-clipboard" aria-hidden="true"></i>
+        </button>
+    </div>
     @if (Model.MeasurementEx != null)
     {
         <div>@Loc["Distance"]: @Model.MeasurementEx.Distance.DistanceMm mm</div>

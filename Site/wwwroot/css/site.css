@@ -24,3 +24,7 @@ body {
 .grayout {
     opacity: 0.6;
 }
+
+.btn-clipboard {
+    padding: 0;
+}
