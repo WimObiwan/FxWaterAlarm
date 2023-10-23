@@ -148,7 +148,8 @@ public class AccountSensor : PageModel
         Graph7D,
         Graph3M,
         Trend,
-        Details
+        Details,
+        QrCode
     }
 
     private readonly IMediator _mediator;
@@ -168,10 +169,13 @@ public class AccountSensor : PageModel
     public Core.Entities.AccountSensor? AccountSensorEntity { get; private set; }
 
     public PageTypeEnum PageType { get; private set; }
+    
+    public string? QrBaseUrl { get; private set; }
 
     public async Task OnGet(string accountLink, string sensorLink, [FromQuery] PageTypeEnum page = PageTypeEnum.Graph7D)
     {
         PageType = page;
+        QrBaseUrl = $"https://wateralarm.be/a/{accountLink}/s/{sensorLink}";
 
         AccountSensorEntity = await _mediator.Send(new SensorByLinkQuery
         {

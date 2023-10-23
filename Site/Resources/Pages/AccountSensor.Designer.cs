@@ -92,5 +92,11 @@ namespace Site.Resources.Pages {
                 return ResourceManager.GetString("Trend", resourceCulture);
             }
         }
+        
+        internal static string QR_Code {
+            get {
+                return ResourceManager.GetString("QR Code", resourceCulture);
+            }
+        }
     }
 }

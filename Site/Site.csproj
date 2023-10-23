@@ -21,6 +21,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="QRCoder-ImageSharp" Version="0.9.0" />
     </ItemGroup>
 
     <ItemGroup>

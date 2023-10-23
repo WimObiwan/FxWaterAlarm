@@ -55,4 +55,8 @@
         <value>Trend</value>
         <comment>Trend</comment>
     </data>
+    <data name="QR Code" xml:space="preserve">
+        <value>QR Code</value>
+        <comment>QR Code</comment>
+    </data>
 </root>

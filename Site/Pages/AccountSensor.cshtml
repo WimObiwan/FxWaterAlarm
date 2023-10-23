@@ -1,5 +1,7 @@
 @page
 @using Microsoft.AspNetCore.Mvc.Localization
+@using QRCoder
+@using SixLabors.ImageSharp
 @model AccountSensor
 @inject IViewLocalizer Loc
 
@@ -76,6 +78,9 @@
             <li class="nav-item">
                 <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Details)) href="?page=details">@Loc["Details"]</a>
             </li>
+            <li class="nav-item">
+                <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.QrCode)) href="?page=qrcode">@Loc["QR Code"]</a>
+            </li>
         </ul>
 
         @if (Model.PageType == AccountSensor.PageTypeEnum.Details)
@@ -90,6 +95,16 @@
             </div>
         }
 
+        @if (IsPageTypeGraph())
+        {
+            <div style="width: 100%; height: 40vh">
+                @await Component.InvokeAsync("MeasurementsGraph", new
+                       {
+                           Model.Measurements
+                       })
+            </div>
+        }
+        
         @if (Model.PageType == AccountSensor.PageTypeEnum.Trend)
         {
             @await Component.InvokeAsync("Trend", new
@@ -102,14 +117,19 @@
                    })
         }
 
-        @if (IsPageTypeGraph())
+        @if (Model.PageType == AccountSensor.PageTypeEnum.QrCode)
         {
-            <div style="width: 100%; height: 40vh">
-                @await Component.InvokeAsync("MeasurementsGraph", new
-                       {
-                           Model.Measurements
-                       })
-            </div>
+            if (Model.QrBaseUrl is { } qrBaseUrl)
+            {
+                QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                QRCodeData qrCodeInfo = qrGenerator.CreateQrCode(qrBaseUrl, QRCodeGenerator.ECCLevel.Q);
+                QRCode qrCode = new QRCode(qrCodeInfo);
+                using Image qrCodeImage = qrCode.GetGraphic(5);
+                using var memoryStream = new MemoryStream();
+                await qrCodeImage.SaveAsPngAsync(memoryStream);
+                string img = "data:image/png;base64," + Convert.ToBase64String(memoryStream.ToArray());
+                <img alt="qrcode" src="@img"/>
+            }
         }
     }
     else
