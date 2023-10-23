@@ -18,3 +18,16 @@ function refreshAt(hours, minutes, seconds) {
     var timeout = (then.getTime() - now.getTime());
     setTimeout(function() { window.location.reload(true); }, timeout);
 }
+
+var clipboardDemos=new ClipboardJS('[data-clipboard]');
+clipboardDemos.on('success',function(e)
+{
+    e.clearSelection();
+    var img = e.trigger.querySelector('.bi');
+    img.classList.remove("bi-clipboard", "bi-check2");
+    img.classList.add("bi-check2");
+    setTimeout(() => {
+        img.classList.remove("bi-clipboard", "bi-check2");
+        img.classList.add("bi-clipboard");
+    }, 2000);
+});

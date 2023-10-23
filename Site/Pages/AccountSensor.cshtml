@@ -129,6 +129,12 @@
                 await qrCodeImage.SaveAsPngAsync(memoryStream);
                 string img = "data:image/png;base64," + Convert.ToBase64String(memoryStream.ToArray());
                 <img alt="qrcode" src="@img"/>
+                <div>
+                    <a id="qrBaseUrl" href="@qrBaseUrl">@qrBaseUrl</a>&nbsp;
+                    <button type="button" class="btn btn-clipboard" title="Copy to clipboard" data-clipboard data-clipboard-target="#qrBaseUrl">
+                        <i class="bi bi-clipboard" aria-hidden="true"></i>
+                    </button>
+                </div>
             }
         }
     }

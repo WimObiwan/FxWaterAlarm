@@ -12,6 +12,7 @@
         @string.Join(" - ", new[] { ViewData["Title"] as string, "WaterAlarm" }.Where(s => !string.IsNullOrEmpty(s)))
     </title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/Site.styles.css" asp-append-version="true"/>
     
@@ -96,6 +97,7 @@
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/lib/clipboard.js/dist/clipboard.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 
 @await RenderSectionAsync("Scripts", false)
