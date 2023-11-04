@@ -28,3 +28,13 @@ body {
 .btn-clipboard {
     padding: 0;
 }
+
+.btn-clipboard:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.btn-clipboard:active:focus {
+    outline: none;
+    box-shadow: none;
+}
