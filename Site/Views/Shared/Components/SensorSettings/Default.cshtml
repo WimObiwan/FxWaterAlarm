@@ -1,3 +1,4 @@
+@using System.Security.Claims
 @using Microsoft.AspNetCore.Mvc.Localization
 @model Site.ViewComponents.SensorSettingsModel
 @inject IViewLocalizer Loc
@@ -12,9 +13,23 @@
 
     <div class="col-auto">
 
-        @if (HttpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
+        @if ((HttpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false) == false)
         {
-            <kbd>DEBUG: Logged in</kbd>
+            <kbd>DEBUG: Not logged in</kbd>
+            
+            <div>@Loc["Please log in before updating your settings.  WaterAlarm.be will send you an e-mail with a link to verify your identity.  When you click the link, you will get back to this page."]</div>
+            
+            <a href="/Account/LoginMail?m=1&a=@Model.AccountSensor.Account.Link&r=@Model.Url" class="btn btn-primary">@Loc["Send login link"]</a>
+        }
+        else if (!string.Equals(HttpContextAccessor.HttpContext?.User.FindFirstValue("email"),
+            Model.AccountSensor.Account.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            <kbd>DEBUG: Logged in - @HttpContextAccessor.HttpContext?.User.FindFirstValue("email")</kbd>
+            <kbd>DEBUG: But not allowed to access this Account</kbd>
+        }
+        else
+        {
+            <kbd>DEBUG: Logged in - @HttpContextAccessor.HttpContext?.User.FindFirstValue("email")</kbd>
 
             <form>
                 <table class="table table-responsive col-auto">
@@ -66,14 +81,6 @@
                     </tr>
                 </table>
             </form>
-        }
-        else
-        {
-            <kbd>DEBUG: Not logged in</kbd>
-            
-            <div>@Loc["Please log in before updating your settings.  WaterAlarm.be will send you an e-mail with a link to verify your identity.  When you click the link, you will get back to this page."]</div>
-            
-            <a href="/Account/LoginMail?m=1&a=@Model.AccountSensor.Account.Link&r=@Model.Url" class="btn btn-primary">@Loc["Send login link"]</a>
         }
 
     </div>
