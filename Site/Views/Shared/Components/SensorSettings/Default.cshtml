@@ -1,0 +1,80 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model Site.ViewComponents.SensorSettingsModel
+@inject IViewLocalizer Loc
+@inject IHttpContextAccessor HttpContextAccessor
+
+<div class="row justify-content-center">
+    <div class="alert alert-warning">
+        This feature is currently in beta, like a pancake flipped too soon – it might be a bit undercooked, 
+        slightly sticky, and could potentially speak a language only understood by obscure inanimate objects.
+    </div>
+    <hr/>
+
+    <div class="col-auto">
+
+        @if (HttpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false)
+        {
+            <kbd>DEBUG: Logged in</kbd>
+
+            <form>
+                <table class="table table-responsive col-auto">
+                    <tr>
+                        <td>
+                            @Loc["Distance to water when full (100%)"]
+                        </td>
+                        <td>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" aria-describedby="basic-addon-DistanceMmFull" value="@Model.AccountSensor.DistanceMmFull" disabled/>
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon-DistanceMmFull">@Loc["mm"]</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Loc["Distance to water when empty (0%)"]
+                        </td>
+                        <td>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" aria-describedby="basic-addon-DistanceMmEmpty" value="@Model.AccountSensor.DistanceMmEmpty" disabled/>
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon-DistanceMmEmpty">@Loc["mm"]</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Loc["Capacity"]
+                        </td>
+                        <td>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" aria-describedby="basic-addon-CapacityL" value="@Model.AccountSensor.CapacityL" disabled/>
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon-CapacityL">@Loc["liter"]</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-primary mb-3" disabled>@Loc["Submit changes"]</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        }
+        else
+        {
+            <kbd>DEBUG: Not logged in</kbd>
+            
+            <div>@Loc["Please log in before updating your settings.  WaterAlarm.be will send you an e-mail with a link to verify your identity.  When you click the link, you will get back to this page."]</div>
+            
+            <a href="/Account/LoginMail?m=1&a=@Model.AccountSensor.Account.Link&r=@Model.Url" class="btn btn-primary">@Loc["Send login link"]</a>
+        }
+
+    </div>
+</div>

@@ -50,4 +50,8 @@
         <value>QR Code</value>
         <comment>QR Code</comment>
     </data>
+    <data name="Settings" xml:space="preserve">
+        <value>Instellingen</value>
+        <comment>Settings</comment>
+    </data>
 </root>

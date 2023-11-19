@@ -1,0 +1,21 @@
+@page
+@model AccountLogin
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+<div class="row">
+    <div class="col-xs-8 col-xs-offset-2">
+        <h1 class="text-center">Login</h1>
+        <form method="post" class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-3">Email Address: </label>
+                <div class="col-sm-9">
+                    <input type="email" name="emailAddress" class="form-control" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>

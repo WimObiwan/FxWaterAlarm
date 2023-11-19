@@ -7,28 +7,29 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Site.Resources.Pages {
+namespace Site.Resources.Views.Shared.Components.SensorSettings {
     using System;
+    using System.Reflection;
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class AccountSensor {
+    internal class Default {
         
         private static System.Resources.ResourceManager resourceMan;
         
         private static System.Globalization.CultureInfo resourceCulture;
         
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AccountSensor() {
+        internal Default() {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Site.Resources.Pages.AccountSensor", typeof(AccountSensor).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Site.Resources.Views.Shared.Components.SensorSettings.Default", typeof(Default).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -45,63 +46,53 @@ namespace Site.Resources.Pages {
             }
         }
         
-        internal static string No_sensor_found_with_the_specified_Id_ {
+        internal static string Please_log_in_before_updating_your_settings___WaterAlarm_be_will_send_you_an_e_mail_with_a_link_to_verify_your_identity___When_you_click_the_link__you_will_get_back_to_this_page_ {
             get {
-                return ResourceManager.GetString("No sensor found with the specified Id.", resourceCulture);
+                return ResourceManager.GetString("Please log in before updating your settings.  WaterAlarm.be will send you an e-ma" +
+                        "il with a link to verify your identity.  When you click the link, you will get b" +
+                        "ack to this page.", resourceCulture);
             }
         }
         
-        internal static string Graph {
+        internal static string Submit_changes {
             get {
-                return ResourceManager.GetString("Graph", resourceCulture);
+                return ResourceManager.GetString("Submit changes", resourceCulture);
             }
         }
         
-        internal static string Graph_6h {
+        internal static string liter {
             get {
-                return ResourceManager.GetString("Graph 6h", resourceCulture);
+                return ResourceManager.GetString("liter", resourceCulture);
             }
         }
         
-        internal static string Graph_24h {
+        internal static string mm {
             get {
-                return ResourceManager.GetString("Graph 24h", resourceCulture);
+                return ResourceManager.GetString("mm", resourceCulture);
             }
         }
         
-        internal static string Graph_7d {
+        internal static string Distance_to_water_when_empty__0__ {
             get {
-                return ResourceManager.GetString("Graph 7d", resourceCulture);
+                return ResourceManager.GetString("Distance to water when empty (0%)", resourceCulture);
             }
         }
         
-        internal static string Graph_3m {
+        internal static string Distance_to_water_when_full__100__ {
             get {
-                return ResourceManager.GetString("Graph 3m", resourceCulture);
+                return ResourceManager.GetString("Distance to water when full (100%)", resourceCulture);
             }
         }
         
-        internal static string Details {
+        internal static string Capacity {
             get {
-                return ResourceManager.GetString("Details", resourceCulture);
+                return ResourceManager.GetString("Capacity", resourceCulture);
             }
         }
         
-        internal static string Trend {
+        internal static string Send_login_link {
             get {
-                return ResourceManager.GetString("Trend", resourceCulture);
-            }
-        }
-        
-        internal static string QR_Code {
-            get {
-                return ResourceManager.GetString("QR Code", resourceCulture);
-            }
-        }
-        
-        internal static string Settings {
-            get {
-                return ResourceManager.GetString("Settings", resourceCulture);
+                return ResourceManager.GetString("Send login link", resourceCulture);
             }
         }
     }

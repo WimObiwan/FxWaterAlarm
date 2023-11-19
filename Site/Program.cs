@@ -1,6 +1,10 @@
 using System.Globalization;
 using Core;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Site;
+using Site.Identity;
 using Site.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,18 +34,51 @@ builder.Services.Configure<RequestLocalizationOptions>(o =>
     o.FallBackToParentUICultures = true;
 });
 
+builder.Services.Configure<AuthenticationMailOptions>(builder.Configuration.GetSection(AuthenticationMailOptions.Location));
+
 builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(
+    x =>
+    {
+        if (builder.Configuration.GetSection(AuthenticationMailOptions.Location).Get<AuthenticationMailOptions>()?.TokenLifespan is { } tokenLifespan)
+            x.TokenLifespan = tokenLifespan;
+    });
 
 builder.Services.AddRazorPages(o =>
         o.Conventions
             .AddPageRoute("/Sensor", "/sensor/{SensorLink}")
             .AddPageRoute("/Sensor", "/s/{SensorLink}")
             .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
+            .AddPageRoute("/AdminOnBoarding", "/admin/onboarding")
+            .AddPageRoute("/AccountLogin", "/account/login")
+            .AddPageRoute("/AccountLoginMail", "/account/loginmail")
+            .AddPageRoute("/AccountLoginMailConfirmation", "/account/loginmailconfirmation")
     )
     .AddViewLocalization();
 builder.Services.AddControllers();
 
 builder.Services.AddWaterAlarmCore(builder.Configuration, typeof(Program).Assembly);
+
+// Identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    //.AddEntityFrameworkStores<IdentityDbContext>()
+    .AddDefaultTokenProviders();
+builder.Services.AddTransient<IUserStore<IdentityUser>, UserStore>();
+builder.Services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)  
+    .AddCookie(options =>  
+    {  
+        options.LoginPath = "/Account/Login";  
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy =>
+        policy.RequireAssertion(context => context.User.HasClaim(c =>
+            c is { Type: "admin", Value: "1" })));
+});
 
 var app = builder.Build();
 
@@ -63,6 +100,7 @@ app.UseRequestLocalizationCookies();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();

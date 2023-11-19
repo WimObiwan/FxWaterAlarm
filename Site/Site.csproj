@@ -53,6 +53,14 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>_Layout.nl.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Views\Shared\Components\SensorSettings\Default.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Default.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Views\Shared\Components\SensorSettings\Default.nl.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Default.nl.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -86,9 +94,15 @@
           <AutoGen>True</AutoGen>
           <DependentUpon>_Layout.resx</DependentUpon>
         </Compile>
+        <Compile Update="Resources\Views\Shared\Components\SensorSettings\Default.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Default.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
+      <AdditionalFiles Include="Views\Shared\Components\SensorSettings\Default.cshtml" />
       <AdditionalFiles Include="Views\Shared\Components\Trend\Default.cshtml" />
     </ItemGroup>
 

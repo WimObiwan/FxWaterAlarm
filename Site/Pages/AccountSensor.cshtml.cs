@@ -149,6 +149,7 @@ public class AccountSensor : PageModel
         Graph3M,
         Trend,
         Details,
+        Settings,
         QrCode
     }
 

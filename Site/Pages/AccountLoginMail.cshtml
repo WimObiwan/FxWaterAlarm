@@ -1,0 +1,23 @@
+@page
+@model AccountLoginMail
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+@if (string.IsNullOrEmpty(Model.EmailAddress))
+{
+    <div>
+        Als uw account gekend is in het systeem werd zojuist een e-mail gestuurd.
+    </div>
+}
+else
+{
+    <div>
+        Er werd een email gestuurd naar het e-mail adres gekoppeld aan uw account (@Model.EmailAddress).
+    </div>
+}
+
+<div>
+    Klik op de link in de e-mail om in te loggen.
+</div>

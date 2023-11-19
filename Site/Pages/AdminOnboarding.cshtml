@@ -1,0 +1,9 @@
+@page
+@using System.Security.Claims
+@model AdminOnBoarding
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+Test @((Request.HttpContext.User.Identity as ClaimsIdentity)?.FindFirst("email")?.Value)
