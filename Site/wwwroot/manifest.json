@@ -1,0 +1,20 @@
+{
+  "short_name": "WaterAlarm",
+  "name": "WaterAlarm",
+  "icons": [
+    {
+      "src": "/img/wateralarm.png",
+      "type": "image/png",
+      "sizes": "156x156"
+    }
+  ],
+  "id": "/?source=pwa",
+  "start_url": "/auto?source=pwa",
+  "display": "standalone",
+  "scope": "/",
+  "shortcuts": [
+  ],
+  "description": "WaterAlarm",
+  "screenshots": [
+  ]
+}

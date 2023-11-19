@@ -29,7 +29,7 @@
         <PropertyGroup>
             <Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</Version>
             <PackageVersion>$(Version)</PackageVersion>
-            <InformationalVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitCommits)$(GitSemVerDashLabel)+$(GitBranch).$(GitCommit) $(GitCommitDate)</InformationalVersion>
+            <InformationalVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitCommits)$(GitSemVerDashLabel)+$(GitBranch)</InformationalVersion>
         </PropertyGroup>
     </Target>
 

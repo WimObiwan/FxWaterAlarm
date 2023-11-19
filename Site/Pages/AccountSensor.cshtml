@@ -10,6 +10,25 @@
     ViewData["Title"] = Model.AccountSensorEntity?.Name ?? Model.AccountSensorEntity?.Sensor.DevEui ?? "Sensor";
 }
 
+<script>
+
+function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+setCookie("auto", window.location.pathname, 365*10);
+</script>
+
+<p class=""><div id="installContainer" class="alert alert-success small-alert hidden">
+    Je kunt WaterAlarm.be nu ook installeren als <i>app</i>.  Druk hiervoor op de knop
+    <button id="butInstall" type="button">
+        installeren
+    </button>
+</div></p>
+
 <div style="text-align: center;">
     @if (Model.AccountSensorEntity?.Name != null)
     {
