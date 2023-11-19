@@ -94,7 +94,7 @@ public class AccountLoginMail : PageModel
 
         return new SendMailResult
         {
-            EmailAddress = emailAddress
+            EmailAddress = AnonymizeEmail(emailAddress)
         };
     }
 
@@ -112,5 +112,41 @@ public class AccountLoginMail : PageModel
 
         var email = account.Email;
         return await SendMail(email, returnUrl);
+    }
+    
+    static string AnonymizeEmail(string email)
+    {
+        // Split the email into local part and domain
+        string[] parts = email.Split('@');
+        
+        // Anonymize the local part (e.g., "example" becomes "ex***le")
+        string anonymizedLocalPart = AnonymizeString(parts[0]);
+
+        // Split the domain into subdomains and the top-level domain
+        string[] domainParts = parts[1].Split('.');
+        int domainPartsCount = domainParts.Length;
+
+        // Anonymize the domain, except for the last part
+        for (int i = 0; i < domainPartsCount - 1; i++)
+        {
+            domainParts[i] = AnonymizeString(domainParts[i]);
+        }
+
+        // Combine the anonymized local part, "@" symbol, and the reconstructed domain
+        return anonymizedLocalPart + "@" + string.Join(".", domainParts);
+    }
+
+    static string AnonymizeString(string input)
+    {
+        if (input.Length <= 2)
+        {
+            // If the string has 2 or fewer characters, keep the first character and mask the rest
+            return input.Substring(0, 1) + new string('*', input.Length - 1);
+        }
+        else
+        {
+            // Keep the first and last characters, and mask the characters in between
+            return input.Substring(0, 1) + new string('*', input.Length - 2) + input.Substring(input.Length - 1, 1);
+        }
     }
 }

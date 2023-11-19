@@ -42,5 +42,5 @@ public class AccountLogin : PageModel
         smtpClient.Send("wim-devos@telenet.be", "wim@obiwan.be", "subject", url);
         
         return Redirect("/Account/LoginMailConfirmation");
-    } 
+    }
 }
