@@ -21,7 +21,7 @@ public class Info : PageModel
         Server = Environment.MachineName;
         Version = ThisAssembly.Git.SemVer.Major + "." + ThisAssembly.Git.SemVer.Minor + "." + ThisAssembly.Git.Commits 
                   + "-" + ThisAssembly.Git.Branch + "+" + ThisAssembly.Git.Commit
-                  + "  " + ThisAssembly.Git.CommitDate;
+                  + " " + ThisAssembly.Git.CommitDate;
         OsVersion = RuntimeInformation.OSDescription;
         DotNetVersion = RuntimeInformation.FrameworkDescription;
         UserAuthId = HttpContext.User.Identity?.Name;
