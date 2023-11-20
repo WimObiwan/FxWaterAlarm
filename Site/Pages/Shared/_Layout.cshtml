@@ -92,9 +92,12 @@
     <div class="container">
         &copy; 2023 - <a href="https://www.foxinnovations.be/">Fox Innovations</a> / <a href="mailto:wim@obiwan.be">Wim Devos</a>
         @* - <a asp-area="" asp-page="/Privacy">Privacy</a> *@
-        <span class="grayout" style="white-space: nowrap;"> - v@(ThisAssembly.Git.SemVer.Major + "." + ThisAssembly.Git.SemVer.Minor + "." + ThisAssembly.Git.Commits 
-                                    + "-" + ThisAssembly.Git.Branch + "+" + ThisAssembly.Git.Commit 
-                                    + " " + ThisAssembly.Git.CommitDate.Substring(0, 10))</span>
+        <span class="grayout" style="white-space: nowrap;">
+            - v@(ThisAssembly.Git.SemVer.Major + "." + ThisAssembly.Git.SemVer.Minor + "." + ThisAssembly.Git.Commits
+                       + "-" + ThisAssembly.Git.Branch + "+" + ThisAssembly.Git.Commit
+                       + " " + ThisAssembly.Git.CommitDate.Substring(0, 10))
+            <a href="/Info">&pi;</a>
+        </span>
     </div>
 </footer>
 
