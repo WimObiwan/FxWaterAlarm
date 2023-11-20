@@ -71,3 +71,8 @@ if ('serviceWorker' in navigator) {
         installContainer.classList.toggle('hidden', false);
     });
 }
+
+// if are standalone android OR safari
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    installContainer.classList.toggle('hidden', true);
+}
