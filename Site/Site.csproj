@@ -118,13 +118,5 @@
       <AdditionalFiles Include="Views\Shared\Components\SensorSettings\Default.cshtml" />
       <AdditionalFiles Include="Views\Shared\Components\Trend\Default.cshtml" />
     </ItemGroup>
-
-    <Target Name="_SetVersion" BeforeTargets="GetAssemblyVersion;GenerateNuspec;GetPackageContents">
-        <PropertyGroup>
-            <Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</Version>
-            <PackageVersion>$(Version)</PackageVersion>
-            <InformationalVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitCommits)$(GitSemVerDashLabel)+$(GitBranch)</InformationalVersion>
-        </PropertyGroup>
-    </Target>
     
 </Project>
