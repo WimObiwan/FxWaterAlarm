@@ -9,27 +9,26 @@
 
 namespace Site.Resources.Pages {
     using System;
-    using System.Reflection;
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class AccountLoginMail {
+    internal class AccountLoginMessage {
         
         private static System.Resources.ResourceManager resourceMan;
         
         private static System.Globalization.CultureInfo resourceCulture;
         
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AccountLoginMail() {
+        internal AccountLoginMessage() {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Site.Resources.Pages.AccountLoginMail", typeof(AccountLoginMail).GetTypeInfo().Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Site.Resources.Pages.AccountLoginMessage", typeof(AccountLoginMessage).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -46,13 +45,6 @@ namespace Site.Resources.Pages {
             }
         }
         
-        internal static string If_your_account_is_known_and_contains_an_email_address__an_email_was_sent_to_you_ {
-            get {
-                return ResourceManager.GetString("If your account is known and contains an email-address, an email was sent to you." +
-                        "", resourceCulture);
-            }
-        }
-        
         internal static string An_email_was_sent_to_the_email_address_linked_to_your_account___0__ {
             get {
                 return ResourceManager.GetString("An email was sent to the email-address linked to your account ({0})", resourceCulture);
@@ -62,6 +54,30 @@ namespace Site.Resources.Pages {
         internal static string Click_on_the_link_in_the_email_to_log_in_ {
             get {
                 return ResourceManager.GetString("Click on the link in the email to log in.", resourceCulture);
+            }
+        }
+        
+        internal static string Or_enter_the_code_in_the_email_ {
+            get {
+                return ResourceManager.GetString("Or enter the code in the email:", resourceCulture);
+            }
+        }
+        
+        internal static string Log_in {
+            get {
+                return ResourceManager.GetString("Log in", resourceCulture);
+            }
+        }
+        
+        internal static string code {
+            get {
+                return ResourceManager.GetString("code", resourceCulture);
+            }
+        }
+        
+        internal static string The_code_is_not_valid___Please_check_the_code_and_try_again_ {
+            get {
+                return ResourceManager.GetString("The code is not valid.  Please check the code and try again.", resourceCulture);
             }
         }
     }

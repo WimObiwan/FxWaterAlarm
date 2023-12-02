@@ -61,13 +61,13 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Default.nl.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Pages\AccountLoginMail.resx">
+        <EmbeddedResource Update="Resources\Pages\AccountLoginMessage.resx">
           <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>AccountLoginMail.Designer.cs</LastGenOutput>
+          <LastGenOutput>AccountLoginMessage.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\Pages\AccountLoginMail.nl.resx">
+        <EmbeddedResource Update="Resources\Pages\AccountLoginMessage.nl.resx">
           <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>AccountLoginMail.nl.Designer.cs</LastGenOutput>
+          <LastGenOutput>AccountLoginMessage.nl.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
 
@@ -107,10 +107,10 @@
           <AutoGen>True</AutoGen>
           <DependentUpon>Default.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\Pages\AccountLoginMail.Designer.cs">
+        <Compile Update="Resources\Pages\AccountLoginMessage.Designer.cs">
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
-          <DependentUpon>AccountLoginMail.resx</DependentUpon>
+          <DependentUpon>AccountLoginMessage.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 
@@ -118,5 +118,9 @@
       <AdditionalFiles Include="Views\Shared\Components\SensorSettings\Default.cshtml" />
       <AdditionalFiles Include="Views\Shared\Components\Trend\Default.cshtml" />
     </ItemGroup>
-    
+
+    <ItemGroup>
+        <None Update="Content\**" CopyToOutputDirectory="PreserveNewest"  />
+    </ItemGroup>
+
 </Project>

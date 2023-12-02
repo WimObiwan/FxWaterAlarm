@@ -19,7 +19,7 @@
             
             <div>@Loc["Please log in before updating your settings.  WaterAlarm.be will send you an e-mail with a link to verify your identity.  When you click the link, you will get back to this page."]</div>
             
-            <a href="/Account/LoginMail?m=1&a=@Model.AccountSensor.Account.Link&r=@Model.Url" class="btn btn-primary">@Loc["Send login link"]</a>
+            <a href="/Account/LoginMessage?m=1&a=@Model.AccountSensor.Account.Link&r=@Model.Url" class="btn btn-primary">@Loc["Send login link"]</a>
         }
         else if (!string.Equals(HttpContextAccessor.HttpContext?.User.FindFirstValue("email"),
             Model.AccountSensor.Account.Email, StringComparison.OrdinalIgnoreCase))

@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Site;
 using Site.Identity;
+using Site.Communication;
 using Site.Middlewares;
+using Site.Pages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,14 +36,15 @@ builder.Services.Configure<RequestLocalizationOptions>(o =>
     o.FallBackToParentUICultures = true;
 });
 
-builder.Services.Configure<AuthenticationMailOptions>(builder.Configuration.GetSection(AuthenticationMailOptions.Location));
+builder.Services.Configure<AccountLoginMessageOptions>(builder.Configuration.GetSection(AccountLoginMessageOptions.Location));
+builder.Services.Configure<MessengerOptions>(builder.Configuration.GetSection(MessengerOptions.Location));
 
 builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
 
 builder.Services.Configure<DataProtectionTokenProviderOptions>(
     x =>
     {
-        if (builder.Configuration.GetSection(AuthenticationMailOptions.Location).Get<AuthenticationMailOptions>()?.TokenLifespan is { } tokenLifespan)
+        if (builder.Configuration.GetSection(AccountLoginMessageOptions.Location).Get<AccountLoginMessageOptions>()?.TokenLifespan is { } tokenLifespan)
             x.TokenLifespan = tokenLifespan;
     });
 
@@ -52,8 +55,8 @@ builder.Services.AddRazorPages(o =>
             .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
             .AddPageRoute("/AdminOnBoarding", "/admin/onboarding")
             .AddPageRoute("/AccountLogin", "/account/login")
-            .AddPageRoute("/AccountLoginMail", "/account/loginmail")
-            .AddPageRoute("/AccountLoginMailConfirmation", "/account/loginmailconfirmation")
+            .AddPageRoute("/AccountLoginMessage", "/account/loginmessage")
+            .AddPageRoute("/AccountLoginMessageConfirmation", "/account/loginmessageconfirmation")
     )
     .AddViewLocalization();
 builder.Services.AddControllers();
@@ -79,6 +82,8 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAssertion(context => context.User.HasClaim(c =>
             c is { Type: "admin", Value: "1" })));
 });
+
+builder.Services.AddTransient<IMessenger, Messenger>();
 
 var app = builder.Build();
 

@@ -18,10 +18,6 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="If your account is known and contains an email-address, an email was sent to you." xml:space="preserve">
-        <value>Als uw account gekend is in het systeem werd zojuist een e-mail gestuurd.</value>
-        <comment>If your account is known and contains an email-address, an email was sent to you.</comment>
-    </data>
     <data name="An email was sent to the email-address linked to your account ({0})" xml:space="preserve">
         <value>Er werd een email gestuurd naar het e-mail adres gekoppeld aan uw account ({0})</value>
         <comment>An email was sent to the email-address linked to your account ({0})</comment>
@@ -29,5 +25,29 @@
     <data name="Click on the link in the email to log in." xml:space="preserve">
         <value>Klik op de link in de e-mail om in te loggen.</value>
         <comment>Click on the link in the email to log in.</comment>
+    </data>
+    <data name="Or enter the code in the email:" xml:space="preserve">
+        <value>Of vul hier de code in van de e-mail:</value>
+        <comment>Or enter the code in the email:</comment>
+    </data>
+    <data name="Log in" xml:space="preserve">
+        <value>Inloggen</value>
+        <comment>Log in</comment>
+    </data>
+    <data name="code" xml:space="preserve">
+        <value>code</value>
+        <comment>code</comment>
+    </data>
+    <data name="1234" xml:space="preserve">
+        <value>1234</value>
+        <comment>1234</comment>
+    </data>
+    <data name="The code is not valid.  Please check the code and try again." xml:space="preserve">
+        <value>De code is niet juist of is vervallen.  Kijk de code opnieuw na, en probeer opnieuw.</value>
+        <comment>The code is not valid.  Please check the code and try again.</comment>
+    </data>
+    <data name="Or resend the verification &lt;a href=&quot;{0}&quot;&gt;mail&lt;/a&gt;." xml:space="preserve">
+        <value>Of verstuur de &lt;a href="{0}"&gt;mail&lt;/a&gt; opnieuw.</value>
+        <comment>Or resend the verification &lt;a href="{0}"&gt;mail&lt;/a&gt;.</comment>
     </data>
 </root>

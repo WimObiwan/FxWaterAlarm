@@ -1,0 +1,72 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@model AccountLoginMessage
+@inject IViewLocalizer Loc
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+@if (Model.WrongCode)
+{
+    <p>
+        <div class="alert alert-warning" role="alert">
+            @Loc["The code is not valid.  Please check the code and try again."]
+            @if (!string.IsNullOrEmpty(Model.ResendMailUrl))
+            {
+                @Loc["Or resend the verification <a href=\"{0}\">mail</a>.", Model.ResendMailUrl]
+            }
+        </div>
+    </p>
+}
+
+@if (!string.IsNullOrEmpty(Model.EmailAddress))
+{
+    <p>
+        <div class="d-flex">
+            <div class="m-auto">
+                @Loc["An email was sent to the email-address linked to your account ({0})", Model.EmailAddress]
+            </div>
+        </div>
+    </p>
+    <p>
+        <div class="d-flex">
+            <div class="m-auto">
+                @Loc["Click on the link in the email to log in."]
+            </div>
+        </div>
+    </p>
+}
+
+<p>
+    @if (!string.IsNullOrEmpty(Model.EmailAddress))
+    {
+        <div class="d-flex">
+            <div class="m-auto">
+                @Loc["Or enter the code in the email:"]
+            </div>
+        </div>
+    }
+    <div class="d-flex">
+        <div class="m-auto">
+            <form class="d-flex flex-row flex-wrap form-floating" method="post" action="">
+                <input type="text" pattern="[0-9]{6}" class="form-control" style="width: 100px" name="code" id="code" placeholder="123 456">
+                <label for="code">@Loc["code"]</label>
+                <button type="submit" class="btn btn-primary">@Loc["Log in"]</button>
+                
+                @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+                {
+                    <input type="hidden" name="returnUrl" value="@Model.ReturnUrl">
+                }
+                @if (!string.IsNullOrEmpty(Model.AccountLink))
+                {
+                    <input type="hidden" name="accountLink" value="@Model.AccountLink">
+                }
+                @if (!string.IsNullOrEmpty(Model.Cookie))
+                {
+                    <input type="hidden" name="cookie" value="@Model.Cookie">
+                }
+            </form>
+        </div>
+    </div>
+</p>
