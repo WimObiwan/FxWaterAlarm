@@ -24,12 +24,19 @@ public class AccountLoginMessageOptions
     [ConfigurationKeyName("TokenLifespan")]
     public required TimeSpan? TokenLifespanRaw { get; init; }
 
+    [ConfigurationKeyName("CodeLifespanHours")]
+    public required int? CodeLifespanHoursRaw { get; init; }
+
     [ConfigurationKeyName("Salt")]
     public required string SaltRaw { get; init; }
 
     public TimeSpan TokenLifespan =>
         TokenLifespanRaw
         ?? throw new Exception("AccountLoginMessageOptions.TokenLifespan not configured");
+
+    public int CodeLifespanHours =>
+        CodeLifespanHoursRaw
+        ?? throw new Exception("AccountLoginMessageOptions.CodeLifespanHours not configured");
 
     public string Salt =>
         string.IsNullOrEmpty(SaltRaw)
@@ -278,7 +285,7 @@ public class AccountLoginMessage : PageModel
         string normalizedCode = NormalizeCode(code);
         
         DateTime now = DateTime.UtcNow;
-        int validityHours = (int)Math.Ceiling(_options.TokenLifespan.TotalHours);
+        int validityHours = _options.CodeLifespanHours;
 
         for (int hour = 0; hour <= validityHours; hour++)
         {
