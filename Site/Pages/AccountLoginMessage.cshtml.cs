@@ -50,12 +50,12 @@ public class AccountLoginMessage : PageModel
         _options = options.Value;
     }
     
-    public async Task<ActionResult> OnGet(
+    public async Task<IActionResult> OnGet(
         [FromQuery(Name = "m")] int mode = 1, 
         [FromQuery(Name = "a")] string? accountLink = null, 
-        [FromQuery(Name = "r")] string? returnUrl = null,
         [FromQuery(Name = "e")] string? emailAddress = null,
-        [FromQuery(Name = "c")] string? cookie = null)
+        [FromQuery(Name = "c")] string? cookie = null,
+        [FromQuery(Name = "r")] string? returnUrl = null)
     {
         switch (mode)
         {
@@ -63,13 +63,15 @@ public class AccountLoginMessage : PageModel
                 if (accountLink != null)
                 {
                     var result = await SendMailToAccountLink(accountLink, returnUrl);
-                    EmailAddress = result.EmailAddress;
-                    AccountLink = accountLink;
-                    Cookie = result.Cookie;
-                    ReturnUrl = returnUrl;
+
+                    return Redirect(2, accountLink, result.EmailAddress, result.Cookie, returnUrl);
                 }
-                else
-                    return BadRequest();
+                return BadRequest();
+            case 2:
+                EmailAddress = emailAddress;
+                AccountLink = accountLink;
+                Cookie = cookie;
+                ReturnUrl = returnUrl;
                 break;
             case 11:
             case 12:
@@ -78,20 +80,45 @@ public class AccountLoginMessage : PageModel
                 Cookie = cookie;
                 ReturnUrl = returnUrl;
                 WrongCode = mode == 12;
-                ResendMailUrl = $"/Account/LoginMessage?m=1&a={accountLink}&r={returnUrl}";
+                ResendMailUrl = GetUrl(1, accountLink, returnUrl);
                 break;
         }
 
         return Page();
     }
 
-    public async Task<IActionResult> OnPost(string? emailAddress, string? returnUrl, string? accountLink, string? code, string? cookie)
+    public IActionResult Redirect(int mode, string? accountLink, string? emailAddress, string? cookie, string? returnUrl)
+    {
+        var url = GetUrl(mode, accountLink, emailAddress, cookie, returnUrl);
+        return Redirect(url);
+    }
+
+    public static string GetUrl(int mode, string? accountLink, string? returnUrl)
+        => GetUrl(mode, accountLink, null, null, returnUrl);
+
+    public static string GetUrl(int mode, string? accountLink, string? emailAddress, string? cookie, string? returnUrl)
+    {
+        var queryStringBuilder = System.Web.HttpUtility.ParseQueryString(string.Empty);
+        queryStringBuilder.Add("m", mode.ToString());
+        if (accountLink != null)
+            queryStringBuilder.Add("a", accountLink);
+        if (emailAddress != null)
+            queryStringBuilder.Add("e", emailAddress);
+        if (cookie != null)
+            queryStringBuilder.Add("c", cookie);
+        if (returnUrl != null)
+            queryStringBuilder.Add("r", returnUrl);
+
+        return $"/Account/LoginMessage?{queryStringBuilder}";
+    }
+
+    public async Task<IActionResult> OnPost(string? accountLink, string? emailAddress, string? cookie, string? returnUrl, string? code)
     {
         if (!string.IsNullOrEmpty(emailAddress))
         {
             var result = await SendMail(emailAddress, null, returnUrl);
 
-            return Redirect($"/Account/LoginMessage?m=11&e={result.EmailAddress}&c={result.Cookie}");
+            return Redirect(11, accountLink, result.EmailAddress, result.Cookie, returnUrl);
         }
 
         if (!string.IsNullOrEmpty(code))
@@ -101,7 +128,7 @@ public class AccountLoginMessage : PageModel
 
             if (!ValidateCookie(cookie, accountLink, code))
             {
-                return Redirect($"/Account/LoginMessage?m=12&a={accountLink}&c={cookie}&r={returnUrl}");
+                return Redirect(12, accountLink, emailAddress, cookie, returnUrl);
             }
 
             // This can be more efficient, by eliminating one redirect...

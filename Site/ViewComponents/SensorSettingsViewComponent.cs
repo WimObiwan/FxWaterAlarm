@@ -8,6 +8,7 @@ public class SensorSettingsModel
 {
     public required AccountSensor AccountSensor { get; init; }
     public required string Url { get; init; }
+    public string LoginUrl => AccountLoginMessage.GetUrl(1, AccountSensor.Account.Link, Url);
 }
 
 public class SensorSettingsViewComponent : ViewComponent
