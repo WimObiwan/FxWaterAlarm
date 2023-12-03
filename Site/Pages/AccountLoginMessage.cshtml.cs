@@ -21,8 +21,20 @@ public class AccountLoginMessageOptions
 {
     public const string Location = "AccountLoginMessage";
 
-    public required TimeSpan? TokenLifespan { get; init; }
-    public required string Salt { get; init; }
+    [ConfigurationKeyName("TokenLifespan")]
+    public required TimeSpan? TokenLifespanRaw { get; init; }
+
+    [ConfigurationKeyName("Salt")]
+    public required string SaltRaw { get; init; }
+
+    public TimeSpan TokenLifespan =>
+        TokenLifespanRaw
+        ?? throw new Exception("AccountLoginMessageOptions.TokenLifespan not configured");
+
+    public string Salt =>
+        string.IsNullOrEmpty(SaltRaw)
+        ? throw new Exception("AccountLoginMessageOptions.Salt not configured")
+        : SaltRaw;
 }
 
 public class AccountLoginMessage : PageModel
@@ -266,7 +278,7 @@ public class AccountLoginMessage : PageModel
         string normalizedCode = NormalizeCode(code);
         
         DateTime now = DateTime.UtcNow;
-        int validityHours = (int)Math.Ceiling((_options.TokenLifespan ?? TimeSpan.Zero).TotalHours);
+        int validityHours = (int)Math.Ceiling(_options.TokenLifespan.TotalHours);
 
         for (int hour = 0; hour <= validityHours; hour++)
         {

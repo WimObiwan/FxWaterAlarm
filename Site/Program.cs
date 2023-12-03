@@ -44,8 +44,12 @@ builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
 builder.Services.Configure<DataProtectionTokenProviderOptions>(
     x =>
     {
-        if (builder.Configuration.GetSection(AccountLoginMessageOptions.Location).Get<AccountLoginMessageOptions>()?.TokenLifespan is { } tokenLifespan)
-            x.TokenLifespan = tokenLifespan;
+        AccountLoginMessageOptions accountLoginMessageOptions =
+            builder.Configuration
+                .GetSection(AccountLoginMessageOptions.Location)
+                .Get<AccountLoginMessageOptions>()
+            ?? throw new Exception("AccountLoginMessageOptions not configured");
+        x.TokenLifespan = accountLoginMessageOptions.TokenLifespan;
     });
 
 builder.Services.AddRazorPages(o =>
