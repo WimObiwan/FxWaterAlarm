@@ -41,15 +41,20 @@ setCookie("auto", window.location.pathname, 365*10);
 
         <ul class="nav nav-tabs">
             @{
-                bool IsPageTypeGraph()
+                bool IsPageTypeInGraphDropDown()
                 {
                     return Model.PageType == AccountSensor.PageTypeEnum.Graph3M || Model.PageType == AccountSensor.PageTypeEnum.Graph7D
                            || Model.PageType == AccountSensor.PageTypeEnum.Graph24H || Model.PageType == AccountSensor.PageTypeEnum.Graph6H;
                 }
-                
-                string PageTypeDropDownMenu()
+
+                bool IsPageTypeInDetailsDropDown()
                 {
-                    if (IsPageTypeGraph())
+                    return Model.PageType == AccountSensor.PageTypeEnum.Details || Model.PageType == AccountSensor.PageTypeEnum.Settings;
+                }
+                
+                string PageTypeDropDownMenu(bool active)
+                {
+                    if (active)
                     {
                         return @$"class=""nav-link dropdown-toggle active""";
                     }
@@ -76,7 +81,7 @@ setCookie("auto", window.location.pathname, 365*10);
                 }
             }
             <li class="nav-item dropdown">
-                <a  @Html.Raw(PageTypeDropDownMenu()) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Graph"]</a>
+                <a  @Html.Raw(PageTypeDropDownMenu(IsPageTypeInGraphDropDown())) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Graph"]</a>
                 <ul class="dropdown-menu">
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph6H)) href="?page=graph6h">@Loc["Graph 6h"]</a>
@@ -96,7 +101,7 @@ setCookie("auto", window.location.pathname, 365*10);
                 <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Trend)) href="?page=trend">@Loc["Trend"]</a>
             </li>
             <li class="nav-item dropdown">
-                <a  @Html.Raw(PageTypeDropDownMenu()) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Details"]</a>
+                <a  @Html.Raw(PageTypeDropDownMenu(IsPageTypeInDetailsDropDown())) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Details"]</a>
                 <ul class="dropdown-menu">
                     <li class="nav-item">
                         <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Details)) href="?page=details">@Loc["Details"]</a>
@@ -113,7 +118,7 @@ setCookie("auto", window.location.pathname, 365*10);
             </li>
         </ul>
 
-        @if (IsPageTypeGraph())
+        @if (IsPageTypeInGraphDropDown())
         {
             <div style="width: 100%; height: 40vh">
                 @await Component.InvokeAsync("MeasurementsGraph", new

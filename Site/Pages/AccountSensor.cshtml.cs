@@ -7,6 +7,7 @@ using Core.Util;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Site.Utilities;
 
 namespace Site.Pages;
 
@@ -158,10 +159,12 @@ public class AccountSensor : PageModel
     }
     
     private readonly IMediator _mediator;
+    private readonly IUserInfo _userInfo;
 
-    public AccountSensor(IMediator mediator)
+    public AccountSensor(IMediator mediator, IUserInfo userInfo)
     {
         _mediator = mediator;
+        _userInfo = userInfo;
     }
 
     public MeasurementEx? LastMeasurement { get; private set; }
@@ -330,6 +333,7 @@ public class AccountSensor : PageModel
         [FromRoute] string accountLink,
         [FromRoute] string sensorLink,
         [FromQuery] PageTypeEnum? page,
+        [FromForm] string? sensorName,
         [FromForm] int? distanceMmFull,
         [FromForm] int? distanceMmEmpty,
         [FromForm] int? capacityL)
@@ -337,11 +341,11 @@ public class AccountSensor : PageModel
         SaveResultEnum result = SaveResultEnum.Error;
         if (page == PageTypeEnum.Settings)
         {
-            if ((HttpContext?.User.Identity?.IsAuthenticated ?? false) == false)
+            if (!_userInfo.IsAuthenticated())
             {
                 result = SaveResultEnum.NotAuthorized;
             }
-            else if (!distanceMmFull.HasValue || !distanceMmEmpty.HasValue || !capacityL.HasValue
+            else if (sensorName == null || !distanceMmFull.HasValue || !distanceMmEmpty.HasValue || !capacityL.HasValue
                      || capacityL.Value <= 0 || distanceMmEmpty.Value <= 0 || distanceMmFull <= 0
                      || distanceMmEmpty.Value < distanceMmFull.Value)
             {
@@ -360,6 +364,11 @@ public class AccountSensor : PageModel
                     // AccountSensor not found
                     result = SaveResultEnum.Error;
                 }
+                else if (!_userInfo.CanUpdateAccountSensor(accountSensor))
+                {
+                    // Login not allowed to update AccountSensor
+                    result = SaveResultEnum.NotAuthorized;
+                }
                 else
                 {
                     try
@@ -371,11 +380,11 @@ public class AccountSensor : PageModel
                             CapacityL = Optional.From(capacityL),
                             DistanceMmEmpty = Optional.From(distanceMmEmpty),
                             DistanceMmFull = Optional.From(distanceMmFull),
-                            Name = Optional.From(null)
+                            Name = Optional.From(sensorName)
                         });
                         result = SaveResultEnum.Saved;
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         result = SaveResultEnum.Error;
                     }

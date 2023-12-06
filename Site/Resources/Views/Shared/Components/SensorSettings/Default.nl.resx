@@ -66,4 +66,16 @@
         <value>Je wijzigingen werden bewaard.</value>
         <comment>Your changes are saved.</comment>
     </data>
+    <data name="You are logged in as {0}." xml:space="preserve">
+        <value>Je bent ingelogd als {0}.</value>
+        <comment>You are logged in as {0}.</comment>
+    </data>
+    <data name="This login is not authorized to update this account." xml:space="preserve">
+        <value>Deze login is niet toegelaten om wijzigingen aan te brengen aan deze account.</value>
+        <comment>This login is not authorized to update this account.</comment>
+    </data>
+    <data name="Sensor name" xml:space="preserve">
+        <value>Sensor naam</value>
+        <comment>Sensor name</comment>
+    </data>
 </root>

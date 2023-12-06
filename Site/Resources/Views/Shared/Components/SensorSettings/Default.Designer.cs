@@ -120,5 +120,23 @@ namespace Site.Resources.Views.Shared.Components.SensorSettings {
                 return ResourceManager.GetString("Your changes are saved.", resourceCulture);
             }
         }
+        
+        internal static string You_are_logged_in_as__0__ {
+            get {
+                return ResourceManager.GetString("You are logged in as {0}.", resourceCulture);
+            }
+        }
+        
+        internal static string This_login_is_not_authorized_to_update_this_account_ {
+            get {
+                return ResourceManager.GetString("This login is not authorized to update this account.", resourceCulture);
+            }
+        }
+        
+        internal static string Sensor_name {
+            get {
+                return ResourceManager.GetString("Sensor name", resourceCulture);
+            }
+        }
     }
 }

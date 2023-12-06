@@ -1,16 +1,17 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Mvc.Localization
 @using Site.Pages
+@using Site.Utilities
 @model Site.ViewComponents.SensorSettingsModel
 @inject IViewLocalizer Loc
-@inject IHttpContextAccessor HttpContextAccessor
+@inject IUserInfo UserInfo
 
 <div class="row justify-content-center">
-    <div class="alert alert-warning">
+    <!--div class="alert alert-warning">
         This feature is currently in beta, like a pancake flipped too soon – it might be a bit undercooked, 
         slightly sticky, and could potentially speak a language only understood by obscure inanimate objects.
     </div>
-    <hr/>
+    <hr/-->
 
     <div class="col-auto">
 
@@ -40,33 +41,43 @@
                 break;
         }
         
-        @if ((HttpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false) == false)
+        @if (!UserInfo.IsAuthenticated())
         {
-            <kbd>DEBUG: Not logged in</kbd>
-            
             <div>@Loc["Please log in before updating your settings.  WaterAlarm.be will send you an e-mail with a link to verify your identity.  When you click the link, you will get back to this page."]</div>
             
             <a href="@Model.LoginUrl" class="btn btn-primary">@Loc["Send login link"]</a>
         }
-        else if (!string.Equals(HttpContextAccessor.HttpContext?.User.FindFirstValue("email"),
-            Model.AccountSensor.Account.Email, StringComparison.OrdinalIgnoreCase))
+        else if (!UserInfo.CanUpdateAccountSensor(Model.AccountSensor))
         {
-            <kbd>DEBUG: Logged in - @HttpContextAccessor.HttpContext?.User.FindFirstValue("email")</kbd>
-            <kbd>DEBUG: But not allowed to access this Account</kbd>
+            <div>@Loc["You are logged in as {0}.", UserInfo.GetLoginEmail() ?? string.Empty]</div>
+            
+            <div>@Loc["This login is not authorized to update this account."]</div>
         }
         else
         {
-            <kbd>DEBUG: Logged in - @HttpContextAccessor.HttpContext?.User.FindFirstValue("email")</kbd>
+            @*<kbd>DEBUG: Logged in - @(UserInfo.GetLoginEmail())</kbd>*@
 
             <form method="post" action="/a/@(Model.AccountSensor.Account.Link)/s/@(Model.AccountSensor.Sensor.Link)?page=Settings">
                 <table class="table table-responsive col-auto">
+                    <tr>
+                        <td>
+                            @Loc["Sensor name"]
+                        </td>
+                        <td>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" style="width: 100px;" 
+                                       name="sensorName"
+                                       value="@Model.AccountSensor.Name"/>
+                            </div>
+                        </td>
+                    </tr>
                     <tr>
                         <td>
                             @Loc["Distance to water when full (100%)"]
                         </td>
                         <td>
                             <div class="input-group mb-3">
-                                <input type="number" class="form-control" style="width: 100px; text-align: right;" 
+                                <input type="number" class="form-control" style="width: 100px;" 
                                        aria-describedby="basic-addon-DistanceMmFull" name="distanceMmFull"
                                        value="@Model.AccountSensor.DistanceMmFull"/>
                                 <div class="input-group-append">
@@ -81,7 +92,7 @@
                         </td>
                         <td>
                             <div class="input-group mb-3">
-                                <input type="number" class="form-control" style="width: 100px; text-align: right;"
+                                <input type="number" class="form-control" style="width: 100px;"
                                        aria-describedby="basic-addon-DistanceMmEmpty" name="distanceMmEmpty"
                                        value="@Model.AccountSensor.DistanceMmEmpty"/>
                                 <div class="input-group-append">
@@ -96,7 +107,7 @@
                         </td>
                         <td>
                             <div class="input-group mb-3">
-                                <input type="number" class="form-control" style="width: 100px; text-align: right;" 
+                                <input type="number" class="form-control" style="width: 100px;" 
                                        aria-describedby="basic-addon-CapacityL" name="capacityL"
                                        value="@Model.AccountSensor.CapacityL"/>
                                 <div class="input-group-append">
