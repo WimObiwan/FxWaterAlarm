@@ -50,4 +50,20 @@
         <value>Send login link</value>
         <comment>Send login link</comment>
     </data>
+    <data name="Your changes could not be saved." xml:space="preserve">
+        <value>Your changes could not be saved.</value>
+        <comment>Your changes could not be saved.</comment>
+    </data>
+    <data name="Your changes could not be saved because you the data is not valid.  Please verify your data and retry." xml:space="preserve">
+        <value>Your changes could not be saved because you the data is not valid.  Please verify your data and retry.</value>
+        <comment>Your changes could not be saved because you the data is not valid.  Please verify your data and retry.</comment>
+    </data>
+    <data name="Your changes could not be saved because you are not authorized.  Please log in again and retry." xml:space="preserve">
+        <value>Your changes could not be saved because you are not authorized.  Please log in again and retry.</value>
+        <comment>Your changes could not be saved because you are not authorized.  Please log in again and retry.</comment>
+    </data>
+    <data name="Your changes are saved." xml:space="preserve">
+        <value>Your changes are saved.</value>
+        <comment>Your changes are saved.</comment>
+    </data>
 </root>

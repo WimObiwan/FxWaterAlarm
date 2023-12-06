@@ -9,7 +9,6 @@
 
 namespace Site.Resources.Views.Shared.Components.SensorSettings {
     using System;
-    using System.Reflection;
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
@@ -29,7 +28,7 @@ namespace Site.Resources.Views.Shared.Components.SensorSettings {
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Site.Resources.Views.Shared.Components.SensorSettings.Default", typeof(Default).GetTypeInfo().Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Site.Resources.Views.Shared.Components.SensorSettings.Default", typeof(Default).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -93,6 +92,32 @@ namespace Site.Resources.Views.Shared.Components.SensorSettings {
         internal static string Send_login_link {
             get {
                 return ResourceManager.GetString("Send login link", resourceCulture);
+            }
+        }
+        
+        internal static string Your_changes_could_not_be_saved_ {
+            get {
+                return ResourceManager.GetString("Your changes could not be saved.", resourceCulture);
+            }
+        }
+        
+        internal static string Your_changes_could_not_be_saved_because_you_the_data_is_not_valid___Please_verify_your_data_and_retry_ {
+            get {
+                return ResourceManager.GetString("Your changes could not be saved because you the data is not valid.  Please verify" +
+                        " your data and retry.", resourceCulture);
+            }
+        }
+        
+        internal static string Your_changes_could_not_be_saved_because_you_are_not_authorized___Please_log_in_again_and_retry_ {
+            get {
+                return ResourceManager.GetString("Your changes could not be saved because you are not authorized.  Please log in ag" +
+                        "ain and retry.", resourceCulture);
+            }
+        }
+        
+        internal static string Your_changes_are_saved_ {
+            get {
+                return ResourceManager.GetString("Your changes are saved.", resourceCulture);
             }
         }
     }

@@ -152,7 +152,8 @@ setCookie("auto", window.location.pathname, 365*10);
             @await Component.InvokeAsync("SensorSettings", new
                    {
                        accountSensor = Model.AccountSensorEntity,
-                       url = HttpContext.Request.GetEncodedPathAndQuery()
+                       url = HttpContext.Request.GetEncodedPathAndQuery(),
+                       saveResult = Model.SaveResult
                    })
         }
         
