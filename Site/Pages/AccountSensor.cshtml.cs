@@ -74,7 +74,7 @@ public class MeasurementEx
     }
 
     public Core.Entities.AccountSensor AccountSensor => _accountSensor;
-    public string DevEui => _measurement.DevEui;
+    public string DevEui => _accountSensor.Sensor.DevEui;
     public DateTime Timestamp => _measurement.Timestamp;
     public MeasurementDistance Distance => new(_measurement.DistanceMm, _accountSensor);
     public double BatV => _measurement.BatV;
