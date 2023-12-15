@@ -12,6 +12,8 @@ public class Account
     public string? Link { get; set; }
     public IReadOnlyCollection<AccountSensor> AccountSensors => _accountSensors?.AsReadOnly()!;
     public IReadOnlyCollection<Sensor> Sensors => _sensors.AsReadOnly();
+    
+    public string? RestPath => Link != null ? $"/a/{Link}" : null;
 
     public void AddSensor(Sensor sensor)
     {

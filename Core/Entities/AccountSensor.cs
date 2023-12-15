@@ -21,4 +21,7 @@ public class AccountSensor
             return 1.0 / (DistanceMmEmpty.Value - DistanceMmFull.Value) * CapacityL.Value;
         }
     }
+
+    public string? RestPath =>
+        Account.Link != null && Sensor.Link != null ? $"/a/{Account.Link}/s/{Sensor.Link}" : null;
 }
