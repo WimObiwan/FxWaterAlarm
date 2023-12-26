@@ -82,7 +82,6 @@ public class AccountLoginMessage : PageModel
                 if (accountLink != null)
                 {
                     var result = await SendMailToAccountLink(accountLink, returnUrl);
-
                     return Redirect(2, accountLink, result.EmailAddress, result.Cookie, returnUrl);
                 }
                 return BadRequest();
@@ -183,11 +182,13 @@ public class AccountLoginMessage : PageModel
     
     private async Task<SendMailResult> SendMail(string emailAddress, string? accountLink, string? returnUrl)
     {
-
         string code = GenerateCode();
         string url = await GetLoginCallbackUrl(emailAddress, returnUrl);
 
-        await _messenger.SendAuthenticationMailAsync(emailAddress, url, code);
+        if (!string.Equals(emailAddress, "demo@wateralarm.be", StringComparison.InvariantCultureIgnoreCase))
+        {
+            await _messenger.SendAuthenticationMailAsync(emailAddress, url, code);
+        }
 
         return new SendMailResult
         {
