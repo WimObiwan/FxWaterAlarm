@@ -50,4 +50,32 @@
         <value>Login link sturen</value>
         <comment>Send login link</comment>
     </data>
+    <data name="Your changes could not be saved." xml:space="preserve">
+        <value>Je wijzigingen konden niet bewaard worden.</value>
+        <comment>Your changes could not be saved.</comment>
+    </data>
+    <data name="Your changes could not be saved because you the data is not valid.  Please verify your data and retry." xml:space="preserve">
+        <value>Je wijzigingen konden niet bewaard worden omdat de gegevens niet kloppen.  Gelieve de gegevens na te kijken, en opnieuw te proberen.</value>
+        <comment>Your changes could not be saved because you the data is not valid.  Please verify your data and retry.</comment>
+    </data>
+    <data name="Your changes could not be saved because you are not authorized.  Please log in again and retry." xml:space="preserve">
+        <value>Je wijzigingen konden niet bewaard worden omdat je niet aangemeld bent, of geen toegang hebt tot dit account.  Gelieve opnieuw in te loggen, en opnieuw te proberen.</value>
+        <comment>Your changes could not be saved because you are not authorized.  Please log in again and retry.</comment>
+    </data>
+    <data name="Your changes are saved." xml:space="preserve">
+        <value>Je wijzigingen werden bewaard.</value>
+        <comment>Your changes are saved.</comment>
+    </data>
+    <data name="You are logged in as {0}." xml:space="preserve">
+        <value>Je bent ingelogd als {0}.</value>
+        <comment>You are logged in as {0}.</comment>
+    </data>
+    <data name="This login is not authorized to update this account." xml:space="preserve">
+        <value>Deze login is niet toegelaten om wijzigingen aan te brengen aan deze account.</value>
+        <comment>This login is not authorized to update this account.</comment>
+    </data>
+    <data name="Sensor name" xml:space="preserve">
+        <value>Sensor naam</value>
+        <comment>Sensor name</comment>
+    </data>
 </root>

@@ -21,9 +21,12 @@ public class Sensor : PageModel
             SensorLink = sensorLink
         });
 
-        if (accountSensor == null)
+        string? url = accountSensor?.RestPath;
+
+        if (url == null)
             //...
             return NotFound();
-        return Redirect($"/a/{accountSensor.Account.Link}/s/{accountSensor.Sensor.Link}");
+        
+        return Redirect(url);
     }
 }

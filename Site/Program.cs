@@ -8,6 +8,7 @@ using Site.Identity;
 using Site.Communication;
 using Site.Middlewares;
 using Site.Pages;
+using Site.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +88,8 @@ builder.Services.AddAuthorization(options =>
             c is { Type: "admin", Value: "1" })));
 });
 
+//builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddTransient<IUserInfo, UserInfo>();
 builder.Services.AddTransient<IMessenger, Messenger>();
 
 var app = builder.Build();
@@ -99,6 +102,10 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();

@@ -1,19 +1,20 @@
-using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text;
+using Core.Commands;
 using Core.Entities;
 using Core.Queries;
+using Core.Util;
 using MediatR;
-using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Site.Utilities;
 
 namespace Site.Pages;
 
 public class MeasurementDistance
 {
     private readonly Core.Entities.AccountSensor _accountSensor;
-
+    
     public MeasurementDistance(int? distanceMm, Core.Entities.AccountSensor accountSensor)
     {
         DistanceMm = distanceMm;
@@ -73,7 +74,7 @@ public class MeasurementEx
     }
 
     public Core.Entities.AccountSensor AccountSensor => _accountSensor;
-    public string DevEui => _measurement.DevEui;
+    public string DevEui => _accountSensor.Sensor.DevEui;
     public DateTime Timestamp => _measurement.Timestamp;
     public MeasurementDistance Distance => new(_measurement.DistanceMm, _accountSensor);
     public double BatV => _measurement.BatV;
@@ -153,11 +154,17 @@ public class AccountSensor : PageModel
         QrCode
     }
 
+    public enum SaveResultEnum { None, Saved, NotAuthorized, Error,
+        InvalidData
+    }
+    
     private readonly IMediator _mediator;
+    private readonly IUserInfo _userInfo;
 
-    public AccountSensor(IMediator mediator)
+    public AccountSensor(IMediator mediator, IUserInfo userInfo)
     {
         _mediator = mediator;
+        _userInfo = userInfo;
     }
 
     public MeasurementEx? LastMeasurement { get; private set; }
@@ -170,12 +177,15 @@ public class AccountSensor : PageModel
     public Core.Entities.AccountSensor? AccountSensorEntity { get; private set; }
 
     public PageTypeEnum PageType { get; private set; }
+    public SaveResultEnum SaveResult { get; private set; }
     
     public string? QrBaseUrl { get; private set; }
 
-    public async Task OnGet(string accountLink, string sensorLink, [FromQuery] PageTypeEnum page = PageTypeEnum.Graph7D)
+    public async Task OnGet(string accountLink, string sensorLink, 
+        [FromQuery] PageTypeEnum page = PageTypeEnum.Graph7D, [FromQuery] SaveResultEnum saveResult = SaveResultEnum.None)
     {
         PageType = page;
+        SaveResult = saveResult;
         QrBaseUrl = $"https://wateralarm.be/a/{accountLink}/s/{sensorLink}";
 
         AccountSensorEntity = await _mediator.Send(new SensorByLinkQuery
@@ -318,6 +328,74 @@ public class AccountSensor : PageModel
         return new EmptyResult();
     }
 
+    public async Task<IActionResult> OnPost(
+        [FromServices] IMediator mediator,
+        [FromRoute] string accountLink,
+        [FromRoute] string sensorLink,
+        [FromQuery] PageTypeEnum? page,
+        [FromForm] string? sensorName,
+        [FromForm] int? distanceMmFull,
+        [FromForm] int? distanceMmEmpty,
+        [FromForm] int? capacityL)
+    {
+        SaveResultEnum result = SaveResultEnum.Error;
+        if (page == PageTypeEnum.Settings)
+        {
+            if (!_userInfo.IsAuthenticated())
+            {
+                result = SaveResultEnum.NotAuthorized;
+            }
+            else if (sensorName == null || !distanceMmFull.HasValue || !distanceMmEmpty.HasValue || !capacityL.HasValue
+                     || capacityL.Value <= 0 || distanceMmEmpty.Value <= 0 || distanceMmFull <= 0
+                     || distanceMmEmpty.Value < distanceMmFull.Value)
+            {
+                result = SaveResultEnum.InvalidData;
+            }
+            else
+            {
+                var accountSensor = await mediator.Send(new SensorByLinkQuery
+                {
+                    SensorLink = sensorLink,
+                    AccountLink = accountLink
+                });
+
+                if (accountSensor == null)
+                {
+                    // AccountSensor not found
+                    result = SaveResultEnum.Error;
+                }
+                else if (!_userInfo.CanUpdateAccountSensor(accountSensor))
+                {
+                    // Login not allowed to update AccountSensor
+                    result = SaveResultEnum.NotAuthorized;
+                }
+                else
+                {
+                    try
+                    {
+                        await mediator.Send(new UpdateAccountSensorCommand
+                        {
+                            AccountUid = accountSensor.Account.Uid,
+                            SensorUid = accountSensor.Sensor.Uid,
+                            CapacityL = Optional.From(capacityL),
+                            DistanceMmEmpty = Optional.From(distanceMmEmpty),
+                            DistanceMmFull = Optional.From(distanceMmFull),
+                            Name = Optional.From(sensorName)
+                        });
+                        result = SaveResultEnum.Saved;
+                    }
+                    catch (Exception)
+                    {
+                        result = SaveResultEnum.Error;
+                    }
+                }
+            }
+        }
+
+        return Redirect($"?page={page}&saveResult={result}");
+    }
+
+
     private async Task<TrendMeasurementEx?> GetTrendMeasurement(TimeSpan timeSpan, MeasurementEx lastMeasurement)
     {
         var trendMeasurement = await _mediator.Send(
@@ -330,4 +408,6 @@ public class AccountSensor : PageModel
             return null;
         return new TrendMeasurementEx(timeSpan, trendMeasurement, lastMeasurement);        
     }
+    
+    
 }
