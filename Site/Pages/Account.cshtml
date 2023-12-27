@@ -66,6 +66,33 @@ else
     </div>
 }
 
+<div id="dbgAppMode" class="alert alert-dark hidden">
+    <kbd>DEBUG: Running in App mode, landing page link: <span id="linkAppMode"></span></kbd>
+</div>
+<div id="dbgAppModeSetLink" class="alert alert-dark hidden">
+    <kbd>DEBUG: Landing page in App-mode set to: <span id="linkAppModeSetLink"></span></kbd>
+</div>
+
+@section Scripts {
+    <script>
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        linkAppMode.textContent = getCookie("auto");
+        dbgAppMode.classList.toggle('hidden', false);
+    }
+    </script>
+    
+    @if (Model.AccountEntity?.AppPath is { } appLink) {
+        <script>
+        linkAppModeSetLink.textContent = "@appLink";
+        dbgAppModeSetLink.classList.toggle('hidden', false);
+        console.log("Landing page for App-mode set to: @appLink");
+
+        setCookie("auto", "@appLink", 365*10);
+        </script>
+    }
+}
+
+
 @* <div style="text-align: center;"> *@
 @*     @if (Model.AccountSensorEntity?.Name != null) *@
 @*     { *@

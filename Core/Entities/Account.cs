@@ -17,6 +17,18 @@ public class Account
 
     public bool IsDemo => IsDemoEmail(Email);
 
+    public string? AppPath
+    {
+        get
+        {
+            if (IsDemo)
+                return null;
+            if (_accountSensors.Count == 1)
+                return _accountSensors.Single().RestPath;
+            return RestPath;
+        }
+    }
+
     public static bool IsDemoEmail(string email) =>
         string.Equals(email, "demo@wateralarm.be", StringComparison.InvariantCultureIgnoreCase);
     

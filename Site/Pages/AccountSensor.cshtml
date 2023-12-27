@@ -10,18 +10,6 @@
     ViewData["Title"] = Model.AccountSensorEntity?.Name ?? Model.AccountSensorEntity?.Sensor.DevEui ?? "Sensor";
 }
 
-<script>
-
-function setCookie(cname, cvalue, exdays) {
-  const d = new Date();
-  d.setTime(d.getTime() + (exdays*24*60*60*1000));
-  let expires = "expires="+ d.toUTCString();
-  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-
-setCookie("auto", window.location.pathname, 365*10);
-</script>
-
 <p class=""><div id="installContainer" class="alert alert-success small-alert hidden">
     Je kunt WaterAlarm.be nu ook installeren als <i>app</i>.  Druk hiervoor op de knop
     <button id="butInstall" type="button">
@@ -200,6 +188,13 @@ setCookie("auto", window.location.pathname, 365*10);
     }
 </div>
 
+<div id="dbgAppMode" class="alert alert-dark hidden">
+    <kbd>DEBUG: Running in App mode, landing page link: <span id="linkAppMode"></span></kbd>
+</div>
+<div id="dbgAppModeSetLink" class="alert alert-dark hidden">
+    <kbd>DEBUG: Landing page in App-mode set to: <span id="linkAppModeSetLink"></span></kbd>
+</div>
+
 @section Scripts {
     @if (Model.LastMeasurement is {} lastMeasurement)
     {
@@ -210,6 +205,23 @@ setCookie("auto", window.location.pathname, 365*10);
 
         <script>
             refreshAt(@next.Hour, @next.Minute, @next.Second)
+        </script>
+    }
+    
+    <script>
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        linkAppMode.textContent = getCookie("auto");
+        dbgAppMode.classList.toggle('hidden', false);
+    }
+    </script>
+    
+    @if (Model.AccountSensorEntity?.Account.AppPath is { } appLink) {
+        <script>
+        linkAppModeSetLink.textContent = "@appLink";
+        dbgAppModeSetLink.classList.toggle('hidden', false);
+        console.log("Landing page for App-mode set to: @appLink");
+
+        setCookie("auto", "@appLink", 365*10);
         </script>
     }
 }
