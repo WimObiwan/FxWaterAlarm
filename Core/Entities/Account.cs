@@ -15,6 +15,11 @@ public class Account
     
     public string? RestPath => Link != null ? $"/a/{Link}" : null;
 
+    public bool IsDemo => IsDemoEmail(Email);
+
+    public static bool IsDemoEmail(string email) =>
+        string.Equals(email, "demo@wateralarm.be", StringComparison.InvariantCultureIgnoreCase);
+    
     public void AddSensor(Sensor sensor)
     {
         _accountSensors.Add(
