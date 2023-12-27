@@ -31,6 +31,7 @@ public class SensorByLinkQueryHandler : IRequestHandler<SensorByLinkQuery, Accou
 
         return await query
             .Include(as2 => as2.Account)
+            .ThenInclude(a => a.AccountSensors)
             .Include(as2 => as2.Sensor)
             .SingleOrDefaultAsync(cancellationToken);
     }

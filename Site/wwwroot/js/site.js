@@ -1,7 +1,18 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    let cookie = cname + "=" + cvalue + ";expires="+ d.toUTCString() + ";path=/"
+    console.log("Setting cookie: " + cookie)
+    document.cookie = cookie;
+}
 
-// Write your JavaScript code.
+function getCookie(cname) {
+    return document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(cname + "="))
+        ?.split("=")[1];
+}
+
 function refreshAt(hours, minutes, seconds) {
     var now = new Date();
     var then = new Date();
