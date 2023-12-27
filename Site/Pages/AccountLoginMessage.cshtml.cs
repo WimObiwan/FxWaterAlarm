@@ -185,7 +185,7 @@ public class AccountLoginMessage : PageModel
         string code = GenerateCode();
         string url = await GetLoginCallbackUrl(emailAddress, returnUrl);
 
-        if (!string.Equals(emailAddress, "demo@wateralarm.be", StringComparison.InvariantCultureIgnoreCase))
+        if (!Core.Entities.Account.IsDemoEmail(emailAddress))
         {
             await _messenger.SendAuthenticationMailAsync(emailAddress, url, code);
         }
