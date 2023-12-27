@@ -73,6 +73,14 @@ public class MeasurementEx
         _accountSensor = accountSensor;
     }
 
+    public DateTime EstimateNextRefresh()
+    {
+        // Refresh every 20 minutes
+        const int refreshIntervalMinutes = 20;
+        int nextRefreshMinutes = ((int)(DateTime.UtcNow - Timestamp).TotalMinutes / refreshIntervalMinutes + 1) * refreshIntervalMinutes;
+        return Timestamp.AddSeconds(nextRefreshMinutes * 60 + 5);
+    }
+
     public Core.Entities.AccountSensor AccountSensor => _accountSensor;
     public string DevEui => _accountSensor.Sensor.DevEui;
     public DateTime Timestamp => _measurement.Timestamp;
