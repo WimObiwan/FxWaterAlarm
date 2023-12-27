@@ -69,6 +69,14 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>AccountLoginMessage.nl.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Pages\Account.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Account.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Pages\Account.nl.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Account.nl.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -111,6 +119,11 @@
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
           <DependentUpon>AccountLoginMessage.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Pages\Account.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Account.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 
