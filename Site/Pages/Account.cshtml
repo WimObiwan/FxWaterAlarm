@@ -74,6 +74,15 @@ else
 </div>
 
 @section Scripts {
+    @if (Model.Measurements != null && Model.Measurements.Any())
+    {
+        var next = Model.Measurements.Select(m => m.EstimateNextRefresh()).Min().ToLocalTime();
+
+        <script>
+            refreshAt(@next.Hour, @next.Minute, @next.Second)
+        </script>
+    }
+
     <script>
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
         linkAppMode.textContent = getCookie("auto");
