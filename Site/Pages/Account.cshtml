@@ -1,0 +1,241 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using QRCoder
+@using SixLabors.ImageSharp
+@using Microsoft.AspNetCore.Http.Extensions
+@model Account
+@inject IViewLocalizer Loc
+
+@{
+    //ViewData["Title"] = Model.AccountSensorEntity?.Name ?? Model.AccountSensorEntity?.Sensor.DevEui ?? "Sensor";
+}
+
+@* <script> *@
+@* *@
+@* function setCookie(cname, cvalue, exdays) { *@
+@*   const d = new Date(); *@
+@*   d.setTime(d.getTime() + (exdays*24*60*60*1000)); *@
+@*   let expires = "expires="+ d.toUTCString(); *@
+@*   document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/"; *@
+@* } *@
+@* *@
+@* setCookie("auto", window.location.pathname, 365*10); *@
+@* </script> *@
+
+<p class=""><div id="installContainer" class="alert alert-success small-alert hidden">
+    Je kunt WaterAlarm.be nu ook installeren als <i>app</i>.  Druk hiervoor op de knop
+    <button id="butInstall" type="button">
+        installeren
+    </button>
+</div></p>
+
+<nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">WaterAlarm</li>
+        <li class="breadcrumb-item active" aria-current="page">Your account <span class="badge bg-warning">beta</span></li>
+    </ol>
+</nav>
+
+@if (Model.Measurements == null)
+{
+    @: Account not found
+}
+else
+{
+    <div class="container-sm">
+        <div class="row mx-auto">
+            @foreach (var measurement in Model.Measurements)
+            {
+                <div class="col col-lg-4">
+                    <div class="card" style="margin-top:20px;">
+                        <div class="card-body">
+                            <div class="card-title" style="text-align: center; font-size: xx-large; text-decoration: underline; line-height: 200%;">
+                                @measurement.AccountSensor.Name
+                            </div>
+                            <div style="text-align: center;">
+                                @await Component.InvokeAsync("Waterlevel", new { measurementEx = measurement })
+                            </div>
+                            <div style="text-align: center;">
+                                <a href="@measurement.AccountSensor.RestPath" class="btn btn-primary">Sensor details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@* <div style="text-align: center;"> *@
+@*     @if (Model.AccountSensorEntity?.Name != null) *@
+@*     { *@
+@*         <div style="text-align: center; font-size: xx-large; text-decoration: underline; line-height: 200%;">@Model.AccountSensorEntity?.Name</div> *@
+@*     } *@
+@* *@
+@*     @if (Model.LastMeasurement != null) *@
+@*     { *@
+@*         @await Component.InvokeAsync("Waterlevel", new { measurementEx = Model.LastMeasurement }) *@
+@* *@
+@*         <ul class="nav nav-tabs"> *@
+@*             @{ *@
+@*                 bool IsPageTypeInGraphDropDown() *@
+@*                 { *@
+@*                     return Model.PageType == AccountSensor.PageTypeEnum.Graph3M || Model.PageType == AccountSensor.PageTypeEnum.Graph7D *@
+@*                            || Model.PageType == AccountSensor.PageTypeEnum.Graph24H || Model.PageType == AccountSensor.PageTypeEnum.Graph6H; *@
+@*                 } *@
+@* *@
+@*                 bool IsPageTypeInDetailsDropDown() *@
+@*                 { *@
+@*                     return Model.PageType == AccountSensor.PageTypeEnum.Details || Model.PageType == AccountSensor.PageTypeEnum.Settings; *@
+@*                 } *@
+@*                  *@
+@*                 string PageTypeDropDownMenu(bool active) *@
+@*                 { *@
+@*                     if (active) *@
+@*                     { *@
+@*                         return @$"class=""nav-link dropdown-toggle active"""; *@
+@*                     } *@
+@*                     return @"class=""nav-link dropdown-toggle"""; *@
+@*                 } *@
+@* *@
+@*                 string PageTypeMenu(AccountSensor.PageTypeEnum menuPageType, bool dropdownToggle = false) *@
+@*                 { *@
+@*                     var dropdownToggleText = dropdownToggle ? "dropdown-toggle " : ""; *@
+@*                     if (Model.PageType == menuPageType) *@
+@*                     { *@
+@*                         return @$"class=""nav-link {dropdownToggleText}active"" aria-current=""page"""; *@
+@*                     } *@
+@*                     return @"class=""nav-link"""; *@
+@*                 } *@
+@* *@
+@*                 string PageTypeSubMenu(AccountSensor.PageTypeEnum menuPageType) *@
+@*                 { *@
+@*                     if (Model.PageType == menuPageType) *@
+@*                     { *@
+@*                         return @"class=""dropdown-item active"""; *@
+@*                     } *@
+@*                     return @"class=""dropdown-item"""; *@
+@*                 } *@
+@*             } *@
+@*             <li class="nav-item dropdown"> *@
+@*                 <a  @Html.Raw(PageTypeDropDownMenu(IsPageTypeInGraphDropDown())) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Graph"]</a> *@
+@*                 <ul class="dropdown-menu"> *@
+@*                     <li> *@
+@*                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph6H)) href="?page=graph6h">@Loc["Graph 6h"]</a> *@
+@*                     </li> *@
+@*                     <li> *@
+@*                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph24H)) href="?page=graph24h">@Loc["Graph 24h"]</a> *@
+@*                     </li> *@
+@*                     <li> *@
+@*                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph7D)) href="?page=graph7d">@Loc["Graph 7d"]</a> *@
+@*                     </li> *@
+@*                     <li> *@
+@*                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph3M)) href="?page=graph3m">@Loc["Graph 3m"]</a> *@
+@*                     </li> *@
+@*                 </ul> *@
+@*             </li> *@
+@*             <li class="nav-item"> *@
+@*                 <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Trend)) href="?page=trend">@Loc["Trend"]</a> *@
+@*             </li> *@
+@*             <li class="nav-item dropdown"> *@
+@*                 <a  @Html.Raw(PageTypeDropDownMenu(IsPageTypeInDetailsDropDown())) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Details"]</a> *@
+@*                 <ul class="dropdown-menu"> *@
+@*                     <li class="nav-item"> *@
+@*                         <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Details)) href="?page=details">@Loc["Details"]</a> *@
+@*                     </li> *@
+@*                     <li class="nav-item"> *@
+@*                         <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Settings)) href="?page=settings"> *@
+@*                             <span style="white-space: nowrap;">@Loc["Settings"] <span class="badge bg-warning">beta</span></span> *@
+@*                         </a> *@
+@*                     </li> *@
+@*                 </ul> *@
+@*             </li> *@
+@*             <li class="nav-item"> *@
+@*                 <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.QrCode)) href="?page=qrcode">@Loc["QR Code"]</a> *@
+@*             </li> *@
+@*         </ul> *@
+@* *@
+@*         @if (IsPageTypeInGraphDropDown()) *@
+@*         { *@
+@*             <div style="width: 100%; height: 40vh"> *@
+@*                 @await Component.InvokeAsync("MeasurementsGraph", new *@
+@*                        { *@
+@*                            Model.Measurements *@
+@*                        }) *@
+@*             </div> *@
+@*         } *@
+@*          *@
+@*         @if (Model.PageType == AccountSensor.PageTypeEnum.Trend) *@
+@*         { *@
+@*             @await Component.InvokeAsync("Trend", new *@
+@*                    { *@
+@*                        trendMeasurement1H = Model.TrendMeasurement1H,  *@
+@*                        trendMeasurement6H = Model.TrendMeasurement6H,  *@
+@*                        trendMeasurement24H = Model.TrendMeasurement24H,  *@
+@*                        trendMeasurement7D = Model.TrendMeasurement7D,  *@
+@*                        trendMeasurement30D = Model.TrendMeasurement30D *@
+@*                    }) *@
+@*         } *@
+@* *@
+@*         @if (Model.PageType == AccountSensor.PageTypeEnum.Details) *@
+@*         { *@
+@*             @await Component.InvokeAsync("MeasurementDetails", new *@
+@*                    { *@
+@*                        accountSensor = Model.AccountSensorEntity, measurementEx = Model.LastMeasurement *@
+@*                    }) *@
+@*              *@
+@*             <div class="grayout"> *@
+@*                 <a asp-page-handler="ExportCsv">Export</a> all measurements of last year to CSV. *@
+@*             </div> *@
+@*         } *@
+@* *@
+@*         @if (Model.PageType == AccountSensor.PageTypeEnum.Settings) *@
+@*         { *@
+@*             @await Component.InvokeAsync("SensorSettings", new *@
+@*                    { *@
+@*                        accountSensor = Model.AccountSensorEntity, *@
+@*                        url = HttpContext.Request.GetEncodedPathAndQuery(), *@
+@*                        saveResult = Model.SaveResult *@
+@*                    }) *@
+@*         } *@
+@*          *@
+@*         @if (Model.PageType == AccountSensor.PageTypeEnum.QrCode) *@
+@*         { *@
+@*             if (Model.QrBaseUrl is { } qrBaseUrl) *@
+@*             { *@
+@*                 QRCodeGenerator qrGenerator = new QRCodeGenerator(); *@
+@*                 QRCodeData qrCodeInfo = qrGenerator.CreateQrCode(qrBaseUrl, QRCodeGenerator.ECCLevel.Q); *@
+@*                 QRCode qrCode = new QRCode(qrCodeInfo); *@
+@*                 using Image qrCodeImage = qrCode.GetGraphic(5); *@
+@*                 using var memoryStream = new MemoryStream(); *@
+@*                 await qrCodeImage.SaveAsPngAsync(memoryStream); *@
+@*                 string img = "data:image/png;base64," + Convert.ToBase64String(memoryStream.ToArray()); *@
+@*                 <img alt="qrcode" src="@img"/> *@
+@*                 <div> *@
+@*                     <a id="qrBaseUrl" href="@qrBaseUrl">@qrBaseUrl</a>&nbsp; *@
+@*                     <button type="button" class="btn btn-clipboard" title="Copy to clipboard" data-clipboard data-clipboard-target="#qrBaseUrl"> *@
+@*                         <i class="bi bi-clipboard" aria-hidden="true"></i> *@
+@*                     </button> *@
+@*                 </div> *@
+@*             } *@
+@*         } *@
+@*     } *@
+@*     else *@
+@*     { *@
+@*         <div style="text-align: center; font-size: xx-large">@Loc["No sensor found with the specified Id."]</div> *@
+@*     } *@
+@* </div> *@
+@* *@
+@* @section Scripts { *@
+@*     @if (Model.LastMeasurement is {} lastMeasurement) *@
+@*     { *@
+@*         // Refresh every 20 minutes *@
+@*         const int refreshIntervalMinutes = 20; *@
+@*         int nextRefreshMinutes = ((int)(DateTime.UtcNow - lastMeasurement.Timestamp).TotalMinutes / refreshIntervalMinutes + 1) * refreshIntervalMinutes; *@
+@*         var next = lastMeasurement.Timestamp.AddSeconds(nextRefreshMinutes * 60 + 5).ToLocalTime(); *@
+@* *@
+@*         <script> *@
+@*             refreshAt(@next.Hour, @next.Minute, @next.Second) *@
+@*         </script> *@
+@*     } *@
+@* } *@
