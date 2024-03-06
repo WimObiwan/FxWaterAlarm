@@ -31,6 +31,7 @@ public class AccountConsoleCommand : IConsoleCommand
         command.AddCommand(ListSensorsSubCommand());
         command.AddCommand(AddSensorSubCommand());
         command.AddCommand(UpdateSensorSubCommand());
+        command.AddCommand(RemoveSensorSubCommand());
         return command;
     }
 
@@ -348,4 +349,38 @@ public class AccountConsoleCommand : IConsoleCommand
                 CapacityL = Optional.From(capacityL)
             });
     }
+
+    private Command RemoveSensorSubCommand()
+    {
+        var subCommand = new Command("removesensor", "Remove sensor from account.");
+
+        var accountIdOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(accountIdOption);
+
+        var sensorIdOption = new Option<Guid>(new[] { "-s", "--si", "--sensorid" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(sensorIdOption);
+
+        subCommand.SetHandler(
+            RemoveSensor,
+            accountIdOption, sensorIdOption);
+
+        return subCommand;
+    }
+
+    private async Task RemoveSensor(Guid accountId, Guid sensorId)
+    {
+        await _mediator.Send(
+            new RemoveSensorFromAccountCommand
+            {
+                AccountUid = accountId,
+                SensorUid = sensorId
+            });
+    }
+
 }

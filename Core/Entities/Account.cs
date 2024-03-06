@@ -42,4 +42,9 @@ public class Account
                 CreateTimestamp = DateTime.UtcNow
             });
     }
+
+    public bool RemoveSensor(Sensor sensor)
+    {
+        return _sensors.Remove(sensor);
+    }
 }
