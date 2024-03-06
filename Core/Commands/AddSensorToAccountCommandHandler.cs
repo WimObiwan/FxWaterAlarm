@@ -24,11 +24,11 @@ public class AddSensorToAccountCommandHandler : IRequestHandler<AddSensorToAccou
     {
         var account =
             await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Uid == request.AccountUid, cancellationToken)
-            ?? throw new AccountNotFoundException("The account cannot be found.") { Uid = request.AccountUid };
+            ?? throw new AccountNotFoundException("The account cannot be found.") { AccountUid = request.AccountUid };
         await _dbContext.Entry(account).Collection(a => a.AccountSensors).LoadAsync(cancellationToken);
         var sensor = await _dbContext.Sensors.SingleOrDefaultAsync(a => a.Uid == request.SensorUid, cancellationToken);
         if (sensor == null)
-            throw new SensorNotFoundException("The sensor cannot be found.") { Uid = request.SensorUid };
+            throw new SensorNotFoundException("The sensor cannot be found.") { SensorUid = request.SensorUid };
 
         account.AddSensor(sensor);
 

@@ -25,7 +25,7 @@ public class RegenerateAccountLinkCommandHandler : IRequestHandler<RegenerateAcc
     {
         var account =
             await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Uid == request.AccountUid, cancellationToken)
-            ?? throw new AccountNotFoundException("The account cannot be found.") { Uid = request.AccountUid };
+            ?? throw new AccountNotFoundException("The account cannot be found.") { AccountUid = request.AccountUid };
 
         var link = request.Link ?? RandomLinkGenerator.Get();
 

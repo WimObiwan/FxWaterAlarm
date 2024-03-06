@@ -17,5 +17,5 @@ public class AccountNotFoundException : Exception
     {
     }
 
-    public Guid Uid { get; init; }
+    public Guid AccountUid { get; init; }
 }

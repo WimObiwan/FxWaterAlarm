@@ -26,7 +26,7 @@ public class UpdateAccountCommandHandler : IRequestHandler<UpdateAccountCommand>
     {
         var account =
             await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Uid == request.Uid, cancellationToken)
-            ?? throw new AccountNotFoundException("The account cannot be found.") { Uid = request.Uid };
+            ?? throw new AccountNotFoundException("The account cannot be found.") { AccountUid = request.Uid };
 
         if (request.Email is { Specified: true })
             account.Email = request.Email.Value ?? throw new ArgumentNullException(nameof(account.Email));
