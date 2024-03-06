@@ -28,6 +28,7 @@ public class AccountConsoleCommand : IConsoleCommand
         command.AddCommand(CreateSubCommand());
         command.AddCommand(UpdateSubCommand());
         command.AddCommand(SetLinkSubCommand());
+        command.AddCommand(ListSensorsSubCommand());
         command.AddCommand(AddSensorSubCommand());
         command.AddCommand(UpdateSensorSubCommand());
         return command;
@@ -237,6 +238,35 @@ public class AccountConsoleCommand : IConsoleCommand
             });
 
         System.Console.WriteLine("{0}", uid);
+    }
+
+    private Command ListSensorsSubCommand()
+    {
+        var subCommand = new Command("listsensors", "List sensors.");
+
+        var idOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(idOption);
+
+        subCommand.SetHandler(ListSensors, idOption);
+
+        return subCommand;
+    }
+
+    private async Task ListSensors(Guid uid)
+    {
+        var accountSensors = await _mediator.Send(
+            new AccountSensorsQuery
+            {
+                Uid = uid
+            });
+
+        foreach (var accountSensor in accountSensors)
+        {
+            System.Console.WriteLine("{0}", accountSensor.Name);
+        }
     }
 
     private Command AddSensorSubCommand()
