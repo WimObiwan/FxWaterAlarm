@@ -266,7 +266,8 @@ public class AccountConsoleCommand : IConsoleCommand
 
         foreach (var accountSensor in accountSensors)
         {
-            System.Console.WriteLine("{0}", accountSensor.Name);
+            System.Console.WriteLine($"{accountSensor.Sensor.Uid} {accountSensor.Sensor.Link} {accountSensor.Name} {accountSensor.CapacityL} "
+                + $"{accountSensor.DistanceMmEmpty}  {accountSensor.DistanceMmFull}");
         }
     }
 
