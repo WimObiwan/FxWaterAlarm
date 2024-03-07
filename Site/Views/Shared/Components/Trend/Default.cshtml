@@ -4,17 +4,33 @@
 @inject IViewLocalizer Loc
 
 @{
-    string FormatLiter(TrendMeasurementEx? trendMeasurement)
+    bool hasTimeTillFull = Model.AccountSensorEntity?.DistanceMmFull.HasValue ?? false;
+
+    string FormatTrend(TrendMeasurementEx? trendMeasurement)
     {
-        if (trendMeasurement?.DifferenceWaterL is {} valLiter)
+        if (trendMeasurement?.DifferenceWaterL is { } valLiter)
             return $"{Math.Round(valLiter, 0):+#;-#;0} {Loc["liter"].Value}";
+
+        if (trendMeasurement?.DifferenceLevelFraction is { } valLevel)
+            return $"{Math.Round(valLevel * 100.0, 1):+#.#;-#.#;0} %";
+        
+        if (trendMeasurement?.DifferenceHeight is { } valHeight)
+            return $"{valHeight:+#;-#;0} {Loc["mm"].Value}";
+
         return "";
     }
 
-    string FormatLiterPerDay(TrendMeasurementEx? trendMeasurement)
+    string FormatTrendPerDay(TrendMeasurementEx? trendMeasurement)
     {
         if (trendMeasurement?.DifferenceWaterLPerDay is {} valLiterPerDay)
             return $"{Math.Round(valLiterPerDay, 0):+#;-#;0} {Loc["liter/day"].Value}";
+
+        if (trendMeasurement?.DifferenceLevelFractionPerDay is {} valLevelPerDay)
+            return $"{Math.Round(valLevelPerDay * 100.0, 1):+#;-#;0} %";
+        
+        if (trendMeasurement?.DifferenceHeightPerDay is {} valHeightPerDay)
+            return $"{Math.Round(valHeightPerDay, 0):+#;-#;0} {Loc["mm/day"].Value}";
+        
         return "";
     }
     
@@ -46,44 +62,62 @@
         <th scope="col">@Loc["Change"]</th>
         <th scope="col">@Loc["Rate"]</th>
         <th scope="col">@Loc["Time till empty"]</th>
-        <th scope="col">@Loc["Time till full"]</th>
+        @if (hasTimeTillFull)
+        {
+            <th scope="col">@Loc["Time till full"]</th>
+        }
     </tr>
     </thead>
     <tbody>
     <tr>
         <th scope="row">@Loc["1 hour"]</th>
-        <td>@FormatLiter(Model.TrendMeasurement1H)</td>
+        <td>@FormatTrend(Model.TrendMeasurement1H)</td>
         <td>-</td>
         <td>-</td>
-        <td>-</td>
+        @if (hasTimeTillFull)
+        {
+            <td>-</td>
+        }
     </tr>
     <tr>
         <th scope="row">@Loc["6 hours"]</th>
-        <td>@FormatLiter(Model.TrendMeasurement6H)</td>
-        <td>@FormatLiterPerDay(Model.TrendMeasurement6H)</td>
+        <td>@FormatTrend(Model.TrendMeasurement6H)</td>
+        <td>@FormatTrendPerDay(Model.TrendMeasurement6H)</td>
         <td>-</td>
-        <td>-</td>
+        @if (hasTimeTillFull)
+        {
+            <td>-</td>
+        }
     </tr>
     <tr>
         <th scope="row">@Loc["24 hours"]</th>
-        <td>@FormatLiter(Model.TrendMeasurement24H)</td>
-        <td>@FormatLiterPerDay(Model.TrendMeasurement24H)</td>
+        <td>@FormatTrend(Model.TrendMeasurement24H)</td>
+        <td>@FormatTrendPerDay(Model.TrendMeasurement24H)</td>
         <td>@FormatTimeTill(Model.TrendMeasurement24H?.TimeTillEmpty)</td>
-        <td>@FormatTimeTill(Model.TrendMeasurement24H?.TimeTillFull)</td>
+        @if (hasTimeTillFull)
+        {
+            <td>@FormatTimeTill(Model.TrendMeasurement24H?.TimeTillFull)</td>
+        }
     </tr>
     <tr>
         <th scope="row">@Loc["7 days"]</th>
-        <td>@FormatLiter(Model.TrendMeasurement7D)</td>
-        <td>@FormatLiterPerDay(Model.TrendMeasurement7D)</td>
+        <td>@FormatTrend(Model.TrendMeasurement7D)</td>
+        <td>@FormatTrendPerDay(Model.TrendMeasurement7D)</td>
         <td>@FormatTimeTill(Model.TrendMeasurement7D?.TimeTillEmpty)</td>
-        <td>@FormatTimeTill(Model.TrendMeasurement7D?.TimeTillFull)</td>
+        @if (hasTimeTillFull)
+        {
+            <td>@FormatTimeTill(Model.TrendMeasurement7D?.TimeTillFull)</td>
+        }
     </tr>
     <tr>
         <th scope="row">@Loc["30 days"]</th>
-        <td>@FormatLiter(Model.TrendMeasurement30D)</td>
-        <td>@FormatLiterPerDay(Model.TrendMeasurement30D)</td>
+        <td>@FormatTrend(Model.TrendMeasurement30D)</td>
+        <td>@FormatTrendPerDay(Model.TrendMeasurement30D)</td>
         <td>@FormatTimeTill(Model.TrendMeasurement30D?.TimeTillEmpty)</td>
-        <td>@FormatTimeTill(Model.TrendMeasurement30D?.TimeTillFull)</td>
+        @if (hasTimeTillFull)
+        {
+            <td>@FormatTimeTill(Model.TrendMeasurement30D?.TimeTillFull)</td>
+        }
     </tr>
     </tbody>
 </table>

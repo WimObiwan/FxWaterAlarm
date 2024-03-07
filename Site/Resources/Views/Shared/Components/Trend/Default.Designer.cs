@@ -116,5 +116,17 @@ namespace Site.Resources.Views.Shared.Components.Trend {
                 return ResourceManager.GetString("> 3 months", resourceCulture);
             }
         }
+        
+        internal static string mm {
+            get {
+                return ResourceManager.GetString("mm", resourceCulture);
+            }
+        }
+        
+        internal static string mm_day {
+            get {
+                return ResourceManager.GetString("mm/day", resourceCulture);
+            }
+        }
     }
 }

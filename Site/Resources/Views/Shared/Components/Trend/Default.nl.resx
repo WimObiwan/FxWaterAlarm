@@ -83,4 +83,12 @@
         <value>&gt; 3 maanden</value>
         <comment>&gt; 3 months</comment>
     </data>
+    <data name="mm" xml:space="preserve">
+        <value>mm</value>
+        <comment>mm</comment>
+    </data>
+    <data name="mm/day" xml:space="preserve">
+        <value>mm/day</value>
+        <comment>mm/day</comment>
+    </data>
 </root>

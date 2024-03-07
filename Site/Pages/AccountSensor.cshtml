@@ -131,13 +131,14 @@
         @if (Model.PageType == AccountSensor.PageTypeEnum.Trend)
         {
             @await Component.InvokeAsync("Trend", new
-                   {
-                       trendMeasurement1H = Model.TrendMeasurement1H, 
-                       trendMeasurement6H = Model.TrendMeasurement6H, 
-                       trendMeasurement24H = Model.TrendMeasurement24H, 
-                       trendMeasurement7D = Model.TrendMeasurement7D, 
-                       trendMeasurement30D = Model.TrendMeasurement30D
-                   })
+            {
+                accountSensorEntity = Model.AccountSensorEntity,
+                trendMeasurement1H = Model.TrendMeasurement1H, 
+                trendMeasurement6H = Model.TrendMeasurement6H, 
+                trendMeasurement24H = Model.TrendMeasurement24H, 
+                trendMeasurement7D = Model.TrendMeasurement7D, 
+                trendMeasurement30D = Model.TrendMeasurement30D
+            })
         }
 
         @if (Model.PageType == AccountSensor.PageTypeEnum.Details)

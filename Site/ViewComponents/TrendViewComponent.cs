@@ -6,6 +6,7 @@ namespace Site.ViewComponents;
 
 public class TrendModel
 {
+    public required AccountSensor? AccountSensorEntity { get; init; }
     public required TrendMeasurementEx? TrendMeasurement1H { get; init; }
     public required TrendMeasurementEx? TrendMeasurement6H { get; init; }
     public required TrendMeasurementEx? TrendMeasurement24H { get; init; }
@@ -16,6 +17,7 @@ public class TrendModel
 public class TrendViewComponent : ViewComponent
 {
     public async Task<IViewComponentResult> InvokeAsync(
+        AccountSensor? accountSensorEntity,
         TrendMeasurementEx? trendMeasurement1H,
         TrendMeasurementEx? trendMeasurement6H,
         TrendMeasurementEx? trendMeasurement24H,
@@ -24,6 +26,7 @@ public class TrendViewComponent : ViewComponent
     {
         var model = new TrendModel
         {
+            AccountSensorEntity = accountSensorEntity,
             TrendMeasurement1H = trendMeasurement1H,
             TrendMeasurement6H = trendMeasurement6H,
             TrendMeasurement24H = trendMeasurement24H,
