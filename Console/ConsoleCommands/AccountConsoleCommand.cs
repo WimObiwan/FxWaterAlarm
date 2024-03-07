@@ -346,8 +346,8 @@ public class AccountConsoleCommand : IConsoleCommand
                 SensorUid = sensorId,
                 Name = Optional.From(name),
                 DistanceMmEmpty = Optional.From(distanceEmptyMm),
-                DistanceMmFull = Optional.From(distanceFullMm),
-                CapacityL = Optional.From(capacityL)
+                DistanceMmFull = Optional.From(distanceFullMm, -1),
+                CapacityL = Optional.From(capacityL, -1)
             });
     }
 
