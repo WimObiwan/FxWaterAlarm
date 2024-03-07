@@ -353,9 +353,11 @@ public class AccountSensor : PageModel
             {
                 result = SaveResultEnum.NotAuthorized;
             }
-            else if (sensorName == null || !distanceMmFull.HasValue || !distanceMmEmpty.HasValue || !capacityL.HasValue
-                     || capacityL.Value <= 0 || distanceMmEmpty.Value <= 0 || distanceMmFull <= 0
-                     || distanceMmEmpty.Value < distanceMmFull.Value)
+            else if (sensorName == null 
+                     || capacityL is <= 0
+                     || distanceMmFull is <= 0
+                     || distanceMmEmpty is <= 0
+                     || distanceMmFull.HasValue && distanceMmEmpty.HasValue && distanceMmEmpty.Value <= distanceMmFull.Value)
             {
                 result = SaveResultEnum.InvalidData;
             }
@@ -385,9 +387,9 @@ public class AccountSensor : PageModel
                         {
                             AccountUid = accountSensor.Account.Uid,
                             SensorUid = accountSensor.Sensor.Uid,
-                            CapacityL = Optional.From(capacityL),
-                            DistanceMmEmpty = Optional.From(distanceMmEmpty),
-                            DistanceMmFull = Optional.From(distanceMmFull),
+                            CapacityL = new Optional<int?>(true, capacityL),
+                            DistanceMmFull = new Optional<int?>(true, distanceMmFull),
+                            DistanceMmEmpty = new Optional<int?>(true, distanceMmEmpty),
                             Name = Optional.From(sensorName)
                         });
                         result = SaveResultEnum.Saved;
