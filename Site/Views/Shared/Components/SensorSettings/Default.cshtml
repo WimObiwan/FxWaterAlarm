@@ -73,21 +73,6 @@
                     </tr>
                     <tr>
                         <td>
-                            @Loc["Distance to water when full (100%)"]
-                        </td>
-                        <td>
-                            <div class="input-group mb-3">
-                                <input type="number" class="form-control" style="width: 100px;" 
-                                       aria-describedby="basic-addon-DistanceMmFull" name="distanceMmFull"
-                                       value="@Model.AccountSensor.DistanceMmFull"/>
-                                <div class="input-group-append">
-                                    <span class="input-group-text" id="basic-addon-DistanceMmFull">@Loc["mm"]</span>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
                             @Loc["Distance to water when empty (0%)"]
                         </td>
                         <td>
@@ -97,6 +82,21 @@
                                        value="@Model.AccountSensor.DistanceMmEmpty"/>
                                 <div class="input-group-append">
                                     <span class="input-group-text" id="basic-addon-DistanceMmEmpty">@Loc["mm"]</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Loc["Distance to water when full (100%)"]
+                        </td>
+                        <td>
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" style="width: 100px;" 
+                                       aria-describedby="basic-addon-DistanceMmFull" name="distanceMmFull"
+                                       value="@Model.AccountSensor.DistanceMmFull"/>
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon-DistanceMmFull">@Loc["mm"]</span>
                                 </div>
                             </div>
                         </td>
