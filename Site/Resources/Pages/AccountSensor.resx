@@ -63,4 +63,8 @@
         <value>Settings</value>
         <comment>Settings</comment>
     </data>
+    <data name="Your account" xml:space="preserve">
+        <value>Your account</value>
+        <comment>Your account</comment>
+    </data>
 </root>

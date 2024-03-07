@@ -35,11 +35,11 @@
         <comment>mm</comment>
     </data>
     <data name="Distance to water when empty (0%)" xml:space="preserve">
-        <value>Afstand tot het water wanneer leeg (0%)</value>
+        <value>Afstand sensor tot water wanneer leeg (0%)</value>
         <comment>Distance to water when empty (0%)</comment>
     </data>
     <data name="Distance to water when full (100%)" xml:space="preserve">
-        <value>Afstand tot het water wanneer vol (100%)</value>
+        <value>Afstand sensor tot water wanneer vol (100%)</value>
         <comment>Distance to water when full (100%)</comment>
     </data>
     <data name="Capacity" xml:space="preserve">

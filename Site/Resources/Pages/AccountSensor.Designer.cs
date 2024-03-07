@@ -104,5 +104,11 @@ namespace Site.Resources.Pages {
                 return ResourceManager.GetString("Settings", resourceCulture);
             }
         }
+        
+        internal static string Your_account {
+            get {
+                return ResourceManager.GetString("Your account", resourceCulture);
+            }
+        }
     }
 }
