@@ -14,4 +14,8 @@
     <data name="liter" xml:space="preserve">
         <value>liter</value>
     </data>
+    <data name="mm" xml:space="preserve">
+        <value>mm</value>
+        <comment>mm</comment>
+    </data>
 </root>

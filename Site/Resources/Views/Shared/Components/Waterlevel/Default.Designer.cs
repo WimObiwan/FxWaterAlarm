@@ -50,5 +50,11 @@ namespace Site.Resources.Views.Shared.Components.Waterlevel {
                 return ResourceManager.GetString("liter", resourceCulture);
             }
         }
+        
+        internal static string mm {
+            get {
+                return ResourceManager.GetString("mm", resourceCulture);
+            }
+        }
     }
 }

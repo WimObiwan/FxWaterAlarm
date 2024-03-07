@@ -22,4 +22,8 @@
         <value>liter</value>
         <comment>liter</comment>
     </data>
+    <data name="mm" xml:space="preserve">
+        <value>mm</value>
+        <comment>mm</comment>
+    </data>
 </root>

@@ -1,83 +1,124 @@
-@model Site.Pages.MeasurementAggEx[]
+@using System.Globalization
+@using Microsoft.AspNetCore.Html
+@model Site.ViewComponents.MeasurementsGraphModel
 
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
+
+    IHtmlContent? maxDistance, minDistance, meanDistance;
+    string yAxisSuffix;
+
+    var measurements = Model.Measurements;
+    var accountSensor = Model.AccountSensorEntity;
+
+    if (accountSensor is not { DistanceMmEmpty: not null })
+    {
+        maxDistance = null;
+        minDistance = null;
+        meanDistance = null;
+        yAxisSuffix = "";
+    }
+    else if (!accountSensor.DistanceMmFull.HasValue)
+    {
+        maxDistance = Json.Serialize(measurements.Select(m => m.MaxDistance.Height));
+        minDistance = Json.Serialize(measurements.Select(m => m.MinDistance.Height));
+        meanDistance = Json.Serialize(measurements.Select(m => m.MeanDistance.Height));
+        yAxisSuffix = " mm";
+    }
+    else if (!accountSensor.CapacityL.HasValue)
+    {
+        maxDistance = Json.Serialize(measurements.Select(m => m.MaxDistance.LevelFraction * 100.0));
+        minDistance = Json.Serialize(measurements.Select(m => m.MinDistance.LevelFraction * 100.0));
+        meanDistance = Json.Serialize(measurements.Select(m => m.MeanDistance.LevelFraction * 100.0));
+        yAxisSuffix = " %";
+    }
+    else
+    {
+        maxDistance = Json.Serialize(measurements.Select(m => m.MaxDistance.WaterL));
+        minDistance = Json.Serialize(measurements.Select(m => m.MinDistance.WaterL));
+        meanDistance = Json.Serialize(measurements.Select(m => m.MeanDistance.WaterL));
+        yAxisSuffix = " L";
+    }
 }
 
 <canvas id="my-chart-@uniqueId"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
-    var ctx = document.getElementById('my-chart-@uniqueId').getContext('2d'); //get the context (canvas)
-
-    var config = {     
-        //configure the chart
-        type: 'line',
-        data: {
-            labels: @Html.Raw(Json.Serialize(Model.Select(m => m.Timestamp.ToLocalTime().ToString("g")))),
-            datasets: [
-            {
-                label: "Min",
-                backgroundColor: 'rgba(55, 173, 221,  0.2)',
-                borderColor: 'rgba(55, 173, 221, 0.0)',
-                fill: false,  //no fill here
-                cubicInterpolationMode: 'monotone',
-                tension: 0.4,
-                data: @Html.Raw(Json.Serialize(Model.Select(m => m.MaxDistance.WaterL)))
-            },
-            {
-                label: "Max",
-                backgroundColor: 'rgba(55, 173, 221, 0.2)',
-                borderColor: 'rgba(55, 173, 221, 0.0)',
-                fill: '-1', //fill until previous dataset
-                cubicInterpolationMode: 'monotone',
-                tension: 0.4,
-                data: @Html.Raw(Json.Serialize(Model.Select(m => m.MinDistance.WaterL)))
-            },
-            {
-                label: "Average",
-                borderColor: 'rgba(55, 173, 221, 1.0)',
-                fill: false,
-                cubicInterpolationMode: 'monotone',
-                tension: 0.4,
-                data: @Html.Raw(Json.Serialize(Model.Select(m => m.MeanDistance.WaterL)))
-            }
-            // ,
-            // {
-            //     label: "Last",
-            //     borderColor: 'rgba(55, 173, 221, 0.3)',
-            //     fill: false,
-            //     cubicInterpolationMode: 'monotone',
-            //     tension: 0.4,
-            //     data: @Html.Raw(Json.Serialize(Model.Select(m => m.LastDistance.WaterL)))
-            // }
-            ]
-        },
-        options: {
-            maintainAspectRatio: false,
-            spanGaps: true,
-            elements: {
-                line: {
-                    tension: 0.000001
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
+@if (maxDistance != null && minDistance != null && meanDistance != null)
+{
+    <script>
+        var ctx = document.getElementById('my-chart-@uniqueId').getContext('2d'); //get the context (canvas)
+    
+        var config = {     
+            //configure the chart
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(measurements.Select(m => m.Timestamp.ToLocalTime().ToString("g")))),
+                datasets: [
+                {
+                    label: "Min",
+                    backgroundColor: 'rgba(55, 173, 221,  0.2)',
+                    borderColor: 'rgba(55, 173, 221, 0.0)',
+                    fill: false,  //no fill here
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4,
+                    data: @Html.Raw(maxDistance)
                 },
-                filler: {
-                    propagate: false
+                {
+                    label: "Max",
+                    backgroundColor: 'rgba(55, 173, 221, 0.2)',
+                    borderColor: 'rgba(55, 173, 221, 0.0)',
+                    fill: '-1', //fill until previous dataset
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4,
+                    data: @Html.Raw(minDistance)
+                },
+                {
+                    label: "Average",
+                    borderColor: 'rgba(55, 173, 221, 1.0)',
+                    fill: false,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4,
+                    data: @Html.Raw(meanDistance)
                 }
+                ]
             },
-            scales: {
-                xAxes: [{
-                    ticks: {
-                        autoSkip: false
+            options: {
+                locale: '@CultureInfo.CurrentCulture.Name',
+                maintainAspectRatio: false,
+                spanGaps: true,
+                elements: {
+                    line: {
+                        tension: 0.000001
                     }
-                }]
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    filler: {
+                        propagate: false
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            autoSkip: false
+                        }
+                    }],
+                    y: {
+                        ticks: {
+                            // Include a dollar sign in the ticks
+                            callback: function(value, index, ticks) {
+                                // call the default formatter, forwarding `this`
+                                return Chart.Ticks.formatters.numeric.apply(this, [value, index, ticks]) + '@yAxisSuffix';
+                            }
+                        }
+                    }
+                }
             }
-        }
-    };
-    var chart = new Chart(ctx, config);        
-</script>
+        };
+        var chart = new Chart(ctx, config);        
+    </script>
+}

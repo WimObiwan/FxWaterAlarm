@@ -122,6 +122,7 @@
             <div style="width: 100%; height: 40vh">
                 @await Component.InvokeAsync("MeasurementsGraph", new
                        {
+                           Model.AccountSensorEntity,
                            Model.Measurements
                        })
             </div>

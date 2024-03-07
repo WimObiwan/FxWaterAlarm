@@ -23,6 +23,16 @@ public class MeasurementDistance
 
     public int? DistanceMm { get; }
 
+    public int? Height
+    {
+        get
+        {
+            if (DistanceMm.HasValue && _accountSensor is { DistanceMmEmpty: not null })
+                return _accountSensor.DistanceMmEmpty.Value - DistanceMm.Value;
+            return null;
+        }
+    }
+
     public double? RealLevelFraction
     {
         get
