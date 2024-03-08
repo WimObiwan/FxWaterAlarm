@@ -1,45 +1,91 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.Html
+@using Site.Pages
 @model Site.ViewComponents.MeasurementsGraphModel
 
 @{
+    const double autoScale = 100.0; // mm
+    
     var uniqueId = Guid.NewGuid().ToString("N");
 
-    IHtmlContent? maxDistance, minDistance, meanDistance;
     string yAxisSuffix;
 
     var measurements = Model.Measurements;
     var accountSensor = Model.AccountSensorEntity;
+
+    IEnumerable<double?>? maxDistance, minDistance, meanDistance;
+    double? scale, absoluteMin, absoluteMax;
 
     if (accountSensor is not { DistanceMmEmpty: not null })
     {
         maxDistance = null;
         minDistance = null;
         meanDistance = null;
+        scale = null;
+        absoluteMin = null;
+        absoluteMax = null;
         yAxisSuffix = "";
     }
     else if (!accountSensor.DistanceMmFull.HasValue)
     {
-        maxDistance = Json.Serialize(measurements.Select(m => m.MaxDistance.Height));
-        minDistance = Json.Serialize(measurements.Select(m => m.MinDistance.Height));
-        meanDistance = Json.Serialize(measurements.Select(m => m.MeanDistance.Height));
+        maxDistance = measurements.Select(m => (double?)m.MaxDistance.Height);
+        minDistance = measurements.Select(m => (double?)m.MinDistance.Height);
+        meanDistance = measurements.Select(m => (double?)m.MeanDistance.Height);
+        scale = autoScale;
+        absoluteMin = 0.0;
+        absoluteMax = null;
         yAxisSuffix = " mm";
     }
     else if (!accountSensor.CapacityL.HasValue)
     {
-        maxDistance = Json.Serialize(measurements.Select(m => m.MaxDistance.LevelFraction * 100.0));
-        minDistance = Json.Serialize(measurements.Select(m => m.MinDistance.LevelFraction * 100.0));
-        meanDistance = Json.Serialize(measurements.Select(m => m.MeanDistance.LevelFraction * 100.0));
+        maxDistance = measurements.Select(m => m.MaxDistance.LevelFraction * 100.0);
+        minDistance = measurements.Select(m => m.MinDistance.LevelFraction * 100.0);
+        meanDistance = measurements.Select(m => m.MeanDistance.LevelFraction * 100.0);
+        scale = (autoScale / (accountSensor.DistanceMmEmpty - accountSensor.DistanceMmFull)) * 100.0;
+        absoluteMin = 0.0;
+        absoluteMax = 100.0;
         yAxisSuffix = " %";
     }
     else
     {
-        maxDistance = Json.Serialize(measurements.Select(m => m.MaxDistance.WaterL));
-        minDistance = Json.Serialize(measurements.Select(m => m.MinDistance.WaterL));
-        meanDistance = Json.Serialize(measurements.Select(m => m.MeanDistance.WaterL));
+        maxDistance = measurements.Select(m => m.MaxDistance.WaterL);
+        minDistance = measurements.Select(m => m.MinDistance.WaterL);
+        meanDistance = measurements.Select(m => m.MeanDistance.WaterL);
+        scale = (autoScale / (accountSensor.DistanceMmEmpty - accountSensor.DistanceMmFull)) * accountSensor.CapacityL;
+        absoluteMin = 0.0;
+        absoluteMax = accountSensor.CapacityL;
         yAxisSuffix = " L";
     }
+
+    var min = minDistance?.Min();
+    var max = maxDistance?.Max();
+    if (min.HasValue && max.HasValue && scale.HasValue)
+    {
+        if (max.Value - min.Value < scale)
+        {
+            double basis = (max.Value + min.Value) / 2.0;
+            max = Math.Round(basis + scale.Value / 2.0, 0);
+            min = Math.Round(basis - scale.Value / 2.0, 0);
+        }
+
+        if (absoluteMin.HasValue && min.Value < absoluteMin.Value)
+        {
+            min = absoluteMin;
+            if (min + scale > max)
+                max = min + scale;
+        }
+        
+        if (absoluteMax.HasValue && max.Value > absoluteMax.Value)
+        {
+            max = absoluteMax;
+            if (max - scale < min)
+                min = max - scale;
+        }
+    }
 }
+
+<!-- @accountSensor?.DistanceMmEmpty @accountSensor?.DistanceMmFull -->
+<!-- @min @max @scale -->
 
 <canvas id="my-chart-@uniqueId"></canvas>
 
@@ -63,7 +109,7 @@
                     fill: false,  //no fill here
                     cubicInterpolationMode: 'monotone',
                     tension: 0.4,
-                    data: @Html.Raw(maxDistance)
+                    data: @Html.Raw(Json.Serialize(maxDistance))
                 },
                 {
                     label: "Max",
@@ -72,7 +118,7 @@
                     fill: '-1', //fill until previous dataset
                     cubicInterpolationMode: 'monotone',
                     tension: 0.4,
-                    data: @Html.Raw(minDistance)
+                    data: @Html.Raw(Json.Serialize(minDistance))
                 },
                 {
                     label: "Average",
@@ -80,7 +126,7 @@
                     fill: false,
                     cubicInterpolationMode: 'monotone',
                     tension: 0.4,
-                    data: @Html.Raw(meanDistance)
+                    data: @Html.Raw(Json.Serialize(meanDistance))
                 }
                 ]
             },
@@ -114,7 +160,9 @@
                                 // call the default formatter, forwarding `this`
                                 return Chart.Ticks.formatters.numeric.apply(this, [value, index, ticks]) + '@yAxisSuffix';
                             }
-                        }
+                        },
+                        suggestedMin: @min?.ToString(CultureInfo.InvariantCulture),
+                        suggestedMax: @max?.ToString(CultureInfo.InvariantCulture)
                     }
                 }
             }
