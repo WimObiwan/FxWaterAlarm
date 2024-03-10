@@ -12,7 +12,7 @@ public class MeasurementDistance
 
     public int? DistanceMm { get; }
 
-    public int? Height
+    public int? HeightMm
     {
         get
         {

@@ -28,9 +28,9 @@
     }
     else if (!accountSensor.DistanceMmFull.HasValue)
     {
-        maxDistance = measurements.Select(m => (double?)m.MaxDistance.Height);
-        minDistance = measurements.Select(m => (double?)m.MinDistance.Height);
-        meanDistance = measurements.Select(m => (double?)m.MeanDistance.Height);
+        maxDistance = measurements.Select(m => (double?)m.MaxDistance.HeightMm);
+        minDistance = measurements.Select(m => (double?)m.MinDistance.HeightMm);
+        meanDistance = measurements.Select(m => (double?)m.MeanDistance.HeightMm);
         scale = autoScale;
         absoluteMin = 0.0;
         absoluteMax = null;

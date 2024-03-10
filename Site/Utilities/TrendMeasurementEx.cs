@@ -32,8 +32,8 @@ public class TrendMeasurementEx
         DifferenceLevelFraction.HasValue ? DifferenceLevelFraction.Value / _timeSpan.TotalDays : null;
 
     public double? DifferenceHeight => 
-        _measurementEx.Distance.Height.HasValue && _trendMeasurementEx.Distance.Height.HasValue 
-            ? _measurementEx.Distance.Height.Value - _trendMeasurementEx.Distance.Height.Value
+        _measurementEx.Distance.HeightMm.HasValue && _trendMeasurementEx.Distance.HeightMm.HasValue 
+            ? _measurementEx.Distance.HeightMm.Value - _trendMeasurementEx.Distance.HeightMm.Value
             : null;
 
     public double? DifferenceHeightPerDay =>
