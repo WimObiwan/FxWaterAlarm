@@ -11,169 +11,6 @@ using Site.Utilities;
 
 namespace Site.Pages;
 
-public class MeasurementDistance
-{
-    private readonly Core.Entities.AccountSensor _accountSensor;
-    
-    public MeasurementDistance(int? distanceMm, Core.Entities.AccountSensor accountSensor)
-    {
-        DistanceMm = distanceMm;
-        _accountSensor = accountSensor;
-    }
-
-    public int? DistanceMm { get; }
-
-    public int? Height
-    {
-        get
-        {
-            if (DistanceMm.HasValue && _accountSensor is { DistanceMmEmpty: not null })
-                return _accountSensor.DistanceMmEmpty.Value - DistanceMm.Value;
-            return null;
-        }
-    }
-
-    public double? RealLevelFraction
-    {
-        get
-        {
-            if (DistanceMm.HasValue && _accountSensor is { DistanceMmEmpty: not null, DistanceMmFull: not null })
-                return ((double)_accountSensor.DistanceMmEmpty.Value - DistanceMm.Value)
-                       / ((double)_accountSensor.DistanceMmEmpty.Value - _accountSensor.DistanceMmFull.Value);
-            return null;
-        }
-    }
-
-    public double? LevelFraction
-    {
-        get
-        {
-            var realLevelFraction = RealLevelFraction;
-            if (!realLevelFraction.HasValue)
-                return null;
-            if (realLevelFraction.Value > 1.0)
-                return 1.0;
-            if (realLevelFraction.Value < 0.0)
-                return 0.0;
-            return realLevelFraction;
-        }
-    }
-
-    public double? WaterL
-    {
-        get
-        {
-            var levelFraction = LevelFraction;
-            if (levelFraction != null && _accountSensor.CapacityL.HasValue)
-                return levelFraction.Value * _accountSensor.CapacityL.Value;
-
-            return null;
-        }
-    }
-}
-
-public class MeasurementEx
-{
-    private readonly Core.Entities.AccountSensor _accountSensor;
-    private readonly Measurement _measurement;
-
-    public MeasurementEx(Measurement measurement, Core.Entities.AccountSensor accountSensor)
-    {
-        _measurement = measurement;
-        _accountSensor = accountSensor;
-    }
-
-    public DateTime EstimateNextRefresh()
-    {
-        // Refresh every 20 minutes
-        const int refreshIntervalMinutes = 20;
-        int nextRefreshMinutes = ((int)(DateTime.UtcNow - Timestamp).TotalMinutes / refreshIntervalMinutes + 1) * refreshIntervalMinutes;
-        return Timestamp.AddSeconds(nextRefreshMinutes * 60 + 5);
-    }
-
-    public Core.Entities.AccountSensor AccountSensor => _accountSensor;
-    public string DevEui => _accountSensor.Sensor.DevEui;
-    public DateTime Timestamp => _measurement.Timestamp;
-    public MeasurementDistance Distance => new(_measurement.DistanceMm, _accountSensor);
-    public double BatV => _measurement.BatV;
-    public double RssiDbm => _measurement.RssiDbm;
-    public double RssiPrc => (_measurement.RssiDbm + 150.0) / 60.0 * 80.0;
-    public double BatteryPrc => (_measurement.BatV - 3.0) / 0.335 * 100.0;
-}
-
-public class MeasurementAggEx
-{
-    private readonly Core.Entities.AccountSensor _accountSensor;
-    private readonly AggregatedMeasurement _aggregatedMeasurement;
-
-    public MeasurementAggEx(AggregatedMeasurement aggregatedMeasurement, Core.Entities.AccountSensor accountSensor)
-    {
-        _aggregatedMeasurement = aggregatedMeasurement;
-        _accountSensor = accountSensor;
-    }
-
-    public string DevEui => _aggregatedMeasurement.DevEui;
-    public DateTime Timestamp => _aggregatedMeasurement.Timestamp;
-    public MeasurementDistance MinDistance => new(_aggregatedMeasurement.MinDistanceMm, _accountSensor);
-    public MeasurementDistance MeanDistance => new(_aggregatedMeasurement.MeanDistanceMm, _accountSensor);
-    public MeasurementDistance MaxDistance => new(_aggregatedMeasurement.MaxDistanceMm, _accountSensor);
-    public MeasurementDistance LastDistance => new(_aggregatedMeasurement.LastDistanceMm, _accountSensor);
-    public double BatV => _aggregatedMeasurement.BatV;
-    public double RssiDbm => _aggregatedMeasurement.RssiDbm;
-    public double RssiPrc => (_aggregatedMeasurement.RssiDbm + 150.0) / 60.0 * 80.0;
-    public double BatteryPrc => (_aggregatedMeasurement.BatV - 3.0) / 0.335 * 100.0;
-}
-
-public class TrendMeasurementEx
-{
-    private readonly TimeSpan _timeSpan;
-    private readonly MeasurementEx _measurementEx;
-    private readonly MeasurementEx _trendMeasurementEx;
-
-    public TrendMeasurementEx(TimeSpan timeSpan, Measurement trend, MeasurementEx measurementEx)
-    {
-        _timeSpan = timeSpan;
-        _measurementEx = measurementEx;
-        _trendMeasurementEx = new MeasurementEx(trend, measurementEx.AccountSensor);
-    }
-
-    public double? DifferenceWaterL => 
-        _measurementEx.Distance.WaterL.HasValue && _trendMeasurementEx.Distance.WaterL.HasValue 
-            ? _measurementEx.Distance.WaterL.Value - _trendMeasurementEx.Distance.WaterL.Value
-            : null;
-
-    public double? DifferenceWaterLPerDay =>
-        DifferenceWaterL.HasValue ? DifferenceWaterL.Value / _timeSpan.TotalDays : null;
-
-    public double? DifferenceLevelFraction => 
-        _measurementEx.Distance.LevelFraction.HasValue && _trendMeasurementEx.Distance.LevelFraction.HasValue 
-            ? _measurementEx.Distance.LevelFraction.Value - _trendMeasurementEx.Distance.LevelFraction.Value
-            : null;
-
-    public double? DifferenceLevelFractionPerDay =>
-        DifferenceLevelFraction.HasValue ? DifferenceLevelFraction.Value / _timeSpan.TotalDays : null;
-
-    public double? DifferenceHeight => 
-        _measurementEx.Distance.Height.HasValue && _trendMeasurementEx.Distance.Height.HasValue 
-            ? _measurementEx.Distance.Height.Value - _trendMeasurementEx.Distance.Height.Value
-            : null;
-
-    public double? DifferenceHeightPerDay =>
-        DifferenceHeight.HasValue ? DifferenceHeight.Value / _timeSpan.TotalDays : null;
-
-    public TimeSpan? TimeTillEmpty => 
-        _measurementEx.Distance.WaterL.HasValue && _trendMeasurementEx.Distance.WaterL.HasValue 
-                                                && _measurementEx.Distance.WaterL.Value < _trendMeasurementEx.Distance.WaterL.Value
-            ? _measurementEx.Distance.WaterL.Value / (_trendMeasurementEx.Distance.WaterL.Value - _measurementEx.Distance.WaterL.Value) * _timeSpan
-            : null;
-    
-    public TimeSpan? TimeTillFull => 
-        _measurementEx.Distance.WaterL.HasValue && _trendMeasurementEx.Distance.WaterL.HasValue 
-                                                && _measurementEx.Distance.WaterL.Value > _trendMeasurementEx.Distance.WaterL.Value
-            ? (_measurementEx.AccountSensor.CapacityL - _measurementEx.Distance.WaterL.Value) / (_measurementEx.Distance.WaterL.Value - _trendMeasurementEx.Distance.WaterL.Value) * _timeSpan
-            : null;
-}
-
 public class AccountSensor : PageModel
 {
     public enum PageTypeEnum
@@ -194,16 +31,18 @@ public class AccountSensor : PageModel
     
     private readonly IMediator _mediator;
     private readonly IUserInfo _userInfo;
+    private readonly ITrendService _trendService;
 
-    public AccountSensor(IMediator mediator, IUserInfo userInfo)
+    public AccountSensor(IMediator mediator, IUserInfo userInfo, ITrendService trendService)
     {
         _mediator = mediator;
         _userInfo = userInfo;
+        _trendService = trendService;
     }
 
     public MeasurementEx? LastMeasurement { get; private set; }
     public MeasurementAggEx[]? Measurements { get; private set; }
-    public TrendMeasurementEx? TrendMeasurement1H { get; private set; }
+    //public TrendMeasurementEx? TrendMeasurement1H { get; private set; }
     public TrendMeasurementEx? TrendMeasurement6H { get; private set; }
     public TrendMeasurementEx? TrendMeasurement24H { get; private set; }
     public TrendMeasurementEx? TrendMeasurement7D { get; private set; }
@@ -252,11 +91,18 @@ public class AccountSensor : PageModel
                 case PageTypeEnum.Trend:
                     if (LastMeasurement != null)
                     {
-                        TrendMeasurement1H = await GetTrendMeasurement(TimeSpan.FromHours(1), LastMeasurement);
-                        TrendMeasurement6H = await GetTrendMeasurement(TimeSpan.FromHours(6), LastMeasurement);
-                        TrendMeasurement24H = await GetTrendMeasurement(TimeSpan.FromHours(24), LastMeasurement);
-                        TrendMeasurement7D = await GetTrendMeasurement(TimeSpan.FromDays(7), LastMeasurement);
-                        TrendMeasurement30D = await GetTrendMeasurement(TimeSpan.FromDays(30), LastMeasurement);
+                        var trendMeasurements = await _trendService.GetTrendMeasurements(LastMeasurement,
+                            //TimeSpan.FromHours(1),
+                            TimeSpan.FromHours(6),
+                            TimeSpan.FromHours(24),
+                            TimeSpan.FromDays(7),
+                            TimeSpan.FromDays(30));
+                        
+                        //TrendMeasurement1H = trendMeasurements[0];
+                        TrendMeasurement6H = trendMeasurements[0];
+                        TrendMeasurement24H = trendMeasurements[1];
+                        TrendMeasurement7D = trendMeasurements[2];
+                        TrendMeasurement30D = trendMeasurements[3];
                     }
                     break;
             }
@@ -430,20 +276,4 @@ public class AccountSensor : PageModel
 
         return Redirect($"?page={page}&saveResult={result}");
     }
-
-
-    private async Task<TrendMeasurementEx?> GetTrendMeasurement(TimeSpan timeSpan, MeasurementEx lastMeasurement)
-    {
-        var trendMeasurement = await _mediator.Send(
-            new MeasurementLastBeforeQuery
-            {
-                DevEui = lastMeasurement.AccountSensor.Sensor.DevEui,
-                Timestamp = lastMeasurement.Timestamp.Add(-timeSpan)
-            });
-        if (trendMeasurement == null)
-            return null;
-        return new TrendMeasurementEx(timeSpan, trendMeasurement, lastMeasurement);        
-    }
-    
-    
 }
