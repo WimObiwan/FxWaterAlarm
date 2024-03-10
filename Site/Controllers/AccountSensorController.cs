@@ -24,6 +24,7 @@ class LastMeasurementDto
     public double RssiDbm { get; init; }
     public double RssiPrc { get; init; }
     public int? DistanceMm { get; init; }
+    public int? HeightMm { get; init; }
     public double? WaterL { get; init; }
     public double? LevelFraction { get; init; }
     public double? RealLevelFraction { get; init; }
@@ -34,18 +35,18 @@ class Trend
 {
     public Trend(TrendMeasurementEx? trendMeasurementEx)
     {
-        DifferenceDistanceMm = trendMeasurementEx?.DifferenceHeight;
+        DifferenceHeightMm = trendMeasurementEx?.DifferenceHeight;
         DifferenceWaterL = trendMeasurementEx?.DifferenceWaterL;
         DifferenceLevelFraction = trendMeasurementEx?.DifferenceLevelFraction;
-        DifferenceDistanceMmPerDay = trendMeasurementEx?.DifferenceHeightPerDay;
+        DifferenceHeightMmPerDay = trendMeasurementEx?.DifferenceHeightPerDay;
         DifferenceWaterLPerDay = trendMeasurementEx?.DifferenceWaterLPerDay;
         DifferenceLevelFractionPerDay = trendMeasurementEx?.DifferenceLevelFractionPerDay;
     }
     
-    public double? DifferenceDistanceMm { get; init; }
+    public double? DifferenceHeightMm { get; init; }
     public double? DifferenceWaterL { get; init; }
     public double? DifferenceLevelFraction { get; init; }
-    public double? DifferenceDistanceMmPerDay { get; init; }
+    public double? DifferenceHeightMmPerDay { get; init; }
     public double? DifferenceWaterLPerDay { get; init; }
     public double? DifferenceLevelFractionPerDay { get; init; }
 }
@@ -103,6 +104,7 @@ public class AccountSensorController : Controller
                 RssiDbm = measurementEx.RssiDbm,
                 RssiPrc = measurementEx.RssiPrc,
                 DistanceMm = measurementEx.Distance.DistanceMm,
+                HeightMm = measurementEx.Distance.HeightMm,
                 WaterL = measurementEx.Distance.WaterL,
                 LevelFraction = measurementEx.Distance.LevelFraction,
                 RealLevelFraction = measurementEx.Distance.RealLevelFraction,
