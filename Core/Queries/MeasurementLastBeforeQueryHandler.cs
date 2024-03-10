@@ -10,11 +10,11 @@ public record MeasurementLastBeforeQuery : IRequest<Measurement?>
     public required DateTime Timestamp { get; init; }
 }
 
-public class MeasurementTrendsQueryHandler : IRequestHandler<MeasurementLastBeforeQuery, Measurement?>
+public class MeasurementLastBeforeQueryHandler : IRequestHandler<MeasurementLastBeforeQuery, Measurement?>
 {
     private readonly IMeasurementRepository _measurementRepository;
 
-    public MeasurementTrendsQueryHandler(IMeasurementRepository measurementRepository)
+    public MeasurementLastBeforeQueryHandler(IMeasurementRepository measurementRepository)
     {
         _measurementRepository = measurementRepository;
     }
