@@ -125,7 +125,7 @@ public class AccountSensor : PageModel
         // https://swimburger.net/blog/dotnet/create-zip-files-on-http-request-without-intermediate-files-using-aspdotnet-mvc-razor-pages-and-endpoints#better-mvc
         
         Response.ContentType = "text/csv";
-        Response.Headers.Add("Content-Disposition", "attachment; filename=\"Export.csv\"");
+        Response.Headers.Append("Content-Disposition", "attachment; filename=\"Export.csv\"");
 
         
         await using TextWriter textWriter = new StreamWriter(Response.BodyWriter.AsStream());

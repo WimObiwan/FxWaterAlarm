@@ -86,11 +86,7 @@ public class AccountSensorController : Controller
         
         var lastMeasurement = await _mediator.Send(new LastMeasurementQuery
             { DevEui = accountSensor.Sensor.DevEui });
-        MeasurementEx? measurementEx;
-        if (lastMeasurement != null)
-            measurementEx = new MeasurementEx(lastMeasurement, accountSensor);
-        else
-            measurementEx = null;
+        var measurementEx = lastMeasurement != null ? new MeasurementEx(lastMeasurement, accountSensor) : null;
 
         LastMeasurementDto? lastMeasurementDto;
         TrendsDto? trendsDto;
