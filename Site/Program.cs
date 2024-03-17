@@ -9,6 +9,7 @@ using Site.Communication;
 using Site.Middlewares;
 using Site.Pages;
 using Site.Utilities;
+using Westwind.AspNetCore.Markdown;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +68,14 @@ builder.Services.AddRazorPages(o =>
     .AddViewLocalization();
 builder.Services.AddControllers();
 
+builder.Services.AddMarkdown(config =>
+        // just add a folder as is
+        config.AddMarkdownProcessingFolder("/Docs/", "~/Pages/__MarkdownPageTemplate.cshtml")
+    );
+        
+builder.Services.AddMvc()
+    .AddApplicationPart(typeof(MarkdownPageProcessorMiddleware).Assembly);
+
 builder.Services.AddWaterAlarmCore(builder.Configuration, typeof(Program).Assembly);
 
 // Identity
@@ -98,6 +107,11 @@ var app = builder.Build();
 
 app.MigrateWaterAlarmDb();
 
+app.UseDefaultFiles(new DefaultFilesOptions()
+{
+    DefaultFileNames = new List<string> { "index.md", "index.html" }
+});
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -111,6 +125,7 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseMarkdown();
 app.UseStaticFiles();
 
 app.UseRequestLocalization();
@@ -122,6 +137,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapDefaultControllerRoute();
+
 app.MapControllers();
 
 app.Run();

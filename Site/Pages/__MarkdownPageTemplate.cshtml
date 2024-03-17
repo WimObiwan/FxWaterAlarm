@@ -1,0 +1,32 @@
+@model Westwind.AspNetCore.Markdown.MarkdownModel
+@{
+    ViewBag.Title = Model.Title;
+    Layout = "_Layout";
+}
+
+@{
+    //Model.YamlHeader
+    var path = new DirectoryInfo(Model.RelativePath ?? "");
+    List<DirectoryInfo> breadcrumbs = new();
+    do
+    {
+        breadcrumbs.Add(path);
+        path = Directory.GetParent(path.FullName);
+    } while (path != null);
+
+    if (breadcrumbs.Count > 0 && breadcrumbs[0].Name == "index.md")
+        breadcrumbs.RemoveAt(0);
+    breadcrumbs.Reverse();
+    if (breadcrumbs.Count > 0)
+        breadcrumbs.RemoveAt(0);
+}
+
+@foreach (var breadcrumb in breadcrumbs)
+{
+    @: >
+    <a href="@breadcrumb.FullName">@breadcrumb.Name</a>
+}
+
+<div>
+    @Model.RenderedMarkdown
+</div>
