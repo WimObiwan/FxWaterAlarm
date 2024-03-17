@@ -4,5 +4,3 @@ title: Test title
 
 # Test
 Test
-
-[Test Page](Test Page.md)
