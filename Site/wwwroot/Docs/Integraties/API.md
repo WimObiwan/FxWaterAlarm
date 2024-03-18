@@ -4,7 +4,7 @@ title: API
 
 # API
 
-Je kunt je gegevens op halen in Json formaat.  Voeg hiervoor `api/`tussen in de 
+Je kunt je gegevens op halen in Json formaat.  Voeg hiervoor `api/` tussen in de 
 persoonlijke link voor je sensor.
 
 Bvb:
