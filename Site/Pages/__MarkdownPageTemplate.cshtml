@@ -25,11 +25,18 @@
     <ol class="breadcrumb">
         @foreach (var breadcrumb in breadcrumbs)
         {
-            var active = breadcrumb == breadcrumbs.Last() ? "active" : "";
-            
-            <li class="breadcrumb-item @active">
-                <a href="@breadcrumb.FullName">@breadcrumb.Name.Replace('_', ' ')</a>
-            </li>
+            if (breadcrumb != breadcrumbs.Last())
+            {
+                <li class="breadcrumb-item">
+                    <a href="@breadcrumb.FullName">@breadcrumb.Name.Replace('_', ' ')</a>
+                </li>
+            }
+            else
+            {
+                <li class="breadcrumb-item active" aria-current="page">
+                    @breadcrumb.Name.Replace('_', ' ').Replace(".md", "")
+                </li>
+            }
         }
     </ol>
 </nav>
