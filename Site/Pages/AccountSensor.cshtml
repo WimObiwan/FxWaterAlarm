@@ -22,7 +22,7 @@
         <li class="breadcrumb-item">WaterAlarm</li>
         @if (Model.AccountSensorEntity != null)
         {
-            <li class="breadcrumb-item"><a href="@Model.AccountSensorEntity.Account.RestPath">@Loc["Your account"]</a>@* <span class="badge bg-warning">beta</span>*@</li>
+            <li class="breadcrumb-item"><a href="@Model.AccountSensorEntity.Account.RestPath">@Loc["Your account"]</a></li>
             <li class="breadcrumb-item active" aria-current="page">@Model.AccountSensorEntity.Name</li>
         }
     </ol>

@@ -56,5 +56,17 @@ namespace Site.Resources.Views.Shared {
                 return ResourceManager.GetString("News blog", resourceCulture);
             }
         }
+        
+        internal static string Dcumentation {
+            get {
+                return ResourceManager.GetString("Dcumentation", resourceCulture);
+            }
+        }
+        
+        internal static string Documentation {
+            get {
+                return ResourceManager.GetString("Documentation", resourceCulture);
+            }
+        }
     }
 }

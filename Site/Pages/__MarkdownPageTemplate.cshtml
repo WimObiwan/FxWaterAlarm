@@ -21,11 +21,18 @@
         breadcrumbs.RemoveAt(0);
 }
 
-@foreach (var breadcrumb in breadcrumbs)
-{
-    @: >
-    <a href="@breadcrumb.FullName">@breadcrumb.Name</a>
-}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        @foreach (var breadcrumb in breadcrumbs)
+        {
+            var active = breadcrumb == breadcrumbs.Last() ? "active" : "";
+            
+            <li class="breadcrumb-item @active">
+                <a href="@breadcrumb.FullName">@breadcrumb.Name.Replace('_', ' ')</a>
+            </li>
+        }
+    </ol>
+</nav>
 
 <div>
     @Model.RenderedMarkdown

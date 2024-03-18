@@ -26,4 +26,12 @@
         <value>News blog</value>
         <comment>News blog</comment>
     </data>
+    <data name="Dcumentation" xml:space="preserve">
+        <value>Dcumentation</value>
+        <comment>Dcumentation</comment>
+    </data>
+    <data name="Documentation" xml:space="preserve">
+        <value>Documentation</value>
+        <comment>Documentation</comment>
+    </data>
 </root>
