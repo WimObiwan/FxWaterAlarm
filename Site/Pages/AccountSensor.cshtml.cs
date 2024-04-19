@@ -15,7 +15,6 @@ public class AccountSensor : PageModel
 {
     public enum PageTypeEnum
     {
-        Graph6H,
         Graph24H,
         Graph7D,
         Graph3M,
@@ -76,9 +75,6 @@ public class AccountSensor : PageModel
             Tuple<TimeSpan, TimeSpan>? period = null;
             switch (PageType)
             {
-                case PageTypeEnum.Graph6H:
-                    period = Tuple.Create(TimeSpan.FromHours(6), TimeSpan.FromMinutes(20));
-                    break;
                 case PageTypeEnum.Graph24H:
                     period = Tuple.Create(TimeSpan.FromDays(1), TimeSpan.FromHours(1));
                     break;

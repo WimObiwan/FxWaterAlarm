@@ -43,7 +43,7 @@
                 bool IsPageTypeInGraphDropDown()
                 {
                     return Model.PageType == AccountSensor.PageTypeEnum.Graph3M || Model.PageType == AccountSensor.PageTypeEnum.Graph7D
-                           || Model.PageType == AccountSensor.PageTypeEnum.Graph24H || Model.PageType == AccountSensor.PageTypeEnum.Graph6H;
+                           || Model.PageType == AccountSensor.PageTypeEnum.Graph24H;
                 }
 
                 bool IsPageTypeInDetailsDropDown()
@@ -82,9 +82,6 @@
             <li class="nav-item dropdown">
                 <a  @Html.Raw(PageTypeDropDownMenu(IsPageTypeInGraphDropDown())) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Graph"]</a>
                 <ul class="dropdown-menu">
-                    <li>
-                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph6H)) href="?page=graph6h">@Loc["Graph 6h"]</a>
-                    </li>
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph24H)) href="?page=graph24h">@Loc["Graph 24h"]</a>
                     </li>
