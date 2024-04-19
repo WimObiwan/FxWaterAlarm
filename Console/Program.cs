@@ -32,7 +32,7 @@ internal class Program
 
             using (SentrySdk.Init(o =>
                    {
-                       o.Dsn = null;
+                       o.Dsn = "";
                        o.TracesSampleRate = 1.0;
                    }))
             {
