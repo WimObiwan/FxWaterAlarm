@@ -23,7 +23,27 @@ public class AggregatedMeasurementsQueryHandler : IRequestHandler<AggregatedMeas
 
     public async Task<AggregatedMeasurement[]> Handle(AggregatedMeasurementsQuery request, CancellationToken cancellationToken)
     {
-        return await _measurementRepository.GetAggregated(request.DevEui, request.From, request.Till, request.Interval,
-            cancellationToken);
+        if (request.Interval != TimeSpan.Zero)
+        {
+            return await _measurementRepository.GetAggregated(request.DevEui, request.From, request.Till,
+                request.Interval,
+                cancellationToken);
+        }
+        else
+        {
+            var result = await _measurementRepository.Get(request.DevEui, request.From, request.Till,
+                cancellationToken);
+            return result.Select(i => new AggregatedMeasurement()
+            {
+                BatV = i.BatV,
+                DevEui = i.DevEui,
+                LastDistanceMm = i.DistanceMm,
+                MaxDistanceMm = i.DistanceMm,
+                MinDistanceMm = i.DistanceMm,
+                MeanDistanceMm = i.DistanceMm,
+                RssiDbm = i.RssiDbm,
+                Timestamp = i.Timestamp
+            }).ToArray();
+        }
     }
 }

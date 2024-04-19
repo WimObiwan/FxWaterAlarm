@@ -76,13 +76,13 @@ public class AccountSensor : PageModel
             switch (PageType)
             {
                 case PageTypeEnum.Graph24H:
-                    period = Tuple.Create(TimeSpan.FromDays(1), TimeSpan.FromHours(1));
+                    period = Tuple.Create(TimeSpan.FromDays(1), TimeSpan.Zero);
                     break;
                 case PageTypeEnum.Graph7D:
-                    period = Tuple.Create(TimeSpan.FromDays(7), TimeSpan.FromHours(6));
+                    period = Tuple.Create(TimeSpan.FromDays(7), TimeSpan.FromHours(4));
                     break;
                 case PageTypeEnum.Graph3M:
-                    period = Tuple.Create(TimeSpan.FromDays(90), TimeSpan.FromDays(7));
+                    period = Tuple.Create(TimeSpan.FromDays(90), TimeSpan.FromDays(3));
                     break;
                 case PageTypeEnum.Trend:
                     if (LastMeasurement != null)
@@ -104,6 +104,7 @@ public class AccountSensor : PageModel
             }
 
             if (period != null)
+            {
                 Measurements = (await _mediator.Send(new AggregatedMeasurementsQuery
                     {
                         DevEui = AccountSensorEntity.Sensor.DevEui,
@@ -113,6 +114,7 @@ public class AccountSensor : PageModel
                     .OrderBy(m => m.Timestamp)
                     .Select(m => new MeasurementAggEx(m, AccountSensorEntity))
                     .ToArray();
+            }
         }
     }
 

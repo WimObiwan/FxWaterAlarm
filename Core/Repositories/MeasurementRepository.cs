@@ -97,20 +97,24 @@ public class MeasurementRepository : IMeasurementRepository
 
         string intervalText;
         if (interval < TimeSpan.FromHours(1))
-            intervalText = $", time({60 / (60 / (int)interval.TotalMinutes)}m)";
+            intervalText = $"{60 / (60 / (int)interval.TotalMinutes)}m";
         else if (interval < TimeSpan.FromDays(1))
-            intervalText = $", time({24 / (24 / (int)interval.TotalHours)}h)";
+            intervalText = $"{24 / (24 / (int)interval.TotalHours)}h";
         else
-            intervalText = $", time({(int)interval.TotalDays}d)";
+            intervalText = $"{(int)interval.TotalDays}d";
 
+        var timeZoneOffset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalSeconds;
+        var groupByText = $", time({intervalText}, -{timeZoneOffset}s)";
+        
         var query = "SELECT "
                     + " MIN(*), MEAN(*), MAX(*), LAST(*)"
                     + " FROM waterlevel"
                     + filterText
                     + " GROUP BY *"
-                    + intervalText
+                    + groupByText
                     + " ORDER BY DESC LIMIT 1000";
 
+        
         using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
         var result = await influxClient.ReadAsync<RecordAgg>("wateralarm", query, parameters,
             cancellationToken);
