@@ -8,6 +8,10 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    @if (!(ViewData["RobotsAllowIndex"] is bool and true))
+    {
+        <meta name="robots" content="noindex"/>
+    }
     <title>
         @string.Join(" - ", new[] { ViewData["Title"] as string, "WaterAlarm" }.Where(s => !string.IsNullOrEmpty(s)))
     </title>
