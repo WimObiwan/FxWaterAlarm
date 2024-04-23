@@ -22,10 +22,14 @@ title: Versie Informatie
 > *
 -->
 
-### Volgende
-> 2024-03
+### v0.27
+> 2024-04-23
 > ##### Nieuw
 > * Documentatie-pagina's
+> * Link instellen in de mobiele app
+> ##### Verbeteringen
+> * Grafiek: Verwijderd 6h
+> * Grafiek: Hou rekening met tijdzone/zomertijd/wintertijd-verschuiving
 
 ### v0.26
 > 2024-03-14
