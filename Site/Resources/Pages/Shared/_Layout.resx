@@ -34,4 +34,8 @@
         <value>Documentation</value>
         <comment>Documentation</comment>
     </data>
+    <data name="Set link" xml:space="preserve">
+        <value>Set link</value>
+        <comment>Set link</comment>
+    </data>
 </root>

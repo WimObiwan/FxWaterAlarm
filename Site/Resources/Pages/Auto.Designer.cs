@@ -7,28 +7,28 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Site.Resources.Views.Shared {
+namespace Site.Resources.Pages {
     using System;
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class _Layout {
+    internal class Auto {
         
         private static System.Resources.ResourceManager resourceMan;
         
         private static System.Globalization.CultureInfo resourceCulture;
         
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal _Layout() {
+        internal Auto() {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Site.Resources.Pages.Shared._Layout", typeof(_Layout).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Site.Resources.Pages.Auto", typeof(Auto).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -45,27 +45,22 @@ namespace Site.Resources.Views.Shared {
             }
         }
         
-        internal static string Language {
+        internal static string On_this_page__you_can_configure_the_link_to_your_sensor_or_account_ {
             get {
-                return ResourceManager.GetString("Language", resourceCulture);
+                return ResourceManager.GetString("On this page, you can configure the link to your sensor or account.", resourceCulture);
             }
         }
         
-        internal static string News_blog {
+        internal static string The_app_will_then_show_your_sensor_s__when_it_is_opened_ {
             get {
-                return ResourceManager.GetString("News blog", resourceCulture);
+                return ResourceManager.GetString("The app will then show your sensor(s) when it is opened.", resourceCulture);
             }
         }
         
-        internal static string Dcumentation {
+        internal static string Paste_below_the_personal_link_to_your_sensor_or_account_that_you_received_after_installing_your_sensor_ {
             get {
-                return ResourceManager.GetString("Dcumentation", resourceCulture);
-            }
-        }
-        
-        internal static string Documentation {
-            get {
-                return ResourceManager.GetString("Documentation", resourceCulture);
+                return ResourceManager.GetString("Paste below the personal link to your sensor or account that you received after i" +
+                        "nstalling your sensor.", resourceCulture);
             }
         }
         

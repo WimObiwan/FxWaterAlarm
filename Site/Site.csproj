@@ -78,6 +78,14 @@
           <Generator>ResXFileCodeGenerator</Generator>
           <LastGenOutput>Account.nl.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Pages\Auto.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Auto.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Pages\Auto.nl.resx">
+          <Generator>ResXFileCodeGenerator</Generator>
+          <LastGenOutput>Auto.nl.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -125,6 +133,11 @@
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
           <DependentUpon>Account.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Resources\Pages\Auto.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Auto.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 

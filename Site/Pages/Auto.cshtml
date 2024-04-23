@@ -1,2 +1,24 @@
 @page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model Site.Pages.Auto
+@inject IViewLocalizer Loc
+
+<div>
+    <div>
+        @Loc["On this page, you can configure the link to your sensor or account."]
+    </div>
+    <div>
+        @Loc["The app will then show your sensor(s) when it is opened."]
+    </div>
+    <div>
+        @Loc["Paste below the personal link to your sensor or account that you received after installing your sensor."]
+    </div>
+    <form method="post" action="?page=Settings">
+        <input type="text" class="form-control"
+               name="link"
+               value="@Model.Link"/>
+        <button type="submit" class="btn btn-primary mb-3">@Loc["Set link"]</button>
+        @Html.AntiForgeryToken()
+    </form>
+</div>

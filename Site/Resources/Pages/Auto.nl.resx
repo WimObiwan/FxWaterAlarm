@@ -18,21 +18,17 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="Language" xml:space="preserve">
-        <value>Taal</value>
-        <comment>Language</comment>
+    <data name="On this page, you can configure the link to your sensor or account." xml:space="preserve">
+        <value>Op deze pagina kun je de link configureren naar jouw sensor of account.</value>
+        <comment>On this page, you can configure the link to your sensor or account.</comment>
     </data>
-    <data name="News blog" xml:space="preserve">
-        <value>Nieuws blog</value>
-        <comment>News blog</comment>
+    <data name="The app will then show your sensor(s) when it is opened." xml:space="preserve">
+        <value>De app toont dan automatisch jouw sensor(en) wanneer je deze opent.</value>
+        <comment>The app will then show your sensor(s) when it is opened.</comment>
     </data>
-    <data name="Dcumentation" xml:space="preserve">
-        <value>Dcumentation</value>
-        <comment>Dcumentation</comment>
-    </data>
-    <data name="Documentation" xml:space="preserve">
-        <value>Documentatie</value>
-        <comment>Documentation</comment>
+    <data name="Paste below the personal link to your sensor or account that you received after installing your sensor." xml:space="preserve">
+        <value>Plak hieronder de persoonlijke link naar jouw sensor of account die je hebt gekregen na installatie van je sensor.</value>
+        <comment>Paste below the personal link to your sensor or account that you received after installing your sensor.</comment>
     </data>
     <data name="Set link" xml:space="preserve">
         <value>Link instellen</value>

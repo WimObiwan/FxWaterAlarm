@@ -1,4 +1,4 @@
-﻿@using System.Reflection
+@using System.Reflection
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IConfiguration Config
 @inject IViewLocalizer Loc
@@ -67,6 +67,11 @@
             
             <div class="navbar-collapse collapse d-sm-inline-flex flex-row-reverse justify-content-between">
                 <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auto?update=true">@Loc["Set link"]
+                            </a>
+                    </li>
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             @Loc["Language"]
