@@ -14,6 +14,7 @@ public class Info : PageModel
     public string? OsVersion { get; set; }
     public string? DotNetVersion { get; set; }
     public string? UserAuthId { get; set; }
+    public string? UserAgent { get; set; }
 
     public void OnGet()
     {
@@ -25,5 +26,6 @@ public class Info : PageModel
         OsVersion = RuntimeInformation.OSDescription;
         DotNetVersion = RuntimeInformation.FrameworkDescription;
         UserAuthId = HttpContext.User.Identity?.Name;
+        UserAgent = HttpContext.Request.Headers.UserAgent;
     }
 }

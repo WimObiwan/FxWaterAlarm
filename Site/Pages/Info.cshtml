@@ -8,33 +8,36 @@
 
 <table style="display: block">
     <tr>
-        <td>RequestHost</td><td>@Model.RequestHost</td>
+        <td><strong>RequestHost</strong></td><td>@Model.RequestHost</td>
     </tr>
     <tr>
-        <td>Server</td><td>@Model.Server</td>
+        <td><strong>Server</strong></td><td>@Model.Server</td>
     </tr>
     <tr>
-        <td>Version</td><td>@Model.Version</td>
+        <td><strong>Version</strong></td><td>@Model.Version</td>
     </tr>
     <tr>
-        <td>OsVersion</td><td>@Model.OsVersion</td>
+        <td><strong>OsVersion</strong></td><td>@Model.OsVersion</td>
     </tr>
     <tr>
-        <td>DotNetVersion</td><td>@Model.DotNetVersion</td>
+        <td><strong>DotNetVersion</strong></td><td>@Model.DotNetVersion</td>
     </tr>
     <tr>
-        <td>UserAuthId</td><td>@Model.UserAuthId</td>
+        <td><strong>UserAuthId</strong></td><td>@Model.UserAuthId</td>
     </tr>
     <tr>
-        <td>Culture</td><td>@CultureInfo.CurrentCulture.Name</td>
+        <td><strong>UserAgent</strong></td><td>@Model.UserAgent</td>
     </tr>
     <tr>
-        <td>UICulture</td><td>@CultureInfo.CurrentUICulture.Name</td>
+        <td><strong>Culture</strong></td><td>@CultureInfo.CurrentCulture.Name</td>
     </tr>
     <tr>
-        <td>DateTime</td><td>@DateTime.Now.ToLongDateString() @DateTime.Now.ToLongTimeString()</td>
+        <td><strong>UICulture</strong></td><td>@CultureInfo.CurrentUICulture.Name</td>
     </tr>
     <tr>
-        <td>DateTimeUTC</td><td>@DateTime.UtcNow.ToLongDateString() @DateTime.UtcNow.ToLongTimeString()</td>
+        <td><strong>DateTime</strong></td><td>@DateTime.Now.ToLongDateString() @DateTime.Now.ToLongTimeString()</td>
+    </tr>
+    <tr>
+        <td><strong>DateTimeUTC</strong></td><td>@DateTime.UtcNow.ToLongDateString() @DateTime.UtcNow.ToLongTimeString()</td>
     </tr>
 </table>
