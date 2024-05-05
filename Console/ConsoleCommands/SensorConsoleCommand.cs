@@ -219,27 +219,38 @@ public class SensorConsoleCommand : IConsoleCommand
         };
         subCommand.AddOption(devEuiOption);
 
-        var fromOption = new Option<DateTime>(new[] { "-f", "--from" }, "Sensor identifier")
-        {
-            IsRequired = true
-        };
+        var fromOption = new Option<DateTime?>(new[] { "-f", "--from" }, "From date");
         subCommand.AddOption(fromOption);
+
+        var durtionOption = new Option<TimeSpan?>(new[] { "-l", "--duration" }, "Duration");
+        subCommand.AddOption(durtionOption);
 
         subCommand.SetHandler(
             ReadLastMedianMeasurement,
             devEuiOption,
-            fromOption);
+            fromOption,
+            durtionOption);
 
         return subCommand;
     }
 
-    private async Task ReadLastMedianMeasurement(string devEui, DateTime from)
+    private async Task ReadLastMedianMeasurement(string devEui, DateTime? from, TimeSpan? duration)
     {
+        DateTime from2;
+        if (from.HasValue && !duration.HasValue)
+            from2 = from.Value;
+        else if (duration.HasValue && !from.HasValue)
+            from2 = DateTime.UtcNow.Add(-duration.Value);
+        else
+        {
+            _logger.LogError("From or duration necessary");
+            return;
+        }
         var result = await _mediator.Send(
             new LastMedianMeasurementQuery
             {
                 DevEui = devEui,
-                From = from
+                From = from2
             });
 
         if (result == null)
