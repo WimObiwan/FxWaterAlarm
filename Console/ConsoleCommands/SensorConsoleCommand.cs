@@ -1,5 +1,6 @@
 using System.CommandLine;
 using Core.Commands;
+using Core.Entities;
 using Core.Queries;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -21,9 +22,11 @@ public class SensorConsoleCommand : IConsoleCommand
     {
         var command = new Command("sensor", "Sensor actions.");
         command.AddCommand(ListSubCommand());
+        command.AddCommand(ReadSubCommand());
         command.AddCommand(CreateSubCommand());
         command.AddCommand(SetLinkSubCommand());
         command.AddCommand(ReadLastMeasurementSubCommand());
+        command.AddCommand(ReadLastMedianMeasurementSubCommand());
         command.AddCommand(ReadAggregatedMeasurementsSubCommand());
         command.AddCommand(ReadMeasurementTrendsSubCommand());
         return command;
@@ -50,6 +53,57 @@ public class SensorConsoleCommand : IConsoleCommand
                 result.Uid, result.DevEui, result.Link);
         }
     }
+
+    private Command ReadSubCommand()
+    {
+        var subCommand = new Command("read", "Read sensor.");
+
+        var idOption = new Option<Guid>(new[] { "-i", "--si", "--sensorid" }, "Account id")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(idOption);
+
+        subCommand.SetHandler(
+            Read,
+            idOption);
+
+        return subCommand;
+    }
+
+    private async Task Read(Guid id)
+    {
+        var sensor = await _mediator.Send(
+            new SensorQuery
+            {
+                Uid = id
+            });
+
+        ShowSensor(sensor);
+    }
+
+    private void ShowSensor(Sensor? sensor)
+    {
+        if (sensor == null)
+        {
+            System.Console.WriteLine("Sensor not found");
+        }
+        else
+        {
+            System.Console.WriteLine($"Sensor uid: {sensor.Uid}");
+            System.Console.WriteLine($"  - DevEui:    {sensor.DevEui}");
+            System.Console.WriteLine($"  - Link:    {sensor.Link}");
+            System.Console.WriteLine($"  - Create:  {sensor.CreateTimestamp}");
+            System.Console.WriteLine($"  - Accounts: {sensor.AccountSensors?.Count}");
+            if (sensor.AccountSensors != null)
+                foreach (var accountSensor in sensor.AccountSensors)
+                {
+                    System.Console.WriteLine($"    - Uid:     {accountSensor.Account.Uid}");
+                    System.Console.WriteLine($"      - DevEui:  {accountSensor.Account.Email}");
+                }
+        }
+    }
+
 
     private Command CreateSubCommand()
     {
@@ -155,9 +209,9 @@ public class SensorConsoleCommand : IConsoleCommand
             result.DevEui, result.Timestamp, result.DistanceMm, result.BatV, result.RssiDbm);
     }
 
-    private Command ReadMeasurementsSubCommand()
+    private Command ReadLastMedianMeasurementSubCommand()
     {
-        var subCommand = new Command("readmeasurements", "Read measurements.");
+        var subCommand = new Command("readlastmedianmeasurement", "Read last measurement.");
 
         var devEuiOption = new Option<string>(new[] { "-d", "--deveui" }, "Sensor identifier")
         {
@@ -165,19 +219,40 @@ public class SensorConsoleCommand : IConsoleCommand
         };
         subCommand.AddOption(devEuiOption);
 
-        var fromOption = new Option<DateTime?>(new[] { "-f", "--from" }, "From date");
+        var fromOption = new Option<DateTime>(new[] { "-f", "--from" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
         subCommand.AddOption(fromOption);
 
-        var tillOption = new Option<DateTime?>(new[] { "-t", "--till" }, "Till date");
-        subCommand.AddOption(tillOption);
-
         subCommand.SetHandler(
-            ReadMeasurements,
+            ReadLastMedianMeasurement,
             devEuiOption,
-            fromOption,
-            tillOption);
+            fromOption);
 
         return subCommand;
+    }
+
+    private async Task ReadLastMedianMeasurement(string devEui, DateTime from)
+    {
+        var result = await _mediator.Send(
+            new LastMedianMeasurementQuery
+            {
+                DevEui = devEui,
+                From = from
+            });
+
+        if (result == null)
+        {
+            _logger.LogWarning("No measurement found for DevEui {DevEui}",
+                devEui);
+            return;
+        }
+
+        _logger.LogInformation("{DevEui} {Timestamp} {DistanceMm} {BatV} {RssiDbm}",
+            result.DevEui, result.Timestamp, result.MeanDistanceMm, result.BatV, result.RssiDbm);
+        System.Console.WriteLine("{0} {1} {2} {3} {4}",
+            result.DevEui, result.Timestamp, result.MeanDistanceMm, result.BatV, result.RssiDbm);
     }
 
     private Command ReadAggregatedMeasurementsSubCommand()

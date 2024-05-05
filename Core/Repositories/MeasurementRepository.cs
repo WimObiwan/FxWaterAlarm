@@ -22,11 +22,13 @@ public interface IMeasurementRepository
     Task<Measurement[]> Get(string devEui, DateTime? from, DateTime? till,
         CancellationToken cancellationToken);
 
-    Task<AggregatedMeasurement[]> GetAggregated(string devEui, DateTime? from, DateTime? till, TimeSpan interval,
+    Task<AggregatedMeasurement[]> GetAggregated(string devEui, DateTime? from, DateTime? till, TimeSpan? interval,
         CancellationToken cancellationToken);
 
     Task<Measurement?> GetLastBefore(string devEui, DateTime dateTime,
         CancellationToken cancellationToken);
+
+    Task<AggregatedMeasurement?> GetLastMedian(string devEui, DateTime from, CancellationToken cancellationToken);
 }
 
 public class MeasurementRepository : IMeasurementRepository
@@ -90,22 +92,30 @@ public class MeasurementRepository : IMeasurementRepository
         return record ?? Array.Empty<Measurement>();
     }
 
-    public async Task<AggregatedMeasurement[]> GetAggregated(string devEui, DateTime? from, DateTime? till, TimeSpan interval,
+    public async Task<AggregatedMeasurement[]> GetAggregated(string devEui, DateTime? from, DateTime? till, TimeSpan? interval,
         CancellationToken cancellationToken)
     {
         (string filterText, object parameters) = GetFilter(devEui, from, till);
 
-        string intervalText;
-        if (interval < TimeSpan.FromHours(1))
-            intervalText = $"{60 / (60 / (int)interval.TotalMinutes)}m";
-        else if (interval < TimeSpan.FromDays(1))
-            intervalText = $"{24 / (24 / (int)interval.TotalHours)}h";
-        else
-            intervalText = $"{(int)interval.TotalDays}d";
+        string? groupByText;
+        if (interval is {} interval2)
+        {
+            string intervalText;
+            if (interval < TimeSpan.FromHours(1))
+                intervalText = $"{60 / (60 / (int)interval2.TotalMinutes)}m";
+            else if (interval < TimeSpan.FromDays(1))
+                intervalText = $"{24 / (24 / (int)interval2.TotalHours)}h";
+            else
+                intervalText = $"{(int)interval2.TotalDays}d";
 
-        var timeZoneOffset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalSeconds;
-        var groupByText = $", time({intervalText}, -{timeZoneOffset}s)";
-        
+            var timeZoneOffset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalSeconds;
+            groupByText = $", time({intervalText}, -{timeZoneOffset}s)";
+        }
+        else
+        {
+            groupByText = null;
+        }
+
         var query = "SELECT "
                     + " MIN(*), MEAN(*), MAX(*), LAST(*)"
                     + " FROM waterlevel"
@@ -181,6 +191,14 @@ public class MeasurementRepository : IMeasurementRepository
             BatV = record.BatV,
             RssiDbm = record.Rssi
         };
+    }
+
+    public async Task<AggregatedMeasurement?> GetLastMedian(string devEui, DateTime from, CancellationToken cancellationToken)
+    {
+        var result = await GetAggregated(devEui, from, null, null, cancellationToken);
+        if (result.Length > 0)
+            return result[0];
+        return null;
     }
 
     // ReSharper disable UnusedAutoPropertyAccessor.Local
