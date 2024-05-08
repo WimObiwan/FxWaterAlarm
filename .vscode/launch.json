@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/Site/bin/Debug/net7.0/Site.dll",
+            "program": "${workspaceRoot}/Site/bin/Debug/net8.0/Site.dll",
             "args": [],
             "cwd": "${workspaceRoot}/Site",
             "stopAtEntry": false,
@@ -40,7 +40,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/Query/bin/Debug/net7.0/Query.dll",
+            "program": "${workspaceRoot}/Query/bin/Debug/net8.0/Query.dll",
             "args": [
             ],
             "cwd": "${workspaceRoot}/Query",
