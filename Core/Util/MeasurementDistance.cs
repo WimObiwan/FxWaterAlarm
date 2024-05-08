@@ -1,4 +1,4 @@
-namespace Site.Utilities;
+namespace Core.Util;
 
 public class MeasurementDistance
 {
