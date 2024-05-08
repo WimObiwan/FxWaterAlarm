@@ -25,6 +25,10 @@
         <PackageReference Include="Vibrant.InfluxDB.Client" Version="4.0.4"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="Content\**" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
     <Target Name="_SetVersion" BeforeTargets="GetAssemblyVersion;GenerateNuspec;GetPackageContents">
         <PropertyGroup>
             <Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</Version>

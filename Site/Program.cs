@@ -1,11 +1,11 @@
 using System.Globalization;
 using Core;
+using Core.Communication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Site;
 using Site.Identity;
-using Site.Communication;
 using Site.Middlewares;
 using Site.Pages;
 using Site.Utilities;

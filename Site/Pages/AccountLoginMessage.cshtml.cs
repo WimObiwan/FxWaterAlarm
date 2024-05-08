@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
+using Core.Communication;
 using Core.Exceptions;
 using Core.Queries;
 using MediatR;
@@ -13,7 +14,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using QRCoder;
-using Site.Communication;
 
 namespace Site.Pages;
 
