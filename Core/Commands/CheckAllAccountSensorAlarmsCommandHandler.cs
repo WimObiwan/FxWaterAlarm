@@ -1,0 +1,46 @@
+using System.Globalization;
+using Core.Communication;
+using Core.Entities;
+using Core.Exceptions;
+using Core.Repositories;
+using Core.Util;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+namespace Core.Commands;
+
+public record CheckAllAccountSensorAlarmsCommand : IRequest
+{
+}
+
+public class CheckAllAccountSensorAlarmsCommandHandler : CheckAccountSensorAlarmsCommandHandlerBase, IRequestHandler<CheckAllAccountSensorAlarmsCommand>
+{
+    private readonly WaterAlarmDbContext _dbContext;
+    private readonly ILogger<CheckAllAccountSensorAlarmsCommandHandler> _logger;
+
+    public CheckAllAccountSensorAlarmsCommandHandler(WaterAlarmDbContext dbContext, IMeasurementRepository measurementRepository, IMessenger messenger, 
+        ILogger<CheckAllAccountSensorAlarmsCommandHandler> logger)
+        : base(measurementRepository, messenger, logger)
+    {
+        _dbContext = dbContext;
+        _logger = logger;
+    }
+
+    public async Task Handle(CheckAllAccountSensorAlarmsCommand request, CancellationToken cancellationToken)
+    {
+        var accountSensors =
+            _dbContext.Accounts
+                .SelectMany(a => a.AccountSensors)
+                .Include(@as => @as.Sensor)
+                .Include(@as => @as.Account);
+        
+        await foreach (var accountSensor in accountSensors.AsAsyncEnumerable().WithCancellation(cancellationToken))
+        {
+            _logger.LogInformation("Handling {Account} {AccountSensorName} {sensor}", 
+                accountSensor.Account.Email, accountSensor.Name, accountSensor.Sensor.DevEui);
+            
+            await CheckAccountSensorAlarms(accountSensor, cancellationToken);
+        }
+    }
+}

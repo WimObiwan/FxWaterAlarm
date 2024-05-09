@@ -39,7 +39,6 @@ builder.Services.Configure<RequestLocalizationOptions>(o =>
 });
 
 builder.Services.Configure<AccountLoginMessageOptions>(builder.Configuration.GetSection(AccountLoginMessageOptions.Location));
-builder.Services.Configure<MessengerOptions>(builder.Configuration.GetSection(MessengerOptions.Location));
 
 builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
 
@@ -101,7 +100,6 @@ builder.Services.AddAuthorization(options =>
 
 //builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IUserInfo, UserInfo>();
-builder.Services.AddTransient<IMessenger, Messenger>();
 
 var app = builder.Build();
 

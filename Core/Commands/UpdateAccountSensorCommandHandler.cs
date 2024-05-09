@@ -14,6 +14,7 @@ public record UpdateAccountSensorCommand : IRequest
     public Optional<int?> DistanceMmEmpty { get; init; }
     public Optional<int?> DistanceMmFull { get; init; }
     public Optional<int?> CapacityL { get; init; }
+    public Optional<bool> AlertsEnabled { get; init; }
 }
 
 public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSensorCommand>
@@ -27,7 +28,7 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
 
     public async Task Handle(UpdateAccountSensorCommand request, CancellationToken cancellationToken)
     {
-        var account =
+        var accountSensor =
             await _dbContext.Accounts
                 .Where(a => a.Uid == request.AccountUid)
                 .SelectMany(a => a.AccountSensors)
@@ -36,13 +37,15 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
                 { AccountUid = request.AccountUid };
 
         if (request.Name is { Specified: true })
-            account.Name = request.Name.Value;
+            accountSensor.Name = request.Name.Value;
         if (request.DistanceMmEmpty is { Specified: true })
-            account.DistanceMmEmpty = request.DistanceMmEmpty.Value;
+            accountSensor.DistanceMmEmpty = request.DistanceMmEmpty.Value;
         if (request.DistanceMmFull is { Specified: true })
-            account.DistanceMmFull = request.DistanceMmFull.Value;
+            accountSensor.DistanceMmFull = request.DistanceMmFull.Value;
         if (request.CapacityL is { Specified: true })
-            account.CapacityL = request.CapacityL.Value;
+            accountSensor.CapacityL = request.CapacityL.Value;
+        if (request.AlertsEnabled is { Specified: true})
+            accountSensor.AlertsEnabled = request.AlertsEnabled.Value;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

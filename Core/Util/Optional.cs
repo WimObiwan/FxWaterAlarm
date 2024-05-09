@@ -4,6 +4,13 @@ public readonly record struct Optional<T>(bool Specified, T? Value);
 
 public static class Optional
 {
+    public static Optional<bool> From(bool? value)
+    {
+        if (!value.HasValue)
+            return new Optional<bool>(false, default);
+        return new Optional<bool>(true, value.Value);
+    }
+
     public static Optional<T> From<T>(T? value, T nullValue)
     {
         if (value == null)

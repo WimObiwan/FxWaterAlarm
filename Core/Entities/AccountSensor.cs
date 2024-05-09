@@ -10,6 +10,7 @@ public class AccountSensor
     public int? DistanceMmEmpty { get; set; }
     public int? DistanceMmFull { get; set; }
     public int? CapacityL { get; set; }
+    public bool AlertsEnabled { get; set; }
 
     public double? ResolutionL
     {

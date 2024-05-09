@@ -32,6 +32,8 @@ public class AccountConsoleCommand : IConsoleCommand
         command.AddCommand(AddSensorSubCommand());
         command.AddCommand(UpdateSensorSubCommand());
         command.AddCommand(RemoveSensorSubCommand());
+        command.AddCommand(CheckSensorAlarmsSubCommand());
+        command.AddCommand(CheckAllSensorAlarmsSubCommand());
         return command;
     }
 
@@ -267,7 +269,7 @@ public class AccountConsoleCommand : IConsoleCommand
         foreach (var accountSensor in accountSensors)
         {
             System.Console.WriteLine($"{accountSensor.Sensor.Uid} {accountSensor.Sensor.Link} {accountSensor.Name} {accountSensor.CapacityL} "
-                + $"{accountSensor.DistanceMmEmpty}  {accountSensor.DistanceMmFull}");
+                + $"{accountSensor.DistanceMmEmpty}  {accountSensor.DistanceMmFull} {accountSensor.AlertsEnabled}");
         }
     }
 
@@ -328,16 +330,18 @@ public class AccountConsoleCommand : IConsoleCommand
         subCommand.AddOption(distanceFullMmOption);
         var capacityLOption = new Option<int?>(new[] { "-c", "--capacity" }, "Capacity in liter");
         subCommand.AddOption(capacityLOption);
+        var alertsEnabled = new Option<bool?>(new[] { "-a", "--alertsEnabled" }, "Alerts enabled");
+        subCommand.AddOption(alertsEnabled);
 
         subCommand.SetHandler(
             UpdateSensor,
-            accountIdOption, sensorIdOption, nameOption, distanceEmptyMmOption, distanceFullMmOption, capacityLOption);
+            accountIdOption, sensorIdOption, nameOption, distanceEmptyMmOption, distanceFullMmOption, capacityLOption, alertsEnabled);
 
         return subCommand;
     }
 
     private async Task UpdateSensor(Guid accountId, Guid sensorId, string? name, int? distanceEmptyMm,
-        int? distanceFullMm, int? capacityL)
+        int? distanceFullMm, int? capacityL, bool? alertsEnabled)
     {
         await _mediator.Send(
             new UpdateAccountSensorCommand
@@ -347,7 +351,8 @@ public class AccountConsoleCommand : IConsoleCommand
                 Name = Optional.From(name),
                 DistanceMmEmpty = Optional.From(distanceEmptyMm),
                 DistanceMmFull = Optional.From(distanceFullMm, -1),
-                CapacityL = Optional.From(capacityL, -1)
+                CapacityL = Optional.From(capacityL, -1),
+                AlertsEnabled = Optional.From(alertsEnabled)
             });
     }
 
@@ -381,6 +386,57 @@ public class AccountConsoleCommand : IConsoleCommand
             {
                 AccountUid = accountId,
                 SensorUid = sensorId
+            });
+    }
+
+    private Command CheckSensorAlarmsSubCommand()
+    {
+        var subCommand = new Command("checksensoralarms", "Check sensor alarms.");
+
+        var accountIdOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(accountIdOption);
+
+        var sensorIdOption = new Option<Guid>(new[] { "-s", "--si", "--sensorid" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(sensorIdOption);
+
+        subCommand.SetHandler(
+            CheckSensorAlarms,
+            accountIdOption, sensorIdOption);
+
+        return subCommand;
+    }
+
+    private async Task CheckSensorAlarms(Guid accountId, Guid sensorId)
+    {
+        await _mediator.Send(
+            new CheckAccountSensorAlarmsCommand
+            {
+                AccountUid = accountId,
+                SensorUid = sensorId
+            });
+    }
+
+    private Command CheckAllSensorAlarmsSubCommand()
+    {
+        var subCommand = new Command("checkallsensoralarms", "Check all sensor alarms.");
+
+        subCommand.SetHandler(
+            CheckAllSensorAlarms);
+
+        return subCommand;
+    }
+
+    private async Task CheckAllSensorAlarms()
+    {
+        await _mediator.Send(
+            new CheckAllAccountSensorAlarmsCommand
+            {
             });
     }
 
