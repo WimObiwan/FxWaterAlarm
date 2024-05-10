@@ -37,10 +37,17 @@ public class CheckAllAccountSensorAlarmsCommandHandler : CheckAccountSensorAlarm
         
         await foreach (var accountSensor in accountSensors.AsAsyncEnumerable().WithCancellation(cancellationToken))
         {
-            _logger.LogInformation("Handling {Account} {AccountSensorName} {sensor}", 
-                accountSensor.Account.Email, accountSensor.Name, accountSensor.Sensor.DevEui);
-            
-            await CheckAccountSensorAlarms(accountSensor, cancellationToken);
+            try
+            {
+                _logger.LogInformation("Handling {Account} {AccountSensorName} {sensor}", 
+                    accountSensor.Account.Email, accountSensor.Name, accountSensor.Sensor.DevEui);
+                
+                await CheckAccountSensorAlarms(accountSensor, cancellationToken);
+            }
+            catch (Exception x)
+            {
+                _logger.LogError(x, "CheckAccountSensorAlarms failed for account {Account}", accountSensor.Account.Email);
+            }
         }
     }
 }

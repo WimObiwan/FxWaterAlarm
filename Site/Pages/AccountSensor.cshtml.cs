@@ -214,7 +214,8 @@ public class AccountSensor : PageModel
         [FromForm] string? sensorName,
         [FromForm] int? distanceMmFull,
         [FromForm] int? distanceMmEmpty,
-        [FromForm] int? capacityL)
+        [FromForm] int? capacityL,
+        [FromForm] bool? alertsEnabled)
     {
         SaveResultEnum result = SaveResultEnum.Error;
         if (page == PageTypeEnum.Settings)
@@ -260,7 +261,8 @@ public class AccountSensor : PageModel
                             CapacityL = new Optional<int?>(true, capacityL),
                             DistanceMmFull = new Optional<int?>(true, distanceMmFull),
                             DistanceMmEmpty = new Optional<int?>(true, distanceMmEmpty),
-                            Name = Optional.From(sensorName)
+                            Name = Optional.From(sensorName),
+                            AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false)
                         });
                         result = SaveResultEnum.Saved;
                     }

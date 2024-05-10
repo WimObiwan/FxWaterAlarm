@@ -46,6 +46,10 @@
         <value>Capacity</value>
         <comment>Capacity</comment>
     </data>
+    <data name="Alerts enabled" xml:space="preserve">
+        <value>Alerts enabled</value>
+        <comment>Alerts enabled</comment>
+    </data>
     <data name="Send login link" xml:space="preserve">
         <value>Send login link</value>
         <comment>Send login link</comment>

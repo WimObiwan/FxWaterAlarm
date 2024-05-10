@@ -118,6 +118,19 @@
                     </tr>
                     <tr>
                         <td>
+                            @Loc["Alerts enabled"] <span class="badge bg-warning">beta</span>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input" 
+                                        name="alertsEnabled"
+                                        value="true"
+                                        @(Model.AccountSensor.AlertsEnabled ? "checked" : "")/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                         </td>
                         <td>
                             <button type="submit" class="btn btn-primary mb-3">@Loc["Submit changes"]</button>

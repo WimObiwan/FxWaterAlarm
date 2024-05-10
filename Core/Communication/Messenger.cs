@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
-using Core.Entities;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -10,8 +10,10 @@ namespace Core.Communication;
 public class MessengerOptions
 {
     public const string Location = "Messenger";
-        
+
+    public string? OverruleAlertDestination { get; init; }
     public required string Sender { get; init; }
+    public required string? Bcc { get; init; }
     public required string SmtpServer { get; init; }
     public required string SmtpUsername { get; init; }
     public required string SmtpPassword { get; init; }
@@ -20,7 +22,7 @@ public class MessengerOptions
 public interface IMessenger
 {
     Task SendAuthenticationMailAsync(string emailAddress, string url, string code);
-    Task SendAlertMailAsync(string emailAddress, string url, string? accountSensorName, string alertMessage);
+    Task SendAlertMailAsync(string emailAddress, string url, string? accountSensorName, string alertMessage, string shortAlertMessage);
 }
 
 public class Messenger : IMessenger
@@ -35,45 +37,70 @@ public class Messenger : IMessenger
         _messengerOptions = messengerOptions.Value;
         _logger = logger;
     }
+
+    private string GetContentPath(string path)
+    {
+        return Path.Join(
+            Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location),
+            "Content",
+            path);
+    }
     
     public async Task SendAuthenticationMailAsync(string emailAddress, string url, string code)
     {
-        string body = await File.ReadAllTextAsync("Content/authentication-mail.html");
-        body = body.Replace("{{LOGINURL}}", url);
-        body = body.Replace("{{LOGINCODE}}", code);
+        string body = await File.ReadAllTextAsync(GetContentPath("authentication-mail.html"));
+        body = body
+            .Replace("{{LOGINURL}}", url)
+            .Replace("{{LOGINCODE}}", code);
 
         LinkedResource[] linkedResources =
         {
-            new LinkedResource("Content/images/wateralarm.png")
+            new LinkedResource(GetContentPath("images/wateralarm.png"))
                 { ContentId = "images-wateralarm.png",  ContentType = new ContentType("image/png") },
-            new LinkedResource("Content/images/check-icon.png")
+            new LinkedResource(GetContentPath("images/check-icon.png"))
                 { ContentId = "images-check-icon.png",  ContentType = new ContentType("image/png") },
-            new LinkedResource("Content/images/Beefree-logo.png")
+            new LinkedResource(GetContentPath("images/Beefree-logo.png"))
                 { ContentId = "images-Beefree-logo.png",  ContentType = new ContentType("image/png") }
         };
 
         await SendMailAsync(emailAddress, "WaterAlarm.be e-mail verificatie", body, linkedResources);
     }
 
-    public async Task SendAlertMailAsync(string emailAddress, string url, string? accountSensorName, string alertMessage)
+    public async Task SendAlertMailAsync(string emailAddress, string url, string? accountSensorName, string alertMessage, string shortAlertMessage)
     {
-        string body = await File.ReadAllTextAsync("Content/alert-mail.html");
-        body = body.Replace("{{URL}}", url);
-        body = body.Replace("{{ACCOUNTSENSORNAME}}", accountSensorName);
-        body = body.Replace("{{ALERTMESSAGE}}", alertMessage);
+        string subject = "WaterAlarm.be melding - {{ACCOUNTSENSORNAME}} - {{SHORTALERTMESSAGE}}";
+        string body = await File.ReadAllTextAsync(GetContentPath("alert-mail.html"));
+
+        body = body
+            .Replace("{{URL}}", url)
+            .Replace("{{ACCOUNTSENSORNAME}}", accountSensorName)
+            .Replace("{{ALERTMESSAGE}}", alertMessage);
+        subject = subject
+            .Replace("{{ACCOUNTSENSORNAME}}", accountSensorName)
+            .Replace("{{SHORTALERTMESSAGE}}", shortAlertMessage);
 
         LinkedResource[] linkedResources =
         {
-            new LinkedResource("Content/images/wateralarm.png")
+            new LinkedResource(GetContentPath("images/wateralarm.png"))
                 { ContentId = "images-wateralarm.png",  ContentType = new ContentType("image/png") },
-            new LinkedResource("Content/images/check-icon.png")
-                { ContentId = "images-check-icon.png",  ContentType = new ContentType("image/png") },
-            new LinkedResource("Content/images/Beefree-logo.png")
+            new LinkedResource(GetContentPath("images/warning.png"))
+                { ContentId = "images-warning-icon.png",  ContentType = new ContentType("image/png") },
+            new LinkedResource(GetContentPath("images/Beefree-logo.png"))
                 { ContentId = "images-Beefree-logo.png",  ContentType = new ContentType("image/png") }
         };
 
-        emailAddress = "wim@obiwan.be";
-        await SendMailAsync(emailAddress, "WaterAlarm.be melding", body, linkedResources);
+        string emailAddressToUse;
+        if (_messengerOptions.OverruleAlertDestination is {} overruleDestination && !string.IsNullOrEmpty(overruleDestination))
+        {
+            _logger.LogWarning("Mail alert to real address {emailAddress} overruled by {overruleDestination}", emailAddress, overruleDestination);
+            emailAddressToUse = overruleDestination;
+        }
+        else
+        {
+            emailAddressToUse = emailAddress;
+        }
+
+        await SendMailAsync(emailAddressToUse, subject, body, linkedResources);
     }
 
     private async Task SendMailAsync(string emailAddress, string subject, string body, IList<LinkedResource> linkedResources)
@@ -96,8 +123,10 @@ public class Messenger : IMessenger
         };
 
         message.To.Add(new MailAddress(emailAddress));
-        // TODO: To be removed, for troubleshooting 
-        message.Bcc.Add("info@wateralarm.be");
+
+        _logger.LogInformation("Using Bcc {bcc}", _messengerOptions.Bcc);
+        if (_messengerOptions.Bcc is {} bcc)
+            message.Bcc.Add(bcc);
 
         AlternateView view = AlternateView.CreateAlternateViewFromString(body, null, MediaTypeNames.Text.Html);
 

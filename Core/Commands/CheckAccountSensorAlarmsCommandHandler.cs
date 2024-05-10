@@ -81,18 +81,19 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         if (DateTime.UtcNow - measurementEx.Timestamp > thresholdData)
             await SendAlert(AlertType.Data, measurementEx.AccountSensor, measurementEx.Timestamp, thresholdData);
 
-        const double thresholdBatteryPrc = 15.0;
-        if (measurementEx.BatteryPrc < thresholdBatteryPrc)
-            await SendAlert(AlertType.Battery, measurementEx.AccountSensor, measurementEx.BatteryPrc, thresholdBatteryPrc);
+        // const double thresholdBatteryPrc = 15.0;
+        // if (measurementEx.BatteryPrc < thresholdBatteryPrc)
+        //     await SendAlert(AlertType.Battery, measurementEx.AccountSensor, measurementEx.BatteryPrc, thresholdBatteryPrc);
 
-        const double thresholdLevelFractionLow1 = 0.15;
+        // const double thresholdLevelFractionLow1 = 0.15;
         const double thresholdLevelFractionLow2 = 0.25;
         //const double thresholdLevelFractionHigh = 1.00;
         if (measurementEx.Distance.LevelFraction is {} levelFraction)
         {
-            if (levelFraction <= thresholdLevelFractionLow1)
-                await SendAlert(AlertType.LevelFractionLow, measurementEx.AccountSensor, levelFraction * 100.0, thresholdLevelFractionLow1);
-            else if (measurementEx.Distance.LevelFraction <= thresholdLevelFractionLow2)
+            // if (levelFraction <= thresholdLevelFractionLow1)
+            //     await SendAlert(AlertType.LevelFractionLow, measurementEx.AccountSensor, levelFraction * 100.0, thresholdLevelFractionLow1);
+            // else
+            if (measurementEx.Distance.LevelFraction <= thresholdLevelFractionLow2)
                 await SendAlert(AlertType.LevelFractionLow, measurementEx.AccountSensor, levelFraction * 100.0, thresholdLevelFractionLow2);
             // else if (measurementEx.Distance.LevelFraction >= thresholdLevelFractionHigh)
             //     await SendAlert(AlertType.LevelFractionHigh, measurementEx.AccountSensor, levelFraction * 100.0, thresholdLevelFractionHigh);
@@ -106,17 +107,18 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         var culture = CultureInfo.GetCultureInfo("nl-BE");
         var dateTimeString = value.ToLocalTime().ToString("f", culture);
 
-        string message;
+        string message, shortMessage;
         switch (alertType)
         {
             case AlertType.Data:
                 message = $"Er werden geen gegevens ontvangen van uw sensor sinds <strong>{dateTimeString}</strong>";
+                shortMessage = "Geen gegevens ontvangen";
                 break;
             default:
                 throw new InvalidOperationException();
         }
 
-        await SendAlert(accountSensor, message);
+        await SendAlert(accountSensor, message, shortMessage);
     }
 
     private async Task SendAlert(AlertType alertType, AccountSensor accountSensor, double value, double? thresholdValue = null)
@@ -124,36 +126,40 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         var culture = CultureInfo.GetCultureInfo("nl-BE");
         var valueString = value.ToString("0", culture);
 
-        string message;
+        string message, shortMessage;
         switch (alertType)
         {
             case AlertType.Battery:
                 message = $"De geschatte batterij-capaciteit is gezakt naar <strong>{valueString}%</strong>";
+                shortMessage = $"Batterij {valueString}%";
                 break;
             case AlertType.LevelFractionHigh:
                 message = $"Het gemeten niveau van de sensor is gestegen naar <strong>{valueString}%</strong>";
+                shortMessage = $"Niveau {valueString}%";
                 break;
             case AlertType.LevelFractionLow:
                 message = $"Het gemeten niveau van de sensor is gezakt naar <strong>{valueString}%</strong>";
+                shortMessage = $"Niveau {valueString}%";
                 break;
             case AlertType.LevelFractionStatus:
                 message = $"Het gemeten niveau van de sensor is <strong>{valueString}%</strong>";
+                shortMessage = $"Niveau {valueString}%";
                 break;
             default:
                 throw new InvalidOperationException();
         }
 
-        await SendAlert(accountSensor, message);
+        await SendAlert(accountSensor, message, shortMessage);
     }
 
-    private async Task SendAlert(AccountSensor accountSensor, string message)
+    private async Task SendAlert(AccountSensor accountSensor, string message, string shortMessage)
     {
         string email = accountSensor.Account.Email;
 
         //TODO
         string url = "https://www.wateralarm.be" + accountSensor.RestPath;
 
-        await _messenger.SendAlertMailAsync(email, url, accountSensor.Name, message);
+        await _messenger.SendAlertMailAsync(email, url, accountSensor.Name, message, shortMessage);
     }
 
     private enum AlertType { Data = 1, Battery = 2, LevelFractionLow = 3, LevelFractionHigh = 4, LevelFractionStatus = 5 }

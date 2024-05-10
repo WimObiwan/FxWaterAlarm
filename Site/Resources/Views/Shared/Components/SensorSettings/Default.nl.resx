@@ -46,6 +46,10 @@
         <value>Capaciteit</value>
         <comment>Capacity</comment>
     </data>
+    <data name="Alerts enabled" xml:space="preserve">
+        <value>Meldingen actief</value>
+        <comment>Alerts enabled</comment>
+    </data>
     <data name="Send login link" xml:space="preserve">
         <value>Login link sturen</value>
         <comment>Send login link</comment>
