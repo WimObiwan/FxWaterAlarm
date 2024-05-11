@@ -44,7 +44,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 ?? throw new Exception("No measurement found");
             
             var measurementEx = new MeasurementEx(measurement, accountSensor);
-            await CheckAccountSensorAlarms(measurementEx, alarms);
+            await CheckAccountSensorAlarms(measurementEx, alarms, cancellationToken);
         }
         else
         {
@@ -53,7 +53,8 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         }
     }
 
-    private async Task CheckAccountSensorAlarms(MeasurementEx measurementEx, IReadOnlyCollection<AccountSensorAlarm> alarms)
+    private async Task CheckAccountSensorAlarms(MeasurementEx measurementEx, IReadOnlyCollection<AccountSensorAlarm> alarms, 
+        CancellationToken cancellationToken)
     {
         foreach (var alarm in alarms)
         {
@@ -128,7 +129,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     _logger.LogInformation("Alarm {Type} {Threshold} is (still) triggered", 
                         alarm.AlarmType, alarm.AlarmThreshold);
 
-                    var sendAlert = await SetAlarmTriggeredIfNeeded(alarm);
+                    var sendAlert = await SetAlarmTriggeredIfNeeded(alarm, cancellationToken);
                     if (sendAlert && sendAlertFunction != null)
                         await sendAlertFunction();
                 }
@@ -137,7 +138,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     _logger.LogInformation("Alarm {Type} {Threshold} is (still) not triggered", 
                         alarm.AlarmType, alarm.AlarmThreshold);
 
-                    await SetAlarmClearedIfNeeded(alarm);
+                    await SetAlarmClearedIfNeeded(alarm, cancellationToken);
                 }
             }
         }
@@ -207,30 +208,35 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
     {
         await _dbContext.Entry(accountSensor).Collection(a => a.Alarms).LoadAsync(cancellationToken);
         return accountSensor.Alarms;
-        // var alerts = new AccountSensorAlarm[]
-        // {
-        //     new()
-        //     {
-        //         AlarmType = AccountSensorAlarmType.Data,
-        //         AlarmThreshold = 24.5
-        //     },
-        //     new()
-        //     {
-        //         AlarmType = AccountSensorAlarmType.LevelFractionLow,
-        //         AlarmThreshold = 25.0
-        //     }
-        // };
-
-        // return Task.FromResult<IList<AccountSensorAlarm>>(alerts);
     }
 
-    private Task<bool> SetAlarmTriggeredIfNeeded(AccountSensorAlarm alarm)
+    private async Task<bool> SetAlarmTriggeredIfNeeded(AccountSensorAlarm alarm, CancellationToken cancellationToken)
     {
-        return Task.FromResult(true);
+        if (alarm.IsCurrentlyTriggered)
+        {
+            _logger.LogInformation("Alarm is triggered since {LastTriggered}", alarm.LastTriggered);
+            return false;
+        }
+
+        _logger.LogInformation("Alarm is now triggered");
+        alarm.LastTriggered = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return true;
     }
 
-    private Task<bool> SetAlarmClearedIfNeeded(AccountSensorAlarm alarm)
+    private async Task<bool> SetAlarmClearedIfNeeded(AccountSensorAlarm alarm, CancellationToken cancellationToken)
     {
-        return Task.FromResult(true);
+        if (alarm.IsCurrentlyCleared)
+        {
+            _logger.LogInformation("Alarm is cleared since {LastTriggered}", alarm.LastCleared);
+            return false;
+        }
+
+        _logger.LogInformation("Alarm is now cleared");
+        alarm.LastCleared = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return true;
     }
 }
