@@ -4,11 +4,11 @@ public readonly record struct Optional<T>(bool Specified, T? Value);
 
 public static class Optional
 {
-    public static Optional<bool> From(bool? value)
+    public static Optional<T> From<T>(T? value) where T: struct
     {
         if (!value.HasValue)
-            return new Optional<bool>(false, default);
-        return new Optional<bool>(true, value.Value);
+            return new Optional<T>(false, default);
+        return new Optional<T>(true, value.Value);
     }
 
     public static Optional<T> From<T>(T? value, T nullValue)
@@ -23,10 +23,5 @@ public static class Optional
     public static Optional<string> From(string? value)
     {
         return From(value, "");
-    }
-
-    public static Optional<T?> From<T>(T? value) where T : struct
-    {
-        return From(value, default(T));
     }
 }

@@ -33,8 +33,8 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
                 .Where(a => a.Uid == request.AccountUid)
                 .SelectMany(a => a.AccountSensors)
                 .SingleOrDefaultAsync(as2 => as2.Sensor.Uid == request.SensorUid, cancellationToken)
-            ?? throw new AccountNotFoundException("The account or sensor cannot be found.")
-                { AccountUid = request.AccountUid };
+            ?? throw new AccountSensorNotFoundException("The account or sensor cannot be found.")
+                { AccountUid = request.AccountUid, SensorUid = request.SensorUid };
 
         if (request.Name is { Specified: true })
             accountSensor.Name = request.Name.Value;

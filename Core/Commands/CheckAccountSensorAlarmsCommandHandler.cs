@@ -19,7 +19,7 @@ public class CheckAccountSensorAlarmsCommandHandler : CheckAccountSensorAlarmsCo
 
     public CheckAccountSensorAlarmsCommandHandler(WaterAlarmDbContext dbContext, IMeasurementRepository measurementRepository, IMessenger messenger, 
         ILogger<CheckAccountSensorAlarmsCommandHandler> logger)
-        : base(measurementRepository, messenger, logger)
+        : base(dbContext, measurementRepository, messenger, logger)
     {
         _dbContext = dbContext;
     }

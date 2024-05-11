@@ -19,6 +19,7 @@ public class WaterAlarmDbContext : DbContext
         m.ApplyConfiguration(new AccountEntityTypeConfiguration());
         m.ApplyConfiguration(new SensorEntityTypeConfiguration());
         m.ApplyConfiguration(new AccountSensorEntityTypeConfiguration());
+        m.ApplyConfiguration(new AccountSensorAlarmEntityTypeConfiguration());
 
         base.OnModelCreating(m);
     }

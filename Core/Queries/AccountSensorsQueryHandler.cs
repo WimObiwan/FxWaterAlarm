@@ -8,7 +8,7 @@ namespace Core.Queries;
 
 public record AccountSensorsQuery : IRequest<IEnumerable<AccountSensor>>
 {
-    public required Guid Uid { get; init; }
+    public required Guid AccountUid { get; init; }
 }
 
 public class AccountSensorsQueryHandler : IRequestHandler<AccountSensorsQuery, IEnumerable<AccountSensor>>
@@ -25,12 +25,12 @@ public class AccountSensorsQueryHandler : IRequestHandler<AccountSensorsQuery, I
     {
         var accountSensors =
             await _dbContext.Accounts
-                .Where(a => a.Uid == request.Uid)
+                .Where(a => a.Uid == request.AccountUid)
                 .Include(a => a.AccountSensors)
                 .ThenInclude(as2 => as2.Sensor)
                 .SingleOrDefaultAsync(cancellationToken)
             ?? throw new AccountNotFoundException("The account cannot be found.")
-                { AccountUid = request.Uid };
+                { AccountUid = request.AccountUid };
         return accountSensors.AccountSensors;
     }
 }

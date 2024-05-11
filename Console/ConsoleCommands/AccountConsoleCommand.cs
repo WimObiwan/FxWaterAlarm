@@ -32,6 +32,9 @@ public class AccountConsoleCommand : IConsoleCommand
         command.AddCommand(AddSensorSubCommand());
         command.AddCommand(UpdateSensorSubCommand());
         command.AddCommand(RemoveSensorSubCommand());
+        command.AddCommand(ListSensorAlarmsSubCommand());
+        command.AddCommand(AddDefaultSensorAlarmsSubCommand());
+        command.AddCommand(UpdateSensorAlarmSubCommand());
         command.AddCommand(CheckSensorAlarmsSubCommand());
         command.AddCommand(CheckAllSensorAlarmsSubCommand());
         return command;
@@ -263,7 +266,7 @@ public class AccountConsoleCommand : IConsoleCommand
         var accountSensors = await _mediator.Send(
             new AccountSensorsQuery
             {
-                Uid = uid
+                AccountUid = uid
             });
 
         foreach (var accountSensor in accountSensors)
@@ -349,7 +352,7 @@ public class AccountConsoleCommand : IConsoleCommand
                 AccountUid = accountId,
                 SensorUid = sensorId,
                 Name = Optional.From(name),
-                DistanceMmEmpty = Optional.From(distanceEmptyMm),
+                DistanceMmEmpty = Optional.From(distanceEmptyMm, -1),
                 DistanceMmFull = Optional.From(distanceFullMm, -1),
                 CapacityL = Optional.From(capacityL, -1),
                 AlertsEnabled = Optional.From(alertsEnabled)
@@ -386,6 +389,126 @@ public class AccountConsoleCommand : IConsoleCommand
             {
                 AccountUid = accountId,
                 SensorUid = sensorId
+            });
+    }
+
+    private Command ListSensorAlarmsSubCommand()
+    {
+        var subCommand = new Command("listsensoralarms", "List sensor alarms.");
+
+        var accountIdOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(accountIdOption);
+
+        var sensorIdOption = new Option<Guid>(new[] { "-s", "--si", "--sensorid" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(sensorIdOption);
+
+        subCommand.SetHandler(
+            ListSensorAlarms,
+            accountIdOption, sensorIdOption);
+
+        return subCommand;
+    }
+
+    private async Task ListSensorAlarms(Guid accountId, Guid sensorId)
+    {
+        var accountSensorAlarms = await _mediator.Send(
+            new AccountSensorAlarmsQuery
+            {
+                AccountUid = accountId,
+                SensorUid = sensorId
+            });
+
+        foreach (var accountSensorAlarm in accountSensorAlarms)
+        {
+            System.Console.WriteLine($"{accountSensorAlarm.Uid} {accountSensorAlarm.AlarmType} {accountSensorAlarm.AlarmThreshold}");
+        }
+    }
+
+    private Command AddDefaultSensorAlarmsSubCommand()
+    {
+        var subCommand = new Command("adddefaultsensoralarms", "List sensor alarms.");
+
+        var accountIdOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(accountIdOption);
+
+        var sensorIdOption = new Option<Guid>(new[] { "-s", "--si", "--sensorid" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(sensorIdOption);
+
+        subCommand.SetHandler(
+            AddDefaultSensorAlarms,
+            accountIdOption, sensorIdOption);
+
+        return subCommand;
+    }
+
+    private async Task AddDefaultSensorAlarms(Guid accountId, Guid sensorId)
+    {
+        await _mediator.Send(
+            new AddDefaultSensorAlarmsCommand
+            {
+                AccountUid = accountId,
+                SensorUid = sensorId
+            });
+    }
+
+    private Command UpdateSensorAlarmSubCommand()
+    {
+        var subCommand = new Command("updatesensoralarm", "Update sensor alarm.");
+
+        var accountIdOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(accountIdOption);
+
+        var sensorIdOption = new Option<Guid>(new[] { "-s", "--si", "--sensorid" }, "Sensor identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(sensorIdOption);
+
+        var alarmIdOption = new Option<Guid>(new[] { "--alarmid" }, "Alarm identifier")
+        {
+            IsRequired = true
+        };
+        subCommand.AddOption(alarmIdOption);
+
+        var alarmTypeOption = new Option<AccountSensorAlarmType?>(new[] { "--alarmtype" }, "Alarm type");
+        subCommand.AddOption(alarmTypeOption);
+
+        var alarmThresholdOption = new Option<double?>(new[] { "--alarmthreshold" }, "Alarm threshold");
+        subCommand.AddOption(alarmThresholdOption);
+
+        subCommand.SetHandler(
+            UpdateSensorAlarm,
+            accountIdOption, sensorIdOption, alarmIdOption, alarmTypeOption, alarmThresholdOption);
+
+        return subCommand;
+    }
+
+    private async Task UpdateSensorAlarm(Guid accountId, Guid sensorId, Guid alarmId, 
+        AccountSensorAlarmType? alarmType, double? alarmThreshold)
+    {
+        await _mediator.Send(
+            new UpdateAccountSensorAlarmCommand
+            {
+                AccountUid = accountId,
+                SensorUid = sensorId,
+                AlarmUid = alarmId,
+                AlarmType = Optional.From<AccountSensorAlarmType>(alarmType),
+                AlarmThreshold = Optional.From(alarmThreshold, -1.0)
             });
     }
 
@@ -439,5 +562,4 @@ public class AccountConsoleCommand : IConsoleCommand
             {
             });
     }
-
 }
