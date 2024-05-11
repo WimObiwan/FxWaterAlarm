@@ -22,6 +22,26 @@ title: Versie Informatie
 > *
 -->
 
+### v0.31
+> 2024-05-12
+> ##### Nieuw
+> * Melding-mails worden niet langer elke nacht gestuurd
+
+### v0.30
+> 2024-05-12
+> ##### Nieuw
+> * Melding-mails met variabele limiet (voorlopig nog niet door de gebruiker aan te passen)
+
+### v0.29
+> 2024-05-10
+> ##### Nieuw
+> * Melding-mails
+
+### v0.28
+> 2024-05-05
+> ##### Nieuw
+> * Sensor informatie voor interne acties
+
 ### v0.27
 > 2024-04-23
 > ##### Nieuw
