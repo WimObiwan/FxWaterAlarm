@@ -34,6 +34,7 @@ public class AccountConsoleCommand : IConsoleCommand
         command.AddCommand(RemoveSensorSubCommand());
         command.AddCommand(ListSensorAlarmsSubCommand());
         command.AddCommand(AddDefaultSensorAlarmsSubCommand());
+        command.AddCommand(AddAllDefaultSensorAlarmsSubCommand());
         command.AddCommand(UpdateSensorAlarmSubCommand());
         command.AddCommand(CheckSensorAlarmsSubCommand());
         command.AddCommand(CheckAllSensorAlarmsSubCommand());
@@ -432,7 +433,7 @@ public class AccountConsoleCommand : IConsoleCommand
 
     private Command AddDefaultSensorAlarmsSubCommand()
     {
-        var subCommand = new Command("adddefaultsensoralarms", "List sensor alarms.");
+        var subCommand = new Command("adddefaultsensoralarms", "Add default sensor alarms.");
 
         var accountIdOption = new Option<Guid>(new[] { "-i", "--ai", "--accountid" }, "Account identifier")
         {
@@ -461,6 +462,22 @@ public class AccountConsoleCommand : IConsoleCommand
                 AccountUid = accountId,
                 SensorUid = sensorId
             });
+    }
+
+    private Command AddAllDefaultSensorAlarmsSubCommand()
+    {
+        var subCommand = new Command("addalldefaultsensoralarms", "Add all default sensor alarms.");
+
+        subCommand.SetHandler(
+            AddAllDefaultSensorAlarms);
+
+        return subCommand;
+    }
+
+    private async Task AddAllDefaultSensorAlarms()
+    {
+        await _mediator.Send(
+            new AddAllDefaultSensorAlarmsCommand());
     }
 
     private Command UpdateSensorAlarmSubCommand()
