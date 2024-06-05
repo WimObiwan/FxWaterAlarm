@@ -25,7 +25,7 @@ title: Versie Informatie
 ### v0.31
 > 2024-05-12
 > ##### Nieuw
-> * Melding-mails worden niet langer elke nacht gestuurd
+> * Melding-mails worden slechts éénmaal gestuurd, en niet langer elke nacht herhaald
 
 ### v0.30
 > 2024-05-12
