@@ -13,17 +13,24 @@ using Svrooij.PowerShell.DependencyInjection.Logging;
 // It has to be a public class with `PsStartup` as base class
 public class Startup : PsStartup
 {
-    // Override the `ConfigureServices` method to register your own dependencies
-    public override void ConfigureServices(IServiceCollection services)
+    private IConfigurationRoot configurationRoot;
+
+    public Startup()
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile("appsettings.Local.json", true, false)
             .AddEnvironmentVariables();
-        IConfigurationRoot configuration = builder.Build();
 
-        services.AddWaterAlarmCore(configuration, typeof(Startup).Assembly);
+        configurationRoot = builder.Build();
+    }
+
+    // Override the `ConfigureServices` method to register your own dependencies
+    public override void ConfigureServices(IServiceCollection services)
+    {
+
+        services.AddWaterAlarmCore(configurationRoot, typeof(Startup).Assembly);
     }
 
     // Override the `ConfigurePowerShellLogging` method to change the default logging configuration.
@@ -31,10 +38,12 @@ public class Startup : PsStartup
     {
         return builder =>
         {
+            // builder.AddConfiguration(configurationRoot.GetSection("Logging"));
+
             builder.DefaultLevel = LogLevel.Information;
-            builder.LogLevel["Svrooij.PowerShell.DependencyInjection.Sample.TestSampleCmdletCommand"] = LogLevel.Debug;
+            builder.LogLevel["Microsoft"] = LogLevel.Warning;
             builder.IncludeCategory = true;
-            builder.StripNamespace = true;
+            //builder.StripNamespace = true;
         };
     }
 }
