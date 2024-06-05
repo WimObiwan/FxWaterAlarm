@@ -56,9 +56,13 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
     private async Task CheckAccountSensorAlarms(MeasurementEx measurementEx, IReadOnlyCollection<AccountSensorAlarm> alarms, 
         CancellationToken cancellationToken)
     {
+        const double AlarmThresholdHisteresisBattery = 5.0;
+        const double AlarmThresholdHisteresisLevelFraction = 5.0;
+
         foreach (var alarm in alarms)
         {
-            bool? isTriggered = null;
+            bool isTriggered = false;
+            bool isCleared = false;
             Func<Task>? sendAlertFunction = null;
             switch (alarm.AlarmType)
             {
@@ -72,6 +76,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     {
                         var thresholdData = TimeSpan.FromHours(alarmThreshold);
                         isTriggered = DateTime.UtcNow - measurementEx.Timestamp > thresholdData;
+                        isCleared = !isTriggered;
                         sendAlertFunction = () => SendAlert(AccountSensorAlarmType.Data, measurementEx.AccountSensor, measurementEx.Timestamp, thresholdData);
                     }
                     break;
@@ -84,7 +89,8 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     }
                     else
                     {
-                        isTriggered = measurementEx.BatteryPrc < alarmThreshold;
+                        isTriggered = measurementEx.BatteryPrc <= alarmThreshold;
+                        isCleared = measurementEx.BatteryPrc > alarmThreshold + AlarmThresholdHisteresisBattery;
                         sendAlertFunction = () => SendAlert(AccountSensorAlarmType.Battery, measurementEx.AccountSensor, measurementEx.BatteryPrc, alarmThreshold);
                     }
                     break;
@@ -103,17 +109,27 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     {
                         levelFraction *= 100.0;
                         isTriggered = levelFraction <= alarmThreshold;
+                        isCleared = levelFraction > alarmThreshold + AlarmThresholdHisteresisLevelFraction;
                         sendAlertFunction = () => SendAlert(AccountSensorAlarmType.LevelFractionLow, measurementEx.AccountSensor, levelFraction, alarmThreshold);
                     }
                     break;
                 }
                 case AccountSensorAlarmType.LevelFractionHigh:
                 {
-                    if (measurementEx.Distance.LevelFraction is {} levelFraction)
+                    if (!(measurementEx.Distance.LevelFraction is {} levelFraction))
+                    {
+                        _logger.LogWarning("No LevelFraction");
+                    }
+                    else if (!(alarm.AlarmThreshold is {} alarmThreshold))
+                    {
+                        _logger.LogWarning("No threshold configured for alarm {AlarmType}", alarm.AlarmType);
+                    }
+                    else
                     {
                         levelFraction *= 100.0;
                         isTriggered = levelFraction >= alarm.AlarmThreshold;
-                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.LevelFractionHigh, measurementEx.AccountSensor, levelFraction, alarm.AlarmThreshold);
+                        isCleared = levelFraction < alarmThreshold - AlarmThresholdHisteresisLevelFraction;
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.LevelFractionHigh, measurementEx.AccountSensor, levelFraction, alarmThreshold);
                     }
                     break;
                 }
@@ -122,29 +138,29 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     break;
             }
 
-            if (isTriggered.HasValue)
+            if (isTriggered)
             {
-                if (isTriggered.Value)
-                {
-                    _logger.LogInformation("Alarm {Type} {Threshold} is (still) triggered", 
-                        alarm.AlarmType, alarm.AlarmThreshold);
+                _logger.LogInformation("Alarm {Type} {Threshold} is (still) triggered", 
+                    alarm.AlarmType, alarm.AlarmThreshold);
 
-                    var sendAlert = await SetAlarmTriggeredIfNeeded(alarm, cancellationToken);
-                    if (sendAlert && sendAlertFunction != null)
-                        await sendAlertFunction();
-                }
-                else
-                {
-                    _logger.LogInformation("Alarm {Type} {Threshold} is (still) not triggered", 
-                        alarm.AlarmType, alarm.AlarmThreshold);
+                var sendAlert = await SetAlarmTriggeredIfNeeded(alarm, cancellationToken);
+                if (sendAlert && sendAlertFunction != null)
+                    await sendAlertFunction();
 
-                    await SetAlarmClearedIfNeeded(alarm, cancellationToken);
-                }
+                if (isCleared)
+                    _logger.LogWarning("Triggered and Cleared should never be both true.  Only using Triggered.");
+            }
+            else if (isCleared)
+            {
+                _logger.LogInformation("Alarm {Type} {Threshold} is (still) not triggered", 
+                    alarm.AlarmType, alarm.AlarmThreshold);
+
+                await SetAlarmClearedIfNeeded(alarm, cancellationToken);
             }
         }
     }
 
-    private async Task SendAlert(AccountSensorAlarmType alertType, AccountSensor accountSensor, DateTime value, TimeSpan? thresholdValue = null)
+    private async Task SendAlert(AccountSensorAlarmType alertType, AccountSensor accountSensor, DateTime value, TimeSpan thresholdValue)
     {
         var culture = CultureInfo.GetCultureInfo("nl-BE");
         var dateTimeString = value.ToLocalTime().ToString("f", culture);
@@ -154,7 +170,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         {
             case AccountSensorAlarmType.Data:
                 message = $"Er werden geen gegevens ontvangen van uw sensor sinds <strong>{dateTimeString}</strong>";
-                shortMessage = "Geen gegevens ontvangen";
+                shortMessage = $"Geen gegevens ontvangen sinds {dateTimeString}";
                 break;
             default:
                 throw new InvalidOperationException();
@@ -163,7 +179,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         await SendAlert(accountSensor, message, shortMessage);
     }
 
-    private async Task SendAlert(AccountSensorAlarmType alertType, AccountSensor accountSensor, double value, double? thresholdValue = null)
+    private async Task SendAlert(AccountSensorAlarmType alertType, AccountSensor accountSensor, double value, double thresholdValue)
     {
         var culture = CultureInfo.GetCultureInfo("nl-BE");
         var valueString = value.ToString("0", culture);
@@ -172,21 +188,21 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         switch (alertType)
         {
             case AccountSensorAlarmType.Battery:
-                message = $"De geschatte batterij-capaciteit is gezakt naar <strong>{valueString}%</strong>";
+                message = $"De geschatte batterij-capaciteit is gezakt onder <strong>{thresholdValue}%</strong>";
                 shortMessage = $"Batterij {valueString}%";
                 break;
             case AccountSensorAlarmType.LevelFractionHigh:
-                message = $"Het gemeten niveau van de sensor is gestegen naar <strong>{valueString}%</strong>";
+                message = $"Het gemeten niveau van de sensor is gestegen boven <strong>{thresholdValue}%</strong>";
                 shortMessage = $"Niveau {valueString}%";
                 break;
             case AccountSensorAlarmType.LevelFractionLow:
-                message = $"Het gemeten niveau van de sensor is gezakt naar <strong>{valueString}%</strong>";
+                message = $"Het gemeten niveau van de sensor is gezakt onder <strong>{thresholdValue}%</strong>";
                 shortMessage = $"Niveau {valueString}%";
                 break;
-            case AccountSensorAlarmType.LevelFractionStatus:
-                message = $"Het gemeten niveau van de sensor is <strong>{valueString}%</strong>";
-                shortMessage = $"Niveau {valueString}%";
-                break;
+            // case AccountSensorAlarmType.LevelFractionStatus:
+            //     message = $"Het gemeten niveau van de sensor is <strong>{valueString}%</strong>";
+            //     shortMessage = $"Niveau {valueString}%";
+            //     break;
             default:
                 throw new InvalidOperationException();
         }
