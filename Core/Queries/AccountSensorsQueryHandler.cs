@@ -27,7 +27,7 @@ public class AccountSensorsQueryHandler : IRequestHandler<AccountSensorsQuery, I
             await _dbContext.Accounts
                 .Where(a => a.Uid == request.AccountUid)
                 .Include(a => a.AccountSensors)
-                .ThenInclude(as2 => as2.Sensor)
+                .ThenInclude(@as => @as.Sensor)
                 .SingleOrDefaultAsync(cancellationToken)
             ?? throw new AccountNotFoundException("The account cannot be found.")
                 { AccountUid = request.AccountUid };
