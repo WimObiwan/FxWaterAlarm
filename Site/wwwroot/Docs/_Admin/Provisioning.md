@@ -2,14 +2,39 @@
 
 ``` powershell
 $email = 'email@domain.tld'
+$devEui = 'xxxx'
+$accountSensorDetails = @{
+    Name = 'Regenput-LoRa',
+    DistanceEmptyMm = 2700,
+    DistanceFullMm = 700,
+    CapacityL = 10000,
+    AlertsEnabled = $true
+}
 
-$account = New-WaAccount -Email $email
-$account.AccountId
-$account.Link
+$account = Get-WAAcount -Email $email
+if (-not $account)
+{
+    $account = New-WAAccount -Email $email
+    Reset-WAAccountLink $account
+    $account = Get-WAAccount $account.Id
+}
+Write-Warning "Using Account: Id=$($account.Id), Link=$($account.Link)"
 
-Set-WaAccount -AccountId $accoutId -Email $email -Link $link
+$sensor = Get-WASensor -DevEui $devEui
+if (-not $sensor)
+{
+    $sensor = New-WASensor -DevEui $devEui
+    Reset-WASensorLink $sensor
+    $sensorw = Get-WASensor $sensor.Id
+}
+Write-Warning "Using Sensor: Id=$($sensor.Id), Link=$($sensor.Link)"
 
-Get-WaAccount -Email $email
-Get-WaAccount -AccountId $accountId
+$accountSensor = Get-WAAccountSensor -Account $account | ?{ $_.SensorId -eq $sensor.Id }
+if (-not $accountSensor)
+{
+    Add-WAAccountSensor -Account $account -Sensor $sensor
+}
 
-$ai = . Console --email $email --format json
+Add-WAAccountSensorDefaultAlarms -Account $account -Sensor $sensor
+Set-WAAccountSensor -Account $account -Sensor $sensor @accountSensorDetails
+```

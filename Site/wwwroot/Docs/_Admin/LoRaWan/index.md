@@ -1,3 +1,4 @@
 # LoRaWan
 
-* [Gateway onboarding](Gateway_onboarding.md)
+* [Gateway Onboarding](Gateway_Onboarding.md)
+* [LDDS75 Onboarding](LDDS75_Onboarding.md)
