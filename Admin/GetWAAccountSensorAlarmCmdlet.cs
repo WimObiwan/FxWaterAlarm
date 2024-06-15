@@ -24,13 +24,25 @@ public class GetWAAccountSensorAlarmCmdlet : DependencyCmdlet<Startup>
         Position = 0,
         Mandatory = true,
         ParameterSetName = "AccountIdAndSensorId")]
-    public Guid AccountUid { get; set; }
+    public Guid AccountId { get; set; }
 
     [Parameter(
         Position = 1,
         Mandatory = true,
         ParameterSetName = "AccountIdAndSensorId")]
-    public Guid SensorUid { get; set; }
+    public Guid SensorId { get; set; }
+
+    [Parameter(
+        Position = 0,
+        Mandatory = true,
+        ParameterSetName = "AccountAndSensor")]
+    public Account Account { get; set; } = null!;
+
+    [Parameter(
+        Position = 1,
+        Mandatory = true,
+        ParameterSetName = "AccountAndSensor")]
+    public Sensor Sensor { get; set; } = null!;
 
     [Parameter(
         Position = 1,
@@ -43,18 +55,22 @@ public class GetWAAccountSensorAlarmCmdlet : DependencyCmdlet<Startup>
     {
         if (ParameterSetName == "AccountIdAndSensorId")
         {
-            await ProcessSingle(AccountUid, SensorUid);
+            await ProcessSingleAsync(AccountId, SensorId);
+        }
+        else if (ParameterSetName == "AccountAndSensor")
+        {
+            await ProcessSingleAsync(Account.Id, Sensor.Id);
         }
         else if (ParameterSetName == "AccountSensor")
         {
             foreach (var accountSensor in AccountSensor)
-                await ProcessSingle(accountSensor.AccountUid, accountSensor.SensorUid);
+                await ProcessSingleAsync(accountSensor.AccountId, accountSensor.SensorId);
         } 
         else
             throw new InvalidOperationException();
     }
 
-    private async Task ProcessSingle(Guid accountUid, Guid sensorUid)
+    private async Task ProcessSingleAsync(Guid accountUid, Guid sensorUid)
     {
 
         var accountSensorAlarms = await _mediator.Send(new AccountSensorAlarmsQuery()

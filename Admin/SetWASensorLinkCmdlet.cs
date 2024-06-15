@@ -16,8 +16,15 @@ public class NewWASensorLinkCmdlet : DependencyCmdlet<Startup>
 
     [Parameter(
         Position = 0,
-        Mandatory = true)]
-    public Guid SensorUid { get; set; }
+        Mandatory = true,
+        ParameterSetName = "SensorId")]
+    public Guid SensorId { get; set; }
+
+    [Parameter(
+        Position = 0,
+        Mandatory = true,
+        ParameterSetName = "Sensor")]
+    public Account Sensor { get; set; } = null!;
 
     [Parameter(
         Position = 1)]
@@ -25,8 +32,22 @@ public class NewWASensorLinkCmdlet : DependencyCmdlet<Startup>
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
+        if (ParameterSetName == "SensorId")
+        {
+            await ProcessSingleAsync(SensorId);
+        }
+        else if (ParameterSetName == "Sensor")
+        {
+            await ProcessSingleAsync(Sensor.Id);
+        }
+        else
+            throw new InvalidOperationException();
+    }
+
+    private async Task ProcessSingleAsync(Guid sensorId)
+    {
         await _mediator.Send(new RegenerateSensorLinkCommand() { 
-            SensorUid = SensorUid,
+            SensorUid = sensorId,
             Link = Link
         });
     }

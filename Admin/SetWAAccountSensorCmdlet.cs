@@ -25,13 +25,25 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         Position = 0,
         Mandatory = true,
         ParameterSetName = "AccountIdAndSensorId")]
-    public Guid AccountUid { get; set; }
+    public Guid AccountId { get; set; }
 
     [Parameter(
         Position = 1,
         Mandatory = true,
         ParameterSetName = "AccountIdAndSensorId")]
-    public Guid SensorUid { get; set; }
+    public Guid SensorId { get; set; }
+
+    [Parameter(
+        Position = 0,
+        Mandatory = true,
+        ParameterSetName = "AccountAndSensor")]
+    public Account Account { get; set; } = null!;
+
+    [Parameter(
+        Position = 1,
+        Mandatory = true,
+        ParameterSetName = "AccountAndSensor")]
+    public Sensor Sensor { get; set; } = null!;
 
     [Parameter(
         Position = 1,
@@ -61,13 +73,18 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
 
         if (ParameterSetName == "AccountIdAndSensorId")
         {
-            accountUid = AccountUid;
-            sensorUid = SensorUid;
+            accountUid = AccountId;
+            sensorUid = SensorId;
+        }
+        else if (ParameterSetName == "AccountAndSensor")
+        {
+            accountUid = Account.Id;
+            sensorUid = Sensor.Id;
         }
         else if (ParameterSetName == "AccountSensor")
         {
-            accountUid = AccountSensor.AccountUid;
-            sensorUid = AccountSensor.SensorUid;
+            accountUid = AccountSensor.AccountId;
+            sensorUid = AccountSensor.SensorId;
         } 
         else
             throw new InvalidOperationException();

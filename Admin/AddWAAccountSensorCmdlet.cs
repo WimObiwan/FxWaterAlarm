@@ -17,19 +17,47 @@ public class AddWAAccountSensorCmdlet : DependencyCmdlet<Startup>
 
     [Parameter(
         Position = 0,
-        Mandatory = true)]
-    public Guid AccountUid { get; set; }
+        Mandatory = true,
+        ParameterSetName = "AccountIdAndSensorId")]
+    public Guid AccountId { get; set; }
 
     [Parameter(
         Position = 1,
-        Mandatory = true)]
-    public Guid SensorUid { get; set; }
+        Mandatory = true,
+        ParameterSetName = "AccountIdAndSensorId")]
+    public Guid SensorId { get; set; }
+
+    [Parameter(
+        Position = 0,
+        Mandatory = true,
+        ParameterSetName = "AccountAndSensor")]
+    public Account Account { get; set; } = null!;
+
+    [Parameter(
+        Position = 1,
+        Mandatory = true,
+        ParameterSetName = "AccountAndSensor")]
+    public Sensor Sensor { get; set; } = null!;
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
+        if (ParameterSetName == "AccountIdAndSensorId")
+        {
+            await ProcessSingle(AccountId, SensorId);
+        }
+        else if (ParameterSetName == "AccountAndSensor")
+        {
+            await ProcessSingle(Account.Id, Sensor.Id);
+        }
+        else
+            throw new InvalidOperationException();
+    }
+
+    private async Task ProcessSingle(Guid accountId, Guid sensorId)
+    {
         await _mediator.Send(new AddSensorToAccountCommand() { 
-            AccountUid = AccountUid,
-            SensorUid = SensorUid
+            AccountUid = accountId,
+            SensorUid = sensorId
         });
     }
 }

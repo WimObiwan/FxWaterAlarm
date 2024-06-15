@@ -459,8 +459,8 @@ public class AccountConsoleCommand : IConsoleCommand
         await _mediator.Send(
             new AddDefaultSensorAlarmsCommand
             {
-                AccountUid = accountId,
-                SensorUid = sensorId
+                AccountId = accountId,
+                SensorId = sensorId
             });
     }
 

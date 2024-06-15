@@ -17,5 +17,6 @@ public class SensorNotFoundException : Exception
     {
     }
 
-    public Guid SensorUid { get; init; }
+    public Guid? SensorUid { get; init; }
+    public string? DevEui { get; init; }
 }

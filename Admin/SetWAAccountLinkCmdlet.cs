@@ -16,8 +16,15 @@ public class NewWAAccountLinkCmdlet : DependencyCmdlet<Startup>
 
     [Parameter(
         Position = 0,
-        Mandatory = true)]
-    public Guid AccountUid { get; set; }
+        Mandatory = true,
+        ParameterSetName = "AccountId")]
+    public Guid AccountId { get; set; }
+
+    [Parameter(
+        Position = 0,
+        Mandatory = true,
+        ParameterSetName = "Account")]
+    public Account Account { get; set; } = null!;
 
     [Parameter(
         Position = 1)]
@@ -25,8 +32,22 @@ public class NewWAAccountLinkCmdlet : DependencyCmdlet<Startup>
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
+        if (ParameterSetName == "AccountId")
+        {
+            await ProcessSingleAsync(AccountId);
+        }
+        else if (ParameterSetName == "Account")
+        {
+            await ProcessSingleAsync(Account.Id);
+        }
+        else
+            throw new InvalidOperationException();
+    }
+
+    private async Task ProcessSingleAsync(Guid accountId)
+    {
         await _mediator.Send(new RegenerateAccountLinkCommand() { 
-            AccountUid = AccountUid,
+            AccountUid = accountId,
             Link = Link
         });
     }

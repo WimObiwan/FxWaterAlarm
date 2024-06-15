@@ -44,7 +44,7 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         else if (ParameterSetName == "Account")
         {
             foreach (var account in Account)
-                await ProcessSingle(account.Uid);
+                await ProcessSingle(account.Id);
         }
         else
             throw new InvalidOperationException();
@@ -62,8 +62,8 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
     private void Return(Core.Entities.AccountSensor accountSensor)
     {
         WriteObject(new AccountSensor {
-            AccountUid = accountSensor.Account.Uid,
-            SensorUid = accountSensor.Sensor.Uid,
+            AccountId = accountSensor.Account.Uid,
+            SensorId = accountSensor.Sensor.Uid,
             Name = accountSensor.Name,
             DistanceMmEmpty = accountSensor.DistanceMmEmpty,
             DistanceMmFull = accountSensor.DistanceMmFull,
@@ -81,8 +81,8 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
 
 public class AccountSensor
 {
-    public required Guid AccountUid { get; init; }
-    public required Guid SensorUid { get; init; }
+    public required Guid AccountId { get; init; }
+    public required Guid SensorId { get; init; }
     public string? Name { get; init; }
     public int? DistanceMmEmpty { get; init; }
     public int? DistanceMmFull { get; init; }

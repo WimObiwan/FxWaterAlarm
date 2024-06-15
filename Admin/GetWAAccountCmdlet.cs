@@ -19,16 +19,34 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
 
     [Parameter(
         Position = 0,
-        ValueFromPipeline = true)]
-    public Guid[]? AccountUid { get; set; }
+        ValueFromPipeline = true,
+        ParameterSetName = "AccountId")]
+    public Guid[]? AccountId { get; set; }
+
+    [Parameter(
+        Position = 0,
+        Mandatory = true,
+        ValueFromPipeline = true,
+        ParameterSetName = "Email")]
+    public string[] Email { get; set; } = null!;
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
-        if (AccountUid == null)
-            await ProcessAll();
+        if (ParameterSetName == "AccountId")
+        {
+            if (AccountId == null)
+                await ProcessAll();
+            else
+                foreach (var accountUid in AccountId)
+                    await ProcessSingle(accountUid);
+        }
+        else if (ParameterSetName == "Email")
+        {
+            foreach (var email in Email)
+                await ProcessSingle(email);
+        }
         else
-            foreach (var accountUid in AccountUid)
-                await ProcessSingle(accountUid);
+            throw new InvalidOperationException();
     }
 
     private async Task ProcessAll()
@@ -55,6 +73,20 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
         Return(account);
     }
 
+    private async Task ProcessSingle(string email)
+    {
+
+        var account = await _mediator.Send(new AccountByEmailQuery() { Email = email });
+        if (account == null)
+        {
+            Exception x = new AccountNotFoundException("The account cannot be found.") { Email = email };
+            WriteError(new ErrorRecord(x, x.GetType().Name, ErrorCategory.InvalidOperation, Email));
+            return;
+        }
+
+        Return(account);
+    }
+
     public void Return(Core.Entities.Account account)
     {
         WriteObject(GetAccount(account));
@@ -63,7 +95,7 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
     public static Account GetAccount(Core.Entities.Account account)
     {
         return new Account {
-            Uid = account.Uid,
+            Id = account.Uid,
             Email = account.Email,
             Name = account.Name,
             CreationTimestamp = account.CreationTimestamp,
@@ -74,7 +106,7 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
 
 public class Account
 {
-    public required Guid Uid { get; init; }
+    public required Guid Id { get; init; }
     public required string Email { get; init; }
     public string? Name { get; init; }
     public required DateTime CreationTimestamp { get; init; }

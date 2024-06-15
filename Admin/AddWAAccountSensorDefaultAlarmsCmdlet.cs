@@ -25,13 +25,25 @@ public class AddWAAccountSensorDefaultAlarmsCmdlet : DependencyCmdlet<Startup>
         Position = 0,
         Mandatory = true,
         ParameterSetName = "AccountIdAndSensorId")]
-    public Guid AccountUid { get; set; }
+    public Guid AccountId { get; set; }
 
     [Parameter(
         Position = 1,
         Mandatory = true,
         ParameterSetName = "AccountIdAndSensorId")]
-    public Guid SensorUid { get; set; }
+    public Guid SensorId { get; set; }
+
+    [Parameter(
+        Position = 0,
+        Mandatory = true,
+        ParameterSetName = "AccountAndSensor")]
+    public Account Account { get; set; } = null!;
+
+    [Parameter(
+        Position = 1,
+        Mandatory = true,
+        ParameterSetName = "AccountAndSensor")]
+    public Sensor Sensor { get; set; } = null!;
 
     [Parameter(
         Position = 1,
@@ -44,24 +56,27 @@ public class AddWAAccountSensorDefaultAlarmsCmdlet : DependencyCmdlet<Startup>
     {
         if (ParameterSetName == "AccountIdAndSensorId")
         {
-            await ProcessSingle(AccountUid, SensorUid);
+            await ProcessSingle(AccountId, SensorId);
+        }
+        else if (ParameterSetName == "AccountAndSensor")
+        {
+            await ProcessSingle(Account.Id, Sensor.Id);
         }
         else if (ParameterSetName == "AccountSensor")
         {
             foreach (var accountSensor in AccountSensor)
-                await ProcessSingle(accountSensor.AccountUid, accountSensor.SensorUid);
-        } 
+                await ProcessSingle(accountSensor.AccountId, accountSensor.SensorId);
+        }
         else
             throw new InvalidOperationException();
     }
 
     private async Task ProcessSingle(Guid accountUid, Guid sensorUid)
     {
-
         await _mediator.Send(new AddDefaultSensorAlarmsCommand()
         {
-            AccountUid = accountUid,
-            SensorUid = sensorUid
+            AccountId = accountUid,
+            SensorId = sensorUid
         });
     }
 }
