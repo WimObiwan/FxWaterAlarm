@@ -19,16 +19,34 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
 
     [Parameter(
         Position = 0,
-        ValueFromPipeline = true)]
-    public Guid[]? SensorUid { get; set; }
+        ValueFromPipeline = true,
+        ParameterSetName = "SensorId")]
+    public Guid[]? SensorId { get; set; }
+
+    [Parameter(
+        Position = 0,
+        Mandatory = true,
+        ValueFromPipeline = true,
+        ParameterSetName = "DevEui")]
+    public string[] DevEui { get; set; } = null!;
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
-        if (SensorUid == null)
-            await ProcessAll();
+        if (ParameterSetName == "AccountId")
+        {
+            if (SensorId == null)
+                await ProcessAll();
+            else
+                foreach (var sensorUid in SensorId)
+                    await ProcessSingle(sensorUid);
+        }
+        else if (ParameterSetName == "DevEui")
+        {
+            foreach (var devEui in DevEui)
+                await ProcessSingle(devEui);
+        }
         else
-            foreach (var sensorUid in SensorUid)
-                await ProcessSingle(sensorUid);
+            throw new InvalidOperationException();
     }
 
     private async Task ProcessAll()
@@ -55,6 +73,20 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
         Return(sensor);
     }
 
+    private async Task ProcessSingle(string devEui)
+    {
+
+        var sensor = await _mediator.Send(new SensorByLinkQuery() { SensorLink = devEui });
+        if (sensor == null)
+        {
+            Exception x = new SensorNotFoundException("The sensor cannot be found.") { DevEui = devEui };
+            WriteError(new ErrorRecord(x, x.GetType().Name, ErrorCategory.InvalidOperation, devEui));
+            return;
+        }
+
+        Return(sensor);
+    }
+
     private void Return(Core.Entities.Sensor sensor)
     {
         WriteObject(GetSensor(sensor));
@@ -63,7 +95,7 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
     public static Sensor GetSensor(Core.Entities.Sensor sensor)
     {
         return new Sensor {
-            Uid = sensor.Uid,
+            Id = sensor.Uid,
             DevEui = sensor.DevEui,
             CreationTimestamp = sensor.CreateTimestamp,
             Link = sensor.Link
@@ -73,7 +105,7 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
 
 public class Sensor
 {
-    public required Guid Uid { get; init; }
+    public required Guid Id { get; init; }
     public required string DevEui { get; init; }
     public required DateTime CreationTimestamp { get; init; }
     public string? Link { get; init; }

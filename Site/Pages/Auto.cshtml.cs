@@ -67,7 +67,7 @@ public class Auto : PageModel
             var sensorLink = match.Groups[2].Success ? match.Groups[2].Value : null;
             if (sensorLink != null)
             {
-                var result = await _mediator.Send(new SensorByLinkQuery
+                var result = await _mediator.Send(new AccountSensorByLinkQuery
                 {
                     SensorLink = sensorLink,
                     AccountLink = accountLink

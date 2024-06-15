@@ -60,7 +60,7 @@ public class AccountSensor : PageModel
         SaveResult = saveResult;
         QrBaseUrl = $"https://wateralarm.be/a/{accountLink}/s/{sensorLink}";
 
-        AccountSensorEntity = await _mediator.Send(new SensorByLinkQuery
+        AccountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
         {
             SensorLink = sensorLink,
             AccountLink = accountLink
@@ -127,7 +127,7 @@ public class AccountSensor : PageModel
 
         
         await using TextWriter textWriter = new StreamWriter(Response.BodyWriter.AsStream());
-        var accountSensorEntity = await _mediator.Send(new SensorByLinkQuery
+        var accountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
         {
             SensorLink = sensorLink,
             AccountLink = accountLink
@@ -234,7 +234,7 @@ public class AccountSensor : PageModel
             }
             else
             {
-                var accountSensor = await mediator.Send(new SensorByLinkQuery
+                var accountSensor = await mediator.Send(new AccountSensorByLinkQuery
                 {
                     SensorLink = sensorLink,
                     AccountLink = accountLink

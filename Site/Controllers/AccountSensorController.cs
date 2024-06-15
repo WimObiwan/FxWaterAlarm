@@ -76,7 +76,7 @@ public class AccountSensorController : Controller
 
     public async Task<IActionResult> Index(string accountLink, string sensorLink)
     {
-        var accountSensor = await _mediator.Send(new SensorByLinkQuery()
+        var accountSensor = await _mediator.Send(new AccountSensorByLinkQuery()
         {
             AccountLink = accountLink,
             SensorLink = sensorLink
