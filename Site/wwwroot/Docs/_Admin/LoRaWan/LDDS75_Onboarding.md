@@ -28,5 +28,6 @@ Onboarding procedure
 	* Id: fx-waterlevel2-<number>
 * Set name fx-ttn-...
 * Set location
+	* https://whatismyelevation.com/
 
 # 3. Turn on device

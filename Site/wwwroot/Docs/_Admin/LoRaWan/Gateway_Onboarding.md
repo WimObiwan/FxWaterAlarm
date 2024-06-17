@@ -23,6 +23,7 @@ Onboarding procedure
 	* Frequency plan: Europe 863-870MHz (recommended)
 * Set name fx-ttn-...
 * Set location
+	* https://whatismyelevation.com/
 
 # 3. Set Wifi password (initially)
 
@@ -43,6 +44,8 @@ Onboarding procedure
 * ...
 * Update location in TTN
 	* https://eu1.cloud.thethings.network/console/gateways
+	* https://whatismyelevation.com/
+
 
 # Other info
  
