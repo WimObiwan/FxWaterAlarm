@@ -22,7 +22,7 @@ public class NewWAAccountCmdlet : DependencyCmdlet<Startup>
 
     [Parameter(
         Position = 1)]
-    public Guid? AccountUid { get; set; }
+    public Guid? AccountId { get; set; }
 
     [Parameter(
         Position = 2)]
@@ -30,14 +30,14 @@ public class NewWAAccountCmdlet : DependencyCmdlet<Startup>
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
-        Guid accountUid = AccountUid ?? Guid.NewGuid();
+        Guid accountId = AccountId ?? Guid.NewGuid();
 
         await _mediator.Send(new CreateAccountCommand() { 
-            Uid = accountUid,
+            Uid = accountId,
             Email = Email,
             Name = Name
         });
 
-        WriteObject(accountUid);
+        WriteObject(accountId);
     }
 }

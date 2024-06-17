@@ -56,27 +56,27 @@ public class AddWAAccountSensorDefaultAlarmsCmdlet : DependencyCmdlet<Startup>
     {
         if (ParameterSetName == "AccountIdAndSensorId")
         {
-            await ProcessSingle(AccountId, SensorId);
+            await ProcessSingleAsync(AccountId, SensorId);
         }
         else if (ParameterSetName == "AccountAndSensor")
         {
-            await ProcessSingle(Account.Id, Sensor.Id);
+            await ProcessSingleAsync(Account.Id, Sensor.Id);
         }
         else if (ParameterSetName == "AccountSensor")
         {
             foreach (var accountSensor in AccountSensor)
-                await ProcessSingle(accountSensor.AccountId, accountSensor.SensorId);
+                await ProcessSingleAsync(accountSensor.AccountId, accountSensor.SensorId);
         }
         else
             throw new InvalidOperationException();
     }
 
-    private async Task ProcessSingle(Guid accountUid, Guid sensorUid)
+    private async Task ProcessSingleAsync(Guid accountId, Guid sensorId)
     {
         await _mediator.Send(new AddDefaultSensorAlarmsCommand()
         {
-            AccountId = accountUid,
-            SensorId = sensorUid
+            AccountId = accountId,
+            SensorId = sensorId
         });
     }
 }

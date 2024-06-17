@@ -70,24 +70,24 @@ public class GetWAAccountSensorAlarmCmdlet : DependencyCmdlet<Startup>
             throw new InvalidOperationException();
     }
 
-    private async Task ProcessSingleAsync(Guid accountUid, Guid sensorUid)
+    private async Task ProcessSingleAsync(Guid accountId, Guid sensorUid)
     {
 
         var accountSensorAlarms = await _mediator.Send(new AccountSensorAlarmsQuery()
         {
-            AccountUid = accountUid,
+            AccountUid = accountId,
             SensorUid = sensorUid
         });
 
         foreach (var accountSensorAlarm in accountSensorAlarms)
-            Return(accountUid, sensorUid, accountSensorAlarm);
+            Return(accountId, sensorUid, accountSensorAlarm);
     }
 
-    private void Return(Guid accountUid, Guid sensorUid, Core.Entities.AccountSensorAlarm accountSensorAlarm)
+    private void Return(Guid accountId, Guid sensorUid, Core.Entities.AccountSensorAlarm accountSensorAlarm)
     {
         WriteObject(new AccountSensorAlarm {
-            AccountUid = accountUid,
-            SensorUid = sensorUid,
+            AccountId = accountId,
+            SensorId = sensorUid,
             AlarmUid = accountSensorAlarm.Uid,
             AlarmType = (AccountSensorAlarmType)(int)accountSensorAlarm.AlarmType,
             AlarmThreshold = accountSensorAlarm.AlarmThreshold,
@@ -99,8 +99,8 @@ public enum AccountSensorAlarmType { Data = 1, Battery = 2, LevelFractionLow = 3
 
 public class AccountSensorAlarm
 {
-    public required Guid AccountUid { get; init; }
-    public required Guid SensorUid { get; init; }
+    public required Guid AccountId { get; init; }
+    public required Guid SensorId { get; init; }
     public required Guid AlarmUid { get; init; }
     public required AccountSensorAlarmType AlarmType { get; init; }
     public required double? AlarmThreshold { get; init; }

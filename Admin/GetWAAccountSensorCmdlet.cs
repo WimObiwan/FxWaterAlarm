@@ -25,7 +25,7 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         Mandatory = true,
         ValueFromPipeline = true, 
         ParameterSetName = "AccountId")]
-    public Guid[] AccountUid { get; set; } = null!;
+    public Guid[] AccountId { get; set; } = null!;
 
     [Parameter(
         Position = 0,
@@ -38,22 +38,22 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
     {
         if (ParameterSetName == "AccountId")
         {
-            foreach (var accountUid in AccountUid)
-                await ProcessSingle(accountUid);
+            foreach (var accountId in AccountId)
+                await ProcessSingleAync(accountId);
         }
         else if (ParameterSetName == "Account")
         {
             foreach (var account in Account)
-                await ProcessSingle(account.Id);
+                await ProcessSingleAync(account.Id);
         }
         else
             throw new InvalidOperationException();
     }
 
-    private async Task ProcessSingle(Guid accountUid)
+    private async Task ProcessSingleAync(Guid accountId)
     {
 
-        var accountSensors = await _mediator.Send(new AccountSensorsQuery() { AccountUid = accountUid });
+        var accountSensors = await _mediator.Send(new AccountSensorsQuery() { AccountUid = accountId });
 
         foreach (var accountSensor in accountSensors)
             Return(accountSensor);

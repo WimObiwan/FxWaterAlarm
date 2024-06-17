@@ -37,8 +37,8 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
             if (AccountId == null)
                 await ProcessAll();
             else
-                foreach (var accountUid in AccountId)
-                    await ProcessSingle(accountUid);
+                foreach (var accountId in AccountId)
+                    await ProcessSingleAsync(accountId);
         }
         else if (ParameterSetName == "Email")
         {
@@ -59,14 +59,14 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
         }
     }
 
-    private async Task ProcessSingle(Guid accountUid)
+    private async Task ProcessSingleAsync(Guid accountId)
     {
 
-        var account = await _mediator.Send(new AccountQuery() { Uid = accountUid });
+        var account = await _mediator.Send(new AccountQuery() { Uid = accountId });
         if (account == null)
         {
-            Exception x = new AccountNotFoundException("The account cannot be found.") { AccountUid = accountUid };
-            WriteError(new ErrorRecord(x, x.GetType().Name, ErrorCategory.InvalidOperation, accountUid));
+            Exception x = new AccountNotFoundException("The account cannot be found.") { AccountUid = accountId };
+            WriteError(new ErrorRecord(x, x.GetType().Name, ErrorCategory.InvalidOperation, accountId));
             return;
         }
 

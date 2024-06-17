@@ -69,30 +69,30 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
-        Guid accountUid, sensorUid;
+        Guid accountId, sensorId;
 
         if (ParameterSetName == "AccountIdAndSensorId")
         {
-            accountUid = AccountId;
-            sensorUid = SensorId;
+            accountId = AccountId;
+            sensorId = SensorId;
         }
         else if (ParameterSetName == "AccountAndSensor")
         {
-            accountUid = Account.Id;
-            sensorUid = Sensor.Id;
+            accountId = Account.Id;
+            sensorId = Sensor.Id;
         }
         else if (ParameterSetName == "AccountSensor")
         {
-            accountUid = AccountSensor.AccountId;
-            sensorUid = AccountSensor.SensorId;
+            accountId = AccountSensor.AccountId;
+            sensorId = AccountSensor.SensorId;
         } 
         else
             throw new InvalidOperationException();
 
         await _mediator.Send(new UpdateAccountSensorCommand() 
         { 
-            AccountUid = accountUid,
-            SensorUid = sensorUid,
+            AccountUid = accountId,
+            SensorUid = sensorId,
             Name = Optional.From(Name),
             DistanceMmEmpty = Optional.From(DistanceEmptyMm, -1),
             DistanceMmFull = Optional.From(DistanceFullMm, -1),
