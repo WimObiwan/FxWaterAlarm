@@ -10,7 +10,7 @@ using Svrooij.PowerShell.DependencyInjection;
 
 namespace WaterAlarmAdmin;
 
-[Cmdlet(VerbsCommon.Get,"WASensor")]
+[Cmdlet(VerbsCommon.Get, "WASensor")]
 [OutputType(typeof(Sensor))]
 public class GetWASensorCmdlet : DependencyCmdlet<Startup>
 {
@@ -59,14 +59,14 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
         }
     }
 
-    private async Task ProcessSingle(Guid sensorUid)
+    private async Task ProcessSingle(Guid sensorId)
     {
 
-        var sensor = await _mediator.Send(new SensorQuery() { Uid = sensorUid });
+        var sensor = await _mediator.Send(new SensorQuery() { Uid = sensorId });
         if (sensor == null)
         {
-            Exception x = new SensorNotFoundException("The sensor cannot be found.") { SensorUid = sensorUid };
-            WriteError(new ErrorRecord(x, x.GetType().Name, ErrorCategory.InvalidOperation, sensorUid));
+            Exception x = new SensorNotFoundException("The sensor cannot be found.") { SensorUid = sensorId };
+            WriteError(new ErrorRecord(x, x.GetType().Name, ErrorCategory.InvalidOperation, sensorId));
             return;
         }
 

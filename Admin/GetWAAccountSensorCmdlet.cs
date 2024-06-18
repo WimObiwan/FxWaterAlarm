@@ -13,7 +13,7 @@ using Svrooij.PowerShell.DependencyInjection;
 
 namespace WaterAlarmAdmin;
 
-[Cmdlet(VerbsCommon.Get,"WAAccountSensor")]
+[Cmdlet(VerbsCommon.Get, "WAAccountSensor")]
 [OutputType(typeof(AccountSensor))]
 public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
 {

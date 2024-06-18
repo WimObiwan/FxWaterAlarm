@@ -1,22 +1,17 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Management.Automation;
-using System.Management.Automation.Runspaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Entities;
-using Core.Exceptions;
-using Core.Queries;
 using MediatR;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Svrooij.PowerShell.DependencyInjection;
 
 namespace WaterAlarmAdmin;
 
-[Cmdlet(VerbsCommon.Add, "WAAccountSensorDefaultAlarms")]
-[OutputType(typeof(AccountSensorAlarm))]
-public class AddWAAccountSensorDefaultAlarmsCmdlet : DependencyCmdlet<Startup>
+[Cmdlet(VerbsCommon.Remove, "WAAccountSensor", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.High)]
+[OutputType(typeof(Guid))]
+public class RemoveWAAccountSensorCmdlet : DependencyCmdlet<Startup>
 {
     [ServiceDependency]
     internal IMediator _mediator { get; set; } = null!;
@@ -48,9 +43,8 @@ public class AddWAAccountSensorDefaultAlarmsCmdlet : DependencyCmdlet<Startup>
     [Parameter(
         Position = 1,
         Mandatory = true,
-        ValueFromPipeline = true,
         ParameterSetName = "AccountSensor")]
-    public AccountSensor[] AccountSensor { get; set; } = null!;
+    public AccountSensor AccountSensor { get; set; } = null!;
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
@@ -64,8 +58,7 @@ public class AddWAAccountSensorDefaultAlarmsCmdlet : DependencyCmdlet<Startup>
         }
         else if (ParameterSetName == "AccountSensor")
         {
-            foreach (var accountSensor in AccountSensor)
-                await ProcessSingleAsync(accountSensor.AccountId, accountSensor.SensorId);
+            await ProcessSingleAsync(AccountSensor.AccountId, AccountSensor.SensorId);
         }
         else
             throw new InvalidOperationException();
@@ -73,10 +66,13 @@ public class AddWAAccountSensorDefaultAlarmsCmdlet : DependencyCmdlet<Startup>
 
     private async Task ProcessSingleAsync(Guid accountId, Guid sensorId)
     {
-        await _mediator.Send(new AddDefaultSensorAlarmsCommand()
+        if (ShouldProcess(sensorId.ToString(), $"Remove from account {accountId}"))
         {
-            AccountId = accountId,
-            SensorId = sensorId
-        });
+            await _mediator.Send(new RemoveSensorFromAccountCommand() { 
+                AccountUid = accountId,
+                SensorUid = sensorId
+            });
+        }
+
     }
 }

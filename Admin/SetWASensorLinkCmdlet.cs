@@ -8,7 +8,7 @@ using Svrooij.PowerShell.DependencyInjection;
 
 namespace WaterAlarmAdmin;
 
-[Cmdlet(VerbsCommon.Reset,"WASensorLink")]
+[Cmdlet(VerbsCommon.Reset, "WASensorLink")]
 public class NewWASensorLinkCmdlet : DependencyCmdlet<Startup>
 {
     [ServiceDependency]

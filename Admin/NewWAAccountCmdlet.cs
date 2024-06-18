@@ -8,7 +8,7 @@ using Svrooij.PowerShell.DependencyInjection;
 
 namespace WaterAlarmAdmin;
 
-[Cmdlet(VerbsCommon.New,"WAAccount")]
+[Cmdlet(VerbsCommon.New, "WAAccount")]
 [OutputType(typeof(Guid))]
 public class NewWAAccountCmdlet : DependencyCmdlet<Startup>
 {

@@ -8,7 +8,7 @@ using Svrooij.PowerShell.DependencyInjection;
 
 namespace WaterAlarmAdmin;
 
-[Cmdlet(VerbsCommon.Add,"WAAccountSensor")]
+[Cmdlet(VerbsCommon.Add, "WAAccountSensor")]
 [OutputType(typeof(Guid))]
 public class AddWAAccountSensorCmdlet : DependencyCmdlet<Startup>
 {
@@ -43,17 +43,17 @@ public class AddWAAccountSensorCmdlet : DependencyCmdlet<Startup>
     {
         if (ParameterSetName == "AccountIdAndSensorId")
         {
-            await ProcessSingle(AccountId, SensorId);
+            await ProcessSingleAsync(AccountId, SensorId);
         }
         else if (ParameterSetName == "AccountAndSensor")
         {
-            await ProcessSingle(Account.Id, Sensor.Id);
+            await ProcessSingleAsync(Account.Id, Sensor.Id);
         }
         else
             throw new InvalidOperationException();
     }
 
-    private async Task ProcessSingle(Guid accountId, Guid sensorId)
+    private async Task ProcessSingleAsync(Guid accountId, Guid sensorId)
     {
         await _mediator.Send(new AddSensorToAccountCommand() { 
             AccountUid = accountId,
