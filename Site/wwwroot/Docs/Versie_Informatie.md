@@ -22,6 +22,12 @@ title: Versie Informatie
 > *
 -->
 
+### v0.32
+> 2024-06-18
+> ##### Andere
+> * Demo changes
+> * (Admin Powershell interface voor intern gebruik)
+
 ### v0.31
 > 2024-05-12
 > ##### Nieuw
