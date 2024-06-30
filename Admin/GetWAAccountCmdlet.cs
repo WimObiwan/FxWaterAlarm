@@ -35,7 +35,7 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
         if (ParameterSetName == "AccountId")
         {
             if (AccountId == null)
-                await ProcessAll();
+                await ProcessAllAsync();
             else
                 foreach (var accountId in AccountId)
                     await ProcessSingleAsync(accountId);
@@ -43,13 +43,13 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
         else if (ParameterSetName == "Email")
         {
             foreach (var email in Email)
-                await ProcessSingle(email);
+                await ProcessSingleAsync(email);
         }
         else
             throw new InvalidOperationException();
     }
 
-    private async Task ProcessAll()
+    private async Task ProcessAllAsync()
     {
         var accounts = await _mediator.Send(new AccountsQuery());
 
@@ -73,9 +73,8 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
         Return(account);
     }
 
-    private async Task ProcessSingle(string email)
+    private async Task ProcessSingleAsync(string email)
     {
-
         var account = await _mediator.Send(new AccountByEmailQuery() { Email = email });
         if (account == null)
         {
@@ -95,7 +94,7 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
     public static Account GetAccount(Core.Entities.Account account)
     {
         return new Account {
-            Id = account.Uid,
+            AccountId = account.Uid,
             Email = account.Email,
             Name = account.Name,
             CreationTimestamp = account.CreationTimestamp,
@@ -106,7 +105,7 @@ public class GetWAAccountCmdlet : DependencyCmdlet<Startup>
 
 public class Account
 {
-    public required Guid Id { get; init; }
+    public required Guid AccountId { get; init; }
     public required string Email { get; init; }
     public string? Name { get; init; }
     public required DateTime CreationTimestamp { get; init; }

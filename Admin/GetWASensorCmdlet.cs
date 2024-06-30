@@ -105,7 +105,7 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
 
 public class Sensor
 {
-    public required Guid Id { get; init; }
+    public required Guid SensorId { get; init; }
     public required string DevEui { get; init; }
     public required DateTime CreationTimestamp { get; init; }
     public string? Link { get; init; }
