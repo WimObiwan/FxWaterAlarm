@@ -47,7 +47,7 @@ public class AddWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         }
         else if (ParameterSetName == "AccountAndSensor")
         {
-            await ProcessSingleAsync(Account.Id, Sensor.Id);
+            await ProcessSingleAsync(Account.AccountId, Sensor.SensorId);
         }
         else
             throw new InvalidOperationException();

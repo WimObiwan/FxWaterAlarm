@@ -44,7 +44,7 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         else if (ParameterSetName == "Account")
         {
             foreach (var account in Account)
-                await ProcessSingleAync(account.Id);
+                await ProcessSingleAync(account.AccountId);
         }
         else
             throw new InvalidOperationException();
@@ -70,6 +70,7 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
             CapacityL = accountSensor.CapacityL,
             ResolutionL = accountSensor.ResolutionL,
             AlertsEnabled = accountSensor.AlertsEnabled,
+            NoMinMaxConstraints = accountSensor.NoMinMaxConstraints,
             RestPath = accountSensor.RestPath,
             //AlarmsCount = accountSensor.Alarms.Count,
             Account = GetWAAccountCmdlet.GetAccount(accountSensor.Account),
@@ -89,6 +90,7 @@ public class AccountSensor
     public int? CapacityL { get; init; }
     public double? ResolutionL { get; init; }
     public bool AlertsEnabled { get; init; }
+    public bool NoMinMaxConstraints { get; init; }
     public string? RestPath { get; init; }
     //public int AlarmsCount { get; init; }
     required public Account Account { get; init; }

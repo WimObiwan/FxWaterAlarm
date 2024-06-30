@@ -95,7 +95,7 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
     public static Sensor GetSensor(Core.Entities.Sensor sensor)
     {
         return new Sensor {
-            Id = sensor.Uid,
+            SensorId = sensor.Uid,
             DevEui = sensor.DevEui,
             CreationTimestamp = sensor.CreateTimestamp,
             Link = sensor.Link

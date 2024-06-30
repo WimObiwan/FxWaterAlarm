@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
@@ -78,8 +78,8 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         }
         else if (ParameterSetName == "AccountAndSensor")
         {
-            accountId = Account.Id;
-            sensorId = Sensor.Id;
+            accountId = Account.AccountId;
+            sensorId = Sensor.SensorId;
         }
         else if (ParameterSetName == "AccountSensor")
         {

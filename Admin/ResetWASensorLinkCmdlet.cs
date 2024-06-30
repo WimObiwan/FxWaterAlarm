@@ -9,7 +9,7 @@ using Svrooij.PowerShell.DependencyInjection;
 namespace WaterAlarmAdmin;
 
 [Cmdlet(VerbsCommon.Reset, "WASensorLink")]
-public class NewWASensorLinkCmdlet : DependencyCmdlet<Startup>
+public class ResetWASensorLinkCmdlet : DependencyCmdlet<Startup>
 {
     [ServiceDependency]
     internal IMediator _mediator { get; set; } = null!;
@@ -24,7 +24,7 @@ public class NewWASensorLinkCmdlet : DependencyCmdlet<Startup>
         Position = 0,
         Mandatory = true,
         ParameterSetName = "Sensor")]
-    public Account Sensor { get; set; } = null!;
+    public Sensor Sensor { get; set; } = null!;
 
     [Parameter(
         Position = 1)]
@@ -38,7 +38,7 @@ public class NewWASensorLinkCmdlet : DependencyCmdlet<Startup>
         }
         else if (ParameterSetName == "Sensor")
         {
-            await ProcessSingleAsync(Sensor.Id);
+            await ProcessSingleAsync(Sensor.SensorId);
         }
         else
             throw new InvalidOperationException();

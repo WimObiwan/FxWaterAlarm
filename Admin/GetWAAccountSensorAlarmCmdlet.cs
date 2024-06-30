@@ -59,7 +59,7 @@ public class GetWAAccountSensorAlarmCmdlet : DependencyCmdlet<Startup>
         }
         else if (ParameterSetName == "AccountAndSensor")
         {
-            await ProcessSingleAsync(Account.Id, Sensor.Id);
+            await ProcessSingleAsync(Account.AccountId, Sensor.SensorId);
         }
         else if (ParameterSetName == "AccountSensor")
         {

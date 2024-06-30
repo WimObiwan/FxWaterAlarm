@@ -9,7 +9,7 @@ using Svrooij.PowerShell.DependencyInjection;
 namespace WaterAlarmAdmin;
 
 [Cmdlet(VerbsCommon.Reset, "WAAccountLink")]
-public class NewWAAccountLinkCmdlet : DependencyCmdlet<Startup>
+public class ResetWAAccountLinkCmdlet : DependencyCmdlet<Startup>
 {
     [ServiceDependency]
     internal IMediator _mediator { get; set; } = null!;
@@ -38,7 +38,7 @@ public class NewWAAccountLinkCmdlet : DependencyCmdlet<Startup>
         }
         else if (ParameterSetName == "Account")
         {
-            await ProcessSingleAsync(Account.Id);
+            await ProcessSingleAsync(Account.AccountId);
         }
         else
             throw new InvalidOperationException();
