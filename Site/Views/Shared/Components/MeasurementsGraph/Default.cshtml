@@ -32,7 +32,10 @@
         minDistance = measurements.Select(m => (double?)m.MinDistance.HeightMm);
         meanDistance = measurements.Select(m => (double?)m.MeanDistance.HeightMm);
         scale = autoScale;
-        absoluteMin = 0.0;
+        if (accountSensor.NoMinMaxConstraints)
+            absoluteMin = null;
+        else
+            absoluteMin = 0.0;
         absoluteMax = null;
         yAxisSuffix = " mm";
     }
@@ -42,8 +45,16 @@
         minDistance = measurements.Select(m => m.MinDistance.LevelFraction * 100.0);
         meanDistance = measurements.Select(m => m.MeanDistance.LevelFraction * 100.0);
         scale = (autoScale / (accountSensor.DistanceMmEmpty - accountSensor.DistanceMmFull)) * 100.0;
-        absoluteMin = 0.0;
-        absoluteMax = 100.0;
+        if (accountSensor.NoMinMaxConstraints)
+        {
+            absoluteMin = null;
+            absoluteMax = null;
+        }
+        else
+        {
+            absoluteMin = 0.0;
+            absoluteMax = 100.0;
+        }
         yAxisSuffix = " %";
     }
     else
@@ -52,8 +63,16 @@
         minDistance = measurements.Select(m => m.MinDistance.WaterL);
         meanDistance = measurements.Select(m => m.MeanDistance.WaterL);
         scale = (autoScale / (accountSensor.DistanceMmEmpty - accountSensor.DistanceMmFull)) * accountSensor.CapacityL;
-        absoluteMin = 0.0;
-        absoluteMax = accountSensor.CapacityL;
+        if (accountSensor.NoMinMaxConstraints)
+        {
+            absoluteMin = null;
+            absoluteMax = null;
+        }
+        else
+        {
+            absoluteMin = 0.0;
+            absoluteMax = accountSensor.CapacityL;
+        }
         yAxisSuffix = " L";
     }
 

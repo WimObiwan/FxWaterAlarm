@@ -131,6 +131,19 @@
                     </tr>
                     <tr>
                         <td>
+                            @Loc["No min/max constraints"] <span class="badge bg-warning">beta</span>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input" 
+                                        name="noMinMaxConstraints"
+                                        value="true"
+                                        @(Model.AccountSensor.NoMinMaxConstraints ? "checked" : "")/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                         </td>
                         <td>
                             <button type="submit" class="btn btn-primary mb-3">@Loc["Submit changes"]</button>

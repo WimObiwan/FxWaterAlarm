@@ -50,6 +50,10 @@
         <value>Meldingen actief</value>
         <comment>Alerts enabled</comment>
     </data>
+    <data name="No min/max constraints" xml:space="preserve">
+        <value>Geen min/max afkapping</value>
+        <comment>No min/max constraints</comment>
+    </data>
     <data name="Send login link" xml:space="preserve">
         <value>Login link sturen</value>
         <comment>Send login link</comment>

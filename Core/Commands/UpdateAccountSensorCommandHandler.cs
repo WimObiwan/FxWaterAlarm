@@ -15,6 +15,7 @@ public record UpdateAccountSensorCommand : IRequest
     public Optional<int?> DistanceMmFull { get; init; }
     public Optional<int?> CapacityL { get; init; }
     public Optional<bool> AlertsEnabled { get; init; }
+    public Optional<bool> NoMinMaxConstraints { get; init; }
 }
 
 public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSensorCommand>
@@ -46,6 +47,8 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
             accountSensor.CapacityL = request.CapacityL.Value;
         if (request.AlertsEnabled is { Specified: true})
             accountSensor.AlertsEnabled = request.AlertsEnabled.Value;
+        if (request.NoMinMaxConstraints is { Specified: true})
+            accountSensor.NoMinMaxConstraints = request.NoMinMaxConstraints.Value;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

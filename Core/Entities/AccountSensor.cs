@@ -12,6 +12,8 @@ public class AccountSensor
     public int? DistanceMmFull { get; set; }
     public int? CapacityL { get; set; }
     public bool AlertsEnabled { get; set; }
+    public bool NoMinMaxConstraints { get; set; }
+    
     public IReadOnlyCollection<AccountSensorAlarm> Alarms => _alarms?.AsReadOnly()!;
 
     public double? ResolutionL

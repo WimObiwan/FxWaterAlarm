@@ -40,10 +40,13 @@ public class MeasurementDistance
             var realLevelFraction = RealLevelFraction;
             if (!realLevelFraction.HasValue)
                 return null;
-            if (realLevelFraction.Value > 1.0)
-                return 1.0;
-            if (realLevelFraction.Value < 0.0)
-                return 0.0;
+            if (!_accountSensor.NoMinMaxConstraints)
+            {
+                if (realLevelFraction.Value > 1.0)
+                    return 1.0;
+                if (realLevelFraction.Value < 0.0)
+                    return 0.0;
+            }
             return realLevelFraction;
         }
     }

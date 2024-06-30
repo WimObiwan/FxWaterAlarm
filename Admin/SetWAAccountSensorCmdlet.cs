@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
@@ -67,6 +67,9 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
     [Parameter]
     public bool? AlertsEnabled { get; set; }
 
+    [Parameter]
+    public bool? NoMinMaxConstraints { get; set; }
+
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
         Guid accountId, sensorId;
@@ -97,7 +100,8 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
             DistanceMmEmpty = Optional.From(DistanceEmptyMm, -1),
             DistanceMmFull = Optional.From(DistanceFullMm, -1),
             CapacityL = Optional.From(CapacityL, -1),
-            AlertsEnabled = Optional.From(AlertsEnabled)
+            AlertsEnabled = Optional.From(AlertsEnabled),
+            NoMinMaxConstraints = Optional.From(NoMinMaxConstraints),
         });
     }
 }
