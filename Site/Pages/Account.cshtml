@@ -82,8 +82,8 @@ else
     
     @if (Model.AccountEntity?.AppPath is { } appLink) {
         <script>
-        linkAppModeSetLink.textContent = "@appLink";
-        dbgAppModeSetLink.classList.toggle('hidden', false);
+        @*linkAppModeSetLink.textContent = "@appLink";
+        dbgAppModeSetLink.classList.toggle('hidden', false);*@
         console.log("Landing page for App-mode set to: @appLink");
 
         setCookie("auto", "@appLink", 365*10);

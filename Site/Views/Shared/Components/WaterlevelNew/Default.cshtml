@@ -1,0 +1,93 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@model Core.Util.MeasurementEx
+@inject IViewLocalizer Loc
+
+@{
+    var uniqueId = Guid.NewGuid().ToString("N");
+}
+
+<div>
+    @* <div id="container-@uniqueId" style="height: 100%"></div> *@
+    <div id="container-@uniqueId" style="height: 300px;"></div>
+
+    @{
+        var levelFraction = Model.Distance.LevelFraction;
+        var realLevelFraction = Model.Distance.RealLevelFraction;
+        var waterL = Model.Distance.WaterL;
+        var height = Model.Distance.HeightMm;
+        var timestamp = Model.Timestamp;
+    }
+
+    @{
+        string size = "xx-large";
+    }
+    @if (waterL.HasValue)
+    {
+        <div style="font-size: @size">@Math.Round(waterL.Value, 0) @Loc["liter"]</div>
+        size = "large";
+    }
+    @if (realLevelFraction.HasValue)
+    {
+        <div style="font-size: @size">@Math.Round(realLevelFraction.Value * 100.0, 1)%</div>
+        size = "large";
+    }
+    @if (height.HasValue)
+    {
+        <div style="font-size: @size">@height.Value @Loc["mm"]</div>
+    }
+    <div>@timestamp.ToLocalTime().ToString("G")</div>
+</div>
+
+@if(levelFraction.HasValue)
+{
+<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+
+<script type="text/javascript">
+    var dom = document.getElementById('container-@uniqueId');
+    var myChart = echarts.init(dom, null, {
+      renderer: 'canvas',
+      useDirtyRect: false
+    });
+    var app = {};
+    
+    var option;
+
+    option = {
+  tooltip: {
+    formatter: '{a} <br/>{b} : {c}%'
+  },
+  series: [
+    {
+      name: 'Pressure',
+      type: 'gauge',
+      progress: {
+        show: true
+      },
+      detail: {
+        valueAnimation: true,
+        formatter: function (value) {
+          return value.toFixed(1);
+        }
+      },
+      data: [
+        {
+          value: @((levelFraction.Value * 100).ToString(CultureInfo.InvariantCulture)),
+          name: '%',
+          itemStyle: {
+            color: '#37addd'
+          },
+
+        }
+      ]
+    }
+  ]
+};
+
+    if (option && typeof option === 'object') {
+      myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+</script>
+}

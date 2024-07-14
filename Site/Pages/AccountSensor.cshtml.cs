@@ -15,9 +15,8 @@ public class AccountSensor : PageModel
 {
     public enum PageTypeEnum
     {
-        Graph24H,
         Graph7D,
-        Graph3M,
+        GraphDynamic,
         Trend,
         Details,
         Settings,
@@ -40,7 +39,6 @@ public class AccountSensor : PageModel
     }
 
     public MeasurementEx? LastMeasurement { get; private set; }
-    public MeasurementAggEx[]? Measurements { get; private set; }
     //public TrendMeasurementEx? TrendMeasurement1H { get; private set; }
     public TrendMeasurementEx? TrendMeasurement6H { get; private set; }
     public TrendMeasurementEx? TrendMeasurement24H { get; private set; }
@@ -49,14 +47,18 @@ public class AccountSensor : PageModel
     public Core.Entities.AccountSensor? AccountSensorEntity { get; private set; }
 
     public PageTypeEnum PageType { get; private set; }
+    public bool Preview { get; private set; }
     public SaveResultEnum SaveResult { get; private set; }
     
     public string? QrBaseUrl { get; private set; }
 
     public async Task OnGet(string accountLink, string sensorLink, 
-        [FromQuery] PageTypeEnum page = PageTypeEnum.Graph7D, [FromQuery] SaveResultEnum saveResult = SaveResultEnum.None)
+        [FromQuery] PageTypeEnum page = PageTypeEnum.Graph7D,
+        [FromQuery] bool preview = false,
+        [FromQuery] SaveResultEnum saveResult = SaveResultEnum.None)
     {
         PageType = page;
+        Preview = preview;
         SaveResult = saveResult;
         QrBaseUrl = $"https://wateralarm.be/a/{accountLink}/s/{sensorLink}";
 
@@ -72,18 +74,8 @@ public class AccountSensor : PageModel
                 { DevEui = AccountSensorEntity.Sensor.DevEui });
             if (lastMeasurement != null) LastMeasurement = new MeasurementEx(lastMeasurement, AccountSensorEntity);
 
-            Tuple<TimeSpan, TimeSpan>? period = null;
             switch (PageType)
             {
-                case PageTypeEnum.Graph24H:
-                    period = Tuple.Create(TimeSpan.FromDays(1), TimeSpan.Zero);
-                    break;
-                case PageTypeEnum.Graph7D:
-                    period = Tuple.Create(TimeSpan.FromDays(7), TimeSpan.FromHours(4));
-                    break;
-                case PageTypeEnum.Graph3M:
-                    period = Tuple.Create(TimeSpan.FromDays(90), TimeSpan.FromDays(3));
-                    break;
                 case PageTypeEnum.Trend:
                     if (LastMeasurement != null)
                     {
@@ -101,19 +93,6 @@ public class AccountSensor : PageModel
                         TrendMeasurement30D = trendMeasurements[3];
                     }
                     break;
-            }
-
-            if (period != null)
-            {
-                Measurements = (await _mediator.Send(new AggregatedMeasurementsQuery
-                    {
-                        DevEui = AccountSensorEntity.Sensor.DevEui,
-                        From = DateTime.UtcNow.Add(-period.Item1),
-                        Interval = period.Item2
-                    }))
-                    .OrderBy(m => m.Timestamp)
-                    .Select(m => new MeasurementAggEx(m, AccountSensorEntity))
-                    .ToArray();
             }
         }
     }
