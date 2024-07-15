@@ -57,27 +57,21 @@ namespace Site.Resources.Pages {
             }
         }
         
-        internal static string Graph_6h {
+        internal static string Capacity {
             get {
-                return ResourceManager.GetString("Graph 6h", resourceCulture);
+                return ResourceManager.GetString("Capacity", resourceCulture);
             }
         }
         
-        internal static string Graph_24h {
+        internal static string Percentage {
             get {
-                return ResourceManager.GetString("Graph 24h", resourceCulture);
+                return ResourceManager.GetString("Percentage", resourceCulture);
             }
         }
         
-        internal static string Graph_7d {
+        internal static string Height {
             get {
-                return ResourceManager.GetString("Graph 7d", resourceCulture);
-            }
-        }
-        
-        internal static string Graph_3m {
-            get {
-                return ResourceManager.GetString("Graph 3m", resourceCulture);
+                return ResourceManager.GetString("Height", resourceCulture);
             }
         }
         

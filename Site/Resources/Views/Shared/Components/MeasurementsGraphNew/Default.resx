@@ -1,4 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
     <resheader name="resmimetype">
         <value>text/microsoft-resx</value>
     </resheader>
@@ -15,15 +23,12 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="No sensor found with the specified Id." xml:space="preserve">
-        <value>Geen sensor gevonden met de opgegeven code.</value>
-    </data>
     <data name="Graph" xml:space="preserve">
-        <value>Grafiek</value>
+        <value>Graph</value>
         <comment>Graph</comment>
     </data>
     <data name="Capacity" xml:space="preserve">
-        <value>Capaciteit</value>
+        <value>Capacity</value>
         <comment>Capacity</comment>
     </data>
     <data name="Percentage" xml:space="preserve">
@@ -31,35 +36,15 @@
         <comment>Percentage</comment>
     </data>
     <data name="Height" xml:space="preserve">
-        <value>Hoogte</value>
+        <value>Height</value>
         <comment>Height</comment>
     </data>
     <data name="Signal" xml:space="preserve">
-        <value>Signaal</value>
+        <value>Signal</value>
         <comment>Signal</comment>
     </data>
     <data name="Battery" xml:space="preserve">
-        <value>Batterij</value>
+        <value>Battery</value>
         <comment>Battery</comment>
-    </data>
-    <data name="Details" xml:space="preserve">
-        <value>Details</value>
-        <comment>Details</comment>
-    </data>
-    <data name="Trend" xml:space="preserve">
-        <value>Trend</value>
-        <comment>Trend</comment>
-    </data>
-    <data name="QR Code" xml:space="preserve">
-        <value>QR Code</value>
-        <comment>QR Code</comment>
-    </data>
-    <data name="Settings" xml:space="preserve">
-        <value>Instellingen</value>
-        <comment>Settings</comment>
-    </data>
-    <data name="Your account" xml:space="preserve">
-        <value>Jouw account</value>
-        <comment>Your account</comment>
     </data>
 </root>

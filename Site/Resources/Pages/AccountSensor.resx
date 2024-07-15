@@ -31,21 +31,25 @@
         <value>Graph</value>
         <comment>Graph</comment>
     </data>
-    <data name="Graph 6h" xml:space="preserve">
-        <value>Graph 6h</value>
-        <comment>Graph 6h</comment>
+    <data name="Capacity" xml:space="preserve">
+        <value>Capacity</value>
+        <comment>Capacity</comment>
     </data>
-    <data name="Graph 24h" xml:space="preserve">
-        <value>Graph 24h</value>
-        <comment>Graph 24h</comment>
+    <data name="Percentage" xml:space="preserve">
+        <value>Percentage</value>
+        <comment>Percentage</comment>
     </data>
-    <data name="Graph 7d" xml:space="preserve">
-        <value>Graph 7d</value>
-        <comment>Graph 7d</comment>
+    <data name="Height" xml:space="preserve">
+        <value>Height</value>
+        <comment>Height</comment>
     </data>
-    <data name="Graph 3m" xml:space="preserve">
-        <value>Graph 3m</value>
-        <comment>Graph 3m</comment>
+    <data name="Signal" xml:space="preserve">
+        <value>Signaal</value>
+        <comment>Signal</comment>
+    </data>
+    <data name="Battery" xml:space="preserve">
+        <value>Batterij</value>
+        <comment>Battery</comment>
     </data>
     <data name="Details" xml:space="preserve">
         <value>Details</value>

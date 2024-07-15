@@ -1,7 +1,9 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.Html
+@using Microsoft.AspNetCore.Mvc.Localization
 @using Site.Pages
 @model Site.ViewComponents.MeasurementsGraphNewModel
+@inject IViewLocalizer Loc
 
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
@@ -110,8 +112,52 @@
 
 @if (Model.AccountSensorEntity != null)
 {
+    bool isArea;
+    string color;
+    LocalizedHtmlString title, serieName;
+    switch (Model.GraphType)
+    {
+        default:
+        case Core.Entities.GraphType.None:
+            color = "#37addd";
+            isArea = true;
+            serieName = @Loc["Graph"];
+            title = @Loc["Graph"];
+            break;
+        case Core.Entities.GraphType.Capacity:
+            color = "#37addd";
+            isArea = true;
+            serieName = @Loc["Capacity"];
+            title = @Loc["Capacity"];
+            break;
+        case Core.Entities.GraphType.Percentage:
+            color = "#37addd";
+            isArea = true;
+            serieName = @Loc["Percentage"];
+            title = @Loc["Percentage"];
+            break;
+        case Core.Entities.GraphType.Height:
+            color = "#37addd";
+            isArea = true;
+            serieName = @Loc["Height"];
+            title = @Loc["Height"];
+            break;
+        case Core.Entities.GraphType.RssiDbm:
+            color = "#00aa00";
+            isArea = false;
+            serieName = @Loc["Signal"];
+            title = @Loc["Signal"];
+            break;
+        case Core.Entities.GraphType.BatV:
+            color = "#ff0000";
+            isArea = false;
+            serieName = @Loc["Battery"];
+            title = @Loc["Battery"];
+            break;
+    }
+
     <script defer>
-var getJSON = function(url, callback) {
+    var getJSON = function(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'json';
@@ -126,10 +172,11 @@ var getJSON = function(url, callback) {
     xhr.send();
 };
 
-getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)', 
+getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)&graphType=@(Model.GraphType)', 
     function(err, data2) {
 
-    data2 = data2.map( el => [el.timeStamp, el.waterL]);
+    unit = data2.unit;
+    data2 = data2.data.map(el => [el.timeStamp, el.value]);
 
     var zoomEnd = new Date();
     //var zoomStart = new Date((new Date(data2[data2.length - 1][0])).getTime() - 21 * 24 * 60 * 60 * 1000);
@@ -152,7 +199,7 @@ getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)'
     },
     title: {
         left: 'center',
-        text: 'Liter'
+        text: '@title'
     },
     toolbox: {
         feature: {
@@ -179,10 +226,14 @@ getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)'
             formatter: function(params){
                 //let label = params.value[1]; // this is my y column
                 let label = params;
-                return label.toLocaleString();
+                return label.toLocaleString() + ' ' + unit;
             },
             showMinLabel: false
         },
+        @if (isArea)
+        {
+        <text>
+        // <!--
         min: function(value) {
             if (value.min < 0) {
                 return value.min;
@@ -196,7 +247,15 @@ getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)'
             }
             return v;
         }
-
+        // -->
+        </text>
+        }
+        else
+        {
+        <text>
+        scale: true
+        </text>
+        }
         @* boundaryGap: ['0%', '0%'] *@
          @*,
         min: 'dataMin',
@@ -235,7 +294,7 @@ getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)'
     ],
     series: [
         {
-        name: 'Water (Liter)',
+        name: '@serieName (' + unit + ')',
         type: 'line',
         @if (Model.ShowTimelineSlider) {
             @: symbol: 'none',
@@ -244,11 +303,16 @@ getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)'
         }
         sampling: 'lttb',
         itemStyle: {
-            color: '#37addd'
+            color: '@color'
         },
+        @if (isArea)
+        {
+        <text>
         areaStyle: {
-            color: '#37addd'
+            color: '@color'
         },
+        </text>
+        }
         data: data2
         }
     ]
@@ -256,7 +320,7 @@ getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)'
 
 
     if (option && typeof option === 'object') {
-    myChart.setOption(option);
+        myChart.setOption(option);
     }
 
     window.addEventListener('resize', myChart.resize);

@@ -1,3 +1,4 @@
+using Core.Entities;
 using Core.Queries;
 using Core.Util;
 using MediatR;
@@ -5,10 +6,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Site.Controllers;
 
-public class MeasurementResult
+
+public class MeasurementResultDataItem
 {
     public required DateTime TimeStamp { get; init; }
-    public int? WaterL { get; init; }
+    public double? Value { get; init; }
+}
+
+public class MeasurementResult
+{
+    public string? Unit { get; init; }
+    public IEnumerable<MeasurementResultDataItem>? Data { get; init; }
 }
 
 [Route("api/a/{AccountLink}/s/{SensorLink}/m")]
@@ -16,7 +24,9 @@ public class AccountSensorMeasurementController : Controller
 {
     private readonly IMediator _mediator;
 
-    public async Task<IActionResult> Index(string accountLink, string sensorLink, [FromQuery]int fromDays = 7)
+    public async Task<IActionResult> Index(
+        string accountLink, string sensorLink, 
+        [FromQuery]int fromDays = 7, [FromQuery]GraphType graphType = GraphType.None)
     {
         if (fromDays > 365) fromDays = 365;
 
@@ -29,9 +39,15 @@ public class AccountSensorMeasurementController : Controller
         if (accountSensor == null)
             return NotFound();
 
+        if (graphType == GraphType.None)
+            graphType = accountSensor.GraphType;
+
+        if (graphType == GraphType.None)
+            return NoContent();
+
         DateTime from = DateTime.UtcNow.AddDays(-fromDays);
         DateTime? last = null;
-        IEnumerable<MeasurementResult>? result = null;
+        IEnumerable<MeasurementResultDataItem>? result = null;
         for (int i = 0; i < 3; i++)
         {
             var measurements = await _mediator.Send(new MeasurementsQuery
@@ -49,15 +65,39 @@ public class AccountSensorMeasurementController : Controller
             var result2 = measurements.Select(measurement =>
             {
                 MeasurementEx measurementEx = new(measurement, accountSensor);
-                int? waterL2;
-                if (measurementEx.Distance.WaterL is {} waterL)
-                    waterL2 = (int)waterL;
-                else
-                    waterL2 = null;
-                return new MeasurementResult
+
+                double? value;
+                switch (graphType)
+                {
+                    case GraphType.Height:
+                        value = measurementEx.Distance.HeightMm;
+                        break;
+                    case GraphType.Percentage:
+                        if (measurementEx.Distance.LevelFraction is {} levelFraction)
+                            value = Math.Round(levelFraction * 100.0, 1);
+                        else
+                            value = null;
+                        break;
+                    case GraphType.Capacity:
+                        if (measurementEx.Distance.WaterL is {} waterL)
+                            value = Math.Round(waterL, 0);
+                        else
+                            value = null;
+                        break;
+                    case GraphType.RssiDbm:
+                        value = measurementEx.RssiDbm;
+                        break;
+                    case GraphType.BatV:
+                        value = measurementEx.BatV;
+                        break;
+                    default:
+                        value = null;
+                        break;
+                }
+                return new MeasurementResultDataItem
                 {
                     TimeStamp = measurement.Timestamp,
-                    WaterL = waterL2
+                    Value = value
                 };
             });
 
@@ -67,7 +107,34 @@ public class AccountSensorMeasurementController : Controller
                 result = result.Concat(result2);
         }
 
-        return Ok(result?.Reverse());
+        string? unit;
+        switch (graphType)
+        {
+            case GraphType.Height:
+                unit = "mm";
+                break;
+            case GraphType.Percentage:
+                unit = "%";
+                break;
+            case GraphType.Capacity:
+                unit = "l";
+                break;
+            case GraphType.RssiDbm:
+                unit = "dBm";
+                break;
+            case GraphType.BatV:
+                unit = "V";
+                break;
+            default:
+                unit = null;
+                break;
+        }
+
+        return Ok(new MeasurementResult
+        {
+            Unit = unit,
+            Data = result?.Reverse() 
+        });
     }
 
     public AccountSensorMeasurementController(IMediator mediator)

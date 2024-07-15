@@ -1,4 +1,5 @@
 @page
+@using Core.Entities
 @using Microsoft.AspNetCore.Mvc.Localization
 @using QRCoder
 @using SixLabors.ImageSharp
@@ -46,8 +47,12 @@
             @{
                 bool IsPageTypeInGraphDropDown()
                 {
-                    return Model.PageType == AccountSensor.PageTypeEnum.Graph7D
-                           || Model.PageType == AccountSensor.PageTypeEnum.GraphDynamic;
+                    return Model.PageType == AccountSensor.PageTypeEnum.GraphDefault
+                           || Model.PageType == AccountSensor.PageTypeEnum.GraphCapacity
+                           || Model.PageType == AccountSensor.PageTypeEnum.GraphPercentage
+                           || Model.PageType == AccountSensor.PageTypeEnum.GraphHeight
+                           || Model.PageType == AccountSensor.PageTypeEnum.GraphSignal
+                           || Model.PageType == AccountSensor.PageTypeEnum.GraphBattery;
                 }
 
                 bool IsPageTypeInDetailsDropDown()
@@ -87,10 +92,33 @@
                 <a  @Html.Raw(PageTypeDropDownMenu(IsPageTypeInGraphDropDown())) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Graph"]</a>
                 <ul class="dropdown-menu">
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Graph7D)) href="?page=graph7d">@Loc["Graph 7d"]</a>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphDefault)) href="?page=graphdefault">@Loc["Graph"]</a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    @if (Model.AccountSensorEntity?.HasCapacity == true)
+                    {
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphCapacity)) href="?page=graphcapacity">@Loc["Capacity"]</a>
+                    </li>
+                    }
+                    @if (Model.AccountSensorEntity?.HasPercentage == true)
+                    {
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphPercentage)) href="?page=graphpercentage">@Loc["Percentage"]</a>
+                    </li>
+                    }
+                    @if (Model.AccountSensorEntity?.HasHeight == true)
+                    {
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphHeight)) href="?page=graphheight">@Loc["Height"]</a>
+                    </li>
+                    }
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphSignal)) href="?page=graphsignal">@Loc["Signal"]</a>
                     </li>
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphDynamic)) href="?page=graphdynamic">@Loc["Dynamic"] <span class="badge bg-warning">beta</span></a>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphBattery)) href="?page=graphbattery">@Loc["Battery"]</a>
                     </li>
                 </ul>
             </li>
@@ -117,28 +145,54 @@
 
         @if (IsPageTypeInGraphDropDown())
         {
-            if (Model.PageType == AccountSensor.PageTypeEnum.GraphDynamic)
+            bool showTimelineSlider;
+            int fromDays;
+            GraphType graphType;
+            if (Model.PageType == AccountSensor.PageTypeEnum.GraphCapacity)
             {
+                showTimelineSlider = true;
+                fromDays = 365;
+                graphType = GraphType.Capacity; 
+            }
+            else if (Model.PageType == AccountSensor.PageTypeEnum.GraphPercentage)
+            {
+                showTimelineSlider = true;
+                fromDays = 365;
+                graphType = GraphType.Percentage; 
+            }
+            else if (Model.PageType == AccountSensor.PageTypeEnum.GraphHeight)
+            {
+                showTimelineSlider = true;
+                fromDays = 365;
+                graphType = GraphType.Height; 
+            }
+            else if (Model.PageType == AccountSensor.PageTypeEnum.GraphSignal)
+            {
+                showTimelineSlider = true;
+                fromDays = 365;
+                graphType = GraphType.RssiDbm; 
+            }
+            else if (Model.PageType == AccountSensor.PageTypeEnum.GraphBattery)
+            {
+                showTimelineSlider = true;
+                fromDays = 365;
+                graphType = GraphType.BatV; 
+            }
+            else //if (Model.PageType == AccountSensor.PageTypeEnum.Graph7D)
+            {
+                showTimelineSlider = false;
+                fromDays = 7;
+                graphType = GraphType.None; 
+            }
             <div style="width: 100%; height: 40vh">
                 @await Component.InvokeAsync("MeasurementsGraphNew", new
                        {
                            AccountSensorEntity = Model.AccountSensorEntity,
-                           ShowTimelineSlider = true,
-                           FromDays = 365
+                           ShowTimelineSlider = showTimelineSlider,
+                           FromDays = fromDays,
+                           GraphType = graphType
                        })
             </div>
-            }
-            else if (Model.PageType == AccountSensor.PageTypeEnum.Graph7D)
-            {
-            <div style="width: 100%; height: 40vh">
-                @await Component.InvokeAsync("MeasurementsGraphNew", new
-                       {
-                           AccountSensorEntity = Model.AccountSensorEntity,
-                           ShowTimelineSlider = false,
-                           FromDays = 7
-                       })
-            </div>
-            }
         }
         
         @if (Model.PageType == AccountSensor.PageTypeEnum.Trend)

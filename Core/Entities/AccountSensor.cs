@@ -1,5 +1,14 @@
 namespace Core.Entities;
 
+public enum GraphType
+{
+    None,
+    Height,
+    Percentage,
+    Capacity,
+    RssiDbm,
+    BatV,
+}
 public class AccountSensor
 {
     private readonly List<AccountSensorAlarm> _alarms = null!;
@@ -29,6 +38,36 @@ public class AccountSensor
 
     public string? RestPath =>
         Account.Link != null && Sensor.Link != null ? $"/a/{Account.Link}/s/{Sensor.Link}" : null;
+
+    public bool HasHeight => 
+        DistanceMmEmpty.HasValue
+        && DistanceMmEmpty.Value > 0;
+
+    public bool HasPercentage => 
+        HasHeight
+        && DistanceMmEmpty.HasValue
+        && DistanceMmFull.HasValue 
+        && DistanceMmFull.Value < DistanceMmEmpty.Value;
+
+    public bool HasCapacity => 
+        HasPercentage
+        && CapacityL.HasValue
+        && CapacityL > 0;
+
+    public GraphType GraphType
+    {
+        get
+        {
+            if (HasCapacity)
+                return GraphType.Capacity;
+            else if (HasPercentage)
+                return GraphType.Percentage;
+            else if (HasHeight)
+                return GraphType.Height;
+            else
+                return GraphType.None;
+        }
+    }
 
     public void AddAlarm(AccountSensorAlarm alarm)
     {

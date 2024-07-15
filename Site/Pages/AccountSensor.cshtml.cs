@@ -15,8 +15,12 @@ public class AccountSensor : PageModel
 {
     public enum PageTypeEnum
     {
-        Graph7D,
-        GraphDynamic,
+        GraphDefault,
+        GraphCapacity,
+        GraphPercentage,
+        GraphHeight,
+        GraphSignal,
+        GraphBattery,
         Trend,
         Details,
         Settings,
@@ -53,7 +57,7 @@ public class AccountSensor : PageModel
     public string? QrBaseUrl { get; private set; }
 
     public async Task OnGet(string accountLink, string sensorLink, 
-        [FromQuery] PageTypeEnum page = PageTypeEnum.Graph7D,
+        [FromQuery] PageTypeEnum page = PageTypeEnum.GraphDefault,
         [FromQuery] bool preview = false,
         [FromQuery] SaveResultEnum saveResult = SaveResultEnum.None)
     {
