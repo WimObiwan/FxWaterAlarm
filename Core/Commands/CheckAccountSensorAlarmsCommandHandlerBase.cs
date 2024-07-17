@@ -58,6 +58,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
     {
         const double AlarmThresholdHisteresisBattery = 5.0;
         const double AlarmThresholdHisteresisPercentage = 5.0;
+        const int AlarmThresholdHisteresisHeight = 50;
 
         foreach (var alarm in alarms)
         {
@@ -133,6 +134,71 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     }
                     break;
                 }
+                // case AccountSensorAlarmType.PercentageStatus:
+                // {
+                //     if (!(measurementEx.Distance.LevelFraction is {} levelFraction))
+                //     {
+                //         _logger.LogWarning("No LevelFraction");
+                //     }
+                //     else
+                //     {
+                //         levelFraction *= 100.0;
+                //         isTriggered = true;
+                //         isCleared = false;
+                //         sendAlertFunction = () => SendAlert(AccountSensorAlarmType.PercentageStatus, measurementEx.AccountSensor, levelFraction, 0.0);
+                //     }
+                //     break;
+                // }
+                case AccountSensorAlarmType.HeightLow:
+                {
+                    if (!(measurementEx.Distance.HeightMm is {} heightMm))
+                    {
+                        _logger.LogWarning("No Height");
+                    }
+                    else if (!(alarm.AlarmThreshold is {} alarmThreshold))
+                    {
+                        _logger.LogWarning("No threshold configured for alarm {AlarmType}", alarm.AlarmType);
+                    }
+                    else
+                    {
+                        isTriggered = heightMm <= alarmThreshold;
+                        isCleared = heightMm > alarmThreshold + AlarmThresholdHisteresisHeight;
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.HeightLow, measurementEx.AccountSensor, heightMm, alarmThreshold);
+                    }
+                    break;
+                }
+                case AccountSensorAlarmType.HeightHigh:
+                {
+                    if (!(measurementEx.Distance.HeightMm is {} heightMm))
+                    {
+                        _logger.LogWarning("No Height");
+                    }
+                    else if (!(alarm.AlarmThreshold is {} alarmThreshold))
+                    {
+                        _logger.LogWarning("No threshold configured for alarm {AlarmType}", alarm.AlarmType);
+                    }
+                    else
+                    {
+                        isTriggered = heightMm >= alarm.AlarmThreshold;
+                        isCleared = heightMm < alarmThreshold - AlarmThresholdHisteresisHeight;
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.HeightHigh, measurementEx.AccountSensor, heightMm, alarmThreshold);
+                    }
+                    break;
+                }
+                // case AccountSensorAlarmType.HeightStatus:
+                // {
+                //     if (!(measurementEx.Distance.HeightMm is {} heightMm))
+                //     {
+                //         _logger.LogWarning("No Height");
+                //     }
+                //     else
+                //     {
+                //         isTriggered = true;
+                //         isCleared = false;
+                //         sendAlertFunction = () => SendAlert(AccountSensorAlarmType.HeightStatus, measurementEx.AccountSensor, heightMm, 0.0);
+                //     }
+                //     break;
+                // }
                 default:
                     _logger.LogError("AlarmType {AlarmType} not implemented", alarm.AlarmType);
                     break;
@@ -202,6 +268,18 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
             // case AccountSensorAlarmType.PercentageStatus:
             //     message = $"Het gemeten niveau van de sensor is <strong>{valueString}%</strong>";
             //     shortMessage = $"Niveau {valueString}%";
+            //     break;
+            case AccountSensorAlarmType.HeightHigh:
+                message = $"Het gemeten niveau van de sensor is gestegen boven <strong>{thresholdValue} mm</strong>";
+                shortMessage = $"Niveau {valueString} mm";
+                break;
+            case AccountSensorAlarmType.HeightLow:
+                message = $"Het gemeten niveau van de sensor is gezakt onder <strong>{thresholdValue} mm</strong>";
+                shortMessage = $"Niveau {valueString} mm";
+                break;
+            // case AccountSensorAlarmType.HeightStatus:
+            //     message = $"Het gemeten niveau van de sensor is <strong>{valueString} mm</strong>";
+            //     shortMessage = $"Niveau {valueString} mm";
             //     break;
             default:
                 throw new InvalidOperationException();

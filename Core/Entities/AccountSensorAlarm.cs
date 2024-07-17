@@ -7,6 +7,9 @@ public enum AccountSensorAlarmType
     PercentageLow = 3,
     PercentageHigh = 4,
     // PercentageStatus = 5
+    HeightLow = 6,
+    HeightHigh = 7,
+    // HeightStatus = 8
 }
 
 public class AccountSensorAlarm
