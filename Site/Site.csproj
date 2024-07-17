@@ -16,11 +16,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="GitInfo" Version="3.3.4">
+        <PackageReference Include="GitInfo" Version="3.3.5">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.16.0" />
+        <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.17.0" />
         <PackageReference Include="QRCoder-ImageSharp" Version="0.10.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
     </ItemGroup>
