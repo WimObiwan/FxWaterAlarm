@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Commands;
 using Core.Entities;
 using Core.Exceptions;
 using Core.Queries;
@@ -13,9 +14,9 @@ using Svrooij.PowerShell.DependencyInjection;
 
 namespace WaterAlarmAdmin;
 
-[Cmdlet(VerbsCommon.Get, "WAAccountSensorAlarm")]
+[Cmdlet(VerbsCommon.Add, "WAAccountSensorAlarm")]
 [OutputType(typeof(AccountSensorAlarm))]
-public class GetWAAccountSensorAlarmCmdlet : DependencyCmdlet<Startup>
+public class AddWAAccountSensorAlarmCmdlet : DependencyCmdlet<Startup>
 {
     [ServiceDependency]
     internal IMediator _mediator { get; set; } = null!;
@@ -49,7 +50,16 @@ public class GetWAAccountSensorAlarmCmdlet : DependencyCmdlet<Startup>
         Mandatory = true,
         ValueFromPipeline = true,
         ParameterSetName = "AccountSensor")]
-    public AccountSensor[] AccountSensor { get; set; } = null!;
+    public AccountSensor AccountSensor { get; set; } = null!;
+
+    [Parameter(
+        Position = 2,
+        Mandatory = true)]
+    public AccountSensorAlarmType AlarmType { get; set; }
+
+    [Parameter(
+        Position = 3)]
+    public double? AlarmThreshold { get; set; }
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
@@ -63,52 +73,24 @@ public class GetWAAccountSensorAlarmCmdlet : DependencyCmdlet<Startup>
         }
         else if (ParameterSetName == "AccountSensor")
         {
-            foreach (var accountSensor in AccountSensor)
-                await ProcessSingleAsync(accountSensor.AccountId, accountSensor.SensorId);
-        } 
+            await ProcessSingleAsync(AccountSensor.AccountId, AccountSensor.SensorId);
+        }
         else
             throw new InvalidOperationException();
     }
 
-    private async Task ProcessSingleAsync(Guid accountId, Guid sensorUid)
+    private async Task ProcessSingleAsync(Guid accountId, Guid sensorId)
     {
-
-        var accountSensorAlarms = await _mediator.Send(new AccountSensorAlarmsQuery()
+        Guid alarmId = Guid.NewGuid();
+        await _mediator.Send(new AddAccountSensorAlarmCommand()
         {
-            AccountUid = accountId,
-            SensorUid = sensorUid
-        });
-
-        foreach (var accountSensorAlarm in accountSensorAlarms)
-            Return(accountId, sensorUid, accountSensorAlarm);
-    }
-
-    private void Return(Guid accountId, Guid sensorUid, Core.Entities.AccountSensorAlarm accountSensorAlarm)
-    {
-        WriteObject(new AccountSensorAlarm {
             AccountId = accountId,
-            SensorId = sensorUid,
-            AlarmId = accountSensorAlarm.Uid,
-            AlarmType = (AccountSensorAlarmType)(int)accountSensorAlarm.AlarmType,
-            AlarmThreshold = accountSensorAlarm.AlarmThreshold,
+            SensorId = sensorId,
+            AlarmId = alarmId,
+            AlarmType = (Core.Entities.AccountSensorAlarmType)(int)AlarmType,
+            AlarmThreshold = AlarmThreshold
         });
+
+        WriteObject(alarmId);
     }
-}
-
-public enum AccountSensorAlarmType
-{
-    Data = 1,
-    Battery = 2,
-    PercentageLow = 3,
-    PercentageHigh = 4,
-    //PercentageStatus = 5,
-}
-
-public class AccountSensorAlarm
-{
-    public required Guid AccountId { get; init; }
-    public required Guid SensorId { get; init; }
-    public required Guid AlarmId { get; init; }
-    public required AccountSensorAlarmType AlarmType { get; init; }
-    public required double? AlarmThreshold { get; init; }
 }

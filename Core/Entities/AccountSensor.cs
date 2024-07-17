@@ -75,7 +75,7 @@ public class AccountSensor
         _alarms.Add(alarm);
     }
 
-    public bool RemoveSensor(AccountSensorAlarm alarm)
+    public bool RemoveAlarm(AccountSensorAlarm alarm)
     {
         return _alarms.Remove(alarm);
     }
