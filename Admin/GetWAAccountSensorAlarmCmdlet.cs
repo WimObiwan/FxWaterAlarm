@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
@@ -95,7 +95,14 @@ public class GetWAAccountSensorAlarmCmdlet : DependencyCmdlet<Startup>
     }
 }
 
-public enum AccountSensorAlarmType { Data = 1, Battery = 2, LevelFractionLow = 3, LevelFractionHigh = 4, LevelFractionStatus = 5 }
+public enum AccountSensorAlarmType
+{
+    Data = 1,
+    Battery = 2,
+    PercentageLow = 3,
+    PercentageHigh = 4,
+    //PercentageStatus = 5,
+}
 
 public class AccountSensorAlarm
 {

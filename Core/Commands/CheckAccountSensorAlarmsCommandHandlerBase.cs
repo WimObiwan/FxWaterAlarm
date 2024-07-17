@@ -57,7 +57,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         CancellationToken cancellationToken)
     {
         const double AlarmThresholdHisteresisBattery = 5.0;
-        const double AlarmThresholdHisteresisLevelFraction = 5.0;
+        const double AlarmThresholdHisteresisPercentage = 5.0;
 
         foreach (var alarm in alarms)
         {
@@ -95,7 +95,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     }
                     break;
                 }
-                case AccountSensorAlarmType.LevelFractionLow:
+                case AccountSensorAlarmType.PercentageLow:
                 {
                     if (!(measurementEx.Distance.LevelFraction is {} levelFraction))
                     {
@@ -109,12 +109,12 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     {
                         levelFraction *= 100.0;
                         isTriggered = levelFraction <= alarmThreshold;
-                        isCleared = levelFraction > alarmThreshold + AlarmThresholdHisteresisLevelFraction;
-                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.LevelFractionLow, measurementEx.AccountSensor, levelFraction, alarmThreshold);
+                        isCleared = levelFraction > alarmThreshold + AlarmThresholdHisteresisPercentage;
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.PercentageLow, measurementEx.AccountSensor, levelFraction, alarmThreshold);
                     }
                     break;
                 }
-                case AccountSensorAlarmType.LevelFractionHigh:
+                case AccountSensorAlarmType.PercentageHigh:
                 {
                     if (!(measurementEx.Distance.LevelFraction is {} levelFraction))
                     {
@@ -128,8 +128,8 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     {
                         levelFraction *= 100.0;
                         isTriggered = levelFraction >= alarm.AlarmThreshold;
-                        isCleared = levelFraction < alarmThreshold - AlarmThresholdHisteresisLevelFraction;
-                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.LevelFractionHigh, measurementEx.AccountSensor, levelFraction, alarmThreshold);
+                        isCleared = levelFraction < alarmThreshold - AlarmThresholdHisteresisPercentage;
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.PercentageHigh, measurementEx.AccountSensor, levelFraction, alarmThreshold);
                     }
                     break;
                 }
@@ -191,15 +191,15 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 message = $"De geschatte batterij-capaciteit is gezakt onder <strong>{thresholdValue}%</strong>";
                 shortMessage = $"Batterij {valueString}%";
                 break;
-            case AccountSensorAlarmType.LevelFractionHigh:
+            case AccountSensorAlarmType.PercentageHigh:
                 message = $"Het gemeten niveau van de sensor is gestegen boven <strong>{thresholdValue}%</strong>";
                 shortMessage = $"Niveau {valueString}%";
                 break;
-            case AccountSensorAlarmType.LevelFractionLow:
+            case AccountSensorAlarmType.PercentageLow:
                 message = $"Het gemeten niveau van de sensor is gezakt onder <strong>{thresholdValue}%</strong>";
                 shortMessage = $"Niveau {valueString}%";
                 break;
-            // case AccountSensorAlarmType.LevelFractionStatus:
+            // case AccountSensorAlarmType.PercentageStatus:
             //     message = $"Het gemeten niveau van de sensor is <strong>{valueString}%</strong>";
             //     shortMessage = $"Niveau {valueString}%";
             //     break;
