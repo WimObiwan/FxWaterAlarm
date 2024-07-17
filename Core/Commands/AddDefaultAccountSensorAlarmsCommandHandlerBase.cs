@@ -7,11 +7,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Commands;
 
-public abstract class AddDefaultSensorAlarmsCommandHandlerBase
+public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
 {
     ILogger _logger;
 
-    public AddDefaultSensorAlarmsCommandHandlerBase(ILogger logger)
+    public AddDefaultAccountSensorAlarmsCommandHandlerBase(ILogger logger)
     {
         _logger = logger;
     }
@@ -35,7 +35,7 @@ public abstract class AddDefaultSensorAlarmsCommandHandlerBase
         accountSensor.AddAlarm(new AccountSensorAlarm
         {
             Uid = Guid.NewGuid(),
-            AlarmType = AccountSensorAlarmType.LevelFractionLow,
+            AlarmType = AccountSensorAlarmType.PercentageLow,
             AlarmThreshold = 25.0
         });
     }

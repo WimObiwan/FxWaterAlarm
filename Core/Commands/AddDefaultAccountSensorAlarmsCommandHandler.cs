@@ -13,7 +13,7 @@ public record AddDefaultSensorAlarmsCommand : IRequest
     public required Guid SensorId { get; init; }
 }
 
-public class AddDefaultSensorAlarmsCommandHandler : AddDefaultSensorAlarmsCommandHandlerBase, IRequestHandler<AddDefaultSensorAlarmsCommand>
+public class AddDefaultSensorAlarmsCommandHandler : AddDefaultAccountSensorAlarmsCommandHandlerBase, IRequestHandler<AddDefaultSensorAlarmsCommand>
 {
     private readonly WaterAlarmDbContext _dbContext;
 
