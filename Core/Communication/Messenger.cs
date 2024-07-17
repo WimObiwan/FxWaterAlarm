@@ -17,6 +17,8 @@ public class MessengerOptions
     public required string SmtpServer { get; init; }
     public required string SmtpUsername { get; init; }
     public required string SmtpPassword { get; init; }
+    public string? MailContentPath { get; init; }
+
 }
 
 public interface IMessenger
@@ -40,10 +42,9 @@ public class Messenger : IMessenger
 
     private string GetContentPath(string path)
     {
-        return Path.Join(
-            Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location),
-            "Content",
-            path);
+        string contentPath = _messengerOptions.MailContentPath
+            ?? Path.Join(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location), "Content");
+        return Path.Join(contentPath, path);
     }
     
     public async Task SendAuthenticationMailAsync(string emailAddress, string url, string code)
