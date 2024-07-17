@@ -39,18 +39,18 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         if (ParameterSetName == "AccountId")
         {
             foreach (var accountId in AccountId)
-                await ProcessSingleAync(accountId);
+                await ProcessSingleAsync(accountId);
         }
         else if (ParameterSetName == "Account")
         {
             foreach (var account in Account)
-                await ProcessSingleAync(account.AccountId);
+                await ProcessSingleAsync(account.AccountId);
         }
         else
             throw new InvalidOperationException();
     }
 
-    private async Task ProcessSingleAync(Guid accountId)
+    private async Task ProcessSingleAsync(Guid accountId)
     {
 
         var accountSensors = await _mediator.Send(new AccountSensorsQuery() { AccountUid = accountId });
