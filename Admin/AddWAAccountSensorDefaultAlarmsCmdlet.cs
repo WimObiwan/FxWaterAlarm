@@ -73,7 +73,7 @@ public class AddWAAccountSensorDefaultAlarmsCmdlet : DependencyCmdlet<Startup>
 
     private async Task ProcessSingleAsync(Guid accountId, Guid sensorId)
     {
-        await _mediator.Send(new AddDefaultSensorAlarmsCommand()
+        await _mediator.Send(new AddDefaultAccountSensorAlarmsCommand()
         {
             AccountId = accountId,
             SensorId = sensorId

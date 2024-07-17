@@ -7,23 +7,23 @@ using Microsoft.Extensions.Logging;
 
 namespace Core.Commands;
 
-public record AddDefaultSensorAlarmsCommand : IRequest
+public record AddDefaultAccountSensorAlarmsCommand : IRequest
 {
     public required Guid AccountId { get; init; }
     public required Guid SensorId { get; init; }
 }
 
-public class AddDefaultSensorAlarmsCommandHandler : AddDefaultAccountSensorAlarmsCommandHandlerBase, IRequestHandler<AddDefaultSensorAlarmsCommand>
+public class AddDefaultAccountSensorAlarmsCommandHandler : AddDefaultAccountSensorAlarmsCommandHandlerBase, IRequestHandler<AddDefaultAccountSensorAlarmsCommand>
 {
     private readonly WaterAlarmDbContext _dbContext;
 
-    public AddDefaultSensorAlarmsCommandHandler(WaterAlarmDbContext dbContext, ILogger<AddDefaultSensorAlarmsCommandHandler> logger)
+    public AddDefaultAccountSensorAlarmsCommandHandler(WaterAlarmDbContext dbContext, ILogger<AddDefaultAccountSensorAlarmsCommandHandler> logger)
     : base (logger)
     {
         _dbContext = dbContext;
     }
 
-    public async Task Handle(AddDefaultSensorAlarmsCommand request, CancellationToken cancellationToken)
+    public async Task Handle(AddDefaultAccountSensorAlarmsCommand request, CancellationToken cancellationToken)
     {
         var accountSensor =
             await _dbContext.Accounts
