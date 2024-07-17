@@ -5,7 +5,8 @@ public enum GraphType
     None,
     Height,
     Percentage,
-    Capacity,
+    Volume,
+    Distance,
     RssiDbm,
     BatV,
 }
@@ -49,7 +50,7 @@ public class AccountSensor
         && DistanceMmFull.HasValue 
         && DistanceMmFull.Value < DistanceMmEmpty.Value;
 
-    public bool HasCapacity => 
+    public bool HasVolume => 
         HasPercentage
         && CapacityL.HasValue
         && CapacityL > 0;
@@ -58,8 +59,8 @@ public class AccountSensor
     {
         get
         {
-            if (HasCapacity)
-                return GraphType.Capacity;
+            if (HasVolume)
+                return GraphType.Volume;
             else if (HasPercentage)
                 return GraphType.Percentage;
             else if (HasHeight)

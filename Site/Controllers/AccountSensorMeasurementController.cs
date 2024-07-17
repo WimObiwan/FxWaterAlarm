@@ -78,11 +78,14 @@ public class AccountSensorMeasurementController : Controller
                         else
                             value = null;
                         break;
-                    case GraphType.Capacity:
+                    case GraphType.Volume:
                         if (measurementEx.Distance.WaterL is {} waterL)
                             value = Math.Round(waterL, 0);
                         else
                             value = null;
+                        break;
+                    case GraphType.Distance:
+                        value = measurementEx.Distance.DistanceMm;
                         break;
                     case GraphType.RssiDbm:
                         value = measurementEx.RssiDbm;
@@ -111,12 +114,13 @@ public class AccountSensorMeasurementController : Controller
         switch (graphType)
         {
             case GraphType.Height:
+            case GraphType.Distance:
                 unit = "mm";
                 break;
             case GraphType.Percentage:
                 unit = "%";
                 break;
-            case GraphType.Capacity:
+            case GraphType.Volume:
                 unit = "l";
                 break;
             case GraphType.RssiDbm:

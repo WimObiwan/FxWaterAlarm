@@ -16,9 +16,10 @@ public class AccountSensor : PageModel
     public enum PageTypeEnum
     {
         GraphDefault,
-        GraphCapacity,
+        GraphVolume,
         GraphPercentage,
         GraphHeight,
+        GraphDistance,
         GraphSignal,
         GraphBattery,
         Trend,

@@ -31,9 +31,9 @@
         <value>Graph</value>
         <comment>Graph</comment>
     </data>
-    <data name="Capacity" xml:space="preserve">
-        <value>Capacity</value>
-        <comment>Capacity</comment>
+    <data name="Volume" xml:space="preserve">
+        <value>Volume</value>
+        <comment>Volume</comment>
     </data>
     <data name="Percentage" xml:space="preserve">
         <value>Percentage</value>
@@ -42,6 +42,10 @@
     <data name="Height" xml:space="preserve">
         <value>Height</value>
         <comment>Height</comment>
+    </data>
+    <data name="Distance" xml:space="preserve">
+        <value>Distance</value>
+        <comment>Distance</comment>
     </data>
     <data name="Signal" xml:space="preserve">
         <value>Signaal</value>
