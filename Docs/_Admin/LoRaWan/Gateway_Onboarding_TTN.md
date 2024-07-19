@@ -1,9 +1,9 @@
 
-# LoRaWan Gateway
+# LoRaWan Gateway 'TTN'
 
 Onboarding procedure
 
-# 1. Information
+## 1. Information
 
 * Take photograph of backside gateway  
   Android: Gallery --> "Copy all"
@@ -13,7 +13,7 @@ Onboarding procedure
 	* Gateway EUI is derived from WIFI MAC, by putting FFFE in between:
 		* 58A0CB__FFFE__800123
 
-# 2. Register in TTN ("Claim")
+## 2. Register in TTN ("Claim")
 
 * Go to TTN --> Gateways
 	* https://eu1.cloud.thethings.network/console/gateways
@@ -25,7 +25,7 @@ Onboarding procedure
 * Set location
 	* https://whatismyelevation.com/
 
-# 3. Set Wifi password (initially)
+## 3. Set Wifi password (initially)
 
 * Plug in (with "reset" at the bottom)
 * Press reset for 5 seconds (LED blinks red/green)
@@ -36,7 +36,7 @@ Onboarding procedure
 * Add WIFI SSID e.g. "Obiwan", with SSID password
 * Click Save & Reboot 
 
-# 4. Change Wifi password
+## 4. Change Wifi password
 
 * Press setup for 10 seconds
 * Connect to WIFI SSID e.g. "MINIHUB-800123" (xxxxxx is last 6 of EUI)
@@ -47,7 +47,7 @@ Onboarding procedure
 	* https://whatismyelevation.com/
 
 
-# Other info
+## Other info
  
 * Required firewall configuration: (OUT)
 	* TCP 443   CUPS

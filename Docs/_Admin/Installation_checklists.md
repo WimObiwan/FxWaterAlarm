@@ -4,29 +4,30 @@
 
 * Sensor
 * Houder + Spare (+ Saucers)
-* Opgeladen batterijen!
 * Mand
   * Potlood
   * Hamer
   * Touw
-  * Boormachine
   * Schroevendraaierset
   * Potlood
   * Schroeven
   * Pluggen
-  * Slijpschijf
   * Lintmeter
   * Stokmeter
+* Boormachine op batterijen (Opgeladen!)
+* Slijpschijf op batterijen (Opgeladen!)
+* Boorset
 * Elektrische boormachine
-* Papier
+* Boekje
 * Schop
 
 ## Onsite
 
 * Boren x2
-* Opmeten
-  * Tot onderkant put
-  * Tot rand
-  * Tot onderkant houder --> 10mm lager
+* Opmeten (zie Excel)
+  * Bottom-Water
+  * Bottom-Top
+  * Bottom-Overflow
+  * Bottom-Sensor (10mm lager)
 * Grootte van waterput
-* Foto!
+* Foto's!

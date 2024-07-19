@@ -22,6 +22,30 @@ title: Versie Informatie
 > *
 -->
 
+### v0.36
+> 2024-07-17
+> ##### Nieuw
+> * Ondersteuning voor alarmen op hoogte (voorlopig nog niet in te stellen door eindgebruiker)
+> * (Admin Powershell interface voor alarmen)
+
+### v0.35
+> 2024-07-17
+> ##### Andere
+> * Vanaf nu wordt *Capaciteit* gebruikt voor de maximale inhoud van de put, en *Volume* voor de huidige inhoud van de put op een bepaald moment. 
+> ##### Verwijderingen
+> * (Console toepassing werd verwijderd, enkel Powershell interface is ondersteund vanaf nu)
+
+### v0.34
+> 2024-07-15
+> ##### Nieuw
+> * Extra grafieken voor batterij, signaal, hoogte, afstand en percentage
+
+### v0.33
+> 2024-07-14
+> ##### Nieuw
+> * Optioneel afzetten van de min/max afkapping, nuttig voor putten die veel boven 100% volume hebben
+> * Experimenteel gebruik van nieuwe visuals, nieuwe grafieken
+
 ### v0.32
 > 2024-06-18
 > ##### Andere
