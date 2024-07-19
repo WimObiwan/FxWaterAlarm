@@ -245,8 +245,8 @@ getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)&
                 return value.min;
             }
             let d = (value.max - value.min);
-            if (d < value.max * 0.2)
-                d = value.max * 0.2;
+            if (d < value.max * 0.1)
+                d = value.max * 0.1;
             let v = value.min - d * 0.5;
             if (v < 0) {
                 return 0;
