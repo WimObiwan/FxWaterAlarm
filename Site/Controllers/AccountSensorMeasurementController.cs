@@ -74,13 +74,13 @@ public class AccountSensorMeasurementController : Controller
                         break;
                     case GraphType.Percentage:
                         if (measurementEx.Distance.LevelFraction is {} levelFraction)
-                            value = Math.Round(levelFraction * 100.0, 1);
+                            value = Math.Round(levelFraction * 100.0, 2);
                         else
                             value = null;
                         break;
                     case GraphType.Volume:
                         if (measurementEx.Distance.WaterL is {} waterL)
-                            value = Math.Round(waterL, 0);
+                            value = Math.Round(waterL, 2);
                         else
                             value = null;
                         break;
