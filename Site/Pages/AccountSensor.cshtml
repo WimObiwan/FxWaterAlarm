@@ -267,15 +267,6 @@
     }
 </div>
 
-@if (Model.Preview)
-{
-    @: [<a href="?preview=false">Switch to normal visuals</a>]
-}
-else
-{
-    @: [<a href="?preview=true">Switch to preview visuals</a> <span class="badge bg-warning">beta</span>]
-}
-
 @*
 <div id="dbgAppMode" class="alert alert-dark hidden">
     <kbd>DEBUG: Running in App mode, landing page link: <span id="linkAppMode"></span></kbd>
