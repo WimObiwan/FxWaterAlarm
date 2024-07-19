@@ -7,104 +7,6 @@
 
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
-
-@*
-    const double autoScale = 100.0; // mm
-
-    string yAxisSuffix;
-
-    var measurements = Model.Measurements;
-    var accountSensor = Model.AccountSensorEntity;
-
-    IEnumerable<double?>? maxDistance, minDistance, meanDistance;
-    double? scale, absoluteMin, absoluteMax;
-
-    if (accountSensor is not { DistanceMmEmpty: not null })
-    {
-        maxDistance = null;
-        minDistance = null;
-        meanDistance = null;
-        scale = null;
-        absoluteMin = null;
-        absoluteMax = null;
-        yAxisSuffix = "";
-    }
-    else if (!accountSensor.DistanceMmFull.HasValue)
-    {
-        maxDistance = measurements.Select(m => (double?)m.MaxDistance.HeightMm);
-        minDistance = measurements.Select(m => (double?)m.MinDistance.HeightMm);
-        meanDistance = measurements.Select(m => (double?)m.MeanDistance.HeightMm);
-        scale = autoScale;
-        if (accountSensor.NoMinMaxConstraints)
-            absoluteMin = null;
-        else
-            absoluteMin = 0.0;
-        absoluteMax = null;
-        yAxisSuffix = " mm";
-    }
-    else if (!accountSensor.CapacityL.HasValue)
-    {
-        maxDistance = measurements.Select(m => m.MaxDistance.LevelFraction * 100.0);
-        minDistance = measurements.Select(m => m.MinDistance.LevelFraction * 100.0);
-        meanDistance = measurements.Select(m => m.MeanDistance.LevelFraction * 100.0);
-        scale = (autoScale / (accountSensor.DistanceMmEmpty - accountSensor.DistanceMmFull)) * 100.0;
-        if (accountSensor.NoMinMaxConstraints)
-        {
-            absoluteMin = null;
-            absoluteMax = null;
-        }
-        else
-        {
-            absoluteMin = 0.0;
-            absoluteMax = 100.0;
-        }
-        yAxisSuffix = " %";
-    }
-    else
-    {
-        maxDistance = measurements.Select(m => m.MaxDistance.WaterL);
-        minDistance = measurements.Select(m => m.MinDistance.WaterL);
-        meanDistance = measurements.Select(m => m.MeanDistance.WaterL);
-        scale = (autoScale / (accountSensor.DistanceMmEmpty - accountSensor.DistanceMmFull)) * accountSensor.CapacityL;
-        if (accountSensor.NoMinMaxConstraints)
-        {
-            absoluteMin = null;
-            absoluteMax = null;
-        }
-        else
-        {
-            absoluteMin = 0.0;
-            absoluteMax = accountSensor.CapacityL;
-        }
-        yAxisSuffix = " L";
-    }
-
-    var min = minDistance?.Min();
-    var max = maxDistance?.Max();
-    if (min.HasValue && max.HasValue && scale.HasValue)
-    {
-        if (max.Value - min.Value < scale)
-        {
-            double basis = (max.Value + min.Value) / 2.0;
-            max = Math.Round(basis + scale.Value / 2.0, 0);
-            min = Math.Round(basis - scale.Value / 2.0, 0);
-        }
-
-        if (absoluteMin.HasValue && min.Value < absoluteMin.Value)
-        {
-            min = absoluteMin;
-            if (min + scale > max)
-                max = min + scale;
-        }
-        
-        if (absoluteMax.HasValue && max.Value > absoluteMax.Value)
-        {
-            max = absoluteMax;
-            if (max - scale < min)
-                min = max - scale;
-        }
-    }
-*@
 }
 
 <div id="chart-container-@uniqueId" style="height: 40vh; width: 100%; touch-action: none;"></div>
@@ -115,6 +17,7 @@
     bool isArea;
     string color;
     LocalizedHtmlString title, serieName;
+    int round;
     switch (Model.GraphType)
     {
         default:
@@ -123,42 +26,49 @@
             isArea = true;
             serieName = @Loc["Graph"];
             title = @Loc["Graph"];
+            round = Model.AccountSensorEntity.RoundVolume;
             break;
         case Core.Entities.GraphType.Volume:
             color = "#37addd";
             isArea = true;
             serieName = @Loc["Volume"];
             title = @Loc["Volume"];
+            round = Model.AccountSensorEntity.RoundVolume;
             break;
         case Core.Entities.GraphType.Percentage:
             color = "#37addd";
             isArea = true;
             serieName = @Loc["Percentage"];
             title = @Loc["Percentage"];
+            round = 10;
             break;
         case Core.Entities.GraphType.Height:
             color = "#37addd";
             isArea = true;
             serieName = @Loc["Height"];
             title = @Loc["Height"];
+            round = 1;
             break;
         case Core.Entities.GraphType.Distance:
             color = "#37addd";
             isArea = true;
             serieName = @Loc["Distance"];
             title = @Loc["Distance"];
+            round = 1;
             break;
         case Core.Entities.GraphType.RssiDbm:
             color = "#00aa00";
             isArea = false;
             serieName = @Loc["Signal"];
             title = @Loc["Signal"];
+            round = 1;
             break;
         case Core.Entities.GraphType.BatV:
             color = "#ff0000";
             isArea = false;
             serieName = @Loc["Battery"];
             title = @Loc["Battery"];
+            round = 10;
             break;
     }
 
@@ -267,24 +177,19 @@ getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)&
         min: 'dataMin',
         max: 'dataMax' *@
     },
-    @* tooltip: {
+    tooltip: {
         trigger: 'item',
-        axisPointer: {
+        @* axisPointer: {
         type: 'shadow',
-        },
+        }, *@
         formatter: (params) => {
-            return
-                "TimeStamp: " + params[0].value[0].toLocaleString() + "<br>" +
-                params[0].seriesName + ": " + params[0].value[1].toLocaleString() + "<br>";
+            let val = params.value[1];
+            val = Math.round(val * @round) / @round;
+            let x = (new Date(params.value[0])).toLocaleString()
+                + '<br/>@serieName: <b>' + val.toLocaleString() + ' ' + unit + '</b>';
+            return x;
         }
-    }, *@
-    @* tooltip: {
-        valueFormatter: function(params){
-            //let label = params.value[1]; // this is my y column
-            let label = params;
-            return label.toLocaleString();
-        }
-    }, *@
+    },
     dataZoom: [
         {
         type: 'inside',
@@ -302,10 +207,11 @@ getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)&
         {
         name: '@serieName (' + unit + ')',
         type: 'line',
+        symbol: 'emptyCircle',
         @if (Model.ShowTimelineSlider) {
-            @: symbol: 'none',
+            @: symbolSize: 2,
         } else {
-            @: symbol: 'emptyCircle',
+            @: symbolSize: 3,
         }
         sampling: 'lttb',
         itemStyle: {

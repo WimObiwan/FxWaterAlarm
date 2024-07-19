@@ -55,6 +55,19 @@ public class AccountSensor
         && CapacityL.HasValue
         && CapacityL > 0;
 
+    public int RoundVolume
+    {
+        get
+        {
+            if (CapacityL < 20)
+                return 100;
+            else if (CapacityL < 200)
+                return 10;
+            else
+                return 1;
+        }
+    }
+
     public GraphType GraphType
     {
         get
