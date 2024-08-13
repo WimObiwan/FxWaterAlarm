@@ -4,10 +4,10 @@
 $email = 'email@domain.tld'
 $devEui = 'xxxx'
 $accountSensorDetails = @{
-    Name = 'Regenput-LoRa',
-    DistanceEmptyMm = 2700,
-    DistanceFullMm = 700,
-    CapacityL = 10000,
+    Name = 'Regenput-LoRa'
+    DistanceEmptyMm = 2700
+    DistanceFullMm = 700
+    CapacityL = 10000
     AlertsEnabled = $true
 }
 
@@ -16,7 +16,7 @@ if (-not $account)
 {
     $account = New-WAAccount -Email $email
     Reset-WAAccountLink $account
-    $account = Get-WAAccount $account.Id
+    $account = Get-WAAccount $account.AccountId
 }
 Write-Warning "Using Account: Id=$($account.Id), Link=$($account.Link)"
 
@@ -25,9 +25,9 @@ if (-not $sensor)
 {
     $sensor = New-WASensor -DevEui $devEui
     Reset-WASensorLink $sensor
-    $sensorw = Get-WASensor $sensor.Id
+    $sensor = Get-WASensor $sensor.Guid
 }
-Write-Warning "Using Sensor: Id=$($sensor.Id), Link=$($sensor.Link)"
+Write-Warning "Using Sensor: Id=$($sensor.SensorId), Link=$($sensor.Link)"
 
 $accountSensor = Get-WAAccountSensor -Account $account | ?{ $_.SensorId -eq $sensor.Id }
 if (-not $accountSensor)

@@ -4,3 +4,4 @@
 * [LoRaWan](LoRaWan/)
 * [Installation checklists](Installation_checklists.md)
 * [Measurement actions](Measurement_actions.md)
+* [Provisioning](Provisioning.md)
