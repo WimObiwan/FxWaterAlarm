@@ -13,7 +13,7 @@ using Westwind.AspNetCore.Markdown;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("appsettings.Local.json", true);
+builder.Configuration.AddJsonFile("appsettings.Local.json", true, true);
 
 // Add services to the container.
 builder.Services.AddLocalization(o =>
@@ -52,6 +52,8 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(
             ?? throw new Exception("AccountLoginMessageOptions not configured");
         x.TokenLifespan = accountLoginMessageOptions.TokenLifespan;
     });
+
+builder.Services.Configure<MessagesOptions>(builder.Configuration.GetSection(MessagesOptions.Location));
 
 builder.Services.AddRazorPages(o =>
         o.Conventions

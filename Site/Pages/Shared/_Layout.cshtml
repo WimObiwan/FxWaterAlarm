@@ -1,7 +1,9 @@
 @using System.Reflection
 @using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
 @inject IConfiguration Config
 @inject IViewLocalizer Loc
+@inject IOptionsSnapshot<MessagesOptions> MessagesOptions
 
 <!DOCTYPE html>
 <html lang="en">
@@ -93,8 +95,33 @@
             </div>
         </div>
     </nav>
+
 </header>
 <div class="container">
+    @if (MessagesOptions.Value?.Messages is {} messages)
+    {
+        int dismissRepeatInterval = (int)(MessagesOptions.Value.DismissRepeatInterval ?? TimeSpan.FromDays(365)).TotalSeconds;
+        @foreach (var message in messages.Where(m => m.Expiration > DateTime.Now))
+        {
+            string alertClass;
+            switch(message.Type)
+            {
+                case Message.TypeEnum.Primary: alertClass = "primary"; break;
+                case Message.TypeEnum.Secondary: alertClass = "secondary"; break;
+                default:
+                case Message.TypeEnum.Success: alertClass = "success"; break;
+                case Message.TypeEnum.Danger: alertClass = "danger"; break;
+                case Message.TypeEnum.Warning: alertClass = "warning"; break;
+                case Message.TypeEnum.Info: alertClass = "info"; break;
+                case Message.TypeEnum.Light: alertClass = "light"; break;
+                case Message.TypeEnum.Dark: alertClass = "dark"; break;
+            }
+            <dismissable-alert id="@message.Id" expiration="@dismissRepeatInterval" alert-class="@alertClass">
+                @Html.Raw(@message.Contents["*"])
+            </dismissable-alert>
+        }
+    }
+
     <main role="main" class="pb-3">
         @RenderBody()
     </main>
