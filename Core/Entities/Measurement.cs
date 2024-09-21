@@ -1,6 +1,6 @@
 namespace Core.Entities;
 
-public class Measurement
+public record Measurement
 {
     public required string DevEui { get; init; }
     public DateTime Timestamp { get; init; }
