@@ -101,7 +101,7 @@
     @if (MessagesOptions.Value?.Messages is {} messages)
     {
         int dismissRepeatInterval = (int)(MessagesOptions.Value.DismissRepeatInterval ?? TimeSpan.FromDays(365)).TotalSeconds;
-        @foreach (var message in messages.Where(m => m.Expiration > DateTime.Now))
+        @foreach (var message in messages.Where(m => m.ExpirationUtc > DateTime.UtcNow))
         {
             string alertClass;
             switch(message.Type)
@@ -116,7 +116,7 @@
                 case Message.TypeEnum.Light: alertClass = "light"; break;
                 case Message.TypeEnum.Dark: alertClass = "dark"; break;
             }
-            <dismissable-alert id="@message.Id" expiration="@dismissRepeatInterval" alert-class="@alertClass">
+            <dismissable-alert id="@message.Id" repeat="@dismissRepeatInterval" expiration="@message.ExpirationUtc" alert-class="@alertClass">
                 @Html.Raw(@message.Contents["*"])
             </dismissable-alert>
         }

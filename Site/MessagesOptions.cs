@@ -15,5 +15,5 @@ class Message
     public required string Id { get; init; }
     public required TypeEnum Type { get; init; }
     public required Dictionary<string, string> Contents { get; init; }
-    public required DateTime Expiration { get; init; }
+    public required DateTime ExpirationUtc { get; init; }
 }

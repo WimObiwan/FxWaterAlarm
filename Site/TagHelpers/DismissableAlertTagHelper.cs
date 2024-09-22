@@ -10,11 +10,13 @@ namespace Site.TagHelpers;
 public class DismissableAlertTagHelper : TagHelper
 {
     public required string Id { get; set; }
-    public int Expiration { get; set; }
+    public int Repeat { get; set; }
+    public DateTime Expiration { get; set; }
     public string? AlertClass { get; set; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+        const string localStoragePrefix = "dismissable-alert-";
         string localStorageName = $"dismissable-alert-{Id}";
         output.TagName = "div";
         output.Attributes.SetAttribute("id", Id);
@@ -33,16 +35,62 @@ public class DismissableAlertTagHelper : TagHelper
         output.Content.AppendHtml($$"""
 <script>
     window.addEventListener('load', function () {
-    	const now = new Date()
-        const store = localStorage.getItem("{{localStorageName}}")
-        if (store === null || Date.parse(store) < now.getTime() - {{Expiration}} * 1000) {
+    	const now = new Date();
+        show = false;
+        try {
+            const store = JSON.parse(localStorage.getItem("{{localStorageName}}"));
+            if (store === null) {
+                show = true;
+            } else {
+                const expiration = store.expiration;
+                if (expiration === null || Date.parse(expiration) < now.getTime()) {
+                    show = true;
+                } else {
+                    const dismissed = store.dismissed;
+                    if (dismissed === null || Date.parse(dismissed) < now.getTime() - {{Repeat}} * 1000) {
+                        show = true;
+                    }
+                }
+            }
+        } catch (e) {
+            show = true;
+        }
+        if (show === true) {
             $("#{{Id}}").removeClass("hidden");
             $("#{{Id}}").addClass("show");
         }
         $("#{{Id}} .btn-close").on("click",function() {
-            localStorage.setItem("{{localStorageName}}", now.toISOString());
+            $.each(localStorage, function(key, value) {
+                if (key.startsWith("{{localStoragePrefix}}")) {
+                    show = false;
+                    try {
+                        const store = JSON.parse(value);
+                        if (store === null) {
+                            show = true;
+                        } else {
+                            const expiration = store.expiration;
+                            if (expiration === null || Date.parse(expiration) < now.getTime()) {
+                                show = true;
+                            } else {
+                                const dismissed = store.dismissed;
+                                if (dismissed === null || Date.parse(dismissed) < now.getTime() - {{Repeat}} * 1000) {
+                                    show = true;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        show = true;
+                    }
+                    if (show === true) {
+                        localStorage.removeItem(key);
+                    }
+                }
+                console.log(key, value);
+            });
+            var store = {"dismissed": now.toISOString(), "expiration": "{{Expiration.ToString("o")}}"};
+            localStorage.setItem("{{localStorageName}}", JSON.stringify(store));
         });
-    })
+    });
 </script>
 """);
     }
