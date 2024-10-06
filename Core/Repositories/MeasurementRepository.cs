@@ -17,15 +17,15 @@ public class MeasurementInfluxOptions
 
 public interface IMeasurementRepository
 {
-    Task<Measurement?> GetLast(string devEui, CancellationToken cancellationToken);
+    Task<MeasurementLevel?> GetLast(string devEui, CancellationToken cancellationToken);
 
-    Task<Measurement[]> Get(string devEui, DateTime? from, DateTime? till,
+    Task<MeasurementLevel[]> Get(string devEui, DateTime? from, DateTime? till,
         CancellationToken cancellationToken);
 
     Task<AggregatedMeasurement[]> GetAggregated(string devEui, DateTime? from, DateTime? till, TimeSpan? interval,
         CancellationToken cancellationToken);
 
-    Task<Measurement?> GetLastBefore(string devEui, DateTime dateTime,
+    Task<MeasurementLevel?> GetLastBefore(string devEui, DateTime dateTime,
         CancellationToken cancellationToken);
 
     Task<AggregatedMeasurement?> GetLastMedian(string devEui, DateTime from, CancellationToken cancellationToken);
@@ -40,10 +40,10 @@ public class MeasurementRepository : IMeasurementRepository
         _options = options.Value;
     }
 
-    public async Task<Measurement?> GetLast(string devEui, CancellationToken cancellationToken)
+    public async Task<MeasurementLevel?> GetLast(string devEui, CancellationToken cancellationToken)
     {
         using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
-        var result = await influxClient.ReadAsync<Record>("wateralarm",
+        var result = await influxClient.ReadAsync<RecordLevel>("wateralarm",
             "SELECT * FROM waterlevel WHERE DevEUI = $devEui GROUP BY * ORDER BY DESC LIMIT 1",
             new { devEui },
             cancellationToken);
@@ -52,7 +52,7 @@ public class MeasurementRepository : IMeasurementRepository
         if (series == null || record == null)
             return null;
 
-        return new Measurement
+        return new MeasurementLevel
         {
             DevEui = (string)series.GroupedTags["DevEUI"],
             Timestamp = record.Timestamp,
@@ -62,7 +62,7 @@ public class MeasurementRepository : IMeasurementRepository
         };
     }
 
-    public async Task<Measurement[]> Get(string devEui, DateTime? from, DateTime? till,
+    public async Task<MeasurementLevel[]> Get(string devEui, DateTime? from, DateTime? till,
         CancellationToken cancellationToken)
     {
         (string filterText, object parameters) = GetFilter(devEui, from, till);
@@ -75,12 +75,12 @@ public class MeasurementRepository : IMeasurementRepository
                     + " ORDER BY DESC LIMIT 1000";
 
         using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
-        var result = await influxClient.ReadAsync<Record>("wateralarm", query, parameters,
+        var result = await influxClient.ReadAsync<RecordLevel>("wateralarm", query, parameters,
             cancellationToken);
 
         var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
         var record = series?.Rows?.Select(record =>
-            new Measurement
+            new MeasurementLevel
             {
                 DevEui = (string)series.GroupedTags["DevEUI"],
                 Timestamp = record.Timestamp,
@@ -89,7 +89,7 @@ public class MeasurementRepository : IMeasurementRepository
                 RssiDbm = record.Rssi
             }).ToArray();
 
-        return record ?? Array.Empty<Measurement>();
+        return record ?? Array.Empty<MeasurementLevel>();
     }
 
     public async Task<AggregatedMeasurement[]> GetAggregated(string devEui, DateTime? from, DateTime? till, TimeSpan? interval,
@@ -126,7 +126,7 @@ public class MeasurementRepository : IMeasurementRepository
 
         
         using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
-        var result = await influxClient.ReadAsync<RecordAgg>("wateralarm", query, parameters,
+        var result = await influxClient.ReadAsync<RecordLevelAgg>("wateralarm", query, parameters,
             cancellationToken);
 
         var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
@@ -170,12 +170,12 @@ public class MeasurementRepository : IMeasurementRepository
         return (filterText.ToString(), parameters);
     }
 
-    public async Task<Measurement?> GetLastBefore(string devEui, DateTime timestamp,
+    public async Task<MeasurementLevel?> GetLastBefore(string devEui, DateTime timestamp,
         CancellationToken cancellationToken)
     {
         using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
-        var result = await influxClient.ReadAsync<Record>("wateralarm",
-            "SELECT * FROM waterlevel WHERE DevEUI = $devEui AND time <= $before GROUP BY * ORDER BY DESC LIMIT 1",
+        var result = await influxClient.ReadAsync<RecordLevel>("wateralarm",
+            $"SELECT * FROM waterlevel WHERE DevEUI = $devEui AND time <= $before GROUP BY * ORDER BY DESC LIMIT 1",
             new { devEui, before = timestamp },
             cancellationToken);
         var series = result?.Results?.FirstOrDefault()?.Series?.FirstOrDefault();
@@ -183,7 +183,7 @@ public class MeasurementRepository : IMeasurementRepository
         if (series == null || record == null)
             return null;
 
-        return new Measurement
+        return new MeasurementLevel
         {
             DevEui = (string)series.GroupedTags["DevEUI"],
             Timestamp = record.Timestamp,
@@ -203,7 +203,7 @@ public class MeasurementRepository : IMeasurementRepository
 
     // ReSharper disable UnusedAutoPropertyAccessor.Local
 
-    private class Record
+    private class RecordLevel
     {
         [InfluxTimestamp] public DateTime Timestamp { get; set; }
 
@@ -216,7 +216,7 @@ public class MeasurementRepository : IMeasurementRepository
         [InfluxField("RSSI")] public int Rssi { get; set; }
     }
 
-    private class RecordAgg
+    private class RecordLevelAgg
     {
         [InfluxTimestamp] public DateTime Timestamp { get; set; }
 

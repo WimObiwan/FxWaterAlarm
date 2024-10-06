@@ -4,12 +4,12 @@ using MediatR;
 
 namespace Core.Queries;
 
-public record LastMeasurementQuery : IRequest<Measurement?>
+public record LastMeasurementQuery : IRequest<MeasurementLevel?>
 {
     public required string DevEui { get; init; }
 }
 
-public class LastMeasurementQueryHandler : IRequestHandler<LastMeasurementQuery, Measurement?>
+public class LastMeasurementQueryHandler : IRequestHandler<LastMeasurementQuery, MeasurementLevel?>
 {
     private readonly IMeasurementRepository _measurementRepository;
 
@@ -18,7 +18,7 @@ public class LastMeasurementQueryHandler : IRequestHandler<LastMeasurementQuery,
         _measurementRepository = measurementRepository;
     }
 
-    public async Task<Measurement?> Handle(LastMeasurementQuery request, CancellationToken cancellationToken)
+    public async Task<MeasurementLevel?> Handle(LastMeasurementQuery request, CancellationToken cancellationToken)
     {
         return await _measurementRepository.GetLast(request.DevEui, cancellationToken);
     }

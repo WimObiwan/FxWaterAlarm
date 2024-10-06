@@ -9,7 +9,7 @@ public class TrendMeasurementEx
     private readonly MeasurementEx _measurementEx;
     private readonly MeasurementEx _trendMeasurementEx;
 
-    public TrendMeasurementEx(TimeSpan timeSpan, Measurement trend, MeasurementEx measurementEx)
+    public TrendMeasurementEx(TimeSpan timeSpan, MeasurementLevel trend, MeasurementEx measurementEx)
     {
         _timeSpan = timeSpan;
         _measurementEx = measurementEx;

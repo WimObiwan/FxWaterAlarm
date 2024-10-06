@@ -1,3 +1,4 @@
+using Core.Entities;
 using Core.Queries;
 using Core.Util;
 using MediatR;
@@ -23,7 +24,7 @@ public class TrendService : ITrendService
     public async Task<TrendMeasurementEx?> GetTrendMeasurement(TimeSpan timeSpan, MeasurementEx lastMeasurement)
     {
         var trendMeasurement = await _mediator.Send(
-            new MeasurementLastBeforeQuery
+            new MeasurementLastBeforeQuery<MeasurementLevel>
             {
                 DevEui = lastMeasurement.AccountSensor.Sensor.DevEui,
                 Timestamp = lastMeasurement.Timestamp.Add(-timeSpan)

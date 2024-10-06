@@ -5,9 +5,9 @@ namespace Core.Util;
 public class MeasurementEx
 {
     private readonly Core.Entities.AccountSensor _accountSensor;
-    private readonly Measurement _measurement;
+    private readonly MeasurementLevel _measurement;
 
-    public MeasurementEx(Measurement measurement, Core.Entities.AccountSensor accountSensor)
+    public MeasurementEx(MeasurementLevel measurement, Core.Entities.AccountSensor accountSensor)
     {
         _measurement = measurement;
         _accountSensor = accountSensor;
