@@ -3,6 +3,7 @@ using System.Management.Automation;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Entities;
 using MediatR;
 using Svrooij.PowerShell.DependencyInjection;
 
@@ -21,7 +22,12 @@ public class NewWASensorCmdlet : DependencyCmdlet<Startup>
     public string DevEui { get; set; } = null!;
 
     [Parameter(
-        Position = 1)]
+        Position = 1,
+        Mandatory = true)]
+    public Core.Entities.SensorType SensorType { get; set; }
+
+    [Parameter(
+        Position = 2)]
     public Guid? SensorUid { get; set; }
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
@@ -30,7 +36,8 @@ public class NewWASensorCmdlet : DependencyCmdlet<Startup>
 
         await _mediator.Send(new CreateSensorCommand() { 
             Uid = sensorUid,
-            DevEui = DevEui
+            DevEui = DevEui,
+            SensorType = SensorType
         });
 
         WriteObject(sensorUid);

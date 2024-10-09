@@ -1,5 +1,7 @@
 namespace Core.Entities;
 
+public enum SensorType { Level, Detect }
+
 public class Sensor
 {
     private readonly List<Account> _accounts = null!;
@@ -9,6 +11,7 @@ public class Sensor
     public required Guid Uid { get; init; }
     public required string DevEui { get; init; }
     public required DateTime CreateTimestamp { get; init; }
+    public required SensorType Type { get; init; }
     public string? Link { get; set; }
     public IReadOnlyCollection<AccountSensor> AccountSensors => _accountSensors.AsReadOnly();
     public IReadOnlyCollection<Account> Accounts => _accounts.AsReadOnly();
