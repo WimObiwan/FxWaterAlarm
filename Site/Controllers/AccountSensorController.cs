@@ -85,30 +85,30 @@ public class AccountSensorController : Controller
         if (accountSensor == null)
             return NotFound();
         
-        var lastMeasurement = await _mediator.Send(new LastMeasurementQuery
+        var lastMeasurement = await _mediator.Send(new LastMeasurementLevelQuery
             { DevEui = accountSensor.Sensor.DevEui });
-        var measurementEx = lastMeasurement != null ? new MeasurementEx(lastMeasurement, accountSensor) : null;
+        var measurementMevelEx = lastMeasurement != null ? new MeasurementLevelEx(lastMeasurement, accountSensor) : null;
 
         LastMeasurementDto? lastMeasurementDto;
         TrendsDto? trendsDto;
-        if (measurementEx != null)
+        if (measurementMevelEx != null)
         {
             lastMeasurementDto = new LastMeasurementDto
             {
-                TimeStamp = measurementEx.Timestamp,
-                BatV = measurementEx.BatV,
-                BatteryPrc = measurementEx.BatteryPrc,
-                RssiDbm = measurementEx.RssiDbm,
-                RssiPrc = measurementEx.RssiPrc,
-                DistanceMm = measurementEx.Distance.DistanceMm,
-                HeightMm = measurementEx.Distance.HeightMm,
-                WaterL = measurementEx.Distance.WaterL,
-                LevelFraction = measurementEx.Distance.LevelFraction,
-                RealLevelFraction = measurementEx.Distance.RealLevelFraction,
-                EstimatedNextRefresh = measurementEx.EstimateNextRefresh()
+                TimeStamp = measurementMevelEx.Timestamp,
+                BatV = measurementMevelEx.BatV,
+                BatteryPrc = measurementMevelEx.BatteryPrc,
+                RssiDbm = measurementMevelEx.RssiDbm,
+                RssiPrc = measurementMevelEx.RssiPrc,
+                DistanceMm = measurementMevelEx.Distance.DistanceMm,
+                HeightMm = measurementMevelEx.Distance.HeightMm,
+                WaterL = measurementMevelEx.Distance.WaterL,
+                LevelFraction = measurementMevelEx.Distance.LevelFraction,
+                RealLevelFraction = measurementMevelEx.Distance.RealLevelFraction,
+                EstimatedNextRefresh = measurementMevelEx.EstimateNextRefresh()
             };
             
-            var trendMeasurements = await _trendService.GetTrendMeasurements(measurementEx,
+            var trendMeasurements = await _trendService.GetTrendMeasurements(measurementMevelEx,
                 //TimeSpan.FromHours(1),
                 TimeSpan.FromHours(6),
                 TimeSpan.FromHours(24),

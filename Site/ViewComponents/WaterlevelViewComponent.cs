@@ -6,8 +6,8 @@ namespace Site.ViewComponents;
 public class WaterlevelViewComponent : ViewComponent
 {
     public async Task<IViewComponentResult> InvokeAsync(
-        MeasurementEx measurementEx)
+        MeasurementLevelEx measurementLevelEx)
     {
-        return await Task.FromResult(View(measurementEx));
+        return await Task.FromResult(View(measurementLevelEx));
     }
 }

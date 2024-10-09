@@ -3,12 +3,12 @@ using Core.Util;
 
 namespace Site.Utilities;
 
-public class MeasurementAggEx
+public class AggregatedMeasurementLevelEx
 {
     private readonly Core.Entities.AccountSensor _accountSensor;
-    private readonly AggregatedMeasurement _aggregatedMeasurement;
+    private readonly AggregatedMeasurementLevel _aggregatedMeasurement;
 
-    public MeasurementAggEx(AggregatedMeasurement aggregatedMeasurement, Core.Entities.AccountSensor accountSensor)
+    public AggregatedMeasurementLevelEx(AggregatedMeasurementLevel aggregatedMeasurement, Core.Entities.AccountSensor accountSensor)
     {
         _aggregatedMeasurement = aggregatedMeasurement;
         _accountSensor = accountSensor;

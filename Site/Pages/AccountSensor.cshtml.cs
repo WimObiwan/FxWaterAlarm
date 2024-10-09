@@ -43,7 +43,7 @@ public class AccountSensor : PageModel
         _trendService = trendService;
     }
 
-    public MeasurementEx? LastMeasurement { get; private set; }
+    public MeasurementLevelEx? LastMeasurement { get; private set; }
     //public TrendMeasurementEx? TrendMeasurement1H { get; private set; }
     public TrendMeasurementEx? TrendMeasurement6H { get; private set; }
     public TrendMeasurementEx? TrendMeasurement24H { get; private set; }
@@ -75,9 +75,9 @@ public class AccountSensor : PageModel
 
         if (AccountSensorEntity != null)
         {
-            var lastMeasurement = await _mediator.Send(new LastMeasurementQuery
+            var lastMeasurement = await _mediator.Send(new LastMeasurementLevelQuery
                 { DevEui = AccountSensorEntity.Sensor.DevEui });
-            if (lastMeasurement != null) LastMeasurement = new MeasurementEx(lastMeasurement, AccountSensorEntity);
+            if (lastMeasurement != null) LastMeasurement = new MeasurementLevelEx(lastMeasurement, AccountSensorEntity);
 
             switch (PageType)
             {
@@ -160,26 +160,26 @@ public class AccountSensor : PageModel
 
             foreach (var record in result)
             {
-                MeasurementEx measurementEx = new(record, accountSensorEntity);
+                MeasurementLevelEx measurementLevelEx = new(record, accountSensorEntity);
                 StringBuilder sb = new();
                 sb
-                    .Append('"').Append(measurementEx.DevEui).Append('"')
+                    .Append('"').Append(measurementLevelEx.DevEui).Append('"')
                     .Append(',')
-                    .Append('"').Append(measurementEx.Timestamp.ToString("yyyy-M-d HH:mm:ss")).Append('"')
+                    .Append('"').Append(measurementLevelEx.Timestamp.ToString("yyyy-M-d HH:mm:ss")).Append('"')
                     .Append(',')
-                    .Append(measurementEx.Distance.DistanceMm)
+                    .Append(measurementLevelEx.Distance.DistanceMm)
                     .Append(',')
-                    .Append(measurementEx.BatV.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementLevelEx.BatV.ToString(CultureInfo.InvariantCulture))
                     .Append(',')
-                    .Append(measurementEx.RssiDbm.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementLevelEx.RssiDbm.ToString(CultureInfo.InvariantCulture))
                     .Append(',')
-                    .Append(measurementEx.Distance.LevelFraction?.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementLevelEx.Distance.LevelFraction?.ToString(CultureInfo.InvariantCulture))
                     .Append(',')
-                    .Append(measurementEx.Distance.WaterL?.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementLevelEx.Distance.WaterL?.ToString(CultureInfo.InvariantCulture))
                     .Append(',')
-                    .Append(measurementEx.BatteryPrc.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementLevelEx.BatteryPrc.ToString(CultureInfo.InvariantCulture))
                     .Append(',')
-                    .Append(measurementEx.RssiPrc.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementLevelEx.RssiPrc.ToString(CultureInfo.InvariantCulture))
                     ;
                 await textWriter.WriteLineAsync(sb.ToString());
             }

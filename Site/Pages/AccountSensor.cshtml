@@ -38,9 +38,9 @@
     @if (Model.LastMeasurement != null)
     {
         @if (Model.Preview) {
-            @await Component.InvokeAsync("WaterlevelNew", new { measurementEx = Model.LastMeasurement })
+            @await Component.InvokeAsync("WaterlevelNew", new { measurementLevelEx = Model.LastMeasurement })
         } else {
-            @await Component.InvokeAsync("Waterlevel", new { measurementEx = Model.LastMeasurement })
+            @await Component.InvokeAsync("Waterlevel", new { measurementLevelEx = Model.LastMeasurement })
         }
 
         <ul class="nav nav-tabs">
@@ -222,7 +222,7 @@
         {
             @await Component.InvokeAsync("MeasurementDetails", new
                    {
-                       accountSensor = Model.AccountSensorEntity, measurementEx = Model.LastMeasurement
+                       accountSensor = Model.AccountSensorEntity, measurementLevelEx = Model.LastMeasurement
                    })
             
             <div class="grayout">

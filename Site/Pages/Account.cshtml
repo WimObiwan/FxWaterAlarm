@@ -41,7 +41,7 @@ else
                                 @measurement.AccountSensor.Name
                             </div>
                             <div style="text-align: center;">
-                                @await Component.InvokeAsync("Waterlevel", new { measurementEx = measurement })
+                                @await Component.InvokeAsync("Waterlevel", new { measurementLevelEx = measurement })
                             </div>
                             <div style="text-align: center; margin-top: 20px;">
                                 <a href="@measurement.AccountSensor.RestPath" class="btn btn-primary">@Loc["Sensor details"]</a>

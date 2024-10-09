@@ -12,15 +12,15 @@ public record MeasurementLastBeforeQuery<TMeasurement> : IRequest<TMeasurement?>
 
 public class MeasurementLastBeforeQueryHandler<TMeasurement> : IRequestHandler<MeasurementLastBeforeQuery<TMeasurement>, TMeasurement?> where TMeasurement : Measurement
 {
-    private readonly IMeasurementRepository _measurementRepository;
+    private readonly IMeasurementLevelRepository _measurementLevelRepository;
 
-    public MeasurementLastBeforeQueryHandler(IMeasurementRepository measurementRepository)
+    public MeasurementLastBeforeQueryHandler(IMeasurementLevelRepository measurementLevelRepository)
     {
-        _measurementRepository = measurementRepository;
+        _measurementLevelRepository = measurementLevelRepository;
     }
 
     public async Task<TMeasurement?> Handle(MeasurementLastBeforeQuery<TMeasurement> request, CancellationToken cancellationToken)
     {
-        return (TMeasurement?)(Measurement?)await _measurementRepository.GetLastBefore(request.DevEui, request.Timestamp, cancellationToken);
+        return (TMeasurement?)(Measurement?)await _measurementLevelRepository.GetLastBefore(request.DevEui, request.Timestamp, cancellationToken);
     }
 }

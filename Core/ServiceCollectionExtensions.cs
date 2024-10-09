@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
         services.Configure<MeasurementInfluxOptions>(configuration.GetSection(MeasurementInfluxOptions.Position));
         services.Configure<MessengerOptions>(configuration.GetSection(MessengerOptions.Location));
 
-        services.AddScoped<IMeasurementRepository, MeasurementRepository>();
+        services.AddScoped<IMeasurementLevelRepository, MeasurementLevelRepository>();
         services.AddScoped<IMessenger, Messenger>();
 
         services.AddSingleton<IVersionInfo, VersionInfo>(_ => new VersionInfo(assembly));

@@ -2,12 +2,12 @@ using Core.Entities;
 
 namespace Core.Util;
 
-public class MeasurementEx
+public class MeasurementLevelEx
 {
     private readonly Core.Entities.AccountSensor _accountSensor;
     private readonly MeasurementLevel _measurement;
 
-    public MeasurementEx(MeasurementLevel measurement, Core.Entities.AccountSensor accountSensor)
+    public MeasurementLevelEx(MeasurementLevel measurement, Core.Entities.AccountSensor accountSensor)
     {
         _measurement = measurement;
         _accountSensor = accountSensor;

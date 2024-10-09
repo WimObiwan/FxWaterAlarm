@@ -11,16 +11,16 @@
             <i class="bi bi-clipboard" aria-hidden="true"></i>
         </button>
     </div>
-    @if (Model.MeasurementEx != null)
+    @if (Model.MeasurementLevelEx != null)
     {
-        <div>@Loc["Distance"]: @Model.MeasurementEx.Distance.DistanceMm mm</div>
+        <div>@Loc["Distance"]: @Model.MeasurementLevelEx.Distance.DistanceMm mm</div>
         <div>
-            @Loc["RSSI"]: @Model.MeasurementEx.RssiDbm dBm
-            - @Math.Round(Model.MeasurementEx.RssiPrc, 0)%
+            @Loc["RSSI"]: @Model.MeasurementLevelEx.RssiDbm dBm
+            - @Math.Round(Model.MeasurementLevelEx.RssiPrc, 0)%
         </div>
         <div>
-            @Loc["Battery"]: @Model.MeasurementEx.BatV V
-            - @Math.Round(Model.MeasurementEx.BatteryPrc, 0)%
+            @Loc["Battery"]: @Model.MeasurementLevelEx.BatV V
+            - @Math.Round(Model.MeasurementLevelEx.BatteryPrc, 0)%
         </div>
     }
     @if (Model.AccountSensor.CapacityL.HasValue)
