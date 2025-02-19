@@ -54,17 +54,20 @@ public class AccountSensor : PageModel
     public PageTypeEnum PageType { get; private set; }
     public bool Preview { get; private set; }
     public SaveResultEnum SaveResult { get; private set; }
+    public int FromDays { get; private set; }
     
     public string? QrBaseUrl { get; private set; }
 
     public async Task OnGet(string accountLink, string sensorLink, 
         [FromQuery] PageTypeEnum page = PageTypeEnum.GraphDefault,
         [FromQuery] bool preview = false,
-        [FromQuery] SaveResultEnum saveResult = SaveResultEnum.None)
+        [FromQuery] SaveResultEnum saveResult = SaveResultEnum.None,
+        [FromQuery] int fromDays = 21)
     {
         PageType = page;
         Preview = preview;
         SaveResult = saveResult;
+        FromDays = fromDays;
         QrBaseUrl = $"https://wateralarm.be/a/{accountLink}/s/{sensorLink}";
 
         AccountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
