@@ -98,9 +98,16 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
             SensorId = sensor.Uid,
             DevEui = sensor.DevEui,
             CreationTimestamp = sensor.CreateTimestamp,
-            Link = sensor.Link
+            Link = sensor.Link,
+            Type = (SensorType)(int)sensor.Type
         };
     }
+}
+
+public enum SensorType
+{
+    Level = 0, 
+    Detect = 1
 }
 
 public class Sensor
@@ -109,4 +116,5 @@ public class Sensor
     public required string DevEui { get; init; }
     public required DateTime CreationTimestamp { get; init; }
     public string? Link { get; init; }
+    public SensorType Type { get; init; }
 }
