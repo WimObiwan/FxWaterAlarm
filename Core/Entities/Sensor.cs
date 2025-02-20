@@ -1,6 +1,10 @@
 namespace Core.Entities;
 
-public enum SensorType { Level, Detect }
+public enum SensorType
+{ 
+    Level = 0, 
+    Detect = 1
+}
 
 public class Sensor
 {
