@@ -85,6 +85,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddDefaultTokenProviders();
 builder.Services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 builder.Services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
+builder.Services.AddTransient<ILastMeasurementService, LastMeasurementService>();
 builder.Services.AddTransient<ITrendService, TrendService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)  

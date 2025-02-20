@@ -72,6 +72,7 @@ class AccountSensorResult
 public class AccountSensorController : Controller
 {
     private readonly IMediator _mediator;
+    private readonly ILastMeasurementService _lastMeasurementService;
     private readonly ITrendService _trendService;
 
     public async Task<IActionResult> Index(string accountLink, string sensorLink)
@@ -85,30 +86,28 @@ public class AccountSensorController : Controller
         if (accountSensor == null)
             return NotFound();
         
-        var lastMeasurement = await _mediator.Send(new LastMeasurementLevelQuery
-            { DevEui = accountSensor.Sensor.DevEui });
-        var measurementMevelEx = lastMeasurement != null ? new MeasurementLevelEx(lastMeasurement, accountSensor) : null;
+        var measurementLevelEx = await _lastMeasurementService.GetLastMeasurement(accountSensor);
 
         LastMeasurementDto? lastMeasurementDto;
         TrendsDto? trendsDto;
-        if (measurementMevelEx != null)
+        if (measurementLevelEx != null)
         {
             lastMeasurementDto = new LastMeasurementDto
             {
-                TimeStamp = measurementMevelEx.Timestamp,
-                BatV = measurementMevelEx.BatV,
-                BatteryPrc = measurementMevelEx.BatteryPrc,
-                RssiDbm = measurementMevelEx.RssiDbm,
-                RssiPrc = measurementMevelEx.RssiPrc,
-                DistanceMm = measurementMevelEx.Distance.DistanceMm,
-                HeightMm = measurementMevelEx.Distance.HeightMm,
-                WaterL = measurementMevelEx.Distance.WaterL,
-                LevelFraction = measurementMevelEx.Distance.LevelFraction,
-                RealLevelFraction = measurementMevelEx.Distance.RealLevelFraction,
-                EstimatedNextRefresh = measurementMevelEx.EstimateNextRefresh()
+                TimeStamp = measurementLevelEx.Timestamp,
+                BatV = measurementLevelEx.BatV,
+                BatteryPrc = measurementLevelEx.BatteryPrc,
+                RssiDbm = measurementLevelEx.RssiDbm,
+                RssiPrc = measurementLevelEx.RssiPrc,
+                DistanceMm = measurementLevelEx.Distance.DistanceMm,
+                HeightMm = measurementLevelEx.Distance.HeightMm,
+                WaterL = measurementLevelEx.Distance.WaterL,
+                LevelFraction = measurementLevelEx.Distance.LevelFraction,
+                RealLevelFraction = measurementLevelEx.Distance.RealLevelFraction,
+                EstimatedNextRefresh = measurementLevelEx.EstimateNextRefresh()
             };
             
-            var trendMeasurements = await _trendService.GetTrendMeasurements(measurementMevelEx,
+            var trendMeasurements = await _trendService.GetTrendMeasurements(measurementLevelEx,
                 //TimeSpan.FromHours(1),
                 TimeSpan.FromHours(6),
                 TimeSpan.FromHours(24),
@@ -148,9 +147,10 @@ public class AccountSensorController : Controller
         return Ok(result);
     }
 
-    public AccountSensorController(IMediator mediator, ITrendService trendService)
+    public AccountSensorController(IMediator mediator, ILastMeasurementService lastMeasurementService, ITrendService trendService)
     {
         _mediator = mediator;
+        _lastMeasurementService = lastMeasurementService;
         _trendService = trendService;
     }
 }
