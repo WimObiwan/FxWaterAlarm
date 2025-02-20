@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Threading;
@@ -32,7 +32,7 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
-        if (ParameterSetName == "AccountId")
+        if (ParameterSetName == "SensorId")
         {
             if (SensorId == null)
                 await ProcessAll();
