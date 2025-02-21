@@ -8,7 +8,7 @@ namespace Site;
 
 public interface ILastMeasurementService
 {
-    Task<MeasurementLevelEx?> GetLastMeasurement(AccountSensor accountSensor);
+    Task<IMeasurementEx?> GetLastMeasurement(AccountSensor accountSensor);
 }
 
 public class LastMeasurementService : ILastMeasurementService
@@ -20,12 +20,12 @@ public class LastMeasurementService : ILastMeasurementService
         _mediator = mediator;
     }
     
-    public async Task<MeasurementLevelEx?> GetLastMeasurement(AccountSensor accountSensor)
+    public async Task<IMeasurementEx?> GetLastMeasurement(AccountSensor accountSensor)
     {
         switch (accountSensor.Sensor.Type)
         {
-            // case SensorType.Detect:
-            //     return await GetLastMeasurementDetect(accountSensor);
+            case SensorType.Detect:
+                return await GetLastMeasurementDetect(accountSensor);
             case SensorType.Level:
                 return await GetLastMeasurementLevel(accountSensor);
             default:
@@ -33,12 +33,22 @@ public class LastMeasurementService : ILastMeasurementService
         }
     }
 
-    public async Task<MeasurementLevelEx?> GetLastMeasurementLevel(AccountSensor accountSensor)
+    private async Task<IMeasurementEx?> GetLastMeasurementLevel(AccountSensor accountSensor)
     {
         var lastMeasurement = await _mediator.Send(new LastMeasurementLevelQuery
             { DevEui = accountSensor.Sensor.DevEui });
         if (lastMeasurement != null)
             return new MeasurementLevelEx(lastMeasurement, accountSensor);
+        else
+            return null;
+    }
+
+    private async Task<IMeasurementEx?> GetLastMeasurementDetect(AccountSensor accountSensor)
+    {
+        var lastMeasurement = await _mediator.Send(new LastMeasurementDetectQuery
+            { DevEui = accountSensor.Sensor.DevEui });
+        if (lastMeasurement != null)
+            return new MeasurementDetectEx(lastMeasurement, accountSensor);
         else
             return null;
     }

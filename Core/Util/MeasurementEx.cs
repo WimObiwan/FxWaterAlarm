@@ -2,12 +2,12 @@ using Core.Entities;
 
 namespace Core.Util;
 
-public class MeasurementLevelEx
+public class MeasurementEx<T> : IMeasurementEx where T : Measurement
 {
-    private readonly Core.Entities.AccountSensor _accountSensor;
-    private readonly MeasurementLevel _measurement;
+    private readonly T _measurement;
+    private readonly AccountSensor _accountSensor;
 
-    public MeasurementLevelEx(MeasurementLevel measurement, Core.Entities.AccountSensor accountSensor)
+    public MeasurementEx(T measurement, AccountSensor accountSensor)
     {
         _measurement = measurement;
         _accountSensor = accountSensor;
@@ -21,10 +21,11 @@ public class MeasurementLevelEx
         return Timestamp.AddSeconds(nextRefreshMinutes * 60 + 5);
     }
 
-    public Core.Entities.AccountSensor AccountSensor => _accountSensor;
+    public AccountSensor AccountSensor => _accountSensor;
+    protected T Measurement => _measurement;
+
     public string DevEui => _accountSensor.Sensor.DevEui;
     public DateTime Timestamp => _measurement.Timestamp;
-    public MeasurementDistance Distance => new(_measurement.DistanceMm, _accountSensor);
     public double BatV => _measurement.BatV;
     public double RssiDbm => _measurement.RssiDbm;
     public double RssiPrc => (_measurement.RssiDbm + 150.0) / 60.0 * 80.0;

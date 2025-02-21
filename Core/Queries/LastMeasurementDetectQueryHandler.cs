@@ -11,16 +11,15 @@ public record LastMeasurementDetectQuery : IRequest<MeasurementDetect?>
 
 public class LastMeasurementDetectQueryHandler : IRequestHandler<LastMeasurementDetectQuery, MeasurementDetect?>
 {
-    private readonly IMeasurementLevelRepository _measurementLevelRepository;
+    private readonly IMeasurementDetectRepository _measurementDetectRepository;
 
-    public LastMeasurementDetectQueryHandler(IMeasurementLevelRepository measurementLevelRepository)
+    public LastMeasurementDetectQueryHandler(IMeasurementDetectRepository measurementDetectRepository)
     {
-        _measurementLevelRepository = measurementLevelRepository;
+        _measurementDetectRepository = measurementDetectRepository;
     }
 
-    public /*async*/ Task<MeasurementDetect?> Handle(LastMeasurementDetectQuery request, CancellationToken cancellationToken)
+    public async Task<MeasurementDetect?> Handle(LastMeasurementDetectQuery request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-        // return await _measurementDetectRepository.GetLast(request.DevEui, cancellationToken);
+        return await _measurementDetectRepository.GetLast(request.DevEui, cancellationToken);
     }
 }

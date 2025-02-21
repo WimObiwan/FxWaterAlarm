@@ -1,5 +1,6 @@
 @page
 @using Core.Entities
+@using Core.Util
 @using Microsoft.AspNetCore.Mvc.Localization
 @using QRCoder
 @using SixLabors.ImageSharp
@@ -37,10 +38,28 @@
 
     @if (Model.LastMeasurement != null)
     {
-        @if (Model.Preview) {
-            @await Component.InvokeAsync("WaterlevelNew", new { measurementLevelEx = Model.LastMeasurement })
-        } else {
-            @await Component.InvokeAsync("Waterlevel", new { measurementLevelEx = Model.LastMeasurement })
+        bool hasGraph;
+        bool hasTrend;
+        @if (Model.LastMeasurement is MeasurementLevelEx measurementLevelEx)
+        {
+            hasGraph = true;
+            hasTrend = true;
+            <div>
+                @await Component.InvokeAsync("Waterlevel", new { measurementLevelEx = Model.LastMeasurement })
+            </div>
+        }
+        else if (Model.LastMeasurement is MeasurementDetectEx measurementDetectEx)
+        {
+            hasGraph = false;
+            hasTrend = false;
+            <div>
+                @await Component.InvokeAsync("Detect", new { measurementDetectEx = measurementDetectEx })
+            </div>
+        }
+        else
+        {
+            hasGraph = false;
+            hasTrend = false;
         }
 
         string? ConstructUrlFilter(AccountSensor.PageTypeEnum? pageType = null, int? fromDays = null)
@@ -106,6 +125,8 @@
                     return @"class=""dropdown-item""";
                 }
             }
+            @if (hasGraph)
+            {
             <li class="nav-item dropdown">
                 <a  @Html.Raw(PageTypeDropDownMenu(IsPageTypeInGraphDropDown())) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Graph"]</a>
                 <ul class="dropdown-menu">
@@ -145,9 +166,13 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item">
-                <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Trend)) href="?page=trend">@Loc["Trend"]</a>
-            </li>
+            }
+            @if (hasTrend)
+            {
+                <li class="nav-item">
+                    <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Trend)) href="?page=trend">@Loc["Trend"]</a>
+                </li>
+            }
             <li class="nav-item dropdown">
                 <a  @Html.Raw(PageTypeDropDownMenu(IsPageTypeInDetailsDropDown())) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Details"]</a>
                 <ul class="dropdown-menu">
@@ -166,7 +191,7 @@
             </li>
         </ul>
 
-        @if (IsPageTypeInGraphDropDown())
+        @if (hasGraph && IsPageTypeInGraphDropDown())
         {
             bool showTimelineSlider;
             GraphType graphType;
@@ -217,7 +242,7 @@
             </div>
         }
         
-        @if (Model.PageType == AccountSensor.PageTypeEnum.Trend)
+        @if (hasTrend && Model.PageType == AccountSensor.PageTypeEnum.Trend)
         {
             @await Component.InvokeAsync("Trend", new
             {
@@ -234,7 +259,7 @@
         {
             @await Component.InvokeAsync("MeasurementDetails", new
                    {
-                       accountSensor = Model.AccountSensorEntity, measurementLevelEx = Model.LastMeasurement
+                       accountSensor = Model.AccountSensorEntity, measurementEx = Model.LastMeasurement
                    })
             
             <div class="grayout">

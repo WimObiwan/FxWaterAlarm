@@ -24,12 +24,9 @@ public interface IMeasurementLevelRepository
 
 public class MeasurementLevelRepository : MeasurementRepositoryBase<RecordLevel, AggregatedRecordLevel, MeasurementLevel, AggregatedMeasurementLevel>, IMeasurementLevelRepository
 {
-    private readonly MeasurementInfluxOptions _options;
-
     public MeasurementLevelRepository(IOptions<MeasurementInfluxOptions> options)
     : base(options)
     {
-        _options = options.Value;
     }
 
     protected override string GetTableName()

@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
         services.Configure<MessengerOptions>(configuration.GetSection(MessengerOptions.Location));
 
         services.AddScoped<IMeasurementLevelRepository, MeasurementLevelRepository>();
+        services.AddScoped<IMeasurementDetectRepository, MeasurementDetectRepository>();
         services.AddScoped<IMessenger, Messenger>();
 
         services.AddSingleton<IVersionInfo, VersionInfo>(_ => new VersionInfo(assembly));

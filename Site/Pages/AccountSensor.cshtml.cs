@@ -45,7 +45,7 @@ public class AccountSensor : PageModel
         _trendService = trendService;
     }
 
-    public MeasurementLevelEx? LastMeasurement { get; private set; }
+    public IMeasurementEx? LastMeasurement { get; private set; }
     //public TrendMeasurementEx? TrendMeasurement1H { get; private set; }
     public TrendMeasurementEx? TrendMeasurement6H { get; private set; }
     public TrendMeasurementEx? TrendMeasurement24H { get; private set; }
@@ -87,18 +87,21 @@ public class AccountSensor : PageModel
                 case PageTypeEnum.Trend:
                     if (LastMeasurement != null)
                     {
-                        var trendMeasurements = await _trendService.GetTrendMeasurements(LastMeasurement,
-                            //TimeSpan.FromHours(1),
-                            TimeSpan.FromHours(6),
-                            TimeSpan.FromHours(24),
-                            TimeSpan.FromDays(7),
-                            TimeSpan.FromDays(30));
-                        
-                        //TrendMeasurement1H = trendMeasurements[0];
-                        TrendMeasurement6H = trendMeasurements[0];
-                        TrendMeasurement24H = trendMeasurements[1];
-                        TrendMeasurement7D = trendMeasurements[2];
-                        TrendMeasurement30D = trendMeasurements[3];
+                        if (LastMeasurement is MeasurementLevelEx measurementLevelEx)
+                        {
+                            var trendMeasurements = await _trendService.GetTrendMeasurements(measurementLevelEx,
+                                //TimeSpan.FromHours(1),
+                                TimeSpan.FromHours(6),
+                                TimeSpan.FromHours(24),
+                                TimeSpan.FromDays(7),
+                                TimeSpan.FromDays(30));
+                            
+                            //TrendMeasurement1H = trendMeasurements[0];
+                            TrendMeasurement6H = trendMeasurements[0];
+                            TrendMeasurement24H = trendMeasurements[1];
+                            TrendMeasurement7D = trendMeasurements[2];
+                            TrendMeasurement30D = trendMeasurements[3];
+                        }
                     }
                     break;
             }

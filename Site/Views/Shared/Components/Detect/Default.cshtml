@@ -1,0 +1,58 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model Core.Util.MeasurementDetectEx
+@inject IViewLocalizer Loc
+
+@{
+    var uniqueId = Guid.NewGuid().ToString("N");
+}
+
+<div>
+    <div>
+        <svg id="fillGauge-@uniqueId" width="200" height="200" onclick=""></svg>
+    </div>
+
+    @{
+        var levelFraction = (int?)Model.Status;
+        var timestamp = Model.Timestamp;
+    }
+
+    @{
+        string size = "xx-large";
+    }
+    <div>@timestamp.ToLocalTime().ToString("G")</div>
+</div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="~/js/LiquidFillGauge.js"></script>
+
+@if (levelFraction.HasValue)
+{
+    int maxValue;
+    double value;
+    bool displayPercent;
+    value = Math.Round(levelFraction.Value * 100.0);
+    maxValue = 100;
+    displayPercent = true;
+    
+    <script>
+        var config = liquidFillGaugeDefaultSettings();
+        
+        config.circleColor = "#1ca3ec"
+        //config.textColor = "#74ccf4"
+        config.textColor = "#74ccf4"
+        //config.waveTextColor = "#bbeeff"
+        config.waveTextColor = "#000000"
+        config.waveColor = "#1ca3ec"
+        config.warningThreshold = .4;
+        config.waveCount = 4;
+        config.waveRiseTime = 60;
+        config.waveAnimateTime = 6000;
+        config.displayPercent = @(displayPercent ? "true" : "false");
+        config.maxValue = @maxValue;
+        config.valueCountUp = false;
+        config.waveRise = false;
+        config.waveAnimate = false;
+
+        var gauge = loadLiquidFillGauge("fillGauge-@uniqueId", @value, config);
+    </script>
+}

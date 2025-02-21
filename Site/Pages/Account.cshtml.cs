@@ -18,7 +18,7 @@ public class Account : PageModel
     private readonly ILastMeasurementService _lastMeasurementService;
 
     public Core.Entities.Account? AccountEntity { get; set; }
-    public IList<MeasurementLevelEx>? Measurements { get; set; }
+    public IList<IMeasurementEx>? Measurements { get; set; }
 
     public Account(IMediator mediator, IUserInfo userInfo, ILastMeasurementService lastMeasurementService)
     {
@@ -45,7 +45,7 @@ public class Account : PageModel
                 return await _lastMeasurementService.GetLastMeasurement(accountSensor);
             })))
                 .Where(m => m != null)
-                .Cast<MeasurementLevelEx>()
+                .Select(m => m!)
                 .ToList();
         }
 

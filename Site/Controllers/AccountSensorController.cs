@@ -85,64 +85,78 @@ public class AccountSensorController : Controller
 
         if (accountSensor == null)
             return NotFound();
+
+        AccountSensorResult result;
         
-        var measurementLevelEx = await _lastMeasurementService.GetLastMeasurement(accountSensor);
-
-        LastMeasurementDto? lastMeasurementDto;
-        TrendsDto? trendsDto;
-        if (measurementLevelEx != null)
+        var measurementEx = await _lastMeasurementService.GetLastMeasurement(accountSensor);
+        
+        if (measurementEx is MeasurementLevelEx measurementLevelEx)
         {
-            lastMeasurementDto = new LastMeasurementDto
+            LastMeasurementDto? lastMeasurementDto;
+            TrendsDto? trendsDto;
+            if (measurementLevelEx != null)
             {
-                TimeStamp = measurementLevelEx.Timestamp,
-                BatV = measurementLevelEx.BatV,
-                BatteryPrc = measurementLevelEx.BatteryPrc,
-                RssiDbm = measurementLevelEx.RssiDbm,
-                RssiPrc = measurementLevelEx.RssiPrc,
-                DistanceMm = measurementLevelEx.Distance.DistanceMm,
-                HeightMm = measurementLevelEx.Distance.HeightMm,
-                WaterL = measurementLevelEx.Distance.WaterL,
-                LevelFraction = measurementLevelEx.Distance.LevelFraction,
-                RealLevelFraction = measurementLevelEx.Distance.RealLevelFraction,
-                EstimatedNextRefresh = measurementLevelEx.EstimateNextRefresh()
-            };
-            
-            var trendMeasurements = await _trendService.GetTrendMeasurements(measurementLevelEx,
-                //TimeSpan.FromHours(1),
-                TimeSpan.FromHours(6),
-                TimeSpan.FromHours(24),
-                TimeSpan.FromDays(7),
-                TimeSpan.FromDays(30));
+                lastMeasurementDto = new LastMeasurementDto
+                {
+                    TimeStamp = measurementLevelEx.Timestamp,
+                    BatV = measurementLevelEx.BatV,
+                    BatteryPrc = measurementLevelEx.BatteryPrc,
+                    RssiDbm = measurementLevelEx.RssiDbm,
+                    RssiPrc = measurementLevelEx.RssiPrc,
+                    DistanceMm = measurementLevelEx.Distance.DistanceMm,
+                    HeightMm = measurementLevelEx.Distance.HeightMm,
+                    WaterL = measurementLevelEx.Distance.WaterL,
+                    LevelFraction = measurementLevelEx.Distance.LevelFraction,
+                    RealLevelFraction = measurementLevelEx.Distance.RealLevelFraction,
+                    EstimatedNextRefresh = measurementLevelEx.EstimateNextRefresh()
+                };
+                
+                var trendMeasurements = await _trendService.GetTrendMeasurements(measurementLevelEx,
+                    //TimeSpan.FromHours(1),
+                    TimeSpan.FromHours(6),
+                    TimeSpan.FromHours(24),
+                    TimeSpan.FromDays(7),
+                    TimeSpan.FromDays(30));
 
-            trendsDto = new TrendsDto()
+                trendsDto = new TrendsDto()
+                {
+                    //Trend1H = new Trend(trendMeasurements[0]),
+                    Trend6H = new Trend(trendMeasurements[0]),
+                    Trend24H = new Trend(trendMeasurements[1]),
+                    Trend7D = new Trend(trendMeasurements[2]),
+                    Trend30D = new Trend(trendMeasurements[3])
+                };
+            }
+            else
             {
-                //Trend1H = new Trend(trendMeasurements[0]),
-                Trend6H = new Trend(trendMeasurements[0]),
-                Trend24H = new Trend(trendMeasurements[1]),
-                Trend7D = new Trend(trendMeasurements[2]),
-                Trend30D = new Trend(trendMeasurements[3])
+                lastMeasurementDto = null;
+                trendsDto = null;
+            }
+
+            result = new AccountSensorResult
+            {
+                AccountSensor = new AccountSensorDto
+                {
+                    Name = accountSensor.Name,
+                    CapacityL = accountSensor.CapacityL,
+                    ResolutionL = accountSensor.ResolutionL,
+                    DistanceMmEmpty = accountSensor.DistanceMmEmpty,
+                    DistanceMmFull = accountSensor.DistanceMmFull,
+                    CreateTimestamp = accountSensor.CreateTimestamp
+                },
+                LastMeasurement = lastMeasurementDto,
+                Trends = trendsDto
             };
+        }
+        else if (measurementEx is MeasurementDetectEx measurementDetectEx)
+        {
+            #warning Implement this
+            throw new NotImplementedException();
         }
         else
         {
-            lastMeasurementDto = null;
-            trendsDto = null;
+            throw new InvalidOperationException("Unknown measurement type");
         }
-
-        var result = new AccountSensorResult
-        {
-            AccountSensor = new AccountSensorDto
-            {
-                Name = accountSensor.Name,
-                CapacityL = accountSensor.CapacityL,
-                ResolutionL = accountSensor.ResolutionL,
-                DistanceMmEmpty = accountSensor.DistanceMmEmpty,
-                DistanceMmFull = accountSensor.DistanceMmFull,
-                CreateTimestamp = accountSensor.CreateTimestamp
-            },
-            LastMeasurement = lastMeasurementDto,
-            Trends = trendsDto
-        };
         
         return Ok(result);
     }
