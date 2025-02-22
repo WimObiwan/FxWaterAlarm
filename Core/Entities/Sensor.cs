@@ -19,4 +19,11 @@ public class Sensor
     public string? Link { get; set; }
     public IReadOnlyCollection<AccountSensor> AccountSensors => _accountSensors.AsReadOnly();
     public IReadOnlyCollection<Account> Accounts => _accounts.AsReadOnly();
+
+    public bool SupportsCapacity => Type == SensorType.Level;
+    public bool SupportsDistance => Type == SensorType.Level;
+    public bool SupportsGraph => Type == SensorType.Level;
+    public bool SupportsMinMaxConstraints => Type == SensorType.Level;
+    public bool SupportsTrend => Type == SensorType.Level;
+    public bool SupportsAlerts => Type == SensorType.Level;
 }

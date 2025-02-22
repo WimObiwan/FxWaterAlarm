@@ -12,10 +12,6 @@
             <i class="bi bi-clipboard" aria-hidden="true"></i>
         </button>
     </div>
-    @if (Model.MeasurementEx is MeasurementLevelEx measurementLevelEx)
-    {
-        <div>@Loc["Distance"]: @measurementLevelEx.Distance.DistanceMm mm</div>
-    }
     @if (Model.MeasurementEx != null)
     {
         <div>
@@ -27,17 +23,33 @@
             - @Math.Round(Model.MeasurementEx.BatteryPrc, 0)%
         </div>
     }
-    @if (Model.AccountSensor.CapacityL.HasValue)
+    @if (Model.AccountSensor.Sensor.SupportsDistance)
     {
-        <div>@Loc["Capacity"]: @Model.AccountSensor.CapacityL.Value liter</div>
+        @if (Model.MeasurementEx is MeasurementLevelEx measurementLevelEx)
+        {
+            <div>@Loc["Distance"]: @measurementLevelEx.Distance.DistanceMm mm</div>
+        }
     }
-    @if (Model.AccountSensor.ResolutionL.HasValue)
+    @if (Model.AccountSensor.Sensor.SupportsCapacity)
     {
-        <div>@Loc["Resolution"]: @Math.Round(Model.AccountSensor.ResolutionL.Value, 2) @Loc["liter (1 mm)"]</div>
+        @if (Model.AccountSensor.CapacityL.HasValue)
+        {
+            <div>@Loc["Capacity"]: @Model.AccountSensor.CapacityL.Value liter</div>
+        }
     }
-    @if (Model.AccountSensor is { DistanceMmFull: not null,DistanceMmEmpty: not null })
+    @if (Model.AccountSensor.Sensor.SupportsCapacity && Model.AccountSensor.Sensor.SupportsDistance)
     {
-        <div>@Loc["Distance Full"]: @Model.AccountSensor.DistanceMmFull.Value mm</div>
-        <div>@Loc["Distance Empty"]: @Model.AccountSensor.DistanceMmEmpty.Value mm</div>
+        @if (Model.AccountSensor.ResolutionL.HasValue)
+        {
+            <div>@Loc["Resolution"]: @Math.Round(Model.AccountSensor.ResolutionL.Value, 2) @Loc["liter (1 mm)"]</div>
+        }
+    }
+    @if (Model.AccountSensor.Sensor.SupportsDistance)
+    {
+        @if (Model.AccountSensor is { DistanceMmFull: not null,DistanceMmEmpty: not null })
+        {
+            <div>@Loc["Distance Full"]: @Model.AccountSensor.DistanceMmFull.Value mm</div>
+            <div>@Loc["Distance Empty"]: @Model.AccountSensor.DistanceMmEmpty.Value mm</div>
+        }
     }
 </div>

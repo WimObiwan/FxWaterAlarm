@@ -71,77 +71,89 @@
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td>
-                            @Loc["Distance to water when empty (0%)"]
-                        </td>
-                        <td>
-                            <div class="input-group mb-3">
-                                <input type="number" class="form-control" style="width: 100px;"
-                                       aria-describedby="basic-addon-DistanceMmEmpty" name="distanceMmEmpty"
-                                       value="@Model.AccountSensor.DistanceMmEmpty"/>
-                                <div class="input-group-append">
-                                    <span class="input-group-text" id="basic-addon-DistanceMmEmpty">@Loc["mm"]</span>
+                    @if (Model.AccountSensor.Sensor.SupportsDistance)
+                    {
+                        <tr>
+                            <td>
+                                @Loc["Distance to water when empty (0%)"]
+                            </td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" style="width: 100px;"
+                                        aria-describedby="basic-addon-DistanceMmEmpty" name="distanceMmEmpty"
+                                        value="@Model.AccountSensor.DistanceMmEmpty"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="basic-addon-DistanceMmEmpty">@Loc["mm"]</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            @Loc["Distance to water when full (100%)"]
-                        </td>
-                        <td>
-                            <div class="input-group mb-3">
-                                <input type="number" class="form-control" style="width: 100px;" 
-                                       aria-describedby="basic-addon-DistanceMmFull" name="distanceMmFull"
-                                       value="@Model.AccountSensor.DistanceMmFull"/>
-                                <div class="input-group-append">
-                                    <span class="input-group-text" id="basic-addon-DistanceMmFull">@Loc["mm"]</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Loc["Distance to water when full (100%)"]
+                            </td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" style="width: 100px;" 
+                                        aria-describedby="basic-addon-DistanceMmFull" name="distanceMmFull"
+                                        value="@Model.AccountSensor.DistanceMmFull"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="basic-addon-DistanceMmFull">@Loc["mm"]</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            @Loc["Capacity"]
-                        </td>
-                        <td>
-                            <div class="input-group mb-3">
-                                <input type="number" class="form-control" style="width: 100px;" 
-                                       aria-describedby="basic-addon-CapacityL" name="capacityL"
-                                       value="@Model.AccountSensor.CapacityL"/>
-                                <div class="input-group-append">
-                                    <span class="input-group-text" id="basic-addon-CapacityL">@Loc["liter"]</span>
+                            </td>
+                        </tr>
+                    }
+                    @if (Model.AccountSensor.Sensor.SupportsCapacity)
+                    {
+                        <tr>
+                            <td>
+                                @Loc["Capacity"]
+                            </td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" style="width: 100px;" 
+                                        aria-describedby="basic-addon-CapacityL" name="capacityL"
+                                        value="@Model.AccountSensor.CapacityL"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="basic-addon-CapacityL">@Loc["liter"]</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            @Loc["Alerts enabled"] <span class="badge bg-warning">beta</span>
-                        </td>
-                        <td>
-                            <div class="form-check form-switch">
-                                <input type="checkbox" class="form-check-input" 
-                                        name="alertsEnabled"
-                                        value="true"
-                                        @(Model.AccountSensor.AlertsEnabled ? "checked" : "")/>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            @Loc["No min/max constraints"] <span class="badge bg-warning">beta</span>
-                        </td>
-                        <td>
-                            <div class="form-check form-switch">
-                                <input type="checkbox" class="form-check-input" 
-                                        name="noMinMaxConstraints"
-                                        value="true"
-                                        @(Model.AccountSensor.NoMinMaxConstraints ? "checked" : "")/>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                    }
+                    @if (Model.AccountSensor.Sensor.SupportsMinMaxConstraints)
+                    {
+                        <tr>
+                            <td>
+                                @Loc["No min/max constraints"] <span class="badge bg-warning">beta</span>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" class="form-check-input" 
+                                            name="noMinMaxConstraints"
+                                            value="true"
+                                            @(Model.AccountSensor.NoMinMaxConstraints ? "checked" : "")/>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (Model.AccountSensor.Sensor.SupportsAlerts)
+                    {
+                        <tr>
+                            <td>
+                                @Loc["Alerts enabled"] <span class="badge bg-warning">beta</span>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" class="form-check-input" 
+                                            name="alertsEnabled"
+                                            value="true"
+                                            @(Model.AccountSensor.AlertsEnabled ? "checked" : "")/>
+                                </div>
+                            </td>
+                        </tr>
+                    }
                     <tr>
                         <td>
                         </td>
