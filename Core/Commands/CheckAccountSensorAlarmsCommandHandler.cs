@@ -17,9 +17,9 @@ public class CheckAccountSensorAlarmsCommandHandler : CheckAccountSensorAlarmsCo
 {
     private readonly WaterAlarmDbContext _dbContext;
 
-    public CheckAccountSensorAlarmsCommandHandler(WaterAlarmDbContext dbContext, IMeasurementLevelRepository measurementLevelRepository, IMessenger messenger, 
+    public CheckAccountSensorAlarmsCommandHandler(WaterAlarmDbContext dbContext, IMediator mediator, IMessenger messenger, 
         ILogger<CheckAccountSensorAlarmsCommandHandler> logger)
-        : base(dbContext, measurementLevelRepository, messenger, logger)
+        : base(dbContext, mediator, messenger, logger)
     {
         _dbContext = dbContext;
     }

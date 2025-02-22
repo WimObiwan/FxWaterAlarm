@@ -1,8 +1,10 @@
 using System.Globalization;
 using Core.Communication;
 using Core.Entities;
+using Core.Queries;
 using Core.Repositories;
 using Core.Util;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Commands;
@@ -10,18 +12,18 @@ namespace Core.Commands;
 public abstract class CheckAccountSensorAlarmsCommandHandlerBase
 {
     private readonly WaterAlarmDbContext _dbContext;
-    private readonly IMeasurementLevelRepository _measurementLevelRepository;
+    private readonly IMediator _mediator;
     private readonly IMessenger _messenger;
     private readonly ILogger _logger;
 
     public CheckAccountSensorAlarmsCommandHandlerBase(
         WaterAlarmDbContext dbContext,
-        IMeasurementLevelRepository measurementLevelRepository, 
+        IMediator mediator,
         IMessenger messenger, 
         ILogger logger)
     {
         _dbContext = dbContext;
-        _measurementLevelRepository = measurementLevelRepository;
+        _mediator = mediator;  // I know... https://lostechies.com/jimmybogard/2016/12/12/dealing-with-duplication-in-mediatr-handlers/
         _messenger = messenger;
         _logger = logger;
     }
@@ -40,11 +42,15 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         {
             // TODO: Use GetLastMedian
             //var medianFrom = DateTime.Now.AddHours(-24).ToUniversalTime();
-            var measurementLevel = await _measurementLevelRepository.GetLast(accountSensor.Sensor.DevEui, cancellationToken)
+
+            var measurementEx = await _mediator.Send(
+                new LastMeasurementQuery 
+                {
+                    AccountSensor = accountSensor
+                }, cancellationToken)
                 ?? throw new Exception("No measurement found");
             
-            var measurementLevelEx = new MeasurementLevelEx(measurementLevel, accountSensor);
-            await CheckAccountSensorAlarms(measurementLevelEx, alarms, cancellationToken);
+            await CheckAccountSensorAlarms(measurementEx, alarms, cancellationToken);
         }
         else
         {
@@ -53,7 +59,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         }
     }
 
-    private async Task CheckAccountSensorAlarms(MeasurementLevelEx measurementLevelEx, IReadOnlyCollection<AccountSensorAlarm> alarms, 
+    private async Task CheckAccountSensorAlarms(IMeasurementEx measurementEx, IReadOnlyCollection<AccountSensorAlarm> alarms, 
         CancellationToken cancellationToken)
     {
         const double AlarmThresholdHisteresisBattery = 5.0;
@@ -76,9 +82,9 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     else
                     {
                         var thresholdData = TimeSpan.FromHours(alarmThreshold);
-                        isTriggered = DateTime.UtcNow - measurementLevelEx.Timestamp > thresholdData;
+                        isTriggered = DateTime.UtcNow - measurementEx.Timestamp > thresholdData;
                         isCleared = !isTriggered;
-                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.Data, measurementLevelEx.AccountSensor, measurementLevelEx.Timestamp, thresholdData);
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.Data, measurementEx.AccountSensor, measurementEx.Timestamp, thresholdData);
                     }
                     break;
                 }
@@ -90,15 +96,19 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     }
                     else
                     {
-                        isTriggered = measurementLevelEx.BatteryPrc <= alarmThreshold;
-                        isCleared = measurementLevelEx.BatteryPrc > alarmThreshold + AlarmThresholdHisteresisBattery;
-                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.Battery, measurementLevelEx.AccountSensor, measurementLevelEx.BatteryPrc, alarmThreshold);
+                        isTriggered = measurementEx.BatteryPrc <= alarmThreshold;
+                        isCleared = measurementEx.BatteryPrc > alarmThreshold + AlarmThresholdHisteresisBattery;
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.Battery, measurementEx.AccountSensor, measurementEx.BatteryPrc, alarmThreshold);
                     }
                     break;
                 }
                 case AccountSensorAlarmType.PercentageLow:
                 {
-                    if (!(measurementLevelEx.Distance.LevelFraction is {} levelFraction))
+                    if (!(measurementEx is MeasurementLevelEx measurementLevelEx))
+                    {
+                        _logger.LogWarning("Last measurement is not a level measurement");
+                    }
+                    else if (!(measurementLevelEx.Distance.LevelFraction is {} levelFraction))
                     {
                         _logger.LogWarning("No LevelFraction");
                     }
@@ -117,7 +127,11 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 }
                 case AccountSensorAlarmType.PercentageHigh:
                 {
-                    if (!(measurementLevelEx.Distance.LevelFraction is {} levelFraction))
+                    if (!(measurementEx is MeasurementLevelEx measurementLevelEx))
+                    {
+                        _logger.LogWarning("Last measurement is not a level measurement");
+                    }
+                    else if (!(measurementLevelEx.Distance.LevelFraction is {} levelFraction))
                     {
                         _logger.LogWarning("No LevelFraction");
                     }
@@ -151,7 +165,11 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 // }
                 case AccountSensorAlarmType.HeightLow:
                 {
-                    if (!(measurementLevelEx.Distance.HeightMm is {} heightMm))
+                    if (!(measurementEx is MeasurementLevelEx measurementLevelEx))
+                    {
+                        _logger.LogWarning("Last measurement is not a level measurement");
+                    }
+                    else if (!(measurementLevelEx.Distance.HeightMm is {} heightMm))
                     {
                         _logger.LogWarning("No Height");
                     }
@@ -169,7 +187,11 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 }
                 case AccountSensorAlarmType.HeightHigh:
                 {
-                    if (!(measurementLevelEx.Distance.HeightMm is {} heightMm))
+                    if (!(measurementEx is MeasurementLevelEx measurementLevelEx))
+                    {
+                        _logger.LogWarning("Last measurement is not a level measurement");
+                    }
+                    else if (!(measurementLevelEx.Distance.HeightMm is {} heightMm))
                     {
                         _logger.LogWarning("No Height");
                     }
