@@ -25,5 +25,5 @@ public class Sensor
     public bool SupportsGraph => Type == SensorType.Level;
     public bool SupportsMinMaxConstraints => Type == SensorType.Level;
     public bool SupportsTrend => Type == SensorType.Level;
-    public bool SupportsAlerts => Type == SensorType.Level;
+    public bool SupportsAlerts => Type == SensorType.Level || Type == SensorType.Detect;
 }

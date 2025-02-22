@@ -71,6 +71,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
             bool isTriggered = false;
             bool isCleared = false;
             Func<Task>? sendAlertFunction = null;
+            Func<Task>? sendAlertClearedFunction = null;
             switch (alarm.AlarmType)
             {
                 case AccountSensorAlarmType.Data:
@@ -121,7 +122,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                         levelFraction *= 100.0;
                         isTriggered = levelFraction <= alarmThreshold;
                         isCleared = levelFraction > alarmThreshold + AlarmThresholdHisteresisPercentage;
-                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.PercentageLow, measurementLevelEx.AccountSensor, levelFraction, alarmThreshold);
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.PercentageLow, measurementEx.AccountSensor, levelFraction, alarmThreshold);
                     }
                     break;
                 }
@@ -144,7 +145,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                         levelFraction *= 100.0;
                         isTriggered = levelFraction >= alarm.AlarmThreshold;
                         isCleared = levelFraction < alarmThreshold - AlarmThresholdHisteresisPercentage;
-                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.PercentageHigh, measurementLevelEx.AccountSensor, levelFraction, alarmThreshold);
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.PercentageHigh, measurementEx.AccountSensor, levelFraction, alarmThreshold);
                     }
                     break;
                 }
@@ -181,7 +182,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     {
                         isTriggered = heightMm <= alarmThreshold;
                         isCleared = heightMm > alarmThreshold + AlarmThresholdHisteresisHeight;
-                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.HeightLow, measurementLevelEx.AccountSensor, heightMm, alarmThreshold);
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.HeightLow, measurementEx.AccountSensor, heightMm, alarmThreshold);
                     }
                     break;
                 }
@@ -203,7 +204,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     {
                         isTriggered = heightMm >= alarm.AlarmThreshold;
                         isCleared = heightMm < alarmThreshold - AlarmThresholdHisteresisHeight;
-                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.HeightHigh, measurementLevelEx.AccountSensor, heightMm, alarmThreshold);
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.HeightHigh, measurementEx.AccountSensor, heightMm, alarmThreshold);
                     }
                     break;
                 }
@@ -219,6 +220,26 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 //         isCleared = false;
                 //         sendAlertFunction = () => SendAlert(AccountSensorAlarmType.HeightStatus, measurementEx.AccountSensor, heightMm, 0.0);
                 //     }
+                //     break;
+                // }
+                case AccountSensorAlarmType.DetectOn:
+                {
+                    if (!(measurementEx is MeasurementDetectEx measurementDetectEx))
+                    {
+                        _logger.LogWarning("Last measurement is not a detect measurement");
+                    }
+                    else
+                    {
+                        isTriggered = measurementDetectEx.Status == 1;
+                        isCleared = measurementDetectEx.Status == 0;
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.DetectOn, measurementEx.AccountSensor, measurementDetectEx.Status);
+                        sendAlertClearedFunction = () => SendAlertCleared(AccountSensorAlarmType.DetectOn, measurementEx.AccountSensor, measurementDetectEx.Status);
+                    }
+                    break;
+                }
+                // case AccountSensorAlarmType.DetectStatus:
+                // {
+                //     ...
                 //     break;
                 // }
                 default:
@@ -243,7 +264,9 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 _logger.LogInformation("Alarm {Type} {Threshold} is (still) not triggered", 
                     alarm.AlarmType, alarm.AlarmThreshold);
 
-                await SetAlarmClearedIfNeeded(alarm, cancellationToken);
+                var sendAlert = await SetAlarmClearedIfNeeded(alarm, cancellationToken);
+                if (sendAlert && sendAlertClearedFunction != null)
+                    await sendAlertClearedFunction();
             }
         }
     }
@@ -302,6 +325,44 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
             // case AccountSensorAlarmType.HeightStatus:
             //     message = $"Het gemeten niveau van de sensor is <strong>{valueString} mm</strong>";
             //     shortMessage = $"Niveau {valueString} mm";
+            //     break;
+            default:
+                throw new InvalidOperationException();
+        }
+
+        await SendAlert(accountSensor, message, shortMessage);
+    }
+
+    private async Task SendAlert(AccountSensorAlarmType alertType, AccountSensor accountSensor, int value)
+    {
+        string message, shortMessage;
+        switch (alertType)
+        {
+            case AccountSensorAlarmType.DetectOn:
+                message = "De sensor heeft water gedetecteerd";
+                shortMessage = "Water gedetecteerd";
+                break;
+            // case AccountSensorAlarmType.DetectStatus:
+            //     ...
+            //     break;
+            default:
+                throw new InvalidOperationException();
+        }
+
+        await SendAlert(accountSensor, message, shortMessage);
+    }
+
+    private async Task SendAlertCleared(AccountSensorAlarmType alertType, AccountSensor accountSensor, int value)
+    {
+        string message, shortMessage;
+        switch (alertType)
+        {
+            case AccountSensorAlarmType.DetectOn:
+                message = "De sensor heeft geen water meer gedetecteerd";
+                shortMessage = "Geen water gedetecteerd";
+                break;
+            // case AccountSensorAlarmType.DetectStatus:
+            //     ...
             //     break;
             default:
                 throw new InvalidOperationException();
