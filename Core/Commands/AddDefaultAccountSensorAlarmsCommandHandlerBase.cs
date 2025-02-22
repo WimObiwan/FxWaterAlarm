@@ -32,6 +32,24 @@ public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
             AlarmThreshold = 24.5
         });
 
+
+        switch (accountSensor.Sensor.Type)
+        {
+            case SensorType.Level:
+                CreateLevelAlarms(accountSensor);
+                break;
+            case SensorType.Detect:
+                CreateDetectAlarms(accountSensor);
+                break;
+            default:
+                _logger.LogWarning("Skip accountsensor {AccountUid} {SensorUid} because the sensor type is not supported", 
+                    accountSensor.Account.Uid, accountSensor.Sensor.Uid);
+                break;
+        }
+    }
+
+    private void CreateLevelAlarms(AccountSensor accountSensor)
+    {
         accountSensor.AddAlarm(new AccountSensorAlarm
         {
             Uid = Guid.NewGuid(),
@@ -39,4 +57,14 @@ public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
             AlarmThreshold = 25.0
         });
     }
+
+    private void CreateDetectAlarms(AccountSensor accountSensor)
+    {
+        accountSensor.AddAlarm(new AccountSensorAlarm
+        {
+            Uid = Guid.NewGuid(),
+            AlarmType = AccountSensorAlarmType.DetectOn,
+        });
+    }
+
 }

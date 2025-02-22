@@ -1,4 +1,5 @@
 @page
+@using Core.Util
 @using Microsoft.AspNetCore.Mvc.Localization
 @using QRCoder
 @using SixLabors.ImageSharp
@@ -40,9 +41,18 @@ else
                             <div class="card-title" style="text-align: center; font-size: xx-large; text-decoration: underline; line-height: 200%;">
                                 @measurement.AccountSensor.Name
                             </div>
-                            <div style="text-align: center;">
-                                @await Component.InvokeAsync("Waterlevel", new { measurementEx = measurement })
-                            </div>
+                            @if (measurement is MeasurementLevelEx measurementLevelEx)
+                            {
+                                <div style="text-align: center;">
+                                    @await Component.InvokeAsync("Waterlevel", new { measurementLevelEx = measurementLevelEx })
+                                </div>
+                            }
+                            else if (measurement is MeasurementDetectEx measurementDetectEx)
+                            {
+                                <div style="text-align: center;">
+                                    @await Component.InvokeAsync("Detect", new { measurementDetectEx = measurementDetectEx })
+                                </div>
+                            }
                             <div style="text-align: center; margin-top: 20px;">
                                 <a href="@measurement.AccountSensor.RestPath" class="btn btn-primary">@Loc["Sensor details"]</a>
                             </div>

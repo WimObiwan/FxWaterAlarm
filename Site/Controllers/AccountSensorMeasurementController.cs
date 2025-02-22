@@ -64,34 +64,34 @@ public class AccountSensorMeasurementController : Controller
 
             var result2 = measurements.Select(measurement =>
             {
-                MeasurementEx measurementEx = new(measurement, accountSensor);
+                MeasurementLevelEx measurementLevelEx = new(measurement, accountSensor);
 
                 double? value;
                 switch (graphType)
                 {
                     case GraphType.Height:
-                        value = measurementEx.Distance.HeightMm;
+                        value = measurementLevelEx.Distance.HeightMm;
                         break;
                     case GraphType.Percentage:
-                        if (measurementEx.Distance.LevelFraction is {} levelFraction)
+                        if (measurementLevelEx.Distance.LevelFraction is {} levelFraction)
                             value = Math.Round(levelFraction * 100.0, 2);
                         else
                             value = null;
                         break;
                     case GraphType.Volume:
-                        if (measurementEx.Distance.WaterL is {} waterL)
+                        if (measurementLevelEx.Distance.WaterL is {} waterL)
                             value = Math.Round(waterL, 2);
                         else
                             value = null;
                         break;
                     case GraphType.Distance:
-                        value = measurementEx.Distance.DistanceMm;
+                        value = measurementLevelEx.Distance.DistanceMm;
                         break;
                     case GraphType.RssiDbm:
-                        value = measurementEx.RssiDbm;
+                        value = measurementLevelEx.RssiDbm;
                         break;
                     case GraphType.BatV:
-                        value = measurementEx.BatV;
+                        value = measurementLevelEx.BatV;
                         break;
                     default:
                         value = null;

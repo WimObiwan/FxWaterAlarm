@@ -1,5 +1,5 @@
 @using Microsoft.AspNetCore.Mvc.Localization
-@model Core.Util.MeasurementLevelEx
+@model Core.Util.MeasurementDetectEx
 @inject IViewLocalizer Loc
 
 @{
@@ -12,53 +12,24 @@
     </div>
 
     @{
-        var levelFraction = Model.Distance.LevelFraction;
-        var realLevelFraction = Model.Distance.RealLevelFraction;
-        var waterL = Model.Distance.WaterL;
-        var height = Model.Distance.HeightMm;
+        var levelFraction = (int?)Model.Status;
         var timestamp = Model.Timestamp;
     }
 
-    @{
-        string size = "xx-large";
-    }
-    @if (waterL.HasValue)
-    {
-        <div style="font-size: @size">@Math.Round(waterL.Value, 0) @Loc["liter"]</div>
-        size = "large";
-    }
-    @if (realLevelFraction.HasValue)
-    {
-        <div style="font-size: @size">@Math.Round(realLevelFraction.Value * 100.0, 1)%</div>
-        size = "large";
-    }
-    @if (height.HasValue)
-    {
-        <div style="font-size: @size">@height.Value @Loc["mm"]</div>
-    }
     <div>@timestamp.ToLocalTime().ToString("G")</div>
 </div>
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script src="~/js/LiquidFillGauge.js"></script>
 
-@if (levelFraction.HasValue || height.HasValue)
+@if (levelFraction.HasValue)
 {
     int maxValue;
     double value;
     bool displayPercent;
-    if (levelFraction.HasValue)
-    {
-        value = Math.Round(levelFraction.Value * 100.0);
-        maxValue = 100;
-        displayPercent = true;
-    }
-    else
-    {
-        value = height ?? 100;
-        maxValue = height ?? 100;
-        displayPercent = false;
-    }
+    value = Math.Round(levelFraction.Value * 100.0);
+    maxValue = 100;
+    displayPercent = true;
     
     <script>
         var config = liquidFillGaugeDefaultSettings();

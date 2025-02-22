@@ -1,8 +1,10 @@
 using System.Globalization;
 using Core.Communication;
 using Core.Entities;
+using Core.Queries;
 using Core.Repositories;
 using Core.Util;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Commands;
@@ -10,18 +12,18 @@ namespace Core.Commands;
 public abstract class CheckAccountSensorAlarmsCommandHandlerBase
 {
     private readonly WaterAlarmDbContext _dbContext;
-    private readonly IMeasurementRepository _measurementRepository;
+    private readonly IMediator _mediator;
     private readonly IMessenger _messenger;
     private readonly ILogger _logger;
 
     public CheckAccountSensorAlarmsCommandHandlerBase(
         WaterAlarmDbContext dbContext,
-        IMeasurementRepository measurementRepository, 
+        IMediator mediator,
         IMessenger messenger, 
         ILogger logger)
     {
         _dbContext = dbContext;
-        _measurementRepository = measurementRepository;
+        _mediator = mediator;  // I know... https://lostechies.com/jimmybogard/2016/12/12/dealing-with-duplication-in-mediatr-handlers/
         _messenger = messenger;
         _logger = logger;
     }
@@ -40,10 +42,14 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         {
             // TODO: Use GetLastMedian
             //var medianFrom = DateTime.Now.AddHours(-24).ToUniversalTime();
-            var measurement = await _measurementRepository.GetLast(accountSensor.Sensor.DevEui, cancellationToken)
+
+            var measurementEx = await _mediator.Send(
+                new LastMeasurementQuery 
+                {
+                    AccountSensor = accountSensor
+                }, cancellationToken)
                 ?? throw new Exception("No measurement found");
             
-            var measurementEx = new MeasurementEx(measurement, accountSensor);
             await CheckAccountSensorAlarms(measurementEx, alarms, cancellationToken);
         }
         else
@@ -53,7 +59,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         }
     }
 
-    private async Task CheckAccountSensorAlarms(MeasurementEx measurementEx, IReadOnlyCollection<AccountSensorAlarm> alarms, 
+    private async Task CheckAccountSensorAlarms(IMeasurementEx measurementEx, IReadOnlyCollection<AccountSensorAlarm> alarms, 
         CancellationToken cancellationToken)
     {
         const double AlarmThresholdHisteresisBattery = 5.0;
@@ -65,6 +71,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
             bool isTriggered = false;
             bool isCleared = false;
             Func<Task>? sendAlertFunction = null;
+            Func<Task>? sendAlertClearedFunction = null;
             switch (alarm.AlarmType)
             {
                 case AccountSensorAlarmType.Data:
@@ -98,7 +105,11 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 }
                 case AccountSensorAlarmType.PercentageLow:
                 {
-                    if (!(measurementEx.Distance.LevelFraction is {} levelFraction))
+                    if (!(measurementEx is MeasurementLevelEx measurementLevelEx))
+                    {
+                        _logger.LogWarning("Last measurement is not a level measurement");
+                    }
+                    else if (!(measurementLevelEx.Distance.LevelFraction is {} levelFraction))
                     {
                         _logger.LogWarning("No LevelFraction");
                     }
@@ -117,7 +128,11 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 }
                 case AccountSensorAlarmType.PercentageHigh:
                 {
-                    if (!(measurementEx.Distance.LevelFraction is {} levelFraction))
+                    if (!(measurementEx is MeasurementLevelEx measurementLevelEx))
+                    {
+                        _logger.LogWarning("Last measurement is not a level measurement");
+                    }
+                    else if (!(measurementLevelEx.Distance.LevelFraction is {} levelFraction))
                     {
                         _logger.LogWarning("No LevelFraction");
                     }
@@ -151,7 +166,11 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 // }
                 case AccountSensorAlarmType.HeightLow:
                 {
-                    if (!(measurementEx.Distance.HeightMm is {} heightMm))
+                    if (!(measurementEx is MeasurementLevelEx measurementLevelEx))
+                    {
+                        _logger.LogWarning("Last measurement is not a level measurement");
+                    }
+                    else if (!(measurementLevelEx.Distance.HeightMm is {} heightMm))
                     {
                         _logger.LogWarning("No Height");
                     }
@@ -169,7 +188,11 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 }
                 case AccountSensorAlarmType.HeightHigh:
                 {
-                    if (!(measurementEx.Distance.HeightMm is {} heightMm))
+                    if (!(measurementEx is MeasurementLevelEx measurementLevelEx))
+                    {
+                        _logger.LogWarning("Last measurement is not a level measurement");
+                    }
+                    else if (!(measurementLevelEx.Distance.HeightMm is {} heightMm))
                     {
                         _logger.LogWarning("No Height");
                     }
@@ -199,6 +222,26 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 //     }
                 //     break;
                 // }
+                case AccountSensorAlarmType.DetectOn:
+                {
+                    if (!(measurementEx is MeasurementDetectEx measurementDetectEx))
+                    {
+                        _logger.LogWarning("Last measurement is not a detect measurement");
+                    }
+                    else
+                    {
+                        isTriggered = measurementDetectEx.Status == 1;
+                        isCleared = measurementDetectEx.Status == 0;
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.DetectOn, measurementEx.AccountSensor, measurementDetectEx.Status);
+                        sendAlertClearedFunction = () => SendAlertCleared(AccountSensorAlarmType.DetectOn, measurementEx.AccountSensor, measurementDetectEx.Status);
+                    }
+                    break;
+                }
+                // case AccountSensorAlarmType.DetectStatus:
+                // {
+                //     ...
+                //     break;
+                // }
                 default:
                     _logger.LogError("AlarmType {AlarmType} not implemented", alarm.AlarmType);
                     break;
@@ -221,7 +264,9 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                 _logger.LogInformation("Alarm {Type} {Threshold} is (still) not triggered", 
                     alarm.AlarmType, alarm.AlarmThreshold);
 
-                await SetAlarmClearedIfNeeded(alarm, cancellationToken);
+                var sendAlert = await SetAlarmClearedIfNeeded(alarm, cancellationToken);
+                if (sendAlert && sendAlertClearedFunction != null)
+                    await sendAlertClearedFunction();
             }
         }
     }
@@ -280,6 +325,44 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
             // case AccountSensorAlarmType.HeightStatus:
             //     message = $"Het gemeten niveau van de sensor is <strong>{valueString} mm</strong>";
             //     shortMessage = $"Niveau {valueString} mm";
+            //     break;
+            default:
+                throw new InvalidOperationException();
+        }
+
+        await SendAlert(accountSensor, message, shortMessage);
+    }
+
+    private async Task SendAlert(AccountSensorAlarmType alertType, AccountSensor accountSensor, int value)
+    {
+        string message, shortMessage;
+        switch (alertType)
+        {
+            case AccountSensorAlarmType.DetectOn:
+                message = "De sensor heeft water gedetecteerd";
+                shortMessage = "Water gedetecteerd";
+                break;
+            // case AccountSensorAlarmType.DetectStatus:
+            //     ...
+            //     break;
+            default:
+                throw new InvalidOperationException();
+        }
+
+        await SendAlert(accountSensor, message, shortMessage);
+    }
+
+    private async Task SendAlertCleared(AccountSensorAlarmType alertType, AccountSensor accountSensor, int value)
+    {
+        string message, shortMessage;
+        switch (alertType)
+        {
+            case AccountSensorAlarmType.DetectOn:
+                message = "De sensor heeft geen water meer gedetecteerd";
+                shortMessage = "Geen water gedetecteerd";
+                break;
+            // case AccountSensorAlarmType.DetectStatus:
+            //     ...
             //     break;
             default:
                 throw new InvalidOperationException();

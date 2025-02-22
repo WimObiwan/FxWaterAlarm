@@ -4,25 +4,25 @@ using MediatR;
 
 namespace Core.Queries;
 
-public record MeasurementsQuery : IRequest<Measurement[]>
+public record MeasurementsQuery : IRequest<MeasurementLevel[]>
 {
     public required string DevEui { get; init; }
     public DateTime? From { get; init; }
     public DateTime? Till { get; init; }
 }
 
-public class MeasurementsQueryHandler : IRequestHandler<MeasurementsQuery, Measurement[]>
+public class MeasurementsQueryHandler : IRequestHandler<MeasurementsQuery, MeasurementLevel[]>
 {
-    private readonly IMeasurementRepository _measurementRepository;
+    private readonly IMeasurementLevelRepository _measurementLevelRepository;
 
-    public MeasurementsQueryHandler(IMeasurementRepository measurementRepository)
+    public MeasurementsQueryHandler(IMeasurementLevelRepository measurementLevelRepository)
     {
-        _measurementRepository = measurementRepository;
+        _measurementLevelRepository = measurementLevelRepository;
     }
 
-    public async Task<Measurement[]> Handle(MeasurementsQuery request, CancellationToken cancellationToken)
+    public async Task<MeasurementLevel[]> Handle(MeasurementsQuery request, CancellationToken cancellationToken)
     {
-        return await _measurementRepository.Get(request.DevEui, request.From, request.Till,
+        return await _measurementLevelRepository.Get(request.DevEui, request.From, request.Till,
             cancellationToken);
     }
 }

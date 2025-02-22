@@ -74,6 +74,12 @@ public class AccountSensorController : Controller
     private readonly IMediator _mediator;
     private readonly ITrendService _trendService;
 
+    public AccountSensorController(IMediator mediator, ITrendService trendService)
+    {
+        _mediator = mediator;
+        _trendService = trendService;
+    }
+
     public async Task<IActionResult> Index(string accountLink, string sensorLink)
     {
         var accountSensor = await _mediator.Send(new AccountSensorByLinkQuery()
@@ -84,73 +90,82 @@ public class AccountSensorController : Controller
 
         if (accountSensor == null)
             return NotFound();
+
+        AccountSensorResult result;
         
-        var lastMeasurement = await _mediator.Send(new LastMeasurementQuery
-            { DevEui = accountSensor.Sensor.DevEui });
-        var measurementEx = lastMeasurement != null ? new MeasurementEx(lastMeasurement, accountSensor) : null;
-
-        LastMeasurementDto? lastMeasurementDto;
-        TrendsDto? trendsDto;
-        if (measurementEx != null)
+        var measurementEx = await _mediator.Send(new LastMeasurementQuery
         {
-            lastMeasurementDto = new LastMeasurementDto
-            {
-                TimeStamp = measurementEx.Timestamp,
-                BatV = measurementEx.BatV,
-                BatteryPrc = measurementEx.BatteryPrc,
-                RssiDbm = measurementEx.RssiDbm,
-                RssiPrc = measurementEx.RssiPrc,
-                DistanceMm = measurementEx.Distance.DistanceMm,
-                HeightMm = measurementEx.Distance.HeightMm,
-                WaterL = measurementEx.Distance.WaterL,
-                LevelFraction = measurementEx.Distance.LevelFraction,
-                RealLevelFraction = measurementEx.Distance.RealLevelFraction,
-                EstimatedNextRefresh = measurementEx.EstimateNextRefresh()
-            };
-            
-            var trendMeasurements = await _trendService.GetTrendMeasurements(measurementEx,
-                //TimeSpan.FromHours(1),
-                TimeSpan.FromHours(6),
-                TimeSpan.FromHours(24),
-                TimeSpan.FromDays(7),
-                TimeSpan.FromDays(30));
+            AccountSensor = accountSensor
+        });
 
-            trendsDto = new TrendsDto()
+        if (measurementEx is MeasurementLevelEx measurementLevelEx)
+        {
+            LastMeasurementDto? lastMeasurementDto;
+            TrendsDto? trendsDto;
+            if (measurementLevelEx != null)
             {
-                //Trend1H = new Trend(trendMeasurements[0]),
-                Trend6H = new Trend(trendMeasurements[0]),
-                Trend24H = new Trend(trendMeasurements[1]),
-                Trend7D = new Trend(trendMeasurements[2]),
-                Trend30D = new Trend(trendMeasurements[3])
+                lastMeasurementDto = new LastMeasurementDto
+                {
+                    TimeStamp = measurementLevelEx.Timestamp,
+                    BatV = measurementLevelEx.BatV,
+                    BatteryPrc = measurementLevelEx.BatteryPrc,
+                    RssiDbm = measurementLevelEx.RssiDbm,
+                    RssiPrc = measurementLevelEx.RssiPrc,
+                    DistanceMm = measurementLevelEx.Distance.DistanceMm,
+                    HeightMm = measurementLevelEx.Distance.HeightMm,
+                    WaterL = measurementLevelEx.Distance.WaterL,
+                    LevelFraction = measurementLevelEx.Distance.LevelFraction,
+                    RealLevelFraction = measurementLevelEx.Distance.RealLevelFraction,
+                    EstimatedNextRefresh = measurementLevelEx.EstimateNextRefresh()
+                };
+                
+                var trendMeasurements = await _trendService.GetTrendMeasurements(measurementLevelEx,
+                    //TimeSpan.FromHours(1),
+                    TimeSpan.FromHours(6),
+                    TimeSpan.FromHours(24),
+                    TimeSpan.FromDays(7),
+                    TimeSpan.FromDays(30));
+
+                trendsDto = new TrendsDto()
+                {
+                    //Trend1H = new Trend(trendMeasurements[0]),
+                    Trend6H = new Trend(trendMeasurements[0]),
+                    Trend24H = new Trend(trendMeasurements[1]),
+                    Trend7D = new Trend(trendMeasurements[2]),
+                    Trend30D = new Trend(trendMeasurements[3])
+                };
+            }
+            else
+            {
+                lastMeasurementDto = null;
+                trendsDto = null;
+            }
+
+            result = new AccountSensorResult
+            {
+                AccountSensor = new AccountSensorDto
+                {
+                    Name = accountSensor.Name,
+                    CapacityL = accountSensor.CapacityL,
+                    ResolutionL = accountSensor.ResolutionL,
+                    DistanceMmEmpty = accountSensor.DistanceMmEmpty,
+                    DistanceMmFull = accountSensor.DistanceMmFull,
+                    CreateTimestamp = accountSensor.CreateTimestamp
+                },
+                LastMeasurement = lastMeasurementDto,
+                Trends = trendsDto
             };
+        }
+        else if (measurementEx is MeasurementDetectEx measurementDetectEx)
+        {
+            #warning Implement this
+            throw new NotImplementedException();
         }
         else
         {
-            lastMeasurementDto = null;
-            trendsDto = null;
+            throw new InvalidOperationException("Unknown measurement type");
         }
-
-        var result = new AccountSensorResult
-        {
-            AccountSensor = new AccountSensorDto
-            {
-                Name = accountSensor.Name,
-                CapacityL = accountSensor.CapacityL,
-                ResolutionL = accountSensor.ResolutionL,
-                DistanceMmEmpty = accountSensor.DistanceMmEmpty,
-                DistanceMmFull = accountSensor.DistanceMmFull,
-                CreateTimestamp = accountSensor.CreateTimestamp
-            },
-            LastMeasurement = lastMeasurementDto,
-            Trends = trendsDto
-        };
         
         return Ok(result);
-    }
-
-    public AccountSensorController(IMediator mediator, ITrendService trendService)
-    {
-        _mediator = mediator;
-        _trendService = trendService;
     }
 }

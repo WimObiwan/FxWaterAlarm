@@ -12,15 +12,15 @@ public record LastMedianMeasurementQuery : IRequest<AggregatedMeasurement?>
 
 public class LastMedianMeasurementQueryHandler : IRequestHandler<LastMedianMeasurementQuery, AggregatedMeasurement?>
 {
-    private readonly IMeasurementRepository _measurementRepository;
+    private readonly IMeasurementLevelRepository _measurementLevelRepository;
 
-    public LastMedianMeasurementQueryHandler(IMeasurementRepository measurementRepository)
+    public LastMedianMeasurementQueryHandler(IMeasurementLevelRepository measurementLevelRepository)
     {
-        _measurementRepository = measurementRepository;
+        _measurementLevelRepository = measurementLevelRepository;
     }
 
     public async Task<AggregatedMeasurement?> Handle(LastMedianMeasurementQuery request, CancellationToken cancellationToken)
     {
-        return await _measurementRepository.GetLastMedian(request.DevEui, request.From, cancellationToken);
+        return await _measurementLevelRepository.GetLastMedian(request.DevEui, request.From, cancellationToken);
     }
 }

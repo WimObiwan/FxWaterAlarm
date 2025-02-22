@@ -17,7 +17,7 @@ public class Account : PageModel
     private readonly IUserInfo _userInfo;
 
     public Core.Entities.Account? AccountEntity { get; set; }
-    public IList<MeasurementEx>? Measurements { get; set; }
+    public IList<IMeasurementEx>? Measurements { get; set; }
 
     public Account(IMediator mediator, IUserInfo userInfo)
     {
@@ -40,15 +40,13 @@ public class Account : PageModel
         {
             Measurements = (await Task.WhenAll(AccountEntity.AccountSensors.Select(async accountSensor =>
             {
-                var lastMeasurement = await _mediator.Send(new LastMeasurementQuery
-                    { DevEui = accountSensor.Sensor.DevEui });
-                if (lastMeasurement != null)
-                    return new MeasurementEx(lastMeasurement, accountSensor);
-                else
-                    return null;
+                return await _mediator.Send(new LastMeasurementQuery
+                {
+                    AccountSensor = accountSensor
+                });
             })))
                 .Where(m => m != null)
-                .Cast<MeasurementEx>()
+                .Select(m => m!)
                 .ToList();
         }
 

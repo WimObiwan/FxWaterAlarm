@@ -10,7 +10,7 @@
 }
 
 <div id="chart-container-@uniqueId" style="height: 40vh; width: 100%; touch-action: none;"></div>
-<script src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<script src="https://fastly.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
 
 @if (Model.AccountSensorEntity != null)
 {
@@ -96,7 +96,7 @@ getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)&
 
     var zoomEnd = new Date();
     //var zoomStart = new Date((new Date(data2[data2.length - 1][0])).getTime() - 21 * 24 * 60 * 60 * 1000);
-    var zoomStart = new Date(zoomEnd.getTime() - 21 * 24 * 60 * 60 * 1000);
+    var zoomStart = new Date(zoomEnd.getTime() - 365 * 24 * 60 * 60 * 1000);
 
     var dom = document.getElementById('chart-container-@uniqueId');
     var myChart = echarts.init(dom, null, {

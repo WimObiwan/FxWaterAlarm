@@ -8,6 +8,7 @@ public record CreateSensorCommand : IRequest
 {
     public required Guid Uid { get; init; }
     public required string DevEui { get; init; }
+    public required Entities.SensorType SensorType { get; init; }
 }
 
 public class CreateSensorCommandHandler : IRequestHandler<CreateSensorCommand>
@@ -25,7 +26,8 @@ public class CreateSensorCommandHandler : IRequestHandler<CreateSensorCommand>
         {
             Uid = request.Uid,
             DevEui = request.DevEui,
-            CreateTimestamp = DateTime.UtcNow
+            CreateTimestamp = DateTime.UtcNow,
+            Type = request.SensorType
         };
         _dbContext.Sensors.Add(sensor);
         await _dbContext.SaveChangesAsync(cancellationToken);

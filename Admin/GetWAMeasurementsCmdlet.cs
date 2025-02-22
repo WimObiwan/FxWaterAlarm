@@ -98,12 +98,12 @@ public class GetWAMeasurementsCmdlet : DependencyCmdlet<Startup>
         }
     }
 
-    private void Return(Core.Entities.Measurement measurement)
+    private void Return(Core.Entities.MeasurementLevel measurement)
     {
         WriteObject(GetMeasurement(measurement));
     }
 
-    public static Measurement GetMeasurement(Core.Entities.Measurement measurement)
+    public static Measurement GetMeasurement(Core.Entities.MeasurementLevel measurement)
     {
         return new Measurement {
             DevEui = measurement.DevEui,

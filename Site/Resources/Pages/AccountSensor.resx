@@ -75,4 +75,20 @@
         <value>Your account</value>
         <comment>Your account</comment>
     </data>
+    <data name="Last week" xml:space="preserve">
+        <value>Last week</value>
+        <comment>Last week</comment>
+    </data>
+    <data name="Last 3 weeks" xml:space="preserve">
+        <value>Last 3 weeks</value>
+        <comment>Last 3 weeks</comment>
+    </data>
+    <data name="Last 3 months" xml:space="preserve">
+        <value>Last 3 months</value>
+        <comment>Last 3 months</comment>
+    </data>
+    <data name="Last year" xml:space="preserve">
+        <value>Last year</value>
+        <comment>Last year</comment>
+    </data>
 </root>

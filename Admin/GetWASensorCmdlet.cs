@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Threading;
@@ -32,7 +32,7 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
 
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
-        if (ParameterSetName == "AccountId")
+        if (ParameterSetName == "SensorId")
         {
             if (SensorId == null)
                 await ProcessAll();
@@ -98,9 +98,16 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
             SensorId = sensor.Uid,
             DevEui = sensor.DevEui,
             CreationTimestamp = sensor.CreateTimestamp,
-            Link = sensor.Link
+            Link = sensor.Link,
+            Type = (SensorType)(int)sensor.Type
         };
     }
+}
+
+public enum SensorType
+{
+    Level = 0, 
+    Detect = 1
 }
 
 public class Sensor
@@ -109,4 +116,5 @@ public class Sensor
     public required string DevEui { get; init; }
     public required DateTime CreationTimestamp { get; init; }
     public string? Link { get; init; }
+    public SensorType Type { get; init; }
 }

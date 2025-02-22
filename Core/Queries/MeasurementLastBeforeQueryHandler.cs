@@ -4,23 +4,23 @@ using MediatR;
 
 namespace Core.Queries;
 
-public record MeasurementLastBeforeQuery : IRequest<Measurement?>
+public record MeasurementLastBeforeQuery<TMeasurement> : IRequest<TMeasurement?> where TMeasurement : Measurement
 {
     public required string DevEui { get; init; }
     public required DateTime Timestamp { get; init; }
 }
 
-public class MeasurementLastBeforeQueryHandler : IRequestHandler<MeasurementLastBeforeQuery, Measurement?>
+public class MeasurementLastBeforeQueryHandler<TMeasurement> : IRequestHandler<MeasurementLastBeforeQuery<TMeasurement>, TMeasurement?> where TMeasurement : Measurement
 {
-    private readonly IMeasurementRepository _measurementRepository;
+    private readonly IMeasurementLevelRepository _measurementLevelRepository;
 
-    public MeasurementLastBeforeQueryHandler(IMeasurementRepository measurementRepository)
+    public MeasurementLastBeforeQueryHandler(IMeasurementLevelRepository measurementLevelRepository)
     {
-        _measurementRepository = measurementRepository;
+        _measurementLevelRepository = measurementLevelRepository;
     }
 
-    public async Task<Measurement?> Handle(MeasurementLastBeforeQuery request, CancellationToken cancellationToken)
+    public async Task<TMeasurement?> Handle(MeasurementLastBeforeQuery<TMeasurement> request, CancellationToken cancellationToken)
     {
-        return await _measurementRepository.GetLastBefore(request.DevEui, request.Timestamp, cancellationToken);
+        return (TMeasurement?)(Measurement?)await _measurementLevelRepository.GetLastBefore(request.DevEui, request.Timestamp, cancellationToken);
     }
 }

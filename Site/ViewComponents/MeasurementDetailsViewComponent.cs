@@ -6,14 +6,14 @@ namespace Site.ViewComponents;
 
 public class MeasurementDetailsModel
 {
-    public required MeasurementEx? MeasurementEx { get; init; }
+    public required IMeasurementEx? MeasurementEx { get; init; }
     public required AccountSensor AccountSensor { get; init; }
 }
 
 public class MeasurementDetailsViewComponent : ViewComponent
 {
     public async Task<IViewComponentResult> InvokeAsync(
-        AccountSensor accountSensor, MeasurementEx? measurementEx)
+        AccountSensor accountSensor, IMeasurementEx? measurementEx)
     {
         var model = new MeasurementDetailsModel
         {
