@@ -22,6 +22,12 @@ title: Versie Informatie
 > *
 -->
 
+### v1.0
+> 2025-02-22
+> * Ondersteuning voor nieuwe sensoren voor "Detectie" LWL02, LWL03.  Inclusief alarmen, maar voorlopig zonder grafiek.
+> * Grafieken werden vereenvoudigd: geen 'Grafiek', maar meteen Volume, Percentage of Hoogte. 
+> * Boven de grafieken worden nu links getoond om snel in te zoomen naar laatste week, laatste 3 weken, laatste 3 maanden en laatste jaar.
+
 ### v0.36
 > 2024-07-17
 > ##### Nieuw
