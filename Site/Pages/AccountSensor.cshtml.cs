@@ -34,14 +34,12 @@ public class AccountSensor : PageModel
     
     private readonly IMediator _mediator;
     private readonly IUserInfo _userInfo;
-    private readonly ILastMeasurementService _lastMeasurementService;
     private readonly ITrendService _trendService;
 
-    public AccountSensor(IMediator mediator, IUserInfo userInfo, ILastMeasurementService lastMeasurementService, ITrendService trendService)
+    public AccountSensor(IMediator mediator, IUserInfo userInfo, ITrendService trendService)
     {
         _mediator = mediator;
         _userInfo = userInfo;
-        _lastMeasurementService = lastMeasurementService;
         _trendService = trendService;
     }
 
@@ -80,7 +78,10 @@ public class AccountSensor : PageModel
 
         if (AccountSensorEntity != null)
         {
-            LastMeasurement = await _lastMeasurementService.GetLastMeasurement(AccountSensorEntity);
+            LastMeasurement = await _mediator.Send(new LastMeasurementQuery
+            {
+                AccountSensor = AccountSensorEntity
+            });
 
             switch (PageType)
             {

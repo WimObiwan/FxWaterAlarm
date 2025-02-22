@@ -72,8 +72,13 @@ class AccountSensorResult
 public class AccountSensorController : Controller
 {
     private readonly IMediator _mediator;
-    private readonly ILastMeasurementService _lastMeasurementService;
     private readonly ITrendService _trendService;
+
+    public AccountSensorController(IMediator mediator, ITrendService trendService)
+    {
+        _mediator = mediator;
+        _trendService = trendService;
+    }
 
     public async Task<IActionResult> Index(string accountLink, string sensorLink)
     {
@@ -88,8 +93,11 @@ public class AccountSensorController : Controller
 
         AccountSensorResult result;
         
-        var measurementEx = await _lastMeasurementService.GetLastMeasurement(accountSensor);
-        
+        var measurementEx = await _mediator.Send(new LastMeasurementQuery
+        {
+            AccountSensor = accountSensor
+        });
+
         if (measurementEx is MeasurementLevelEx measurementLevelEx)
         {
             LastMeasurementDto? lastMeasurementDto;
@@ -159,12 +167,5 @@ public class AccountSensorController : Controller
         }
         
         return Ok(result);
-    }
-
-    public AccountSensorController(IMediator mediator, ILastMeasurementService lastMeasurementService, ITrendService trendService)
-    {
-        _mediator = mediator;
-        _lastMeasurementService = lastMeasurementService;
-        _trendService = trendService;
     }
 }

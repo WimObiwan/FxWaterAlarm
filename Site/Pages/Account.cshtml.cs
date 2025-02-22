@@ -15,16 +15,14 @@ public class Account : PageModel
 {
     private readonly IMediator _mediator;
     private readonly IUserInfo _userInfo;
-    private readonly ILastMeasurementService _lastMeasurementService;
 
     public Core.Entities.Account? AccountEntity { get; set; }
     public IList<IMeasurementEx>? Measurements { get; set; }
 
-    public Account(IMediator mediator, IUserInfo userInfo, ILastMeasurementService lastMeasurementService)
+    public Account(IMediator mediator, IUserInfo userInfo)
     {
         _mediator = mediator;
         _userInfo = userInfo;
-        _lastMeasurementService = lastMeasurementService;
     }
 
     public async Task OnGet(string accountLink)
@@ -42,7 +40,10 @@ public class Account : PageModel
         {
             Measurements = (await Task.WhenAll(AccountEntity.AccountSensors.Select(async accountSensor =>
             {
-                return await _lastMeasurementService.GetLastMeasurement(accountSensor);
+                return await _mediator.Send(new LastMeasurementQuery
+                {
+                    AccountSensor = accountSensor
+                });
             })))
                 .Where(m => m != null)
                 .Select(m => m!)
