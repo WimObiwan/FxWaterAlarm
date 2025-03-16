@@ -136,10 +136,20 @@
                     }
                     @if (Model.AccountSensorEntity?.HasPercentage == true)
                     {
-                    <li>
-                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphPercentage))
-                            href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphPercentage)">@Loc["Percentage"]</a>
-                    </li>
+                        if (Model.AccountSensorEntity.Sensor.Type == SensorType.Moisture)
+                        {
+                            <li>
+                                <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphPercentage))
+                                    href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphPercentage)">@Loc["Moisture"]</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphPercentage))
+                                    href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphPercentage)">@Loc["Percentage"]</a>
+                            </li>
+                        }
                     }
                     @if (Model.AccountSensorEntity?.HasHeight == true)
                     {

@@ -52,54 +52,80 @@ public class AccountSensorMeasurementController : Controller
         {
             var measurements = await _mediator.Send(new MeasurementsQuery
                 {
-                    DevEui = accountSensor.Sensor.DevEui,
+                    AccountSensor = accountSensor,
                     From = from,
                     Till = last
                 });
 
-            if (measurements.Length == 0)
+            if (measurements == null || measurements.Length == 0)
                 break;
 
             last = measurements[^1].Timestamp;
 
-            var result2 = measurements.Select(measurement =>
+            var result2 = measurements.Select(measurementEx =>
             {
-                MeasurementLevelEx measurementLevelEx = new(measurement, accountSensor);
-
                 double? value;
                 switch (graphType)
                 {
                     case GraphType.Height:
-                        value = measurementLevelEx.Distance.HeightMm;
+                    {
+                        if (measurementEx is MeasurementLevelEx measurementLevelEx)
+                            value = measurementLevelEx.Distance.HeightMm;
+                        else
+                            value = null;
                         break;
+                    }
                     case GraphType.Percentage:
-                        if (measurementLevelEx.Distance.LevelFraction is {} levelFraction)
-                            value = Math.Round(levelFraction * 100.0, 2);
+                    {
+                        if (measurementEx is MeasurementLevelEx measurementLevelEx)
+                            if (measurementLevelEx.Distance.LevelFraction is {} levelFraction)
+                                value = Math.Round(levelFraction * 100.0, 2);
+                            else
+                                value = null;
+                        else if (measurementEx is MeasurementMoistureEx measurementMoistureEx)
+                            value = measurementMoistureEx.SoilMoisturePrc;
                         else
                             value = null;
                         break;
+                    }
                     case GraphType.Volume:
-                        if (measurementLevelEx.Distance.WaterL is {} waterL)
-                            value = Math.Round(waterL, 2);
+                    {
+                        if (measurementEx is MeasurementLevelEx measurementLevelEx)
+                            if (measurementLevelEx.Distance.WaterL is {} waterL)
+                                value = Math.Round(waterL, 2);
+                            else
+                                value = null;
                         else
                             value = null;
                         break;
+                    }
                     case GraphType.Distance:
-                        value = measurementLevelEx.Distance.DistanceMm;
+                    {
+                        if (measurementEx is MeasurementLevelEx measurementLevelEx)
+                            value = measurementLevelEx.Distance.DistanceMm;
+                        else
+                            value = null;
                         break;
+                    }
                     case GraphType.RssiDbm:
-                        value = measurementLevelEx.RssiDbm;
+                    {
+                        value = measurementEx.RssiDbm;
                         break;
+                    }
                     case GraphType.BatV:
-                        value = measurementLevelEx.BatV;
+                    {
+                        value = measurementEx.BatV;
                         break;
+                    }
                     default:
+                    {
                         value = null;
                         break;
+                    }
                 }
                 return new MeasurementResultDataItem
                 {
-                    TimeStamp = measurement.Timestamp,
+                    TimeStamp = measurementEx.Timestamp,
                     Value = value
                 };
             });
