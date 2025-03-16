@@ -52,6 +52,12 @@
                 @await Component.InvokeAsync("Detect", new { measurementDetectEx = measurementDetectEx })
             </div>
         }
+        else if (Model.LastMeasurement is MeasurementMoistureEx measurementMoistureEx)
+        {
+            <div>
+                @await Component.InvokeAsync("Moisture", new { measurementMoistureEx = measurementMoistureEx })
+            </div>
+        }
 
         string? ConstructUrlFilter(AccountSensor.PageTypeEnum? pageType = null, int? fromDays = null)
         {

@@ -3,7 +3,8 @@ namespace Core.Entities;
 public enum SensorType
 { 
     Level = 0, 
-    Detect = 1
+    Detect = 1,
+    Moisture = 2
 }
 
 public class Sensor

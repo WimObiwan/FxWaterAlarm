@@ -53,6 +53,12 @@ else
                                     @await Component.InvokeAsync("Detect", new { measurementDetectEx = measurementDetectEx })
                                 </div>
                             }
+                            else if (measurement is MeasurementMoistureEx measurementMoistureEx)
+                            {
+                                <div style="text-align: center;">
+                                    @await Component.InvokeAsync("Moisture", new { measurementMoistureEx = measurementMoistureEx })
+                                </div>
+                            }
                             <div style="text-align: center; margin-top: 20px;">
                                 <a href="@measurement.AccountSensor.RestPath" class="btn btn-primary">@Loc["Sensor details"]</a>
                             </div>

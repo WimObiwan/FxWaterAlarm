@@ -1,5 +1,5 @@
 @using Microsoft.AspNetCore.Mvc.Localization
-@model Core.Util.MeasurementDetectEx
+@model Core.Util.MeasurementMoistureEx
 @inject IViewLocalizer Loc
 
 @{
@@ -12,22 +12,23 @@
     </div>
 
     @{
-        var status = (int?)Model.Status;
+        var soilConductivity = (int?)Model.SoilConductivity;
+        var soilMoisturePrc = (double?)Model.SoilMoisturePrc;
+        var soilTemperatureC = (double?)Model.SoilTemperatureC;
         var timestamp = Model.Timestamp;
     }
 
-    @if (status.HasValue)
+    @if (soilMoisturePrc.HasValue)
     {
-        <div style="font-size: large">
-            @if (status.Value != 0)
-            {
-                <span class="text-danger">@Loc["Water gedetecteerd"]</span>
-            }
-            else
-            {
-                <span class="text-success">@Loc["Geen water gedetecteerd"]</span>
-            }
-        </div>
+        <div style="font-size: xx-large">@Math.Round(soilMoisturePrc.Value, 1)%</div>
+    }
+    @if (soilConductivity.HasValue)
+    {
+        <div style="font-size: size">@soilConductivity.Value @Loc["µS/cm"]</div>
+    }
+    @if (soilTemperatureC.HasValue)
+    {
+        <div style="font-size: size">@Math.Round(soilTemperatureC.Value, 1) @Loc["°C"]</div>
     }
     <div>@timestamp.ToLocalTime().ToString("G")</div>
 </div>
@@ -35,12 +36,12 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script src="~/js/LiquidFillGauge.js"></script>
 
-@if (status.HasValue)
+@if (soilMoisturePrc.HasValue)
 {
     int maxValue;
     double value;
     bool displayPercent;
-    value = Math.Round(status.Value * 100.0);
+    value = Math.Round(soilMoisturePrc.Value);
     maxValue = 100;
     displayPercent = true;
     

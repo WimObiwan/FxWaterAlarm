@@ -41,6 +41,9 @@ public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
             case SensorType.Detect:
                 CreateDetectAlarms(accountSensor);
                 break;
+            case SensorType.Moisture:
+                CreateMoistureAlarms(accountSensor);
+                break;
             default:
                 _logger.LogWarning("Skip accountsensor {AccountUid} {SensorUid} because the sensor type is not supported", 
                     accountSensor.Account.Uid, accountSensor.Sensor.Uid);
@@ -67,4 +70,9 @@ public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
         });
     }
 
+    private void CreateMoistureAlarms(AccountSensor accountSensor)
+    {
+        #warning Implement this method
+        throw new NotImplementedException();
+    }
 }
