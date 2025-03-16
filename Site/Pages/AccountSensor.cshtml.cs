@@ -153,7 +153,7 @@ public class AccountSensor : PageModel
 
         DateTime from = DateTime.UtcNow.AddYears(-1);
         DateTime? last = null;
-        while (true)
+        for (var safetyCounter = 0; safetyCounter < 10; safetyCounter++)
         {
             var result = await _mediator.Send(new MeasurementsQuery
             {
