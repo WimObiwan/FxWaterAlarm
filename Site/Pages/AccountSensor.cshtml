@@ -85,6 +85,8 @@
                            || Model.PageType == AccountSensor.PageTypeEnum.GraphPercentage
                            || Model.PageType == AccountSensor.PageTypeEnum.GraphHeight
                            || Model.PageType == AccountSensor.PageTypeEnum.GraphDistance
+                           || Model.PageType == AccountSensor.PageTypeEnum.GraphTemperature
+                           || Model.PageType == AccountSensor.PageTypeEnum.GraphConductivity
                            || Model.PageType == AccountSensor.PageTypeEnum.GraphSignal
                            || Model.PageType == AccountSensor.PageTypeEnum.GraphBattery;
                 }
@@ -165,6 +167,20 @@
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphDistance)">@Loc["Distance"]</a>
                     </li>
                     }
+                    @if (Model.AccountSensorEntity?.HasTemperature == true)
+                    {
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphTemperature))
+                            href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphTemperature)">@Loc["Temperature"]</a>
+                    </li>
+                    }
+                    @if (Model.AccountSensorEntity?.HasConductivity == true)
+                    {
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphConductivity))
+                            href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphConductivity)">@Loc["Conductivity"]</a>
+                    </li>
+                    }
                     <li><hr class="dropdown-divider"></li>
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphSignal))
@@ -237,6 +253,14 @@
                 case AccountSensor.PageTypeEnum.GraphDistance:
                     showTimelineSlider = true;
                     graphType = GraphType.Distance;
+                    break;
+                case AccountSensor.PageTypeEnum.GraphTemperature:
+                    showTimelineSlider = true;
+                    graphType = GraphType.Temperature;
+                    break;
+                case AccountSensor.PageTypeEnum.GraphConductivity:
+                    showTimelineSlider = true;
+                    graphType = GraphType.Conductivity;
                     break;
                 case AccountSensor.PageTypeEnum.GraphSignal:
                     showTimelineSlider = true;

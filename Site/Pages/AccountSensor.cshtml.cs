@@ -20,6 +20,8 @@ public class AccountSensor : PageModel
         GraphPercentage,
         GraphHeight,
         GraphDistance,
+        GraphTemperature,
+        GraphConductivity,
         GraphSignal,
         GraphBattery,
         Trend,

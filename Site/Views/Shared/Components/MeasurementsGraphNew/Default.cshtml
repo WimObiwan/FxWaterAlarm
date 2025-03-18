@@ -79,6 +79,20 @@
             title = @Loc["Battery"];
             round = 10;
             break;
+        case Core.Entities.GraphType.Temperature:
+            color = "#006600";
+            isArea = false;
+            serieName = @Loc["Temperature"];
+            title = @Loc["Temperature"];
+            round = 10;
+            break;
+        case Core.Entities.GraphType.Conductivity:
+            color = "#660000";
+            isArea = false;
+            serieName = @Loc["Conductivity"];
+            title = @Loc["Conductivity"];
+            round = 10;
+            break;
     }
 
     <script defer>

@@ -9,6 +9,8 @@ public enum GraphType
     Distance,
     RssiDbm,
     BatV,
+    Temperature,
+    Conductivity,
 }
 public class AccountSensor
 {
@@ -66,6 +68,12 @@ public class AccountSensor
         && HasPercentage
         && CapacityL.HasValue
         && CapacityL > 0;
+
+    public bool HasTemperature => 
+        Sensor.SupportsTemperature;
+
+    public bool HasConductivity =>
+        Sensor.SupportsConductivity;
 
     public int RoundVolume
     {

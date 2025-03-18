@@ -107,6 +107,22 @@ public class AccountSensorMeasurementController : Controller
                             value = null;
                         break;
                     }
+                    case GraphType.Temperature:
+                    {
+                        if (measurementEx is MeasurementMoistureEx measurementMoistureEx)
+                            value = measurementMoistureEx.SoilTemperatureC;
+                        else
+                            value = null;
+                        break;
+                    }
+                    case GraphType.Conductivity:
+                    {
+                        if (measurementEx is MeasurementMoistureEx measurementMoistureEx)
+                            value = measurementMoistureEx.SoilConductivity;
+                        else
+                            value = null;
+                        break;
+                    }
                     case GraphType.RssiDbm:
                     {
                         value = measurementEx.RssiDbm;
@@ -148,6 +164,12 @@ public class AccountSensorMeasurementController : Controller
                 break;
             case GraphType.Volume:
                 unit = "l";
+                break;
+            case GraphType.Temperature:
+                unit = "°C";
+                break;
+            case GraphType.Conductivity:
+                unit = "µS/cm";
                 break;
             case GraphType.RssiDbm:
                 unit = "dBm";

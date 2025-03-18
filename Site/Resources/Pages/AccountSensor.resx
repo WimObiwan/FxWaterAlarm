@@ -51,6 +51,14 @@
         <value>Distance</value>
         <comment>Distance</comment>
     </data>
+    <data name="Temperature" xml:space="preserve">
+        <value>Temperature</value>
+        <comment>Temperature</comment>
+    </data>
+    <data name="Conductivity" xml:space="preserve">
+        <value>Conductivity</value>
+        <comment>Conductivity</comment>
+    </data>
     <data name="Signal" xml:space="preserve">
         <value>Signaal</value>
         <comment>Signal</comment>
