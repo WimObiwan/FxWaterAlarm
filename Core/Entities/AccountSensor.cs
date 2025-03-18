@@ -40,18 +40,30 @@ public class AccountSensor
     public string? RestPath =>
         Account.Link != null && Sensor.Link != null ? $"/a/{Account.Link}/s/{Sensor.Link}" : null;
 
+    public bool HasDistance => 
+        Sensor.SupportsDistance;
+
     public bool HasHeight => 
-        DistanceMmEmpty.HasValue
+        Sensor.SupportsDistance
+        && DistanceMmEmpty.HasValue
         && DistanceMmEmpty.Value > 0;
 
-    public bool HasPercentage => 
+    private bool HasPercentageUsingHeight => 
         HasHeight
         && DistanceMmEmpty.HasValue
         && DistanceMmFull.HasValue 
         && DistanceMmFull.Value < DistanceMmEmpty.Value;
 
+    public bool HasPercentage => 
+        Sensor.SupportsPercentage
+        && (
+            Sensor.Type != SensorType.Level
+            || HasPercentageUsingHeight
+        );
+
     public bool HasVolume => 
-        HasPercentage
+        Sensor.SupportsCapacity
+        && HasPercentage
         && CapacityL.HasValue
         && CapacityL > 0;
 

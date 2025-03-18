@@ -36,10 +36,19 @@
             round = Model.AccountSensorEntity.RoundVolume;
             break;
         case Core.Entities.GraphType.Percentage:
-            color = "#37addd";
+            if (Model.AccountSensorEntity.Sensor.Type == Core.Entities.SensorType.Moisture)
+            {
+                color = "#993333";
+                serieName = @Loc["Moisture"];
+                title = @Loc["Moisture"];
+            }
+            else
+            {
+                color = "#37addd";
+                serieName = @Loc["Percentage"];
+                title = @Loc["Percentage"];
+            }
             isArea = true;
-            serieName = @Loc["Percentage"];
-            title = @Loc["Percentage"];
             round = 10;
             break;
         case Core.Entities.GraphType.Height:

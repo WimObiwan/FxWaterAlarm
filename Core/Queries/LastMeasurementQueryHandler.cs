@@ -14,11 +14,16 @@ public class LastMeasurementQueryHandler : IRequestHandler<LastMeasurementQuery,
 {
     private readonly IMeasurementLevelRepository _measurementLevelRepository;
     private readonly IMeasurementDetectRepository _measurementDetectRepository;
+    private readonly IMeasurementMoistureRepository _measurementMoistureRepository;
 
-    public LastMeasurementQueryHandler(IMeasurementLevelRepository measurementLevelRepository, IMeasurementDetectRepository measurementDetectRepository)
+    public LastMeasurementQueryHandler(
+        IMeasurementLevelRepository measurementLevelRepository, 
+        IMeasurementDetectRepository measurementDetectRepository,
+        IMeasurementMoistureRepository measurementMoistureRepository)
     {
         _measurementLevelRepository = measurementLevelRepository;
         _measurementDetectRepository = measurementDetectRepository;
+        _measurementMoistureRepository = measurementMoistureRepository;
     }
 
     public async Task<IMeasurementEx?> Handle(LastMeasurementQuery request, CancellationToken cancellationToken)
@@ -30,6 +35,8 @@ public class LastMeasurementQueryHandler : IRequestHandler<LastMeasurementQuery,
                 return await GetLastMeasurementLevel(accountSensor, cancellationToken);
             case SensorType.Detect:
                 return await GetLastMeasurementDetect(accountSensor, cancellationToken);
+            case SensorType.Moisture:
+                return await GetLastMeasurementMoisture(accountSensor, cancellationToken);
             default:
                 return null;
         }
@@ -49,6 +56,15 @@ public class LastMeasurementQueryHandler : IRequestHandler<LastMeasurementQuery,
         var lastMeasurement = await _measurementDetectRepository.GetLast(accountSensor.Sensor.DevEui, cancellationToken);
         if (lastMeasurement != null)
             return new MeasurementDetectEx(lastMeasurement, accountSensor);
+        else
+            return null;
+    }
+
+    private async Task<IMeasurementEx?> GetLastMeasurementMoisture(AccountSensor accountSensor, CancellationToken cancellationToken)
+    {
+        var lastMeasurement = await _measurementMoistureRepository.GetLast(accountSensor.Sensor.DevEui, cancellationToken);
+        if (lastMeasurement != null)
+            return new MeasurementMoistureEx(lastMeasurement, accountSensor);
         else
             return null;
     }

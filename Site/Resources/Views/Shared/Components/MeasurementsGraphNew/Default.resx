@@ -35,6 +35,10 @@
         <value>Percentage</value>
         <comment>Percentage</comment>
     </data>
+    <data name="Moisture" xml:space="preserve">
+        <value>Moisture</value>
+        <comment>Moisture</comment>
+    </data>
     <data name="Height" xml:space="preserve">
         <value>Height</value>
         <comment>Height</comment>

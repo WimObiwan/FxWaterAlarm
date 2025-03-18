@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IMeasurementLevelRepository, MeasurementLevelRepository>();
         services.AddScoped<IMeasurementDetectRepository, MeasurementDetectRepository>();
+        services.AddScoped<IMeasurementMoistureRepository, MeasurementMoistureRepository>();
         services.AddScoped<IMessenger, Messenger>();
 
         services.AddSingleton<IVersionInfo, VersionInfo>(_ => new VersionInfo(assembly));

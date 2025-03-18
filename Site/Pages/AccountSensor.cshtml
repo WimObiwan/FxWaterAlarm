@@ -52,6 +52,12 @@
                 @await Component.InvokeAsync("Detect", new { measurementDetectEx = measurementDetectEx })
             </div>
         }
+        else if (Model.LastMeasurement is MeasurementMoistureEx measurementMoistureEx)
+        {
+            <div>
+                @await Component.InvokeAsync("Moisture", new { measurementMoistureEx = measurementMoistureEx })
+            </div>
+        }
 
         string? ConstructUrlFilter(AccountSensor.PageTypeEnum? pageType = null, int? fromDays = null)
         {
@@ -130,10 +136,20 @@
                     }
                     @if (Model.AccountSensorEntity?.HasPercentage == true)
                     {
-                    <li>
-                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphPercentage))
-                            href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphPercentage)">@Loc["Percentage"]</a>
-                    </li>
+                        if (Model.AccountSensorEntity.Sensor.Type == SensorType.Moisture)
+                        {
+                            <li>
+                                <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphPercentage))
+                                    href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphPercentage)">@Loc["Moisture"]</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphPercentage))
+                                    href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphPercentage)">@Loc["Percentage"]</a>
+                            </li>
+                        }
                     }
                     @if (Model.AccountSensorEntity?.HasHeight == true)
                     {
@@ -142,10 +158,13 @@
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphHeight)">@Loc["Height"]</a>
                     </li>
                     }
+                    @if (Model.AccountSensorEntity?.HasDistance == true)
+                    {
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphDistance))
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphDistance)">@Loc["Distance"]</a>
                     </li>
+                    }
                     <li><hr class="dropdown-divider"></li>
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphSignal))
@@ -186,10 +205,24 @@
         {
             bool showTimelineSlider;
             GraphType graphType;
-            switch (Model.PageType)
+
+            var pageType = Model.PageType;
+
+            if (pageType == AccountSensor.PageTypeEnum.GraphDefault && Model.AccountSensorEntity != null)
+            {
+                if (Model.AccountSensorEntity.HasVolume)
+                    pageType = AccountSensor.PageTypeEnum.GraphVolume;
+                else if (Model.AccountSensorEntity.HasPercentage)
+                    pageType = AccountSensor.PageTypeEnum.GraphPercentage;
+                else if (Model.AccountSensorEntity.HasHeight)
+                    pageType = AccountSensor.PageTypeEnum.GraphHeight;
+                else if (Model.AccountSensorEntity.HasDistance)
+                    pageType = AccountSensor.PageTypeEnum.GraphDistance;
+            }
+
+            switch (pageType)
             {
                 case AccountSensor.PageTypeEnum.GraphVolume:
-                default:
                     showTimelineSlider = true;
                     graphType = GraphType.Volume;
                     break;
@@ -213,24 +246,31 @@
                     showTimelineSlider = true;
                     graphType = GraphType.BatV;
                     break;
+                default:
+                    showTimelineSlider = false;
+                    graphType = GraphType.None;
+                    break;
             }
 
-            <p>
-            [ <a href="@ConstructUrlFilter(Model.PageType, 7)">@Loc["Last week"]</a> ]
-            [ <a href="@ConstructUrlFilter(Model.PageType, 21)">@Loc["Last 3 weeks"]</a> ]
-            [ <a href="@ConstructUrlFilter(Model.PageType, 92)">@Loc["Last 3 months"]</a> ]
-            [ <a href="@ConstructUrlFilter(Model.PageType, 365)">@Loc["Last year"]</a> ] 
-            </p>
+            if (graphType != GraphType.None)
+            {
+                <p>
+                [ <a href="@ConstructUrlFilter(Model.PageType, 7)">@Loc["Last week"]</a> ]
+                [ <a href="@ConstructUrlFilter(Model.PageType, 21)">@Loc["Last 3 weeks"]</a> ]
+                [ <a href="@ConstructUrlFilter(Model.PageType, 92)">@Loc["Last 3 months"]</a> ]
+                [ <a href="@ConstructUrlFilter(Model.PageType, 365)">@Loc["Last year"]</a> ] 
+                </p>
 
-            <div style="width: 100%; height: 40vh">
-                @await Component.InvokeAsync("MeasurementsGraphNew", new
-                       {
-                           AccountSensorEntity = Model.AccountSensorEntity,
-                           ShowTimelineSlider = showTimelineSlider,
-                           FromDays = Model.FromDays,
-                           GraphType = graphType
-                       })
-            </div>
+                <div style="width: 100%; height: 40vh">
+                    @await Component.InvokeAsync("MeasurementsGraphNew", new
+                        {
+                            AccountSensorEntity = Model.AccountSensorEntity,
+                            ShowTimelineSlider = showTimelineSlider,
+                            FromDays = Model.FromDays,
+                            GraphType = graphType
+                        })
+                </div>
+            }
         }
         
         @if (hasTrend && Model.PageType == AccountSensor.PageTypeEnum.Trend)

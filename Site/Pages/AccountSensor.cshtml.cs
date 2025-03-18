@@ -153,40 +153,41 @@ public class AccountSensor : PageModel
 
         DateTime from = DateTime.UtcNow.AddYears(-1);
         DateTime? last = null;
-        while (true)
+        for (var safetyCounter = 0; safetyCounter < 10; safetyCounter++)
         {
             var result = await _mediator.Send(new MeasurementsQuery
             {
-                DevEui = accountSensorEntity.Sensor.DevEui,
+                AccountSensor = accountSensorEntity,
                 From = from,
                 Till = last
             });
 
-            if (result.Length == 0)
+            if (result == null || result.Length == 0)
                 break;
 
-            foreach (var record in result)
-            {
-                MeasurementLevelEx measurementLevelEx = new(record, accountSensorEntity);
+            foreach (var measurementEx in result)
+            {                
+                MeasurementLevelEx? measurementLevelEx = measurementEx as MeasurementLevelEx;
+                #warning Implement this
                 StringBuilder sb = new();
                 sb
-                    .Append('"').Append(measurementLevelEx.DevEui).Append('"')
+                    .Append('"').Append(measurementEx.DevEui).Append('"')
                     .Append(',')
-                    .Append('"').Append(measurementLevelEx.Timestamp.ToString("yyyy-M-d HH:mm:ss")).Append('"')
+                    .Append('"').Append(measurementEx.Timestamp.ToString("yyyy-M-d HH:mm:ss")).Append('"')
                     .Append(',')
-                    .Append(measurementLevelEx.Distance.DistanceMm)
+                    .Append(measurementLevelEx?.Distance.DistanceMm)
                     .Append(',')
-                    .Append(measurementLevelEx.BatV.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementEx.BatV.ToString(CultureInfo.InvariantCulture))
                     .Append(',')
-                    .Append(measurementLevelEx.RssiDbm.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementEx.RssiDbm.ToString(CultureInfo.InvariantCulture))
                     .Append(',')
-                    .Append(measurementLevelEx.Distance.LevelFraction?.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementLevelEx?.Distance.LevelFraction?.ToString(CultureInfo.InvariantCulture))
                     .Append(',')
-                    .Append(measurementLevelEx.Distance.WaterL?.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementLevelEx?.Distance.WaterL?.ToString(CultureInfo.InvariantCulture))
                     .Append(',')
-                    .Append(measurementLevelEx.BatteryPrc.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementEx.BatteryPrc.ToString(CultureInfo.InvariantCulture))
                     .Append(',')
-                    .Append(measurementLevelEx.RssiPrc.ToString(CultureInfo.InvariantCulture))
+                    .Append(measurementEx.RssiPrc.ToString(CultureInfo.InvariantCulture))
                     ;
                 await textWriter.WriteLineAsync(sb.ToString());
             }
