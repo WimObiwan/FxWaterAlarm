@@ -29,10 +29,15 @@ public class AccountSensorByLinkQueryHandler : IRequestHandler<AccountSensorByLi
         if (request.AccountLink != null)
             query = query.Where(as2 => as2.Account.Link == request.AccountLink);
 
-        return await query
+        var accountSensor = await query
             .Include(as2 => as2.Account)
             .ThenInclude(a => a.AccountSensors)
             .Include(as2 => as2.Sensor)
             .SingleOrDefaultAsync(cancellationToken);
+        
+        if (accountSensor != null)
+            accountSensor.EnsureEnabled();
+
+        return accountSensor;
     }
 }

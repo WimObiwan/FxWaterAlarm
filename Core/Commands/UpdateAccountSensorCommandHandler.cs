@@ -10,6 +10,7 @@ public record UpdateAccountSensorCommand : IRequest
 {
     public required Guid AccountUid { get; init; }
     public required Guid SensorUid { get; init; }
+    public Optional<bool> Disabled { get; init; }
     public Optional<string> Name { get; init; }
     public Optional<int?> DistanceMmEmpty { get; init; }
     public Optional<int?> DistanceMmFull { get; init; }
@@ -37,6 +38,8 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
             ?? throw new AccountSensorNotFoundException("The account or sensor cannot be found.")
                 { AccountUid = request.AccountUid, SensorUid = request.SensorUid };
 
+        if (request.Disabled is { Specified: true })
+            accountSensor.Disabled = request.Disabled.Value;
         if (request.Name is { Specified: true })
             accountSensor.Name = request.Name.Value;
         if (request.DistanceMmEmpty is { Specified: true })

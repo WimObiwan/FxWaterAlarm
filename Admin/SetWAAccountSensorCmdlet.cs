@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Management.Automation;
-using System.Management.Automation.Runspaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
-using Core.Entities;
-using Core.Exceptions;
-using Core.Queries;
 using Core.Util;
 using MediatR;
 using Svrooij.PowerShell.DependencyInjection;
@@ -51,6 +45,9 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         ValueFromPipeline = true,
         ParameterSetName = "AccountSensor")]
     public AccountSensor AccountSensor { get; set; } = null!;
+
+    [Parameter]
+    public bool? Disabled { get; set; }
 
     [Parameter]
     public string? Name { get; set; }
@@ -96,6 +93,7 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         { 
             AccountUid = accountId,
             SensorUid = sensorId,
+            Disabled = Optional.From(Disabled),
             Name = Optional.From(Name),
             DistanceMmEmpty = Optional.From(DistanceEmptyMm, -1),
             DistanceMmFull = Optional.From(DistanceFullMm, -1),

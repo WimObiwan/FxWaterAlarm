@@ -41,6 +41,8 @@ public class AddAccountSensorAlarmCommandHandler : IRequestHandler<AddAccountSen
             ?? throw new AccountSensorNotFoundException("The account or sensor cannot be found.")
                 { AccountUid = request.AccountId, SensorUid = request.SensorId };
 
+        accountSensor.EnsureEnabled();
+
         accountSensor.AddAlarm(new AccountSensorAlarm
         {
             Uid = request.AlarmId,

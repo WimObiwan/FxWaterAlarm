@@ -24,14 +24,18 @@ public class AccountSensorAlarmsQueryHandler : IRequestHandler<AccountSensorAlar
     public async Task<IEnumerable<AccountSensorAlarm>> Handle(AccountSensorAlarmsQuery request,
         CancellationToken cancellationToken)
     {
-        var accountSensorAlarms =
+        var accountSensor =
             await _dbContext.Accounts
                 .Where(a => a.Uid == request.AccountUid)
                 .SelectMany(a => a.AccountSensors)
                 .Where(@as => @as.Sensor.Uid == request.SensorUid)
-                .SelectMany(@as => @as.Alarms)
-                .ToListAsync(cancellationToken);
+                .Include(@as => @as.Alarms)
+                .SingleOrDefaultAsync(cancellationToken)
+                ?? throw new AccountSensorNotFoundException("The accountsensor cannot be found.")
+                { AccountUid = request.AccountUid, SensorUid = request.SensorUid };
 
-        return accountSensorAlarms;
+        accountSensor.EnsureEnabled();
+
+        return accountSensor.Alarms;
     }
 }

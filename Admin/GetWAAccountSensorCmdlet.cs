@@ -64,6 +64,7 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         WriteObject(new AccountSensor {
             AccountId = accountSensor.Account.Uid,
             SensorId = accountSensor.Sensor.Uid,
+            Disabled = accountSensor.Disabled,
             Name = accountSensor.Name,
             DistanceMmEmpty = accountSensor.DistanceMmEmpty,
             DistanceMmFull = accountSensor.DistanceMmFull,
@@ -84,6 +85,7 @@ public class AccountSensor
 {
     public required Guid AccountId { get; init; }
     public required Guid SensorId { get; init; }
+    public bool Disabled { get; init; }
     public string? Name { get; init; }
     public int? DistanceMmEmpty { get; init; }
     public int? DistanceMmFull { get; init; }

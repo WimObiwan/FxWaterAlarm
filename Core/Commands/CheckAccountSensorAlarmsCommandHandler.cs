@@ -30,7 +30,7 @@ public class CheckAccountSensorAlarmsCommandHandler : CheckAccountSensorAlarmsCo
             await _dbContext.Accounts
                 .Where(a => a.Uid == request.AccountUid)
                 .SelectMany(a => a.AccountSensors)
-                .Where(@as => @as.Sensor.Uid == request.SensorUid)
+                .Where(@as => @as.Sensor.Uid == request.SensorUid && !@as.Disabled)
                 .Include(@as => @as.Sensor)
                 .Include(@as => @as.Account)
                 .SingleOrDefaultAsync(cancellationToken)

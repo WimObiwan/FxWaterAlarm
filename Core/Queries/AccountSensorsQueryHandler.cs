@@ -31,6 +31,7 @@ public class AccountSensorsQueryHandler : IRequestHandler<AccountSensorsQuery, I
                 .SingleOrDefaultAsync(cancellationToken)
             ?? throw new AccountNotFoundException("The account cannot be found.")
                 { AccountUid = request.AccountUid };
-        return accountSensors.AccountSensors;
+
+        return accountSensors.AccountSensors.Where(@as => !@as.Disabled);
     }
 }

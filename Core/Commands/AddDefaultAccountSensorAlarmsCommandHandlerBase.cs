@@ -18,6 +18,8 @@ public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
 
     public void CreateAlarms(AccountSensor accountSensor)
     {
+        accountSensor.EnsureEnabled();
+
         if (accountSensor.Alarms.Count > 0)
         {
             _logger.LogWarning("Skip accountsensor {AccountUid} {SensorUid} because there are already alarms", 

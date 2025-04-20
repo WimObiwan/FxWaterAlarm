@@ -28,6 +28,7 @@ public class CheckAllAccountSensorAlarmsCommandHandler : CheckAccountSensorAlarm
         var accountSensors =
             _dbContext.Accounts
                 .SelectMany(a => a.AccountSensors)
+                .Where(@as => !@as.Disabled)
                 .Include(@as => @as.Sensor)
                 .Include(@as => @as.Account);
         

@@ -34,6 +34,8 @@ public class RemoveAlarmFromAccountSensorCommandHandler : IRequestHandler<Remove
             ?? throw new AccountSensorNotFoundException("The account or sensor cannot be found.")
                 { AccountUid = request.AccountUid, SensorUid = request.SensorUid };
 
+        accountSensor.EnsureEnabled();
+
         var alarm = accountSensor.Alarms.Where(a => a.Uid == request.AlarmUid).FirstOrDefault()
             ?? throw new AccountSensorAlarmNotFoundException("The alarm cannot be found.")
                 { AccountUid = request.AccountUid, SensorUid = request.SensorUid, AlarmUid = request.AlarmUid };

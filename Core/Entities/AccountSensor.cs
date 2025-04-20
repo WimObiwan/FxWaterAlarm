@@ -19,6 +19,7 @@ public class AccountSensor
     public required Sensor Sensor { get; init; }
     public required DateTime CreateTimestamp { get; init; }
 
+    public bool Disabled { get; set; }
     public string? Name { get; set; }
     public int? DistanceMmEmpty { get; set; }
     public int? DistanceMmFull { get; set; }
@@ -101,6 +102,12 @@ public class AccountSensor
             else
                 return GraphType.None;
         }
+    }
+
+    public void EnsureEnabled()
+    {
+        if (Disabled)
+            throw new InvalidOperationException("The account sensor is disabled");
     }
 
     public void AddAlarm(AccountSensorAlarm alarm)

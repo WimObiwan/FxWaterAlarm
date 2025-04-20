@@ -27,15 +27,25 @@ public class UpdateAccountSensorAlarmCommandHandler : IRequestHandler<UpdateAcco
 
     public async Task Handle(UpdateAccountSensorAlarmCommand request, CancellationToken cancellationToken)
     {
-        var alarm =
+        var accountSensor =
             await _dbContext.Accounts
                 .Where(a => a.Uid == request.AccountUid)
                 .SelectMany(a => a.AccountSensors)
                 .Where(@as => @as.Sensor.Uid == request.SensorUid)
-                .SelectMany(@as => @as.Alarms)
+                .SingleOrDefaultAsync(cancellationToken)
+            ?? throw new AccountSensorNotFoundException("The account or sensor cannot be found.")
+                { AccountUid = request.AccountUid, SensorUid = request.SensorUid };
+
+        accountSensor.EnsureEnabled();
+
+        // Load the alarms explicitly
+        var alarm =
+            await _dbContext.Entry(accountSensor)
+                .Collection(@as => @as.Alarms)
+                .Query()
                 .Where(al => al.Uid == request.AlarmUid)
                 .SingleOrDefaultAsync(cancellationToken)
-            ?? throw new AccountSensorAlarmNotFoundException("The account, sensor or alarm cannot be found.")
+            ?? throw new AccountSensorAlarmNotFoundException("The alarm cannot be found.")
                 { AccountUid = request.AccountUid, SensorUid = request.SensorUid, AlarmUid = request.AlarmUid };
 
         if (request.AlarmType.Specified)
