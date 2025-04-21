@@ -82,4 +82,56 @@
         <value>Sensor name</value>
         <comment>Sensor name</comment>
     </data>
+    <data name="Sensor order" xml:space="preserve">
+        <value>Sensor order</value>
+        <comment>Sensor order</comment>
+    </data>
+    <data name="Active sensor alarms" xml:space="preserve">
+        <value>Active sensor alarms</value>
+        <comment>Active sensor alarms</comment>
+    </data>
+    <data name="No data received" xml:space="preserve">
+        <value>No data received</value>
+        <comment>No data received</comment>
+    </data>
+    <data name="hours" xml:space="preserve">
+        <value>hours</value>
+        <comment>hours</comment>
+    </data>
+    <data name="Battery below" xml:space="preserve">
+        <value>Battery below</value>
+        <comment>Battery below</comment>
+    </data>
+    <data name="Volt" xml:space="preserve">
+        <value>Volt</value>
+        <comment>Volt</comment>
+    </data>
+    <data name="Detect on" xml:space="preserve">
+        <value>Detect on</value>
+        <comment>Detect on</comment>
+    </data>
+    <data name="Percentage below" xml:space="preserve">
+        <value>Percentage below</value>
+        <comment>Percentage below</comment>
+    </data>
+    <data name="Percentage above" xml:space="preserve">
+        <value>Percentage above</value>
+        <comment>Percentage above</comment>
+    </data>
+    <data name="%" xml:space="preserve">
+        <value>%</value>
+        <comment>%</comment>
+    </data>
+    <data name="Height below" xml:space="preserve">
+        <value>Height below</value>
+        <comment>Height below</comment>
+    </data>
+    <data name="Height above" xml:space="preserve">
+        <value>Height above</value>
+        <comment>Height above</comment>
+    </data>
+    <data name="mm" xml:space="preserve">
+        <value>mm</value>
+        <comment>mm</comment>
+    </data>
 </root>

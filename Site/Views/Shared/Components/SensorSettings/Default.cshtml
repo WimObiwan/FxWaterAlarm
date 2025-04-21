@@ -176,6 +176,40 @@
                 </table>
                 @Html.AntiForgeryToken()
             </form>
+
+            <h3>@Loc["Active sensor alarms"]</h3>
+            <ul>
+                @foreach (var alarm in Model.AccountSensor.Alarms)
+                {
+                    switch (alarm.AlarmType)
+                    {
+                        case Core.Entities.AccountSensorAlarmType.Data:
+                            <div>@Loc["No data received"] @alarm.AlarmThreshold @Loc["hours"]</div>
+                            break;
+                        case Core.Entities.AccountSensorAlarmType.Battery:
+                            <div>@Loc["Battery below"] @alarm.AlarmThreshold @Loc["Volt"]</div>
+                            break;
+                        case Core.Entities.AccountSensorAlarmType.DetectOn:
+                            <div>@Loc["Detect on"]</div>
+                            break;
+                        case Core.Entities.AccountSensorAlarmType.PercentageLow:
+                            <div>@Loc["Percentage below"] @alarm.AlarmThreshold @Loc["%"]</div>
+                            break;
+                        case Core.Entities.AccountSensorAlarmType.PercentageHigh:
+                            <div>@Loc["Percentage above"] @alarm.AlarmThreshold @Loc["%"]</div>
+                            break;
+                        case Core.Entities.AccountSensorAlarmType.HeightLow:
+                            <div>@Loc["Height below"] @alarm.AlarmThreshold @Loc["mm"]</div>
+                            break;
+                        case Core.Entities.AccountSensorAlarmType.HeightHigh:
+                            <div>@Loc["Height above"] @alarm.AlarmThreshold @Loc["mm"]</div>
+                            break;
+                        default:
+                            <div>@Loc["Unknown alarm type"]</div>
+                            break;
+                    }
+                }
+            </ul>
         }
 
     </div>
