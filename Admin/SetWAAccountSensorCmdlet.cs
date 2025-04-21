@@ -50,6 +50,9 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
     public bool? Disabled { get; set; }
 
     [Parameter]
+    public int? Order { get; set; }
+
+    [Parameter]
     public string? Name { get; set; }
 
     [Parameter]
@@ -94,6 +97,7 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
             AccountUid = accountId,
             SensorUid = sensorId,
             Disabled = Optional.From(Disabled),
+            Order = Optional.From(Order),
             Name = Optional.From(Name),
             DistanceMmEmpty = Optional.From(DistanceEmptyMm, -1),
             DistanceMmFull = Optional.From(DistanceFullMm, -1),

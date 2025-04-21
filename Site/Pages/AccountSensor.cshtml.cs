@@ -206,6 +206,7 @@ public class AccountSensor : PageModel
         [FromRoute] string sensorLink,
         [FromQuery] PageTypeEnum? page,
         [FromForm] string? sensorName,
+        [FromForm] int? order,
         [FromForm] int? distanceMmFull,
         [FromForm] int? distanceMmEmpty,
         [FromForm] int? capacityL,
@@ -257,6 +258,7 @@ public class AccountSensor : PageModel
                             DistanceMmFull = new Optional<int?>(true, distanceMmFull),
                             DistanceMmEmpty = new Optional<int?>(true, distanceMmEmpty),
                             Name = Optional.From(sensorName),
+                            Order = new Optional<int>(true, order ?? 0),
                             AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false),
                             NoMinMaxConstraints = new Optional<bool>(true, noMinMaxConstraints ?? false)
                         });

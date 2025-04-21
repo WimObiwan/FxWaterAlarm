@@ -71,6 +71,18 @@
                             </div>
                         </td>
                     </tr>
+                    <tr>
+                        <td>
+                            @Loc["Sensor order"]
+                        </td>
+                        <td>
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" style="width: 100px;" 
+                                       name="order"
+                                       value="@Model.AccountSensor.Order"/>
+                            </div>
+                        </td>
+                    </tr>
                     @if (Model.AccountSensor.Sensor.SupportsDistance)
                     {
                         <tr>

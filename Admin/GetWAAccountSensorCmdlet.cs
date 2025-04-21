@@ -34,6 +34,9 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         ParameterSetName = "Account")]
     public Account[] Account { get; set; } = null!;
 
+    [Parameter]
+    public SwitchParameter IncludeDisabled { get; set; } = false;
+
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
         if (ParameterSetName == "AccountId")
@@ -53,7 +56,7 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
     private async Task ProcessSingleAsync(Guid accountId)
     {
 
-        var accountSensors = await _mediator.Send(new AccountSensorsQuery() { AccountUid = accountId });
+        var accountSensors = await _mediator.Send(new AccountSensorsQuery() { AccountUid = accountId, IncludeDisabled = IncludeDisabled });
 
         foreach (var accountSensor in accountSensors)
             Return(accountSensor);
@@ -65,6 +68,7 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
             AccountId = accountSensor.Account.Uid,
             SensorId = accountSensor.Sensor.Uid,
             Disabled = accountSensor.Disabled,
+            Order = accountSensor.Order,
             Name = accountSensor.Name,
             DistanceMmEmpty = accountSensor.DistanceMmEmpty,
             DistanceMmFull = accountSensor.DistanceMmFull,
@@ -86,6 +90,7 @@ public class AccountSensor
     public required Guid AccountId { get; init; }
     public required Guid SensorId { get; init; }
     public bool Disabled { get; init; }
+    public int Order { get; init; }
     public string? Name { get; init; }
     public int? DistanceMmEmpty { get; init; }
     public int? DistanceMmFull { get; init; }

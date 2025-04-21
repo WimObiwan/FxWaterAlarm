@@ -86,4 +86,8 @@
         <value>Sensor naam</value>
         <comment>Sensor name</comment>
     </data>
+    <data name="Sensor order" xml:space="preserve">
+        <value>Sensor volgorde</value>
+        <comment>Sensor order</comment>
+    </data>
 </root>

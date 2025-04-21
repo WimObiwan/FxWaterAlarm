@@ -23,7 +23,7 @@ public class AccountByLinkQueryHandler : IRequestHandler<AccountByLinkQuery, Acc
     {
         return await _dbContext.Accounts
             .Where(a => a.Link == request.Link)
-            .Include(a => a.AccountSensors.Where(@as => !@as.Disabled))
+            .Include(a => a.AccountSensors.Where(@as => !@as.Disabled).OrderBy(@as => @as.Order))
             .ThenInclude(@as => @as.Sensor)
             .SingleOrDefaultAsync(cancellationToken);
     }

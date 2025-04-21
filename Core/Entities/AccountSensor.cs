@@ -19,6 +19,7 @@ public class AccountSensor
     public required Sensor Sensor { get; init; }
     public required DateTime CreateTimestamp { get; init; }
 
+    public int Order { get; set; }
     public bool Disabled { get; set; }
     public string? Name { get; set; }
     public int? DistanceMmEmpty { get; set; }
