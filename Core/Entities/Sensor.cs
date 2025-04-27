@@ -26,7 +26,8 @@ public class Sensor
     public bool SupportsPercentage => Type == SensorType.Level || Type == SensorType.Moisture;
     public bool SupportsTemperature => Type == SensorType.Moisture;
     public bool SupportsConductivity => Type == SensorType.Moisture;
-    public bool SupportsGraph => Type == SensorType.Level || Type == SensorType.Moisture;
+    public bool SupportsStatus => Type == SensorType.Detect;
+    public bool SupportsGraph => Type == SensorType.Level || Type == SensorType.Moisture || Type == SensorType.Detect;
     public bool SupportsMinMaxConstraints => Type == SensorType.Level;
     public bool SupportsTrend => Type == SensorType.Level;
     public bool SupportsAlerts => Type == SensorType.Level || Type == SensorType.Detect;

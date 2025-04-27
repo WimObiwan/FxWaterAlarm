@@ -123,6 +123,14 @@ public class AccountSensorMeasurementController : Controller
                             value = null;
                         break;
                     }
+                    case GraphType.Status:
+                    {
+                        if (measurementEx is MeasurementDetectEx measurementMoistureEx)
+                            value = measurementMoistureEx.Status;
+                        else
+                            value = null;
+                        break;
+                    }
                     case GraphType.RssiDbm:
                     {
                         value = measurementEx.RssiDbm;
@@ -170,6 +178,9 @@ public class AccountSensorMeasurementController : Controller
                 break;
             case GraphType.Conductivity:
                 unit = "µS/cm";
+                break;
+            case GraphType.Status:
+                unit = "";
                 break;
             case GraphType.RssiDbm:
                 unit = "dBm";

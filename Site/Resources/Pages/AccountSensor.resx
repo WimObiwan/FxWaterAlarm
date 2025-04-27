@@ -59,6 +59,10 @@
         <value>Conductivity</value>
         <comment>Conductivity</comment>
     </data>
+    <data name="Status" xml:space="preserve">
+        <value>Status</value>
+        <comment>Status</comment>
+    </data>
     <data name="Signal" xml:space="preserve">
         <value>Signaal</value>
         <comment>Signal</comment>

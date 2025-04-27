@@ -11,6 +11,7 @@ public enum GraphType
     BatV,
     Temperature,
     Conductivity,
+    Status,
 }
 public class AccountSensor
 {
@@ -76,6 +77,9 @@ public class AccountSensor
 
     public bool HasConductivity =>
         Sensor.SupportsConductivity;
+
+    public bool HasStatus =>
+        Sensor.SupportsStatus;
 
     public int RoundVolume
     {

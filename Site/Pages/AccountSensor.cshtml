@@ -87,6 +87,7 @@
                            || Model.PageType == AccountSensor.PageTypeEnum.GraphDistance
                            || Model.PageType == AccountSensor.PageTypeEnum.GraphTemperature
                            || Model.PageType == AccountSensor.PageTypeEnum.GraphConductivity
+                           || Model.PageType == AccountSensor.PageTypeEnum.GraphStatus
                            || Model.PageType == AccountSensor.PageTypeEnum.GraphSignal
                            || Model.PageType == AccountSensor.PageTypeEnum.GraphBattery;
                 }
@@ -181,6 +182,13 @@
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphConductivity)">@Loc["Conductivity"]</a>
                     </li>
                     }
+                    @if (Model.AccountSensorEntity?.HasStatus == true)
+                    {
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphStatus))
+                            href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphStatus)">@Loc["Status"]</a>
+                    </li>
+                    }
                     <li><hr class="dropdown-divider"></li>
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphSignal))
@@ -261,6 +269,10 @@
                 case AccountSensor.PageTypeEnum.GraphConductivity:
                     showTimelineSlider = true;
                     graphType = GraphType.Conductivity;
+                    break;
+                case AccountSensor.PageTypeEnum.GraphStatus:
+                    showTimelineSlider = true;
+                    graphType = GraphType.Status;
                     break;
                 case AccountSensor.PageTypeEnum.GraphSignal:
                     showTimelineSlider = true;
