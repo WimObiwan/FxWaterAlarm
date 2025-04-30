@@ -242,6 +242,8 @@
                     pageType = AccountSensor.PageTypeEnum.GraphHeight;
                 else if (Model.AccountSensorEntity.HasDistance)
                     pageType = AccountSensor.PageTypeEnum.GraphDistance;
+                else if (Model.AccountSensorEntity.HasStatus)
+                    pageType = AccountSensor.PageTypeEnum.GraphStatus;
             }
 
             switch (pageType)
