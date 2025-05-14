@@ -73,8 +73,8 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
                     { AccountUid = request.AccountUid };
 
             ResetAccountSensorOrderHelper.ResetOrder(_logger, account, accountSensor);
-
-            await _dbContext.SaveChangesAsync(cancellationToken);
         }
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }
