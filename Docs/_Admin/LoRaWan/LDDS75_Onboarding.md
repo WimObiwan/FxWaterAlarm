@@ -37,9 +37,16 @@ Onboarding procedure
 
 ## 4. Set update frequency using downlink packet
 
+Both LDDS75 and DDS75-LB
+
 * Interval 5 minutes  
   `0100012C`
 * Interval 20 minutes:  
   `010004B0`
 * Interval 2 uur:  
   `01001C20`
+* Interval 12 uur:
+  `0100A8C0`
+* Interval 24 uur:  
+  `01015180`
+
