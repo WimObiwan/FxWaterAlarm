@@ -43,14 +43,25 @@
     value = Math.Round(status.Value * 100.0);
     maxValue = 100;
     displayPercent = true;
+    string colorCircle, colorText;
+    if (status.Value == 0)
+    {
+        colorCircle = "#198754";
+        colorText = "#198754";
+    }
+    else
+    {
+        colorCircle = "#ff3333";
+        colorText = "#ff6666";
+    }
     
     <script>
         var config = liquidFillGaugeDefaultSettings();
         
-        config.circleColor = "#ff3333"
-        config.textColor = "#ff6666"
+        config.circleColor = "@colorCircle"
+        config.textColor = "@colorText"
         config.waveTextColor = "#000000"
-        config.waveColor = "#ff3333"
+        config.waveColor = "@colorCircle"
         config.warningThreshold = .4;
         config.waveCount = 4;
         config.waveRiseTime = 60;
