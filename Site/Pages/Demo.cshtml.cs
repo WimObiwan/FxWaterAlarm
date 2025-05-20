@@ -10,8 +10,8 @@ public class Demo : PageModel
     public IActionResult OnGet()
     {
         // Buiten
-        // return Redirect($"/a/demo/s/i5WOmUdoO0");
+        return Redirect($"/a/demo/s/f2y616afaEA");
         // Garage
-        return Redirect($"/a/demo/s/ter0TfgBG58");
+        // return Redirect($"/a/demo/s/ter0TfgBG58");
     }
 }
