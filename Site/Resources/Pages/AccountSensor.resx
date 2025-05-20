@@ -91,20 +91,24 @@
         <value>Your account</value>
         <comment>Your account</comment>
     </data>
+    <data name="Last 2 days" xml:space="preserve">
+        <value>2 days</value>
+        <comment>Last 2 days</comment>
+    </data>
     <data name="Last week" xml:space="preserve">
-        <value>Last week</value>
+        <value>Week</value>
         <comment>Last week</comment>
     </data>
     <data name="Last 3 weeks" xml:space="preserve">
-        <value>Last 3 weeks</value>
+        <value>3 weeks</value>
         <comment>Last 3 weeks</comment>
     </data>
     <data name="Last 3 months" xml:space="preserve">
-        <value>Last 3 months</value>
+        <value>3 months</value>
         <comment>Last 3 months</comment>
     </data>
     <data name="Last year" xml:space="preserve">
-        <value>Last year</value>
+        <value>Year</value>
         <comment>Last year</comment>
     </data>
 </root>
