@@ -88,11 +88,11 @@ int? capacity = (int?)accountSensor.CapacityL;
     />
 
   <path d="
-    M 60 50
+    M 60 60
     V @(50 + empty / 10)
     "
     fill="none"
-    stroke="black"
+    stroke="gray"
     stroke-dasharray="4,6"
     />
 
@@ -177,7 +177,7 @@ else
   @if (accountSensor.DistanceMmFull.HasValue && current - accountSensor.DistanceMmFull.Value > 140)
   {
     <text> 
-      <text x="65" y="@(50 + full / 10 - 5)" text-anchor="left" font-size="0.8rem">
+      <text x="65" y="@(50 + full / 10 - 5)" text-anchor="left" font-size="0.8rem" fill="gray">
         @accountSensor.DistanceMmFull.Value mm
       </text>
     </text> 
@@ -186,7 +186,7 @@ else
   @if (empty - current > 140)
   {
     <text> 
-      <text x="65" y="@(50 + empty / 10 - 5)" text-anchor="left" font-size="0.8rem">
+      <text x="65" y="@(50 + empty / 10 - 5)" text-anchor="left" font-size="0.8rem" fill="gray">
         @empty mm
       </text>
     </text>
