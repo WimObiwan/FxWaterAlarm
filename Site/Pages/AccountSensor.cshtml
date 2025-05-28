@@ -43,7 +43,7 @@
         @if (Model.LastMeasurement is MeasurementLevelEx measurementLevelEx)
         {
             <div>
-                @await Component.InvokeAsync("Waterlevel", new { measurementLevelEx = Model.LastMeasurement })
+                @await Component.InvokeAsync("Waterlevel", new { measurementLevelEx = measurementLevelEx })
             </div>
         }
         else if (Model.LastMeasurement is MeasurementDetectEx measurementDetectEx)
@@ -207,21 +207,27 @@
                     <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Trend)) href="?page=trend">@Loc["Trend"]</a>
                 </li>
             }
+            @if (true)
+            {
+                <li class="nav-item">
+                    <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Diagram)) href="?page=diagram">@Loc["Diagram"]</a>
+                </li>
+            }
             <li class="nav-item dropdown">
                 <a  @Html.Raw(PageTypeDropDownMenu(IsPageTypeInDetailsDropDown())) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Details"]</a>
                 <ul class="dropdown-menu">
                     <li class="nav-item">
-                        <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Details)) href="?page=details">@Loc["Details"]</a>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Details)) href="?page=details">@Loc["Details"]</a>
                     </li>
                     <li class="nav-item">
-                        <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Settings)) href="?page=settings">
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.QrCode)) href="?page=qrcode">@Loc["QR Code"]</a>
+                    </li>
+                    <li class="nav-item">
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Settings)) href="?page=settings">
                             <span style="white-space: nowrap;">@Loc["Settings"]</span>
                         </a>
                     </li>
                 </ul>
-            </li>
-            <li class="nav-item">
-                <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.QrCode)) href="?page=qrcode">@Loc["QR Code"]</a>
             </li>
         </ul>
 
@@ -312,6 +318,14 @@
             }
         }
         
+        @if (hasTrend && Model.PageType == AccountSensor.PageTypeEnum.Diagram)
+        {
+            @await Component.InvokeAsync("Diagram", new
+            {
+                measurementEx = Model.LastMeasurement
+            })
+        }
+
         @if (hasTrend && Model.PageType == AccountSensor.PageTypeEnum.Trend)
         {
             @await Component.InvokeAsync("Trend", new

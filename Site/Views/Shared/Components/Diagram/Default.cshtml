@@ -1,0 +1,194 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Core.Util;
+@using Site.Pages
+@using Site.Utilities
+@model Site.ViewComponents.DiagramModel
+@inject IViewLocalizer Loc
+
+@{
+}
+
+@if (!(Model.MeasurementEx is MeasurementLevelEx measurementLevelEx))
+{
+
+    <div class="alert alert-warning">
+        @Loc["The diagram type is not supported for this measurement type."]
+    </div>
+}
+else
+{
+
+var accountSensor = measurementLevelEx.AccountSensor;
+var distance = measurementLevelEx.Distance;
+
+int? empty = accountSensor.DistanceMmEmpty;
+int? current = distance.DistanceMm;
+int? height = distance.HeightMm;
+
+if (empty == null || current == null || height == null)
+{
+    <div class="alert alert-warning">
+        @Loc["The diagram cannot be displayed because the required data is missing."]
+    </div>
+    return;
+}
+
+int full = accountSensor.DistanceMmFull ?? 30;
+int? volume = (int?)distance.WaterL;
+int? capacity = (int?)accountSensor.CapacityL;
+
+<svg style="max-width: 90vw; max-height=70vh; object-fit: scale-down;" viewBox="0 0 300 @(50 + empty / 10 + 30)" xmlns="http://www.w3.org/2000/svg">
+
+  <text x="245" y="40" text-anchor="end" font-size="0.8rem" font-weight="bold" fill="blue" dominant-baseline="hanging">
+    WaterAlarm.be
+  </text>
+
+  <text x="245" y="55" text-anchor="end" font-size="0.8rem" font-weight="bold" dominant-baseline="hanging">
+    @accountSensor.Name
+  </text>
+
+  <!-- Well -->
+  <path d="
+    M 50 30 
+    V @(50 + full / 10)
+    H 30
+    V @(50 + empty / 10)
+    H 255
+    V @(50 + full / 10)
+    H 130
+    V 30
+    " 
+    fill="none"
+    stroke="black"
+    stroke-width="3"
+    />  
+
+  <!-- Sensor -->
+  <rect x="50" y="39" width="15" height="3" />
+
+  <path d="
+    M 60 40 
+    L 57 50
+    H 63
+    L 60 40
+    " 
+    fill="black"
+    stroke="black"
+    />
+
+  <path d="
+    M 50 @(50 + full / 10)
+    H 130
+    "
+    fill="none"
+    stroke="black"
+    stroke-dasharray="2,2"
+    />
+
+  <path d="
+    M 60 50
+    V @(50 + empty / 10)
+    "
+    fill="none"
+    stroke="black"
+    stroke-dasharray="4,6"
+    />
+
+  <path d="
+    M 30 @(50 + current / 10)
+    q 12.5 -3 25 0
+    q 12.5  3 25 0
+    q 12.5 -3 25 0
+    q 12.5  3 25 0
+    q 12.5 -3 25 0
+    q 12.5  3 25 0
+    q 12.5 -3 25 0
+    q 12.5  3 25 0
+    q 12.5 -3 25 0
+    L 255 @(50 + empty / 10)
+    H 30
+    Z
+    " 
+    fill="rgba(0, 0, 255, 0.2)"
+    stroke="none"
+    />
+
+  <path d="
+    M 30 @(50 + current / 10)
+    q 12.5 -3 25 0
+    q 12.5  3 25 0
+    q 12.5 -3 25 0
+    q 12.5  3 25 0
+    q 12.5 -3 25 0
+    q 12.5  3 25 0
+    q 12.5 -3 25 0
+    q 12.5  3 25 0
+    q 12.5 -3 25 0
+    " 
+    fill="none"
+    stroke="blue"
+    stroke-width="3"
+    />
+
+  <text x="65" y="@(50 + current / 10 - 5)" text-anchor="left" font-size="0.8rem" font-weight="bold" fill="blue">
+    @current mm
+  </text>
+
+  @if (accountSensor.DistanceMmFull.HasValue)
+  {
+    <text> 
+      <text x="65" y="@(50 + full / 10 - 5)" text-anchor="left" font-size="0.8rem">
+        @accountSensor.DistanceMmFull.Value mm
+      </text>
+    </text> 
+  }
+
+  @if (empty - current > 200)
+  {
+    <text> 
+      <text x="65" y="@(50 + empty / 10 - 5)" text-anchor="left" font-size="0.8rem">
+        @empty mm
+      </text>
+    </text>
+  }
+
+  <path d="
+    M 130 @(50 + current / 10)
+    V @(50 + empty / 10)
+    "
+    fill="none"
+    stroke="blue"
+    stroke-dasharray="4,6"
+    />
+
+  <text x="135" y="@(50 + current / 10 + 5)" text-anchor="left" font-size="0.8rem" font-weight="bold" fill="blue" dominant-baseline="hanging">
+    @height mm
+  </text>
+
+  @if (volume.HasValue)
+  {
+    <text> 
+        <text x="245" y="@(50 + (empty + current) / 20)" text-anchor="end" font-size="1rem" font-weight="bold" fill="blue" dominant-baseline="middle">
+            @volume l
+        </text>
+    </text>
+  }
+
+  @if (capacity.HasValue)
+  {
+    <text> 
+        <text x="245" y="@(50 + full / 10 + 5)" text-anchor="end" font-size="0.8rem" dominant-baseline="hanging">
+        @capacity l
+        </text>
+    </text>
+}
+
+</svg>
+
+<p>
+<span class="badge bg-warning">beta</span>
+This feature is currently in beta and may not be fully polished yet. You might encounter the occasional quirk or
+unexpected behavior—think of it as still settling into its final form.
+</p>
+
+}

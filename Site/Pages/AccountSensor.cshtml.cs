@@ -25,6 +25,7 @@ public class AccountSensor : PageModel
         GraphStatus,
         GraphSignal,
         GraphBattery,
+        Diagram,
         Trend,
         Details,
         Settings,
