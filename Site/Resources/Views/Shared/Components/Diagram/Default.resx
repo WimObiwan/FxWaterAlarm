@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="This diagram visualizes..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            This diagram visualizes the water level in the well.
+            <br/>
+            The vertical gray dashed line shows the 'view' of the sensor.
+            <br/>
+            When the well is empty (0%), the sensor will measure <span style="font-weight: bold; color: gray;">{0} mm</span>.
+            ]]>
+        </value>
+        <comment>This diagram visualizes...</comment>
+    </data>
+    <data name="When full..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            When the well is full (100%), the sensor will measure <span style="font-weight: bold; color: gray;">{0} mm</span>.
+            ]]>
+        </value>
+        <comment>When full...</comment>
+    </data>
+    <data name="Currently..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            Currently, the water is at <span style="font-weight: bold; color: gray;">{0} mm</span> from the sensor.
+            <br/>
+            Which means the water level is at <span style="font-weight: bold; color: blue;">{1} mm</span> from the bottom of the well.
+            <br/>
+            The well is therefore {2}% full.
+            ]]>
+        </value>
+        <comment>Currently...</comment>
+    </data>
+    <data name="Capacity..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            Since the total capacity of the well is <span style="font-weight: bold; color: black;">{0} l</span>, 
+            the current water volume is <span style="font-weight: bold; color: blue;">{1} l</span>.
+            ]]>
+        </value>
+        <comment>Capacity...</comment>
+    </data>
+</root>

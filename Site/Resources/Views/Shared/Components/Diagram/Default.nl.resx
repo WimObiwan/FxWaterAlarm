@@ -1,0 +1,59 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="This diagram visualizes..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            Dit diagram visualiseert het water in de waterput.
+            <br/>
+            De verticale grijze streepjeslijn toont het 'zicht' van de sensor.
+            <br/>
+            Wanneer de put leeg is (0%) zal de sensor <span style="font-weight: bold; color: gray;">{0} mm</span> meten.
+            ]]>
+        </value>
+        <comment>This diagram visualizes...</comment>
+    </data>
+    <data name="When full..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            Wanneer de put vol is (100%), zal de sensor <span style="font-weight: bold; color: gray;">{0} mm</span> meten.
+            ]]>
+        </value>
+        <comment>When full...</comment>
+    </data>
+    <data name="Currently..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            Momenteel meet de sensor het water op <span style="font-weight: bold; color: gray;">{0} mm</span>.
+            <br/>
+            Dit wil zeggen dat de hoogte van het water in de put <span style="font-weight: bold; color: blue;">{1} mm</span> bedraagt.
+            <br/>
+            De put is dus {2}% vol is.
+            ]]>
+        </value>
+        <comment>Currently...</comment>
+    </data>
+    <data name="Capacity..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            Aangezien de totale capaciteit van de put <span style="font-weight: bold; color: black;">{0} l</span> is, 
+            is er momenteel <span style="font-weight: bold; color: blue;">{1} l</span> aanwezig.
+            ]]>
+        </value>
+        <comment>Capacity...</comment>
+    </data>
+</root>

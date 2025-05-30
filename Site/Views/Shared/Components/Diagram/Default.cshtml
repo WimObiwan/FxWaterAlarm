@@ -170,7 +170,7 @@ else
 
 }
 
-  <text x="65" y="@(50 + current / 10 - 5)" text-anchor="left" font-size="0.8rem" font-weight="bold" fill="blue">
+  <text x="65" y="@(50 + current / 10 - 5)" text-anchor="left" font-size="0.8rem" fill="gray">
     @current mm
   </text>
 
@@ -216,6 +216,25 @@ else
 
 </svg>
 
+<p>
+  @Html.Raw(Loc.GetString("This diagram visualizes...", @empty))
+  @if (accountSensor.DistanceMmFull.HasValue)
+  {
+    <br/>
+    @Html.Raw(Loc.GetString("When full...", @accountSensor.DistanceMmFull))
+  }
+  @if (measurementLevelEx.Distance.LevelFraction is {} levelFraction)
+  {
+    <br/>
+    @Html.Raw(Loc.GetString("Currently...", @current, @height, @Math.Round((decimal)levelFraction * 100)))
+  }
+  @if (capacity.HasValue && volume.HasValue)
+  {
+    <br/>
+    @Html.Raw(Loc.GetString("Capacity...", @capacity, @volume))
+  }
+</p>
+<hr>
 <p>
 <span class="badge bg-warning">beta</span>
 This feature is currently in beta and may not be fully polished yet. You might encounter the occasional quirk or
