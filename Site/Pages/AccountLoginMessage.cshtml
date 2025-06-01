@@ -54,6 +54,7 @@
                 <label for="code">@Loc["code"]</label>
                 <button type="submit" class="btn btn-primary">@Loc["Log in"]</button>
                 
+                <input type="hidden" name="mode" value="22">
                 @if (!string.IsNullOrEmpty(Model.ReturnUrl))
                 {
                     <input type="hidden" name="returnUrl" value="@Model.ReturnUrl">

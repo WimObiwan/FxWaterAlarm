@@ -30,6 +30,9 @@ public class AccountLoginMessageOptions
     [ConfigurationKeyName("Salt")]
     public required string SaltRaw { get; init; }
 
+    [ConfigurationKeyName("AdminEmails")]
+    public string[]? AdminEmails { get; init; } = null;
+
     public TimeSpan TokenLifespan =>
         TokenLifespanRaw
         ?? throw new Exception("AccountLoginMessageOptions.TokenLifespan not configured");
@@ -85,6 +88,11 @@ public class AccountLoginMessage : PageModel
                     return Redirect(2, accountLink, result.EmailAddress, result.Cookie, returnUrl);
                 }
                 return BadRequest();
+            case 3:
+                {
+                    var result = await SendMailToAdmin(emailAddress, returnUrl);
+                    return Redirect(2, accountLink, result.EmailAddress, result.Cookie, returnUrl);
+                }
             case 2:
                 EmailAddress = emailAddress;
                 AccountLink = accountLink;
@@ -130,21 +138,21 @@ public class AccountLoginMessage : PageModel
         return $"/Account/LoginMessage?{queryStringBuilder}";
     }
 
-    public async Task<IActionResult> OnPost(string? accountLink, string? emailAddress, string? cookie, string? returnUrl, string? code)
+    public async Task<IActionResult> OnPost(int mode, string? accountLink, string? emailAddress, string? cookie, string? returnUrl, string? code)
     {
-        if (!string.IsNullOrEmpty(emailAddress))
+        if (mode == 21 && !string.IsNullOrEmpty(emailAddress))
         {
             var result = await SendMail(emailAddress, null, returnUrl);
 
             return Redirect(11, accountLink, result.EmailAddress, result.Cookie, returnUrl);
         }
 
-        if (!string.IsNullOrEmpty(code))
+        if (mode == 22 && !string.IsNullOrEmpty(code))
         {
-            if (string.IsNullOrEmpty(cookie) || string.IsNullOrEmpty(accountLink))
+            if (string.IsNullOrEmpty(cookie))
                 throw new InvalidOperationException();
 
-            if (!ValidateCookie(cookie, accountLink, code))
+            if (!ValidateCookie(cookie, accountLink , code))
             {
                 return Redirect(12, accountLink, emailAddress, cookie, returnUrl);
             }
@@ -177,6 +185,20 @@ public class AccountLoginMessage : PageModel
         var url = Url.PageLink("AccountCallback", pageHandler: null, 
             values: new { token = token, email = emailAddress, url = escapedReturnUrl },
             protocol: Request.Scheme);
+        return url ?? throw new InvalidOperationException("Could not generate URL for AccountCallback");
+    }
+    
+    public static string GetLogoutUrl(PageModel page, string? returnUrl)
+    {
+        string? escapedReturnUrl;
+        if (returnUrl == null)
+            escapedReturnUrl = null;
+        else
+            escapedReturnUrl = Uri.EscapeDataString(returnUrl);
+        
+        var url = page.Url.PageLink("AccountCallback", pageHandler: null, 
+            values: new { token = "", email = "", url = escapedReturnUrl },
+            protocol: page.Request.Scheme);
         return url ?? throw new InvalidOperationException("Could not generate URL for AccountCallback");
     }
     
@@ -217,12 +239,20 @@ public class AccountLoginMessage : PageModel
         string email = await GetEmailAddress(accountLink);
         return await SendMail(email, accountLink, returnUrl);
     }
+
+    private async Task<SendMailResult> SendMailToAdmin(string? adminEmail, string? returnUrl)
+    {
+        string email = adminEmail
+            ?? _options.AdminEmails?.FirstOrDefault()
+            ?? throw new InvalidOperationException("No admin email configured");
+        return await SendMail(email, null, returnUrl);
+    }
     
     static string AnonymizeEmail(string email)
     {
         // Split the email into local part and domain
         string[] parts = email.Split('@');
-        
+
         // Anonymize the local part (e.g., "example" becomes "ex***le")
         string anonymizedLocalPart = AnonymizeString(parts[0]);
 

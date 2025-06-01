@@ -2,6 +2,7 @@ using System.Globalization;
 using Core;
 using Core.Communication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Site;
@@ -92,12 +93,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {  
         options.LoginPath = "/Account/Login";  
     });
+builder.Services.AddSingleton<IAuthorizationHandler, AdminRequirementHandler>(); 
 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin", policy =>
-        policy.RequireAssertion(context => context.User.HasClaim(c =>
-            c is { Type: "admin", Value: "1" })));
+        policy.Requirements.Add(new AdminRequirement()));
 });
 
 //builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
