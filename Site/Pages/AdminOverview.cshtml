@@ -1,0 +1,42 @@
+@page
+@using Core.Util
+@using Microsoft.AspNetCore.Http.Extensions
+@using Site.Utilities
+@model AdminOverview
+@inject IUserInfo UserInfo
+
+@{
+    ViewData["Title"] = "Admin";
+}
+<h1>Admin Page</h1>
+
+@if(UserInfo.IsAuthenticated())
+{
+    <div class="alert alert-info">
+        <p>
+            Welcome, @UserInfo.GetLoginEmail().
+            <a href="@AccountLoginMessage.GetLogoutUrl(Model, Request.GetEncodedUrl())" class="btn btn-primary">Log Out</a>.
+        </p>
+    </div>
+    @if (await UserInfo.IsAdmin())
+    {
+        <div class="alert alert-success">
+            <p>You have admin privileges.</p>
+            <p>Here you can manage the site settings, users, and other administrative tasks.</p>
+            <a href="adm/sensors" class="btn btn-secondary">Manage Sensors</a>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <p>You do not have admin privileges. Please contact the site administrator for access.</p>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-warning">
+        <p>You are not authenticated. Please log in to access admin features.</p>
+        <a href="@AccountLoginMessage.GetUrl(3, null, null, null, Request.GetEncodedUrl())" class="btn btn-primary">Log In</a>
+    </div>
+}

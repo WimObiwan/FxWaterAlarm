@@ -1,0 +1,33 @@
+@page
+@using System.Security.Claims
+@model AdminSensors
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+@foreach (var account in Model.Accounts.OrderBy(a => a.Name ?? a.Email))
+{
+<div class="account-item">
+    @if (string.IsNullOrEmpty(account.Name))
+    {
+    <h2>@account.Email</h2>
+    }
+    else
+    {
+    <h2>@account.Name</h2>
+    <p><a href="mailto:@account.Email">@account.Email</a></p>
+    }
+    <p>@account.CreationTimestamp.ToString("g")</p>
+    @foreach (var accountSensor in account.AccountSensors.OrderBy(@as => @as.Order))
+    {
+    <div class="sensor-item">
+        <h5>@accountSensor.Name</h5>
+        <p>@accountSensor.Sensor.Type</p>
+        <p><a href="@accountSensor.RestPath" target="_blank">View Sensor</a></p>
+    </div>
+    }
+</div>
+<hr/>
+}
+
