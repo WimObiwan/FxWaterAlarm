@@ -15,9 +15,18 @@ public class AccountCallback : PageModel
     {
         _userManager = userManager;
     }
-    
+
     public async Task<IActionResult> OnGet(string token, string email, string? url)
     {
+        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+        {
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            if (url == null)
+                return Redirect("/");
+
+            return Redirect(Uri.UnescapeDataString(url));
+        }
+
         var user = await _userManager.FindByEmailAsync(email) ?? throw new Exception("User not found");
         var isValid = await _userManager.VerifyUserTokenAsync(user, "Default", "passwordless-auth", token);
 
@@ -29,10 +38,10 @@ public class AccountCallback : PageModel
                 new("sub", user.Id),
                 new("email", user.Email ?? "")
             };
-            if (string.Equals(email, "info@foxinnovations.be", StringComparison.InvariantCultureIgnoreCase))
-            {
-                claims.Add(new("admin", "1"));
-            }
+            // if (_userInfo.IsAdmin())
+            // {
+            //     claims.Add(new("admin", "1"));
+            // }
             await HttpContext.SignInAsync(
                 IdentityConstants.ApplicationScheme,
                 new ClaimsPrincipal(new ClaimsIdentity(claims, IdentityConstants.ApplicationScheme)));
