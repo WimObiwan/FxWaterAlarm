@@ -26,7 +26,8 @@ public class AccountsQueryHandler : IRequestHandler<AccountsQuery, List<Account>
         if (request.IncludeAccountSensors)
         {
             accounts = accounts
-                .Include(a => a.AccountSensors)
+                .Include(a => a.AccountSensors
+                    .Where(@as => !@as.Disabled))
                 .ThenInclude(@as => @as.Sensor);
         }
 
