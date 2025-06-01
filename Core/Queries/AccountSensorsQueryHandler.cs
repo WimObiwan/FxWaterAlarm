@@ -47,6 +47,10 @@ public class AccountSensorsQueryHandler : IRequestHandler<AccountSensorsQuery, I
                        .Where(@as => request.IncludeDisabled || !@as.Disabled)
                         .OrderBy(@as => @as.Order))
                     .ThenInclude(@as => @as.Sensor)
+                    .Include(@as => @as.AccountSensors
+                       .Where(@as => request.IncludeDisabled || !@as.Disabled)
+                        .OrderBy(@as => @as.Order))
+                    .ThenInclude(@as => @as.Account)
                     .SelectMany(a => a.AccountSensors)
                     .ToListAsync(cancellationToken);
 
