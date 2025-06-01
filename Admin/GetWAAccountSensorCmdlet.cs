@@ -34,6 +34,12 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
         ParameterSetName = "Account")]
     public Account[] Account { get; set; } = null!;
 
+    [Parameter(
+        Position = 0,
+        Mandatory = true,
+        ParameterSetName = "All")]
+    public SwitchParameter All { get; set; }
+
     [Parameter]
     public SwitchParameter IncludeDisabled { get; set; } = false;
 
@@ -49,13 +55,16 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
             foreach (var account in Account)
                 await ProcessSingleAsync(account.AccountId);
         }
+        else if (ParameterSetName == "All" && All.IsPresent)
+        {
+            await ProcessSingleAsync(null);
+        }
         else
             throw new InvalidOperationException();
     }
 
-    private async Task ProcessSingleAsync(Guid accountId)
+    private async Task ProcessSingleAsync(Guid? accountId)
     {
-
         var accountSensors = await _mediator.Send(new AccountSensorsQuery() { AccountUid = accountId, IncludeDisabled = IncludeDisabled });
 
         foreach (var accountSensor in accountSensors)

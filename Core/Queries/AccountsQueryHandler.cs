@@ -7,6 +7,7 @@ namespace Core.Queries;
 
 public record AccountsQuery : IRequest<List<Account>>
 {
+    public bool IncludeAccountSensors { get; init; } = false;
 }
 
 public class AccountsQueryHandler : IRequestHandler<AccountsQuery, List<Account>>
@@ -20,6 +21,16 @@ public class AccountsQueryHandler : IRequestHandler<AccountsQuery, List<Account>
 
     public async Task<List<Account>> Handle(AccountsQuery request, CancellationToken cancellationToken)
     {
-        return await _dbContext.Accounts.ToListAsync(cancellationToken);
+        IQueryable<Account> accounts =
+            _dbContext.Accounts;
+        if (request.IncludeAccountSensors)
+        {
+            accounts = accounts
+                .Include(a => a.AccountSensors)
+                .ThenInclude(@as => @as.Sensor);
+        }
+
+        return await accounts
+            .ToListAsync(cancellationToken);
     }
 }
