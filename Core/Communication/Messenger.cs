@@ -126,7 +126,7 @@ public class Messenger : IMessenger
         message.To.Add(new MailAddress(emailAddress));
 
         _logger.LogInformation("Using Bcc {bcc}", _messengerOptions.Bcc);
-        if (_messengerOptions.Bcc is {} bcc)
+        if (_messengerOptions.Bcc is {} bcc && !string.Equals(bcc, emailAddress, StringComparison.OrdinalIgnoreCase))
             message.Bcc.Add(bcc);
 
         AlternateView view = AlternateView.CreateAlternateViewFromString(body, null, MediaTypeNames.Text.Html);
