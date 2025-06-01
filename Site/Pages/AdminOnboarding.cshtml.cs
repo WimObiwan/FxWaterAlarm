@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace Site.Pages;
 
 [Authorize(Policy = "Admin")]
-public class AdminOnBoarding : PageModel
+public class AdminOnboarding : PageModel
 {
     public void OnGet()
     {
