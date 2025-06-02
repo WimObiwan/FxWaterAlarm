@@ -15,7 +15,7 @@
     <div class="alert alert-info">
         <p>
             Welcome, @UserInfo.GetLoginEmail().
-            <a href="@AccountLoginMessage.GetLogoutUrl(Model, Request.GetEncodedUrl())" class="btn btn-primary">Log Out</a>.
+            <a href="@AccountLoginMessage.GetLogoutUrl(Model, Request.GetEncodedUrl())" class="btn btn-primary">Log out</a>.
         </p>
     </div>
     @if (await UserInfo.IsAdmin())

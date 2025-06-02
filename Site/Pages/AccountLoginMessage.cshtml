@@ -61,7 +61,11 @@
                 }
                 @if (!string.IsNullOrEmpty(Model.AccountLink))
                 {
-                    <input type="hidden" name="accountLink" value="@Model.AccountLink">
+                    <input type="hidden" name="accountLink" value="@(Model.AccountLink)">
+                }
+                @if (!string.IsNullOrEmpty(Model.EmailAddress))
+                {
+                    <input type="hidden" name="emailAddress" value="@(Model.EmailAddress)">
                 }
                 @if (!string.IsNullOrEmpty(Model.Cookie))
                 {

@@ -152,14 +152,21 @@ public class AccountLoginMessage : PageModel
             if (string.IsNullOrEmpty(cookie))
                 throw new InvalidOperationException();
 
-            if (!ValidateCookie(cookie, accountLink , code))
+            if (!ValidateCookie(cookie, accountLink ?? emailAddress ?? string.Empty, code))
             {
                 return Redirect(12, accountLink, emailAddress, cookie, returnUrl);
             }
 
             // This can be more efficient, by eliminating one redirect...
-            string emailAddressFromAccountLink = await GetEmailAddress(accountLink);
-            string callbackUrl = await GetLoginCallbackUrl(emailAddressFromAccountLink, returnUrl);
+            string emailAddressLogin;
+            if (accountLink != null)
+                emailAddressLogin = await GetEmailAddress(accountLink);
+            else if (!string.IsNullOrEmpty(emailAddress))
+                emailAddressLogin = emailAddress;
+            else
+                throw new InvalidOperationException("No account link or email address provided.");
+
+            string callbackUrl = await GetLoginCallbackUrl(emailAddressLogin, returnUrl);
             return Redirect(callbackUrl);
         }
 
@@ -212,9 +219,14 @@ public class AccountLoginMessage : PageModel
             await _messenger.SendAuthenticationMailAsync(emailAddress, url, code);
         }
 
+        if (!string.IsNullOrEmpty(accountLink))
+        {
+            emailAddress = AnonymizeEmail(emailAddress);
+        }
+
         return new SendMailResult
         {
-            EmailAddress = AnonymizeEmail(emailAddress),
+            EmailAddress = emailAddress,
             Cookie = GenerateCookie(accountLink ?? emailAddress, code)
         };
     }
