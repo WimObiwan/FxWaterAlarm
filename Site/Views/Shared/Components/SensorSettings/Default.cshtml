@@ -47,7 +47,7 @@
             
             <a href="@Model.LoginUrl" class="btn btn-primary">@Loc["Send login link"]</a>
         }
-        else if (!UserInfo.CanUpdateAccountSensor(Model.AccountSensor))
+        else if (!await UserInfo.CanUpdateAccountSensor(Model.AccountSensor))
         {
             <div>@Loc["You are logged in as {0}.", UserInfo.GetLoginEmail() ?? string.Empty]</div>
             

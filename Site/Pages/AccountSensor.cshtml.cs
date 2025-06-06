@@ -246,7 +246,7 @@ public class AccountSensor : PageModel
                     // AccountSensor not found
                     result = SaveResultEnum.Error;
                 }
-                else if (!_userInfo.CanUpdateAccountSensor(accountSensor))
+                else if (!await _userInfo.CanUpdateAccountSensor(accountSensor))
                 {
                     // Login not allowed to update AccountSensor
                     result = SaveResultEnum.NotAuthorized;

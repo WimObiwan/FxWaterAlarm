@@ -10,8 +10,8 @@ public interface IUserInfo
 {
     bool IsAuthenticated();
     string? GetLoginEmail();
-    bool CanUpdateAccount(Account account);
-    bool CanUpdateAccountSensor(AccountSensor accountSensor);
+    Task<bool> CanUpdateAccount(Account account);
+    Task<bool> CanUpdateAccountSensor(AccountSensor accountSensor);
     Task<bool> IsAdmin();
 }
 
@@ -40,8 +40,11 @@ public class UserInfo : IUserInfo
         return _httpContextAccessor.HttpContext?.User.FindFirstValue("email");
     }
 
-    public bool CanUpdateAccount(Account account)
+    public async Task<bool> CanUpdateAccount(Account account)
     {
+        if (await IsAdmin())
+            return true;
+
         var loginEmail = GetLoginEmail();
 
         if (string.IsNullOrEmpty(loginEmail))
@@ -50,9 +53,9 @@ public class UserInfo : IUserInfo
         return string.Equals(loginEmail, account.Email, StringComparison.OrdinalIgnoreCase);
     }
 
-    public bool CanUpdateAccountSensor(AccountSensor accountSensor)
+    public async Task<bool> CanUpdateAccountSensor(AccountSensor accountSensor)
     {
-        return CanUpdateAccount(accountSensor.Account);
+        return await CanUpdateAccount(accountSensor.Account);
     }
 
     public async Task<bool> IsAdmin()
