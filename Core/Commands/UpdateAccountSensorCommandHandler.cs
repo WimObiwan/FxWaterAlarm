@@ -16,6 +16,7 @@ public record UpdateAccountSensorCommand : IRequest
     public Optional<string> Name { get; init; }
     public Optional<int?> DistanceMmEmpty { get; init; }
     public Optional<int?> DistanceMmFull { get; init; }
+    public Optional<int?> UnusableHeightMm { get; init; }
     public Optional<int?> CapacityL { get; init; }
     public Optional<bool> AlertsEnabled { get; init; }
     public Optional<bool> NoMinMaxConstraints { get; init; }
@@ -52,6 +53,8 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
             accountSensor.DistanceMmEmpty = request.DistanceMmEmpty.Value;
         if (request.DistanceMmFull is { Specified: true })
             accountSensor.DistanceMmFull = request.DistanceMmFull.Value;
+        if (request.UnusableHeightMm is { Specified: true })
+            accountSensor.UnusableHeightMm = request.UnusableHeightMm.Value;
         if (request.CapacityL is { Specified: true })
             accountSensor.CapacityL = request.CapacityL.Value;
         if (request.AlertsEnabled is { Specified: true})

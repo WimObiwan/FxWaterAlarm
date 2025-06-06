@@ -62,6 +62,9 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
     public int? DistanceFullMm { get; set; }
 
     [Parameter]
+    public int? UnusableHeightMm { get; set; }
+
+    [Parameter]
     public int? CapacityL { get; set; }
 
     [Parameter]
@@ -101,6 +104,7 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
             Name = Optional.From(Name),
             DistanceMmEmpty = Optional.From(DistanceEmptyMm, -1),
             DistanceMmFull = Optional.From(DistanceFullMm, -1),
+            UnusableHeightMm = Optional.From(UnusableHeightMm, -1),
             CapacityL = Optional.From(CapacityL, -1),
             AlertsEnabled = Optional.From(AlertsEnabled),
             NoMinMaxConstraints = Optional.From(NoMinMaxConstraints),

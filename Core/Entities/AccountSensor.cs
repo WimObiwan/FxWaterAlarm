@@ -26,6 +26,7 @@ public class AccountSensor
     public int? DistanceMmEmpty { get; set; }
     public int? DistanceMmFull { get; set; }
     public int? CapacityL { get; set; }
+    public int? UnusableHeightMm { get; set; }
     public bool AlertsEnabled { get; set; }
     public bool NoMinMaxConstraints { get; set; }
     
@@ -41,6 +42,12 @@ public class AccountSensor
             return 1.0 / (DistanceMmEmpty.Value - DistanceMmFull.Value) * CapacityL.Value;
         }
     }
+
+    public double? UnusableCapacityL =>
+        ResolutionL.HasValue && UnusableHeightMm.HasValue ? UnusableHeightMm * ResolutionL : null;
+
+    public double? UsableCapacityL =>
+        CapacityL.HasValue && ResolutionL.HasValue ? (CapacityL.Value - (UnusableHeightMm ?? 0) * ResolutionL) : null;
 
     public string? RestPath =>
         Account.Link != null && Sensor.Link != null ? $"/a/{Account.Link}/s/{Sensor.Link}" : null;
