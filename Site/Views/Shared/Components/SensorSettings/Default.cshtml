@@ -115,6 +115,21 @@
                                 </div>
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                @Loc["Unusable height at bottom"] <span class="badge bg-warning">beta</span>
+                            </td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" style="width: 100px;" 
+                                        aria-describedby="basic-addon-UnusableHeightMm" name="unusableHeightMm"
+                                        value="@Model.AccountSensor.UnusableHeightMm"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="basic-addon-UnusableHeightMm">@Loc["mm"]</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
                     }
                     @if (Model.AccountSensor.Sensor.SupportsCapacity)
                     {

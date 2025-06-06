@@ -211,6 +211,7 @@ public class AccountSensor : PageModel
         [FromForm] int? order,
         [FromForm] int? distanceMmFull,
         [FromForm] int? distanceMmEmpty,
+        [FromForm] int? unusableHeightMm,
         [FromForm] int? capacityL,
         [FromForm] bool? alertsEnabled,
         [FromForm] bool? noMinMaxConstraints)
@@ -222,11 +223,13 @@ public class AccountSensor : PageModel
             {
                 result = SaveResultEnum.NotAuthorized;
             }
-            else if (sensorName == null 
+            else if (sensorName == null
                      || capacityL is <= 0
                      || distanceMmFull is <= 0
                      || distanceMmEmpty is <= 0
-                     || distanceMmFull.HasValue && distanceMmEmpty.HasValue && distanceMmEmpty.Value <= distanceMmFull.Value)
+                     || unusableHeightMm is < 0
+                     || distanceMmFull.HasValue && distanceMmEmpty.HasValue
+                        && (distanceMmEmpty.Value - (unusableHeightMm ?? 0)) <= distanceMmFull.Value)
             {
                 result = SaveResultEnum.InvalidData;
             }
@@ -259,6 +262,7 @@ public class AccountSensor : PageModel
                             CapacityL = new Optional<int?>(true, capacityL),
                             DistanceMmFull = new Optional<int?>(true, distanceMmFull),
                             DistanceMmEmpty = new Optional<int?>(true, distanceMmEmpty),
+                            UnusableHeightMm = new Optional<int?>(true, unusableHeightMm),
                             Name = Optional.From(sensorName),
                             Order = new Optional<int>(true, order ?? 0),
                             AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false),

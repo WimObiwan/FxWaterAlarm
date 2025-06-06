@@ -42,6 +42,10 @@
         <value>Distance sensor to water when full (100%)</value>
         <comment>Distance to water when full (100%)</comment>
     </data>
+    <data name="Unusable height at bottom" xml:space="preserve">
+        <value>Unusable height at bottom</value>
+        <comment>Unusable height at bottom</comment>
+    </data>
     <data name="Capacity" xml:space="preserve">
         <value>Capacity</value>
         <comment>Capacity</comment>
