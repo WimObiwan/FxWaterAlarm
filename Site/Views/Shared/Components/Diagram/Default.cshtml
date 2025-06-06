@@ -129,11 +129,14 @@ int? capacity = (int?)accountSensor.CapacityL;
     stroke-dasharray="4,6"
     />
 
+  @if (unusable > 200)
+  {
   <text>
   <text x="145" y="@(50 + (empty - unusable) / 10 + 5)" text-anchor="left" font-size="0.8rem" fill="purple" dominant-baseline="hanging">
     @unusable mm
   </text>
   </text>
+  }
 }
 
 @if (current > full)
@@ -245,7 +248,7 @@ else
     </text>
   }
 
-  @if (unusableCapacityL.HasValue)
+  @if (unusableCapacityL.HasValue && unusable.HasValue && unusable.Value > 200)
   {
     <text> 
         <text x="245" y="@(50 + empty / 10 - 5)" text-anchor="end" font-size="0.8rem" font-weight="bold" fill="purple">
