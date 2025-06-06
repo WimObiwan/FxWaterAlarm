@@ -18,11 +18,13 @@
     <data name="This diagram visualizes..." xml:space="preserve">
         <value>
             <![CDATA[
-            Dit diagram visualiseert het water in de waterput.
+            <b>Uitleg bij het diagram van de waterput</b>
             <br/>
-            De verticale grijze streepjeslijn toont het 'zicht' van de sensor.
+            Het diagram toont het waterniveau in de waterput, gemeten door een sensor.
             <br/>
-            Wanneer de put leeg is (0%) zal de sensor <span style="font-weight: bold; color: gray;">{0} mm</span> meten.
+            De verticale grijze stippellijn geeft het 'zicht' van de sensor weer.
+            <br/>
+            Als de put leeg is (0%), meet de sensor een afstand van <span style="font-weight: bold; color: gray;">{0} mm</span> tot het wateroppervlak.
             ]]>
         </value>
         <comment>This diagram visualizes...</comment>
@@ -30,7 +32,7 @@
     <data name="When full..." xml:space="preserve">
         <value>
             <![CDATA[
-            Wanneer de put vol is (100%), zal de sensor <span style="font-weight: bold; color: gray;">{0} mm</span> meten.
+            Als de put volledig vol is (100%), meet de sensor <span style="font-weight: bold; color: gray;">{0} mm</span>.
             ]]>
         </value>
         <comment>When full...</comment>
@@ -38,11 +40,7 @@
     <data name="Currently..." xml:space="preserve">
         <value>
             <![CDATA[
-            Momenteel meet de sensor het water op <span style="font-weight: bold; color: gray;">{0} mm</span>.
-            <br/>
-            Dit wil zeggen dat de hoogte van het water in de put <span style="font-weight: bold; color: blue;">{1} mm</span> bedraagt.
-            <br/>
-            De put is dus {2}% vol is.
+            Op dit moment meet de sensor een afstand van <span style="font-weight: bold; color: gray;">{0} mm</span>, wat betekent dat het water <span style="font-weight: bold; color: blue;">{1} mm</span> hoog staat.
             ]]>
         </value>
         <comment>Currently...</comment>
@@ -50,10 +48,23 @@
     <data name="Capacity..." xml:space="preserve">
         <value>
             <![CDATA[
-            Aangezien de totale capaciteit van de put <span style="font-weight: bold; color: black;">{0} l</span> is, 
-            is er momenteel <span style="font-weight: bold; color: blue;">{1} l</span> aanwezig.
+            De totale capaciteit van de put bedraagt <span style="font-weight: bold; color: black;">{0} l</span>.
+            <br/>
+            Bij de huidige stand is de put voor <span style="font-weight: bold; color: blue;">{1}%</span> gevuld, goed voor <span style="font-weight: bold; color: blue;">{2} l</span> water.
             ]]>
         </value>
         <comment>Capacity...</comment>
+    </data>
+    <data name="Unusable..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            De onderste <span style="font-weight: bold; color: purple;">{0} mm</span> van de put is niet bruikbaar. Dat komt overeen met <span style="font-weight: bold; color: purple;">{1} l</span>.
+            <br/>
+            Daarom is de bruikbare capaciteit van de put <span style="font-weight: bold; color: black;">{2} l</span>.
+            <br/>
+            Van die bruikbare inhoud is de put momenteel voor <span style="font-weight: bold; color: blue;">{3}%</span> gevuld, ofwel <span style="font-weight: bold; color: blue;">{4} l</span> bruikbaar water.
+            ]]>
+        </value>
+        <comment>Unusable...</comment>
     </data>
 </root>

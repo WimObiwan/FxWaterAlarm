@@ -22,6 +22,7 @@ var accountSensor = measurementLevelEx.AccountSensor;
 var distance = measurementLevelEx.Distance;
 
 int? empty = accountSensor.DistanceMmEmpty;
+int? unusable = accountSensor.UnusableHeightMm;
 int? current = distance.DistanceMm;
 int? height = distance.HeightMm;
 
@@ -37,6 +38,8 @@ if (empty == null || current == null || height == null)
 
 int full = accountSensor.DistanceMmFull ?? 30;
 int? volume = (int?)distance.WaterL;
+int? usableCapacityL = (int?)accountSensor.UsableCapacityL;
+int? unusableCapacityL = (int?)accountSensor.UnusableCapacityL;
 int? capacity = (int?)accountSensor.CapacityL;
 
 <svg style="max-width: 400px; max-height=70vh; object-fit: scale-down;" viewBox="0 0 300 @(50 + empty / 10 + 30)" xmlns="http://www.w3.org/2000/svg">
@@ -96,6 +99,43 @@ int? capacity = (int?)accountSensor.CapacityL;
     stroke-dasharray="4,6"
     />
 
+@if (unusable.HasValue && unusable > 0)
+{
+  <path d="
+    M 30 @(50 + (empty - unusable) / 10)
+    H 255
+    V @(50 + empty / 10)
+    H 30
+    "
+    fill="rgba(255, 0, 255, 0.2)"
+    stroke="none"
+    />
+
+  <path d="
+    M 30 @(50 + (empty - unusable) / 10)
+    H 255
+    "
+    fill="none"
+    stroke="purple"
+    stroke-dasharray="2,2"
+    />
+
+  <path d="
+    M 140 @(50 + (empty - unusable) / 10)
+    V @(50 + empty / 10)
+    "
+    fill="none"
+    stroke="purple"
+    stroke-dasharray="4,6"
+    />
+
+  <text>
+  <text x="145" y="@(50 + (empty - unusable) / 10 + 5)" text-anchor="left" font-size="0.8rem" fill="purple" dominant-baseline="hanging">
+    @unusable mm
+  </text>
+  </text>
+}
+
 @if (current > full)
 {
 
@@ -110,7 +150,7 @@ int? capacity = (int?)accountSensor.CapacityL;
     q 12.5 -3 25 0
     q 12.5  3 25 0
     q 12.5 -3 25 0
-    L 255 @(50 + empty / 10)
+    L 255 @(50 + (empty - (unusable ?? 0)) / 10)
     H 30
     Z
     " 
@@ -199,7 +239,23 @@ else
   @if (volume.HasValue)
   {
     <text> 
-        <text x="245" y="@(50 + (empty + current) / 20)" text-anchor="end" font-size="1rem" font-weight="bold" fill="blue" dominant-baseline="middle">
+        <text x="245" y="@(50 + (empty - (unusable ?? 0) + current) / 20)" text-anchor="end" font-size="1rem" font-weight="bold" fill="blue" dominant-baseline="middle">
+            @volume l
+        </text>
+    </text>
+  }
+
+  @if (unusableCapacityL.HasValue)
+  {
+    <text> 
+        <text x="245" y="@(50 + empty / 10 - 5)" text-anchor="end" font-size="0.8rem" font-weight="bold" fill="purple">
+            @unusableCapacityL l
+        </text>
+    </text>
+  }
+  {
+    <text> 
+        <text x="245" y="@(50 + (empty - (unusable ?? 0) + current) / 20)" text-anchor="end" font-size="1rem" font-weight="bold" fill="blue" dominant-baseline="middle">
             @volume l
         </text>
     </text>
@@ -223,15 +279,19 @@ else
     <br/>
     @Html.Raw(Loc.GetString("When full...", @accountSensor.DistanceMmFull))
   }
-  @if (measurementLevelEx.Distance.LevelFraction is {} levelFraction)
+  <br/>
+  @Html.Raw(Loc.GetString("Currently...", @current, @height))
+  @if (capacity.HasValue && volume.HasValue && measurementLevelEx.Distance.LevelFractionIncludingUnusableHeight is {} levelFractionIncludingUnusableHeight)
   {
     <br/>
-    @Html.Raw(Loc.GetString("Currently...", @current, @height, @Math.Round((decimal)levelFraction * 100)))
+    @Html.Raw(Loc.GetString("Capacity...", capacity.Value, Math.Round(levelFractionIncludingUnusableHeight * 100, 2), volume.Value + (unusableCapacityL ?? 0)))
   }
-  @if (capacity.HasValue && volume.HasValue)
+  @if (unusable.HasValue && unusableCapacityL.HasValue && capacity.HasValue && measurementLevelEx.Distance.LevelFraction is {} levelFraction
+    && volume.HasValue)
   {
     <br/>
-    @Html.Raw(Loc.GetString("Capacity...", @capacity, @volume))
+    @Html.Raw(Loc.GetString("Unusable...", unusable.Value, unusableCapacityL.Value, capacity.Value - unusableCapacityL.Value,
+      Math.Round(levelFraction * 100, 2), volume.Value))
   }
 </p>
 <hr>

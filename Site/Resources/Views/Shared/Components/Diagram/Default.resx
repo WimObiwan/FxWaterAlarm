@@ -26,11 +26,13 @@
     <data name="This diagram visualizes..." xml:space="preserve">
         <value>
             <![CDATA[
-            This diagram visualizes the water level in the well.
+            <b>Explanation of the Water Well Diagram</b>
             <br/>
-            The vertical gray dashed line shows the 'view' of the sensor.
+            The diagram shows the water level in the well, measured by a sensor.
             <br/>
-            When the well is empty (0%), the sensor will measure <span style="font-weight: bold; color: gray;">{0} mm</span>.
+            The vertical grey dashed line represents the sensor’s "line of sight."
+            <br/>
+            When the well is empty (0%), the sensor measures a distance of <span style="font-weight: bold; color: gray;">{0} mm</span> to the water surface.
             ]]>
         </value>
         <comment>This diagram visualizes...</comment>
@@ -38,7 +40,7 @@
     <data name="When full..." xml:space="preserve">
         <value>
             <![CDATA[
-            When the well is full (100%), the sensor will measure <span style="font-weight: bold; color: gray;">{0} mm</span>.
+            When the well is full (100%), the sensor measures <span style="font-weight: bold; color: gray;">{0} mm</span>.
             ]]>
         </value>
         <comment>When full...</comment>
@@ -46,11 +48,7 @@
     <data name="Currently..." xml:space="preserve">
         <value>
             <![CDATA[
-            Currently, the water is at <span style="font-weight: bold; color: gray;">{0} mm</span> from the sensor.
-            <br/>
-            Which means the water level is at <span style="font-weight: bold; color: blue;">{1} mm</span> from the bottom of the well.
-            <br/>
-            The well is therefore {2}% full.
+            Currently, the sensor measures a distance of <span style="font-weight: bold; color: gray;">{0} mm</span>, which means the water is <span style="font-weight: bold; color: blue;">{1} mm</span> high.
             ]]>
         </value>
         <comment>Currently...</comment>
@@ -58,10 +56,23 @@
     <data name="Capacity..." xml:space="preserve">
         <value>
             <![CDATA[
-            Since the total capacity of the well is <span style="font-weight: bold; color: black;">{0} l</span>, 
-            the current water volume is <span style="font-weight: bold; color: blue;">{1} l</span>.
+            The total capacity of the well is <span style="font-weight: bold; color: black;">{0} l</span>.
+            <br/>
+            At the current level, the well is <span style="font-weight: bold; color: blue;">{1}%</span> full, which equals <span style="font-weight: bold; color: blue;">{2} l</span> of water.
             ]]>
         </value>
         <comment>Capacity...</comment>
+    </data>
+    <data name="Unusable..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            The bottom <span style="font-weight: bold; color: purple;">{0} mm</span> of the well is unusable, which corresponds to <span style="font-weight: bold; color: purple;">{1} l</span>.
+            <br/>
+            Therefore, the usable capacity of the well is <span style="font-weight: bold; color: black;">{2} l</span>.
+            <br/>
+            Of this usable volume, the well is currently <span style="font-weight: bold; color: blue;">{3}%</span> full, or <span style="font-weight: bold; color: blue;">{4} l</span> of usable water.
+            ]]>
+        </value>
+        <comment>Unusable...</comment>
     </data>
 </root>
