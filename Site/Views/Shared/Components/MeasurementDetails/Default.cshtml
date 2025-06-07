@@ -1,7 +1,9 @@
+@using Core.Helpers
 @using Core.Util
 @using Microsoft.AspNetCore.Mvc.Localization
 @model Site.ViewComponents.MeasurementDetailsModel
 @inject IViewLocalizer Loc
+@inject IUrlBuilder UrlModel
 
 <div class="grayout">
     <div>
@@ -23,8 +25,9 @@
             - @Math.Round(Model.MeasurementEx.BatteryPrc, 0)%
         </div>
     }
-    @if (Model.AccountSensor.Sensor.SupportsDistance)
-    {
+    using Core.Helpers;
+#line default
+{
         @if (Model.MeasurementEx is MeasurementLevelEx measurementLevelEx)
         {
             <div>@Loc["Distance"]: @measurementLevelEx.Distance.DistanceMm mm</div>
@@ -52,4 +55,16 @@
             <div>@Loc["Distance Empty"]: @Model.AccountSensor.DistanceMmEmpty.Value mm</div>
         }
     }
+    <div>
+        @Loc["Link"]:
+        <a href="@UrlModel.BuildUrl(Model.AccountSensor.RestPath)" target="_blank">
+            @UrlModel.BuildUrl(Model.AccountSensor.RestPath)
+        </a>
+    </div>
+    <div>
+        @Loc["API Link"]: 
+        <a href="@UrlModel.BuildUrl(Model.AccountSensor.ApiRestPath)" target="_blank">
+            @UrlModel.BuildUrl(Model.AccountSensor.ApiRestPath)
+        </a>
+    </div>
 </div>

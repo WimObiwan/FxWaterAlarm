@@ -52,7 +52,10 @@ public class AccountSensor
     public string? RestPath =>
         Account.Link != null && Sensor.Link != null ? $"/a/{Account.Link}/s/{Sensor.Link}" : null;
 
-    public bool HasDistance => 
+    public string? ApiRestPath =>
+        Account.Link != null && Sensor.Link != null ? $"/api/a/{Account.Link}/s/{Sensor.Link}" : null;
+
+    public bool HasDistance =>
         Sensor.SupportsDistance;
 
     public bool HasHeight => 
