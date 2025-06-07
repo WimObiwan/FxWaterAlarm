@@ -60,8 +60,6 @@ public class Messenger : IMessenger
                 { ContentId = "images-wateralarm.png",  ContentType = new ContentType("image/png") },
             new LinkedResource(GetContentPath("images/check-icon.png"))
                 { ContentId = "images-check-icon.png",  ContentType = new ContentType("image/png") },
-            new LinkedResource(GetContentPath("images/Beefree-logo.png"))
-                { ContentId = "images-Beefree-logo.png",  ContentType = new ContentType("image/png") }
         };
 
         await SendMailAsync(emailAddress, "WaterAlarm.be e-mail verificatie", body, linkedResources);
@@ -86,8 +84,6 @@ public class Messenger : IMessenger
                 { ContentId = "images-wateralarm.png",  ContentType = new ContentType("image/png") },
             new LinkedResource(GetContentPath("images/warning.png"))
                 { ContentId = "images-warning-icon.png",  ContentType = new ContentType("image/png") },
-            new LinkedResource(GetContentPath("images/Beefree-logo.png"))
-                { ContentId = "images-Beefree-logo.png",  ContentType = new ContentType("image/png") }
         };
 
         string emailAddressToUse;
