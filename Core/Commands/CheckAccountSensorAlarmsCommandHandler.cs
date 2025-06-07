@@ -1,5 +1,6 @@
 using Core.Communication;
 using Core.Exceptions;
+using Core.Helpers;
 using Core.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,9 +18,9 @@ public class CheckAccountSensorAlarmsCommandHandler : CheckAccountSensorAlarmsCo
 {
     private readonly WaterAlarmDbContext _dbContext;
 
-    public CheckAccountSensorAlarmsCommandHandler(WaterAlarmDbContext dbContext, IMediator mediator, IMessenger messenger, 
+    public CheckAccountSensorAlarmsCommandHandler(WaterAlarmDbContext dbContext, IMediator mediator, IMessenger messenger, IUrlBuilder urlBuilder,
         ILogger<CheckAccountSensorAlarmsCommandHandler> logger)
-        : base(dbContext, mediator, messenger, logger)
+        : base(dbContext, mediator, messenger, urlBuilder, logger)
     {
         _dbContext = dbContext;
     }

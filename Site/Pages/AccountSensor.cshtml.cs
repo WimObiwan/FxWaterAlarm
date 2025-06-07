@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using Core.Commands;
 using Core.Entities;
+using Core.Helpers;
 using Core.Queries;
 using Core.Util;
 using MediatR;
@@ -39,12 +40,14 @@ public class AccountSensor : PageModel
     private readonly IMediator _mediator;
     private readonly IUserInfo _userInfo;
     private readonly ITrendService _trendService;
+    private readonly IUrlBuilder _urlBuilder;
 
-    public AccountSensor(IMediator mediator, IUserInfo userInfo, ITrendService trendService)
+    public AccountSensor(IMediator mediator, IUserInfo userInfo, ITrendService trendService, IUrlBuilder urlBuilder)
     {
         _mediator = mediator;
         _userInfo = userInfo;
         _trendService = trendService;
+        _urlBuilder = urlBuilder;
     }
 
     public IMeasurementEx? LastMeasurement { get; private set; }
@@ -72,7 +75,6 @@ public class AccountSensor : PageModel
         Preview = preview;
         SaveResult = saveResult;
         FromDays = fromDays;
-        QrBaseUrl = $"https://wateralarm.be/a/{accountLink}/s/{sensorLink}";
 
         AccountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
         {
@@ -82,6 +84,8 @@ public class AccountSensor : PageModel
 
         if (AccountSensorEntity != null)
         {
+            QrBaseUrl = _urlBuilder.BuildUrl(AccountSensorEntity.RestPath);
+
             LastMeasurement = await _mediator.Send(new LastMeasurementQuery
             {
                 AccountSensor = AccountSensorEntity

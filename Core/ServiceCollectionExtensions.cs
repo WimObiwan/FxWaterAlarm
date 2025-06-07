@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Core.Commands;
 using Core.Communication;
+using Core.Helpers;
 using Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMeasurementDetectRepository, MeasurementDetectRepository>();
         services.AddScoped<IMeasurementMoistureRepository, MeasurementMoistureRepository>();
         services.AddScoped<IMessenger, Messenger>();
+        services.AddScoped<IUrlBuilder, UrlBuilder>();
 
         services.AddSingleton<IVersionInfo, VersionInfo>(_ => new VersionInfo(assembly));
 

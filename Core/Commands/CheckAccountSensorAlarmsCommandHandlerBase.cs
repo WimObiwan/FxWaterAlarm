@@ -1,6 +1,7 @@
 using System.Globalization;
 using Core.Communication;
 using Core.Entities;
+using Core.Helpers;
 using Core.Queries;
 using Core.Repositories;
 using Core.Util;
@@ -14,17 +15,20 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
     private readonly WaterAlarmDbContext _dbContext;
     private readonly IMediator _mediator;
     private readonly IMessenger _messenger;
+    private readonly IUrlBuilder _urlBuilder;
     private readonly ILogger _logger;
 
     public CheckAccountSensorAlarmsCommandHandlerBase(
         WaterAlarmDbContext dbContext,
         IMediator mediator,
-        IMessenger messenger, 
+        IMessenger messenger,
+        IUrlBuilder urlBuilder,
         ILogger logger)
     {
         _dbContext = dbContext;
         _mediator = mediator;  // I know... https://lostechies.com/jimmybogard/2016/12/12/dealing-with-duplication-in-mediatr-handlers/
         _messenger = messenger;
+        _urlBuilder = urlBuilder;
         _logger = logger;
     }
 
@@ -375,8 +379,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
     {
         string email = accountSensor.Account.Email;
 
-        //TODO
-        string url = "https://www.wateralarm.be" + accountSensor.RestPath;
+        string url = _urlBuilder.BuildUrl(accountSensor.RestPath);
 
         await _messenger.SendAlertMailAsync(email, url, accountSensor.Name, message, shortMessage);
     }
