@@ -74,7 +74,10 @@ public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
 
     private void CreateMoistureAlarms(AccountSensor accountSensor)
     {
-        #warning Implement this method
-        throw new NotImplementedException();
-    }
+        accountSensor.AddAlarm(new AccountSensorAlarm
+        {
+            Uid = Guid.NewGuid(),
+            AlarmType = AccountSensorAlarmType.DetectOn
+        });
+   }
 }

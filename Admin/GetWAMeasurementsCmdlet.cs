@@ -10,7 +10,7 @@
 
 // namespace WaterAlarmAdmin;
 
-#warning Implement this
+//#warning Implement this
 
 // [Cmdlet(VerbsCommon.Get, "WAMeasurements")]
 // [OutputType(typeof(Guid))]

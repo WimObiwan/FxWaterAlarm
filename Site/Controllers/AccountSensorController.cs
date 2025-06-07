@@ -10,11 +10,15 @@ namespace Site.Controllers;
 class AccountSensorDto
 {
     public required string? Name { get; init; }
-    public required int? CapacityL { get; init; }
-    public required double? ResolutionL { get; init; }
-    public required int? DistanceMmEmpty { get; init; }
-    public required int? DistanceMmFull { get; init; }
     public required DateTime CreateTimestamp { get; init; }
+    public int? CapacityL { get; init; } = null;
+    public double? ResolutionL { get; init; } = null;
+    public int? DistanceMmEmpty { get; init; } = null;
+    public int? DistanceMmFull { get; init; } = null;
+    public int? UnusableHeightMm { get; init; } = null;
+    public double? UnusableCapacity { get; init; } = null;
+    public double? UsableCapacity { get; init; } = null;
+
 }
 
 class LastMeasurementDto
@@ -30,6 +34,7 @@ class LastMeasurementDto
     public double? LevelFraction { get; init; }
     public double? RealLevelFraction { get; init; }
     public DateTime EstimatedNextRefresh { get; init; }
+    public int? Status { get; init; }
 }
 
 class Trend
@@ -146,11 +151,14 @@ public class AccountSensorController : Controller
                 AccountSensor = new AccountSensorDto
                 {
                     Name = accountSensor.Name,
+                    CreateTimestamp = accountSensor.CreateTimestamp,
                     CapacityL = accountSensor.CapacityL,
                     ResolutionL = accountSensor.ResolutionL,
                     DistanceMmEmpty = accountSensor.DistanceMmEmpty,
                     DistanceMmFull = accountSensor.DistanceMmFull,
-                    CreateTimestamp = accountSensor.CreateTimestamp
+                    UnusableHeightMm = accountSensor.UnusableHeightMm,
+                    UnusableCapacity = accountSensor.UnusableCapacityL,
+                    UsableCapacity = accountSensor.UsableCapacityL
                 },
                 LastMeasurement = lastMeasurementDto,
                 Trends = trendsDto
@@ -158,8 +166,34 @@ public class AccountSensorController : Controller
         }
         else if (measurementEx is MeasurementDetectEx measurementDetectEx)
         {
-            #warning Implement this
-            throw new NotImplementedException();
+            LastMeasurementDto? lastMeasurementDto;
+            if (measurementDetectEx != null)
+            {
+                lastMeasurementDto = new LastMeasurementDto
+                {
+                    TimeStamp = measurementDetectEx.Timestamp,
+                    BatV = measurementDetectEx.BatV,
+                    BatteryPrc = measurementDetectEx.BatteryPrc,
+                    RssiDbm = measurementDetectEx.RssiDbm,
+                    RssiPrc = measurementDetectEx.RssiPrc,
+                    Status = measurementDetectEx.Status,
+                };
+            }
+            else
+            {
+                lastMeasurementDto = null;
+            }
+
+            result = new AccountSensorResult
+            {
+                AccountSensor = new AccountSensorDto
+                {
+                    Name = accountSensor.Name,
+                    CreateTimestamp = accountSensor.CreateTimestamp
+                },
+                LastMeasurement = lastMeasurementDto,
+                Trends = null
+            };
         }
         else
         {
