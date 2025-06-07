@@ -1,0 +1,21 @@
+@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Site.Pages.Help
+@inject IViewLocalizer Loc
+
+<div>
+    <div>
+        @Loc["Enter your ID..."]
+    </div>
+    <form method="post" action="">
+        <input type="text" class="form-control"
+               name="id"
+               value=""/>
+        <button type="submit" class="btn btn-primary mb-3">@Loc["Submit"]</button>
+        @Html.AntiForgeryToken()
+    </form>
+    <div>
+        @Loc["The owner will receive a mail with the account or sensor link."]
+    </div>
+</div>

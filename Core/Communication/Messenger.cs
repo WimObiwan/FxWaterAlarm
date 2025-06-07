@@ -25,6 +25,7 @@ public interface IMessenger
 {
     Task SendAuthenticationMailAsync(string emailAddress, string url, string code);
     Task SendAlertMailAsync(string emailAddress, string url, string? accountSensorName, string alertMessage, string shortAlertMessage);
+    Task SendLinkMailAsync(string emailAddress, string url);
 }
 
 public class Messenger : IMessenger
@@ -90,6 +91,34 @@ public class Messenger : IMessenger
         if (_messengerOptions.OverruleAlertDestination is {} overruleDestination && !string.IsNullOrEmpty(overruleDestination))
         {
             _logger.LogWarning("Mail alert to real address {emailAddress} overruled by {overruleDestination}", emailAddress, overruleDestination);
+            emailAddressToUse = overruleDestination;
+        }
+        else
+        {
+            emailAddressToUse = emailAddress;
+        }
+
+        await SendMailAsync(emailAddressToUse, subject, body, linkedResources);
+    }
+
+    public async Task SendLinkMailAsync(string emailAddress, string url)
+    {
+        string subject = "WaterAlarm.be Link";
+        string body = await File.ReadAllTextAsync(GetContentPath("help-mail.html"));
+
+        body = body
+            .Replace("{{URL}}", url);
+
+        LinkedResource[] linkedResources =
+        {
+            new LinkedResource(GetContentPath("images/wateralarm.png"))
+                { ContentId = "images-wateralarm.png",  ContentType = new ContentType("image/png") },
+        };
+
+        string emailAddressToUse;
+        if (_messengerOptions.OverruleAlertDestination is {} overruleDestination && !string.IsNullOrEmpty(overruleDestination))
+        {
+            _logger.LogWarning("Mail link to real address {emailAddress} overruled by {overruleDestination}", emailAddress, overruleDestination);
             emailAddressToUse = overruleDestination;
         }
         else
