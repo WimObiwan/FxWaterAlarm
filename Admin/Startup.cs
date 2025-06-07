@@ -29,7 +29,7 @@ public class Startup : PsStartup
     // Override the `ConfigureServices` method to register your own dependencies
     public override void ConfigureServices(IServiceCollection services)
     {
-
+        services.AddSingleton<IConfiguration>(configurationRoot);
         services.AddWaterAlarmCore(configurationRoot, typeof(Startup).Assembly);
     }
 
