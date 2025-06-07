@@ -18,7 +18,7 @@ public class MessengerOptions
     public required string SmtpUsername { get; init; }
     public required string SmtpPassword { get; init; }
     public string? MailContentPath { get; init; }
-
+    public string[]? IgnoreBcc { get; init; }
 }
 
 public interface IMessenger
@@ -122,7 +122,9 @@ public class Messenger : IMessenger
         message.To.Add(new MailAddress(emailAddress));
 
         _logger.LogInformation("Using Bcc {bcc}", _messengerOptions.Bcc);
-        if (_messengerOptions.Bcc is {} bcc && !string.Equals(bcc, emailAddress, StringComparison.OrdinalIgnoreCase))
+        if (_messengerOptions.Bcc is { } bcc
+            && !string.Equals(bcc, emailAddress, StringComparison.OrdinalIgnoreCase)
+            && (_messengerOptions.IgnoreBcc == null || !_messengerOptions.IgnoreBcc.Contains(emailAddress, StringComparer.OrdinalIgnoreCase)))
             message.Bcc.Add(bcc);
 
         AlternateView view = AlternateView.CreateAlternateViewFromString(body, null, MediaTypeNames.Text.Html);
