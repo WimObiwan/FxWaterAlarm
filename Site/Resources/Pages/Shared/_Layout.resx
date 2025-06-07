@@ -26,9 +26,9 @@
         <value>News blog</value>
         <comment>News blog</comment>
     </data>
-    <data name="Dcumentation" xml:space="preserve">
-        <value>Dcumentation</value>
-        <comment>Dcumentation</comment>
+    <data name="My sensors" xml:space="preserve">
+        <value>My sensors</value>
+        <comment>My sensors</comment>
     </data>
     <data name="Documentation" xml:space="preserve">
         <value>Documentation</value>
