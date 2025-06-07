@@ -72,7 +72,6 @@ public class GetWAInfoCmdlet : DependencyCmdlet<Startup>
 
     private async Task ProcessSingleAsync(string email)
     {
-
         var account = await _mediator.Send(new AccountByEmailQuery() { Email = email });
         if (account == null)
         {
