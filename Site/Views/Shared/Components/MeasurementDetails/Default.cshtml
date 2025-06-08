@@ -25,9 +25,8 @@
             - @Math.Round(Model.MeasurementEx.BatteryPrc, 0)%
         </div>
     }
-    using Core.Helpers;
-#line default
-{
+    @if (Model.AccountSensor.Sensor.SupportsDistance)
+    {
         @if (Model.MeasurementEx is MeasurementLevelEx measurementLevelEx)
         {
             <div>@Loc["Distance"]: @measurementLevelEx.Distance.DistanceMm mm</div>
