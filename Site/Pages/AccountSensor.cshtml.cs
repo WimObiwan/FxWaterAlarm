@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using Core.Commands;
+using Core.Communication;
 using Core.Entities;
 using Core.Helpers;
 using Core.Queries;
@@ -117,14 +118,45 @@ public class AccountSensor : PageModel
         }
     }
 
+    public async Task<IActionResult> OnPostTestMailAlertAsync(
+        [FromServices] IMediator mediator,
+        [FromServices] IMessenger messenger,
+        [FromRoute] string accountLink,
+        [FromRoute] string sensorLink)
+    {
+        if (!_userInfo.IsAuthenticated())
+            return Unauthorized();
+
+        var accountSensorEntity = await mediator.Send(new AccountSensorByLinkQuery
+        {
+            SensorLink = sensorLink,
+            AccountLink = accountLink
+        });
+
+        if (accountSensorEntity == null)
+            return NotFound();
+
+        if (!await _userInfo.CanUpdateAccountSensor(accountSensorEntity))
+            return Forbid();
+
+        await messenger.SendAlertMailAsync(
+            accountSensorEntity.Account.Email,
+            _urlBuilder.BuildUrl(accountSensorEntity.RestPath),
+            accountSensorEntity.Name,
+            "Er is gelukkig geen probleem, dit is een test alert.",
+            "Test alert");
+
+        return new JsonResult(new { success = true });
+    }
+
     public async Task<IActionResult> OnGetExportCsv(string accountLink, string sensorLink)
     {
         // https://swimburger.net/blog/dotnet/create-zip-files-on-http-request-without-intermediate-files-using-aspdotnet-mvc-razor-pages-and-endpoints#better-mvc
-        
+
         Response.ContentType = "text/csv";
         Response.Headers.Append("Content-Disposition", "attachment; filename=\"Export.csv\"");
 
-        
+
         await using TextWriter textWriter = new StreamWriter(Response.BodyWriter.AsStream());
         var accountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
         {
@@ -174,7 +206,7 @@ public class AccountSensor : PageModel
                 break;
 
             foreach (var measurementEx in result)
-            {                
+            {
                 MeasurementLevelEx? measurementLevelEx = measurementEx as MeasurementLevelEx;
 
                 // TODO: Implement for other measurement types

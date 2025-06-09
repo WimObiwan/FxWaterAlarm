@@ -178,6 +178,7 @@
                                             value="true"
                                             @(Model.AccountSensor.AlertsEnabled ? "checked" : "")/>
                                 </div>
+                                <button type="button" style="float: left; margin: 10px 0;" class="btn btn-secondary mb-3" id="testMailAlert">@Loc["Test email alert"]</button>
                             </td>
                         </tr>
                     }
@@ -188,9 +189,32 @@
                             <button type="submit" class="btn btn-primary mb-3">@Loc["Submit changes"]</button>
                         </td>
                     </tr>
+
                 </table>
                 @Html.AntiForgeryToken()
             </form>
+
+
+            <script>
+                document.getElementById('testMailAlert').addEventListener('click', () => {
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                    fetch('?handler=TestMailAlert', {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': token
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        // Optionally update page content here
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                });
+            </script>
 
             <h3>@Loc["Active sensor alarms"]</h3>
             <ul>
