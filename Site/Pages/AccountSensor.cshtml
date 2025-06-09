@@ -3,13 +3,24 @@
 @using Core.Util
 @using Microsoft.AspNetCore.Mvc.Localization
 @using QRCoder
+@using Site.Utilities
 @using SixLabors.ImageSharp
 @using Microsoft.AspNetCore.Http.Extensions
 @model AccountSensor
+@inject IUserInfo UserInfo
 @inject IViewLocalizer Loc
 
 @{
     ViewData["Title"] = Model.AccountSensorEntity?.Name ?? Model.AccountSensorEntity?.Sensor.DevEui ?? "Sensor";
+}
+
+@if (await UserInfo.IsAdmin())
+{
+<div class="alert alert-warning small-alert">
+    Administration mode
+    - @Model.AccountSensorEntity?.Account.Name (@Model.AccountSensorEntity?.Account.Email)
+    - @Model.AccountSensorEntity?.Name
+</div>
 }
 
 <p class=""><div id="installContainer" class="alert alert-success small-alert hidden">

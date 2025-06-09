@@ -2,13 +2,25 @@
 @using Core.Util
 @using Microsoft.AspNetCore.Mvc.Localization
 @using QRCoder
+@using Site.Utilities
 @using SixLabors.ImageSharp
 @using Microsoft.AspNetCore.Http.Extensions
 @model Account
+@inject IUserInfo UserInfo
 @inject IViewLocalizer Loc
 
 @{
     ViewData["Title"] = "Account";
+}
+
+@if (await UserInfo.IsAdmin())
+{
+<div class="alert alert-warning small-alert">
+    <div>
+        Administration mode
+        - @Model.AccountEntity?.Name (@Model.AccountEntity?.Email)
+    </div>
+</div>
 }
 
 <p class=""><div id="installContainer" class="alert alert-success small-alert hidden">
