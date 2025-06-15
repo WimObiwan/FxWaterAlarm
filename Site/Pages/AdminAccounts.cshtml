@@ -103,6 +103,7 @@
         <th><i class="fas fa-microchip"></i> Sensor</th>
         <th><i class="fas fa-tint"></i> Type</th>
         <th><i class="fas fa-link"></i> Link</th>
+        <th><i class="fas fa-trash"></i> Remove</th>
       </tr>
     </thead>
     <tbody>
@@ -112,6 +113,16 @@
         <td>@accountSensor.Name</td>
         <td class="sensor-type">@accountSensor.Sensor.Type</td>
         <td><a href="@accountSensor.RestPath" target="_blank">View Sensor</a></td>
+        <td>
+          <form method="POST" action="?handler=RemoveAccountSensor" onsubmit="return confirmDelete();">
+            <input type="hidden" name="accountId" value="@account.Uid">
+            <input type="hidden" name="sensorId" value="@accountSensor.Sensor.Uid">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="delete-btn" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </form>
+        </td>
       </tr>
   }
     </tbody>
@@ -130,3 +141,11 @@
     </button>
   </form>
 </div>
+
+@section Scripts {
+<script>
+  function confirmDelete() {
+    return confirm("Are you sure you want to delete this sensor?");
+  }
+</script>
+}

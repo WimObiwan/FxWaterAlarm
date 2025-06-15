@@ -68,4 +68,18 @@ public class AdminAccounts : PageModel
 
         return Redirect(account.RestPath + "?message=" + Uri.EscapeDataString(message));
     }
+
+    public async Task<IActionResult> OnPostRemoveAccountSensor(Guid accountId, Guid sensorId)
+    {
+        // Remove the account sensor
+        await _mediator.Send(new RemoveSensorFromAccountCommand()
+        {
+            AccountUid = accountId,
+            SensorUid = sensorId
+        });
+ 
+        string message = "Account sensor removed successfully.";
+
+        return RedirectToPage(new { message });
+    }
 }
