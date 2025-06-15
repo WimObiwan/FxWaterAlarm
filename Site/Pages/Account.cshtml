@@ -20,6 +20,29 @@
         Administration mode
         - @Model.AccountEntity?.Name (@Model.AccountEntity?.Email)
     </div>
+    <div>
+        <div>
+            Account ID: <span id="accountId" style="font-weight: bold;">@Model.AccountEntity?.Uid</span>
+            <button type="button" class="btn btn-clipboard" title="Copy to clipboard" data-clipboard data-clipboard-target="#accountId">
+                <i class="bi bi-clipboard" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div>
+            Link: <span id="link" style="font-weight: bold;">@Model.AccountEntity?.Link</span>
+            <button type="button" class="btn btn-clipboard" title="Copy to clipboard" data-clipboard data-clipboard-target="#link">
+                <i class="bi bi-clipboard" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+    <div>
+        <form method="post" action="?handler=AddSensor">
+            <input type="text" class="form-control form-control-sm" name="deveui" placeholder="deveui" required>
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-secondary btn-sm">
+                Add sensor
+            </button>
+        </form>
+    </div>
 </div>
 }
 
@@ -30,6 +53,13 @@
     </button>.
 </div></p>
 
+@if (@Model.Message is {} message)
+{
+    <div class="alert alert-info">
+        @message
+    </div>
+}
+
 <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">WaterAlarm</li>
@@ -37,7 +67,7 @@
     </ol>
 </nav>
 
-@if (Model.Measurements == null)
+@if (Model.AccountSensors == null)
 {
     @: Account not found
 }
@@ -45,14 +75,25 @@ else
 {
     <div class="container-sm">
         <div class="row mx-auto">
-            @foreach (var measurement in Model.Measurements)
+            @foreach (var accountSensorWithMeasurement in Model.AccountSensors)
             {
+                var accountSensor = accountSensorWithMeasurement.Item1;
+                var measurement = accountSensorWithMeasurement.Item2;
                 <div class="col col-lg-4">
                     <div class="card" style="margin-top: 10px; margin-bottom: 10px;">
                         <div class="card-body">
-                            <div class="card-title" style="text-align: center; font-size: xx-large; text-decoration: underline; line-height: 200%;">
-                                @measurement.AccountSensor.Name
-                            </div>
+                            @if (string.IsNullOrEmpty(accountSensor.Name))
+                            {
+                                <div class="card-title" style="text-align: center; font-size: medium; text-decoration: wavy; line-height: 200%;">
+                                    @accountSensor.Sensor.DevEui
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="card-title" style="text-align: center; font-size: xx-large; text-decoration: underline; line-height: 200%;">
+                                    @accountSensor.Name
+                                </div>
+                            }
                             @if (measurement is MeasurementLevelEx measurementLevelEx)
                             {
                                 <div style="text-align: center;">
@@ -72,7 +113,7 @@ else
                                 </div>
                             }
                             <div style="text-align: center; margin-top: 20px;">
-                                <a href="@measurement.AccountSensor.RestPath" class="btn btn-primary">@Loc["Sensor details"]</a>
+                                <a href="@accountSensor.RestPath" class="btn btn-primary">@Loc["Sensor details"]</a>
                             </div>
                         </div>
                     </div>
@@ -92,13 +133,21 @@ else
 *@
 
 @section Scripts {
-    @if (Model.Measurements != null && Model.Measurements.Any())
+    @if (Model.AccountSensors != null && Model.AccountSensors.Any())
     {
-        var next = Model.Measurements.Select(m => m.EstimateNextRefresh()).Min().ToLocalTime();
+        var next = Model.AccountSensors
+            .Select(m => m.Item2)
+            .Where(m => m != null)
+            .Select(m => (DateTime?)m!.EstimateNextRefresh())
+            .Min();
 
-        <script>
-            refreshAt(@next.Hour, @next.Minute, @next.Second)
-        </script>
+        if (next != null)
+        {
+            var nextLocal = next.Value.ToLocalTime();
+            <script>
+                refreshAt(@nextLocal.Hour, @nextLocal.Minute, @nextLocal.Second)
+            </script>
+        }
     }
 
     <script>

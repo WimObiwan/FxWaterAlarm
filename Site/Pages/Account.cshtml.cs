@@ -1,7 +1,4 @@
-using System.Globalization;
-using System.Text;
 using Core.Commands;
-using Core.Entities;
 using Core.Queries;
 using Core.Util;
 using MediatR;
@@ -17,7 +14,8 @@ public class Account : PageModel
     private readonly IUserInfo _userInfo;
 
     public Core.Entities.Account? AccountEntity { get; set; }
-    public IList<IMeasurementEx>? Measurements { get; set; }
+    public IList<Tuple<Core.Entities.AccountSensor, IMeasurementEx?>>? AccountSensors { get; set; }
+    public string? Message { get; set; }
 
     public Account(IMediator mediator, IUserInfo userInfo)
     {
@@ -25,8 +23,10 @@ public class Account : PageModel
         _userInfo = userInfo;
     }
 
-    public async Task OnGet(string accountLink)
+    public async Task OnGet(string accountLink, string? message = null)
     {
+        Message = message;
+
         AccountEntity = await _mediator.Send(new AccountByLinkQuery
         {
             Link = accountLink
@@ -38,17 +38,56 @@ public class Account : PageModel
         }
         else
         {
-            Measurements = (await Task.WhenAll(AccountEntity.AccountSensors.Select(async accountSensor =>
+            AccountSensors = (await Task.WhenAll(AccountEntity.AccountSensors.Select(async accountSensor =>
             {
-                return await _mediator.Send(new LastMeasurementQuery
-                {
-                    AccountSensor = accountSensor
-                });
+                return Tuple.Create(
+                    accountSensor,
+                    await _mediator.Send(new LastMeasurementQuery
+                    {
+                        AccountSensor = accountSensor
+                    }));
             })))
-                .Where(m => m != null)
-                .Select(m => m!)
-                .ToList();
+            .ToList();
+        }
+    }
+
+    public async Task<IActionResult> OnPostAddSensorAsync(
+        [FromRoute] string accountLink,
+        [FromForm] string deveui)
+    {
+        string? message = null;
+
+        var accountEntity = await _mediator.Send(new AccountByLinkQuery
+        {
+            Link = accountLink
+        });
+
+        if (accountEntity == null)
+            return NotFound();
+
+        if (!await _userInfo.CanUpdateAccount(accountEntity))
+            return Forbid();
+
+        var sensorEntity = await _mediator.Send(new SensorByLinkQuery
+        {
+            SensorLink = deveui
+        });
+
+        if (sensorEntity == null)
+        {
+            message = "Sensor not found";
+        }
+        else
+        {
+            await _mediator.Send(new AddSensorToAccountCommand
+            {
+                AccountUid = accountEntity.Uid,
+                SensorUid = sensorEntity.Uid
+            });
+            
+            message = "Sensor added successfully";
         }
 
+        return RedirectToPage(new { accountLink, message });
     }
 }
