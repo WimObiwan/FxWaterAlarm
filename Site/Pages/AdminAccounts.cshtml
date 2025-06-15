@@ -1,0 +1,132 @@
+@page
+@using System.Security.Claims
+@model AdminAccounts
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  .account-container {
+    margin: 30px auto;
+    max-width: 800px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fdfdfd;
+  }
+
+  .account-container h2 {
+    margin-top: 0;
+    color: #333;
+  }
+
+  .account-header {
+    margin-bottom: 15px;
+  }
+
+  .account-header i {
+    margin-right: 8px;
+    color: #555;
+  }
+
+  table.sensor-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .sensor-table th, .sensor-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+  }
+
+  .sensor-table th {
+    background-color: #f3f3f3;
+    color: #444;
+  }
+
+  .sensor-type {
+    font-size: 0.9em;
+    color: #666;
+  }
+
+  hr {
+    margin: 40px 0;
+    border: none;
+    border-top: 1px solid #ccc;
+  }
+</style>
+
+@if (@Model.Message is {} message)
+{
+    <div class="alert alert-info">
+      <div>
+        @message
+      </div>
+    </div>
+}
+
+
+
+@foreach (var account in Model.Accounts.OrderBy(a => a.Name ?? a.Email))
+{
+<div class="account-container">
+  <div class="account-header">
+    <h2>
+      <i class="fas fa-user-shield"></i>
+  @if (string.IsNullOrEmpty(account.Name))
+  {
+      @account.Email
+  }
+  else
+  {
+      @account.Name
+  }
+
+    </h2>
+    <p>
+        <i class="fas fa-envelope"></i>
+        <a href="mailto:@account.Email">@account.Email</a>
+    </p>
+    <p><i class="fas fa-clock"></i> @account.CreationTimestamp.ToString("g")</p>
+    <p><i class="fas fa-link"></i> <a href="@account.RestPath" target="_blank">View Account</a></p>
+
+  </div>
+  
+  <table class="sensor-table">
+    <thead>
+      <tr>
+        <th><i class="fas fa-microchip"></i> Sensor</th>
+        <th><i class="fas fa-tint"></i> Type</th>
+        <th><i class="fas fa-link"></i> Link</th>
+      </tr>
+    </thead>
+    <tbody>
+  @foreach (var accountSensor in account.AccountSensors.OrderBy(@as => @as.Order))
+  {
+      <tr>
+        <td>@accountSensor.Name</td>
+        <td class="sensor-type">@accountSensor.Sensor.Type</td>
+        <td><a href="@accountSensor.RestPath" target="_blank">View Sensor</a></td>
+      </tr>
+  }
+    </tbody>
+  </table>
+
+</div>
+}
+
+<div class="account-container">
+  <form method="post" action="?handler=AddAccount">
+    <input type="text" name="Email" placeholder="Account Email" class="form-control mb-2" />
+    <input type="text" name="Name" placeholder="Account Name (optional)" class="form-control mb-2" />
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-plus"></i> Add new account
+    </button>
+  </form>
+</div>

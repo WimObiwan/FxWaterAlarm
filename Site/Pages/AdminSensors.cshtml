@@ -61,49 +61,50 @@
   }
 </style>
 
-@foreach (var account in Model.Accounts.OrderBy(a => a.Name ?? a.Email))
+@if (@Model.Message is {} message)
 {
-<div class="account-container">
-  <div class="account-header">
-    <h2>
-      <i class="fas fa-user-shield"></i>
-  @if (string.IsNullOrEmpty(account.Name))
-  {
-      @account.Email
-  }
-  else
-  {
-      @account.Name
-  }
-
-    </h2>
-    <p>
-        <i class="fas fa-envelope"></i>
-        <a href="mailto:@account.Email">@account.Email</a>
-    </p>
-    <p><i class="fas fa-clock"></i> @account.CreationTimestamp.ToString("g")</p>
-  </div>
-  
-  <table class="sensor-table">
-    <thead>
-      <tr>
-        <th><i class="fas fa-microchip"></i> Sensor</th>
-        <th><i class="fas fa-tint"></i> Type</th>
-        <th><i class="fas fa-link"></i> Link</th>
-      </tr>
-    </thead>
-    <tbody>
-  @foreach (var accountSensor in account.AccountSensors.OrderBy(@as => @as.Order))
-  {
-      <tr>
-        <td>@accountSensor.Name</td>
-        <td class="sensor-type">@accountSensor.Sensor.Type</td>
-        <td><a href="@accountSensor.RestPath" target="_blank">View Sensor</a></td>
-      </tr>
-  }
-    </tbody>
-  </table>
-
-</div>
+    <div class="alert alert-info">
+      <div>
+        @message
+      </div>
+      @if (Model.SensorEntity != null)
+      {
+      <div>
+        <div>
+            Sensor ID: <span id="sensorId" style="font-weight: bold;">@Model.SensorEntity?.Uid</span>
+            <button type="button" class="btn btn-clipboard" title="Copy to clipboard" data-clipboard data-clipboard-target="#sensorId">
+                <i class="bi bi-clipboard" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div>
+            DevEui: <span id="devEui" style="font-weight: bold;">@Model.SensorEntity?.DevEui</span>
+            <button type="button" class="btn btn-clipboard" title="Copy to clipboard" data-clipboard data-clipboard-target="#devEui">
+                <i class="bi bi-clipboard" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div>
+            Link: <span id="link" style="font-weight: bold;">@Model.SensorEntity?.Link</span>
+            <button type="button" class="btn btn-clipboard" title="Copy to clipboard" data-clipboard data-clipboard-target="#link">
+                <i class="bi bi-clipboard" aria-hidden="true"></i>
+            </button>
+        </div>
+      </div>
+      }
+    </div>
 }
+
+<div class="account-container">
+  <form method="post" action="?handler=AddSensor">
+    <input type="text" name="DevEui" placeholder="deveui" class="form-control mb-2" />
+    <select name="SensorType" class="form-control mb-2" />
+      <option value="Level">Level</option>
+      <option value="Detect">Detect</option>
+      <option value="Moisture">Moisture</option>
+    </select>
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-plus"></i> Add new sensor
+    </button>
+  </form>
+</div>
 

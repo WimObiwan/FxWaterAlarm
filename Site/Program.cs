@@ -63,6 +63,7 @@ builder.Services.AddRazorPages(o =>
             .AddPageRoute("/Account", "/a/{AccountLink}")
             .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
             .AddPageRoute("/AdminOverview", "/adm")
+            .AddPageRoute("/AdminAccounts", "/adm/accounts")
             .AddPageRoute("/AdminSensors", "/adm/sensors")
             .AddPageRoute("/AccountLogin", "/account/login")
             .AddPageRoute("/AccountLoginMessage", "/account/loginmessage")
