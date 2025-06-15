@@ -46,29 +46,40 @@
     {
         <div style="text-align: center; font-size: xx-large; text-decoration: underline; line-height: 200%;">@Model.AccountSensorEntity.Name</div>
     }
-
-    @if (Model.LastMeasurement != null)
+    else
     {
-        bool hasGraph = Model.AccountSensorEntity?.Sensor.SupportsGraph == true;
-        bool hasTrend = Model.AccountSensorEntity?.Sensor.SupportsTrend == true;
-        @if (Model.LastMeasurement is MeasurementLevelEx measurementLevelEx)
+        <div style="text-align: center; font-size: medium; text-decoration: wavy; line-height: 200%;">@Model.AccountSensorEntity?.Sensor.DevEui</div>
+    }
+
+    @if (Model.AccountSensorEntity != null)
+    {
+        Core.Entities.AccountSensor accountSensor = Model.AccountSensorEntity;
+
+        @if (Model.LastMeasurement != null)
         {
-            <div>
-                @await Component.InvokeAsync("Waterlevel", new { measurementLevelEx = measurementLevelEx })
-            </div>
+            IMeasurementEx lastMeasurement = Model.LastMeasurement;
+            @if (lastMeasurement is MeasurementLevelEx measurementLevelEx)
+            {
+                <div>
+                    @await Component.InvokeAsync("Waterlevel", new { measurementLevelEx = measurementLevelEx })
+                </div>
+            }
+            else if (lastMeasurement is MeasurementDetectEx measurementDetectEx)
+            {
+                <div>
+                    @await Component.InvokeAsync("Detect", new { measurementDetectEx = measurementDetectEx })
+                </div>
+            }
+            else if (lastMeasurement is MeasurementMoistureEx measurementMoistureEx)
+            {
+                <div>
+                    @await Component.InvokeAsync("Moisture", new { measurementMoistureEx = measurementMoistureEx })
+                </div>
+            }
         }
-        else if (Model.LastMeasurement is MeasurementDetectEx measurementDetectEx)
-        {
-            <div>
-                @await Component.InvokeAsync("Detect", new { measurementDetectEx = measurementDetectEx })
-            </div>
-        }
-        else if (Model.LastMeasurement is MeasurementMoistureEx measurementMoistureEx)
-        {
-            <div>
-                @await Component.InvokeAsync("Moisture", new { measurementMoistureEx = measurementMoistureEx })
-            </div>
-        }
+
+        bool hasGraph = accountSensor.Sensor.SupportsGraph == true;
+        bool hasTrend = accountSensor.Sensor.SupportsTrend == true;
 
         string? ConstructUrlFilter(AccountSensor.PageTypeEnum? pageType = null, int? fromDays = null)
         {
@@ -92,15 +103,15 @@
                 bool IsPageTypeInGraphDropDown()
                 {
                     return Model.PageType == AccountSensor.PageTypeEnum.GraphDefault
-                           || Model.PageType == AccountSensor.PageTypeEnum.GraphVolume
-                           || Model.PageType == AccountSensor.PageTypeEnum.GraphPercentage
-                           || Model.PageType == AccountSensor.PageTypeEnum.GraphHeight
-                           || Model.PageType == AccountSensor.PageTypeEnum.GraphDistance
-                           || Model.PageType == AccountSensor.PageTypeEnum.GraphTemperature
-                           || Model.PageType == AccountSensor.PageTypeEnum.GraphConductivity
-                           || Model.PageType == AccountSensor.PageTypeEnum.GraphStatus
-                           || Model.PageType == AccountSensor.PageTypeEnum.GraphSignal
-                           || Model.PageType == AccountSensor.PageTypeEnum.GraphBattery;
+                            || Model.PageType == AccountSensor.PageTypeEnum.GraphVolume
+                            || Model.PageType == AccountSensor.PageTypeEnum.GraphPercentage
+                            || Model.PageType == AccountSensor.PageTypeEnum.GraphHeight
+                            || Model.PageType == AccountSensor.PageTypeEnum.GraphDistance
+                            || Model.PageType == AccountSensor.PageTypeEnum.GraphTemperature
+                            || Model.PageType == AccountSensor.PageTypeEnum.GraphConductivity
+                            || Model.PageType == AccountSensor.PageTypeEnum.GraphStatus
+                            || Model.PageType == AccountSensor.PageTypeEnum.GraphSignal
+                            || Model.PageType == AccountSensor.PageTypeEnum.GraphBattery;
                 }
 
                 bool IsPageTypeInDetailsDropDown()
@@ -141,16 +152,16 @@
             <li class="nav-item dropdown">
                 <a  @Html.Raw(PageTypeDropDownMenu(IsPageTypeInGraphDropDown())) data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">@Loc["Graph"]</a>
                 <ul class="dropdown-menu">
-                    @if (Model.AccountSensorEntity?.HasVolume == true)
+                    @if (accountSensor.HasVolume == true)
                     {
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphVolume, AccountSensor.PageTypeEnum.GraphDefault))
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphVolume)">@Loc["Volume"]</a>
                     </li>
                     }
-                    @if (Model.AccountSensorEntity?.HasPercentage == true)
+                    @if (accountSensor.HasPercentage == true)
                     {
-                        if (Model.AccountSensorEntity.Sensor.Type == SensorType.Moisture)
+                        if (accountSensor.Sensor.Type == SensorType.Moisture)
                         {
                             <li>
                                 <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphPercentage))
@@ -165,35 +176,35 @@
                             </li>
                         }
                     }
-                    @if (Model.AccountSensorEntity?.HasHeight == true)
+                    @if (accountSensor.HasHeight == true)
                     {
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphHeight))
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphHeight)">@Loc["Height"]</a>
                     </li>
                     }
-                    @if (Model.AccountSensorEntity?.HasDistance == true)
+                    @if (accountSensor.HasDistance == true)
                     {
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphDistance))
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphDistance)">@Loc["Distance"]</a>
                     </li>
                     }
-                    @if (Model.AccountSensorEntity?.HasTemperature == true)
+                    @if (accountSensor.HasTemperature == true)
                     {
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphTemperature))
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphTemperature)">@Loc["Temperature"]</a>
                     </li>
                     }
-                    @if (Model.AccountSensorEntity?.HasConductivity == true)
+                    @if (accountSensor.HasConductivity == true)
                     {
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphConductivity))
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphConductivity)">@Loc["Conductivity"]</a>
                     </li>
                     }
-                    @if (Model.AccountSensorEntity?.HasStatus == true)
+                    @if (accountSensor.HasStatus == true)
                     {
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphStatus))
@@ -249,17 +260,17 @@
 
             var pageType = Model.PageType;
 
-            if (pageType == AccountSensor.PageTypeEnum.GraphDefault && Model.AccountSensorEntity != null)
+            if (pageType == AccountSensor.PageTypeEnum.GraphDefault)
             {
-                if (Model.AccountSensorEntity.HasVolume)
+                if (accountSensor.HasVolume)
                     pageType = AccountSensor.PageTypeEnum.GraphVolume;
-                else if (Model.AccountSensorEntity.HasPercentage)
+                else if (accountSensor.HasPercentage)
                     pageType = AccountSensor.PageTypeEnum.GraphPercentage;
-                else if (Model.AccountSensorEntity.HasHeight)
+                else if (accountSensor.HasHeight)
                     pageType = AccountSensor.PageTypeEnum.GraphHeight;
-                else if (Model.AccountSensorEntity.HasDistance)
+                else if (accountSensor.HasDistance)
                     pageType = AccountSensor.PageTypeEnum.GraphDistance;
-                else if (Model.AccountSensorEntity.HasStatus)
+                else if (accountSensor.HasStatus)
                     pageType = AccountSensor.PageTypeEnum.GraphStatus;
             }
 
@@ -320,7 +331,7 @@
                 <div style="width: 100%; height: 40vh">
                     @await Component.InvokeAsync("MeasurementsGraphNew", new
                         {
-                            AccountSensorEntity = Model.AccountSensorEntity,
+                            AccountSensorEntity = accountSensor,
                             ShowTimelineSlider = showTimelineSlider,
                             FromDays = Model.FromDays,
                             GraphType = graphType
@@ -330,7 +341,7 @@
         }
         
         @if (hasTrend && Model.PageType == AccountSensor.PageTypeEnum.Diagram)
-        {
+        {            
             @await Component.InvokeAsync("Diagram", new
             {
                 measurementEx = Model.LastMeasurement
@@ -341,7 +352,7 @@
         {
             @await Component.InvokeAsync("Trend", new
             {
-                accountSensorEntity = Model.AccountSensorEntity,
+                accountSensorEntity = accountSensor,
                 // trendMeasurement1H = Model.TrendMeasurement1H, 
                 trendMeasurement6H = Model.TrendMeasurement6H, 
                 trendMeasurement24H = Model.TrendMeasurement24H, 
@@ -354,7 +365,7 @@
         {
             @await Component.InvokeAsync("MeasurementDetails", new
                    {
-                       accountSensor = Model.AccountSensorEntity, measurementEx = Model.LastMeasurement
+                       accountSensor = accountSensor, measurementEx = Model.LastMeasurement
                    })
             
             <div class="grayout">
@@ -366,7 +377,7 @@
         {
             @await Component.InvokeAsync("SensorSettings", new
                    {
-                       accountSensor = Model.AccountSensorEntity,
+                       accountSensor = accountSensor,
                        url = HttpContext.Request.GetEncodedPathAndQuery(),
                        saveResult = Model.SaveResult
                    })
@@ -425,7 +436,7 @@
     }
     </script>
     
-    @if (Model.AccountSensorEntity?.Account.AppPath is { } appLink) {
+    @if (@Model.AccountSensorEntity?.Account.AppPath is { } appLink) {
         <script>
         @*linkAppModeSetLink.textContent = "@appLink";
         dbgAppModeSetLink.classList.toggle('hidden', false);*@
