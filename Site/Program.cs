@@ -58,14 +58,11 @@ builder.Services.Configure<MessagesOptions>(builder.Configuration.GetSection(Mes
 
 builder.Services.AddRazorPages(o =>
         o.Conventions
-            .AddPageRoute("/Sensor", "/sensor/{SensorLink}")
-            .AddPageRoute("/Sensor", "/s/{SensorLink}")
             .AddPageRoute("/Account", "/a/{AccountLink}")
             .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
             .AddPageRoute("/AdminOverview", "/adm")
             .AddPageRoute("/AdminAccounts", "/adm/accounts")
             .AddPageRoute("/AdminSensors", "/adm/sensors")
-            .AddPageRoute("/AccountLogin", "/account/login")
             .AddPageRoute("/AccountLoginMessage", "/account/loginmessage")
             .AddPageRoute("/AccountLoginMessageConfirmation", "/account/loginmessageconfirmation")
     )
@@ -92,8 +89,8 @@ builder.Services.AddTransient<ITrendService, TrendService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)  
     .AddCookie(options =>  
-    {  
-        options.LoginPath = "/Account/Login";  
+    {
+        options.LoginPath = "/Account/LoginMessage";  
     });
 builder.Services.AddSingleton<IAuthorizationHandler, AdminRequirementHandler>(); 
 
