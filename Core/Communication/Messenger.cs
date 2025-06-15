@@ -50,7 +50,7 @@ public class Messenger : IMessenger
     
     public async Task SendAuthenticationMailAsync(string emailAddress, string url, string code)
     {
-        string subject = "WaterAlarm Log-in code";
+        string subject = "WaterAlarm Log-in code - {{LOGINCODE}}";
 
         string contents = """
             <h1>Uw log-in code<br>voor wateralarm.be</h1>
@@ -61,6 +61,9 @@ public class Messenger : IMessenger
             </div>
             <a href="{{LOGINURL}}" class="btn">Inloggen</a>
             """;
+
+        subject = subject
+            .Replace("{{LOGINCODE}}", code);
 
         contents = contents
             .Replace("{{LOGINURL}}", url)
