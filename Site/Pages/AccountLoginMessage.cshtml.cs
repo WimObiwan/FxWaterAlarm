@@ -138,7 +138,13 @@ public class AccountLoginMessage : PageModel
         return $"/Account/LoginMessage?{queryStringBuilder}";
     }
 
-    public async Task<IActionResult> OnPost(int mode, string? accountLink, string? emailAddress, string? cookie, string? returnUrl, string? code)
+    public async Task<IActionResult> OnPost(
+        int mode,
+        string? accountLink,
+        string? emailAddress,
+        string? cookie,
+        string? returnUrl,
+        string? code)
     {
         if (mode == 21 && !string.IsNullOrEmpty(emailAddress))
         {
