@@ -1,3 +1,5 @@
+using Core.Exceptions;
+
 namespace Core.Entities;
 
 public enum GraphType
@@ -122,7 +124,12 @@ public class AccountSensor
     public void EnsureEnabled()
     {
         if (Disabled)
-            throw new InvalidOperationException("The account sensor is disabled");
+            throw
+                new AccountSensorDisabledException()
+                {
+                    AccountUid = Account.Uid,
+                    SensorUid = Sensor.Uid
+                };
     }
 
     public void AddAlarm(AccountSensorAlarm alarm)

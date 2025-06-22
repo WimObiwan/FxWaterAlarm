@@ -7,15 +7,12 @@ public class AccountSensorDisabledException : Exception
     {
     }
 
-    public AccountSensorDisabledException(string message)
-        : base(message)
+    public AccountSensorDisabledException(Exception innerException)
+        : base(message: null, innerException)
     {
     }
 
-    public AccountSensorDisabledException(string message, Exception inner)
-        : base(message, inner)
-    {
-    }
+    public override string Message => $"Account sensor is disabled (AccountUid: {AccountUid}, SensorUid: {SensorUid})";
 
     public Guid AccountUid { get; init; }
     public Guid SensorUid { get; init; }
