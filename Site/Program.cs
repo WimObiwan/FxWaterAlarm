@@ -45,12 +45,12 @@ builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
 builder.Services.Configure<DataProtectionTokenProviderOptions>(
     x =>
     {
-        AccountLoginMessageOptions accountLoginMessageOptions =
-            builder.Configuration
-                .GetSection(AccountLoginMessageOptions.Location)
-                .Get<AccountLoginMessageOptions>()
-            ?? throw new Exception("AccountLoginMessageOptions not configured");
-        x.TokenLifespan = accountLoginMessageOptions.TokenLifespan;
+        // AccountLoginMessageOptions accountLoginMessageOptions =
+        //     builder.Configuration
+        //         .GetSection(AccountLoginMessageOptions.Location)
+        //         .Get<AccountLoginMessageOptions>()
+        //     ?? throw new Exception("AccountLoginMessageOptions not configured");
+        // x.TokenLifespan = accountLoginMessageOptions.TokenLifespan;
     });
 
 builder.Services.Configure<MessagesOptions>(builder.Configuration.GetSection(MessagesOptions.Location));
@@ -86,7 +86,7 @@ builder.Services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 builder.Services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
 builder.Services.AddTransient<ITrendService, TrendService>();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)  
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)  
     .AddCookie(options =>
     {
         AccountLoginMessageOptions accountLoginMessageOptions =
@@ -97,7 +97,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Account/LoginMessage";
         options.ExpireTimeSpan = accountLoginMessageOptions.TokenLifespan;
         options.SlidingExpiration = false;
-        options.Cookie.Expiration = accountLoginMessageOptions.TokenLifespan;
     });
 builder.Services.AddSingleton<IAuthorizationHandler, AdminRequirementHandler>(); 
 
