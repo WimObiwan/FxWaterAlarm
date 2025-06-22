@@ -111,14 +111,33 @@
   {
       <tr>
         <td>@accountSensor.Name</td>
-        <td class="sensor-type">@accountSensor.Sensor.Type</td>
+        <td class="sensor-type">
+          @switch (accountSensor.Sensor.Type)
+          {
+              case Core.Entities.SensorType.Level:
+                  <i class="fas fa-water"></i>
+                  <text>Level</text>
+                  break;
+              case Core.Entities.SensorType.Moisture:
+                  <i class="fas fa-seedling"></i>
+                  <text>Moisture</text>
+                  break;
+              case Core.Entities.SensorType.Detect:
+                  <i class="fas fa-exclamation-triangle"></i>
+                  <text>Detect</text>
+                  break;
+              default:
+                  @accountSensor.Sensor.Type
+                  break;
+          }
+        </td>
         <td><a href="@accountSensor.RestPath" target="_blank">View Sensor</a></td>
         <td>
           <form method="POST" action="?handler=RemoveAccountSensor" onsubmit="return confirmDelete();">
             <input type="hidden" name="accountId" value="@account.Uid">
             <input type="hidden" name="sensorId" value="@accountSensor.Sensor.Uid">
             @Html.AntiForgeryToken()
-            <button type="submit" class="delete-btn" title="Delete">
+            <button type="submit" class="btn btn-danger delete-btn" title="Delete">
               <i class="fas fa-trash"></i>
             </button>
           </form>
