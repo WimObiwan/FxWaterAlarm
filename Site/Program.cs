@@ -87,9 +87,17 @@ builder.Services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
 builder.Services.AddTransient<ITrendService, TrendService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)  
-    .AddCookie(options =>  
+    .AddCookie(options =>
     {
-        options.LoginPath = "/Account/LoginMessage";  
+        AccountLoginMessageOptions accountLoginMessageOptions =
+            builder.Configuration
+                .GetSection(AccountLoginMessageOptions.Location)
+                .Get<AccountLoginMessageOptions>()
+            ?? throw new Exception("AccountLoginMessageOptions not configured");
+        options.LoginPath = "/Account/LoginMessage";
+        options.ExpireTimeSpan = accountLoginMessageOptions.TokenLifespan;
+        options.SlidingExpiration = false;
+        options.Cookie.Expiration = accountLoginMessageOptions.TokenLifespan;
     });
 builder.Services.AddSingleton<IAuthorizationHandler, AdminRequirementHandler>(); 
 
