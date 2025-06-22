@@ -17,7 +17,8 @@
     <form method="post" action="?page=Settings">
         <input type="text" class="form-control"
                name="link"
-               value="@Model.Link"/>
+               value="@Model.Link"
+               autofocus/>
         <button type="submit" class="btn btn-primary mb-3">@Loc["Set link"]</button>
         @Html.AntiForgeryToken()
     </form>
