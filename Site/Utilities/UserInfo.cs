@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using Core.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -60,7 +59,10 @@ public class UserInfo : IUserInfo
 
     public async Task<bool> IsAdmin()
     {
-        if (!(_httpContextAccessor.HttpContext?.User is { } user))
+        if (!(_httpContextAccessor.HttpContext is { } httpContext))
+            return false;
+
+        if (!(httpContext.User is { } user))
             return false;
 
         var result = await _authorizationService.AuthorizeAsync(user, "Admin");

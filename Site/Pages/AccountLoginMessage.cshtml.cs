@@ -1,19 +1,14 @@
-using System.Diagnostics;
-using System.Net;
-using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using Core.Communication;
 using Core.Exceptions;
 using Core.Queries;
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
-using QRCoder;
+using NetTools;
 
 namespace Site.Pages;
 
@@ -33,6 +28,9 @@ public class AccountLoginMessageOptions
     [ConfigurationKeyName("AdminEmails")]
     public string[]? AdminEmails { get; init; } = null;
 
+    [ConfigurationKeyName("AdminIPs")]
+    public string[]? AdminIPsRaw { get; init; } = null;
+
     public TimeSpan TokenLifespan =>
         TokenLifespanRaw
         ?? throw new Exception("AccountLoginMessageOptions.TokenLifespan not configured");
@@ -45,6 +43,17 @@ public class AccountLoginMessageOptions
         string.IsNullOrEmpty(SaltRaw)
         ? throw new Exception("AccountLoginMessageOptions.Salt not configured")
         : SaltRaw;
+
+    public IEnumerable<IPAddressRange>? AdminIPs
+    {
+        get
+        {
+            if (AdminIPsRaw is null)
+                return null;
+
+            return AdminIPsRaw.Select(ipRange => IPAddressRange.Parse(ipRange));
+        }
+    }
 }
 
 public class AccountLoginMessage : PageModel

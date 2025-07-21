@@ -1,7 +1,9 @@
 using System.Globalization;
+using System.Net;
 using Core;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Site;
@@ -54,6 +56,11 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(
     });
 
 builder.Services.Configure<MessagesOptions>(builder.Configuration.GetSection(MessagesOptions.Location));
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 
 builder.Services.AddRazorPages(o =>
         o.Conventions
@@ -122,12 +129,14 @@ app.UseDefaultFiles(new DefaultFilesOptions()
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
+    app.UseForwardedHeaders();
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 else
 {
     app.UseDeveloperExceptionPage();
+    app.UseForwardedHeaders();
 }
 
 app.UseHttpsRedirection();
