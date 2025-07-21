@@ -32,8 +32,7 @@ public class AdminRequirementHandler : AuthorizationHandler<AdminRequirement>
 
         var remoteIpAddress = httpContext?.Connection.RemoteIpAddress;
 
-        
-        _logger.LogWarning("Using IpAddress: {IPAddress}", httpContext?.Connection.RemoteIpAddress);
+        _logger.LogDebug("Using IpAddress: {IPAddress}", httpContext?.Connection.RemoteIpAddress);
 
         if (
             !string.IsNullOrEmpty(loginEmail)
