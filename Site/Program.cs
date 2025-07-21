@@ -3,6 +3,7 @@ using System.Net;
 using Core;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -16,6 +17,20 @@ using Westwind.AspNetCore.Markdown;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.Local.json", true, true);
+
+var dataProtectionConfig = builder.Configuration.GetSection("DataProtection");
+if (dataProtectionConfig != null)
+{
+    var keyPath = dataProtectionConfig["KeyStoragePath"];
+    if (!string.IsNullOrEmpty(keyPath))
+    {
+        var dp = builder.Services.AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(keyPath));
+        var applicationName = dataProtectionConfig["ApplicationName"];
+        if (!string.IsNullOrEmpty(applicationName))
+            dp.SetApplicationName("WaterAlarm");
+    }
+}
 
 // Add services to the container.
 builder.Services.AddLocalization(o =>
