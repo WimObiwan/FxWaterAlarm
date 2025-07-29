@@ -234,7 +234,7 @@ public class AccountSensorMeasurementController : Controller
         //var start = data.First().TimeStamp.Date.AddHours(data.First().TimeStamp.Hour);
         //var end = data.Last().TimeStamp.Date.AddHours(data.Last().TimeStamp.Hour);
         start = start.Date.AddHours(start.Hour);
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var end = now.Date.AddHours(now.Hour);
 
         var result = new List<MeasurementResultDataItem>();
