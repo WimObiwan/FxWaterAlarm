@@ -32,21 +32,27 @@ public class AdminRequirementHandler : AuthorizationHandler<AdminRequirement>
 
         var remoteIpAddress = httpContext?.Connection.RemoteIpAddress;
 
-        _logger.LogDebug("Using IpAddress: {IPAddress}", httpContext?.Connection.RemoteIpAddress);
+        _logger.LogDebug("Admin authorization, using IpAddress: {IPAddress}", remoteIpAddress);
 
         if (
-            !string.IsNullOrEmpty(loginEmail)
-            && adminEmails != null
-            && adminEmails.Contains(loginEmail, StringComparer.InvariantCultureIgnoreCase)
-            && httpContext != null
-            && (adminIPs == null || adminIPs.Any(ipRange => ipRange.Contains(remoteIpAddress)))
+            string.IsNullOrEmpty(loginEmail)
+            || adminEmails == null
+            || !adminEmails.Contains(loginEmail, StringComparer.InvariantCultureIgnoreCase)
         )
         {
-            context.Succeed(requirement);
+            context.Fail();
+        }
+        else if (
+            httpContext == null
+            || (adminIPs != null && !adminIPs.Any(ipRange => ipRange.Contains(remoteIpAddress)))
+        )
+        {
+            _logger.LogWarning("Authorization failed for user {Email} from IP {IPAddress}", loginEmail, remoteIpAddress);
+            context.Fail();
         }
         else
         {
-            context.Fail();
+            context.Succeed(requirement);
         }
 
         return Task.CompletedTask;
