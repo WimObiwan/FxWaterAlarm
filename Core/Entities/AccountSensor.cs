@@ -10,6 +10,7 @@ public enum GraphType
     Volume,
     Distance,
     RssiDbm,
+    Reception,
     BatV,
     Temperature,
     Conductivity,

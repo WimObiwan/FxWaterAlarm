@@ -118,6 +118,7 @@
                             || Model.PageType == AccountSensor.PageTypeEnum.GraphConductivity
                             || Model.PageType == AccountSensor.PageTypeEnum.GraphStatus
                             || Model.PageType == AccountSensor.PageTypeEnum.GraphSignal
+                            || Model.PageType == AccountSensor.PageTypeEnum.GraphReception
                             || Model.PageType == AccountSensor.PageTypeEnum.GraphBattery;
                 }
 
@@ -224,6 +225,10 @@
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphSignal)">@Loc["Signal"]</a>
                     </li>
                     <li>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphReception))
+                            href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphReception)">@Loc["Reception"]</a>
+                    </li>
+                    <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphBattery))
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphBattery)">@Loc["Battery"]</a>
                     </li>
@@ -316,6 +321,10 @@
                 case AccountSensor.PageTypeEnum.GraphSignal:
                     showTimelineSlider = true;
                     graphType = GraphType.RssiDbm;
+                    break;
+                case AccountSensor.PageTypeEnum.GraphReception:
+                    showTimelineSlider = true;
+                    graphType = GraphType.Reception;
                     break;
                 case AccountSensor.PageTypeEnum.GraphBattery:
                     showTimelineSlider = true;

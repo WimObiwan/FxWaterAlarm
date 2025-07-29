@@ -18,6 +18,7 @@
     string color;
     LocalizedHtmlString title, serieName;
     int round;
+    int? minValue = null;
     switch (Model.GraphType)
     {
         default:
@@ -71,6 +72,14 @@
             serieName = @Loc["Signal"];
             title = @Loc["Signal"];
             round = 1;
+            break;
+        case Core.Entities.GraphType.Reception:
+            color = "#00aa00";
+            isArea = true;
+            serieName = @Loc["Reception"];
+            title = @Loc["Reception"];
+            round = 1;
+            minValue = 0;
             break;
         case Core.Entities.GraphType.BatV:
             color = "#ff0000";
@@ -176,30 +185,16 @@ getJSON('@(Model.AccountSensorEntity.ApiRestPath)/m?fromDays=@(Model.FromDays)&g
             },
             showMinLabel: false
         },
-        @if (isArea)
+        @if (minValue.HasValue)
         {
         <text>
-        // <!--
-        min: function(value) {
-            if (value.min < 0) {
-                return value.min;
-            }
-            let d = (value.max - value.min);
-            if (d < value.max * 0.1)
-                d = value.max * 0.1;
-            let v = value.min - d * 0.5;
-            if (v < 0) {
-                return 0;
-            }
-            return v;
-        }
-        // -->
+            min: @minValue.Value
         </text>
         }
         else
         {
         <text>
-        scale: true
+            scale: true
         </text>
         }
         @* boundaryGap: ['0%', '0%'] *@

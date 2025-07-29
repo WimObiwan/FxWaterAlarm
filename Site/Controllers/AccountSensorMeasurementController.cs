@@ -45,7 +45,13 @@ public class AccountSensorMeasurementController : Controller
         if (graphType == GraphType.None)
             return NoContent();
 
-        DateTime from = DateTime.UtcNow.AddDays(-fromDays);
+        DateTime originalFrom = DateTime.UtcNow.AddDays(-fromDays);
+        DateTime from = originalFrom;
+        if (graphType == GraphType.Reception)
+        {
+            from = from.AddHours(-24);
+        }
+
         DateTime? last = null;
         IEnumerable<MeasurementResultDataItem>? result = null;
         for (int i = 0; i < 3; i++)
@@ -138,6 +144,11 @@ public class AccountSensorMeasurementController : Controller
                         value = measurementEx.RssiDbm;
                         break;
                     }
+                    case GraphType.Reception:
+                    {
+                        value = 1;
+                        break;
+                    }
                     case GraphType.BatV:
                     {
                         value = measurementEx.BatV;
@@ -160,6 +171,11 @@ public class AccountSensorMeasurementController : Controller
                 result = result2;
             else
                 result = result.Concat(result2);
+        }
+
+        if (graphType == GraphType.Reception)
+        {
+            result = RollupCountPerHour(originalFrom, result);
         }
 
         string? unit;
@@ -187,6 +203,9 @@ public class AccountSensorMeasurementController : Controller
             case GraphType.RssiDbm:
                 unit = "dBm";
                 break;
+            case GraphType.Reception:
+                unit = "";
+                break;
             case GraphType.BatV:
                 unit = "V";
                 break;
@@ -200,6 +219,40 @@ public class AccountSensorMeasurementController : Controller
             Unit = unit,
             Data = result?.Reverse() 
         });
+    }
+
+    private IEnumerable<MeasurementResultDataItem>? RollupCountPerHour(DateTime start, IEnumerable<MeasurementResultDataItem>? measurementResults)
+    {
+        if (measurementResults == null || !measurementResults.Any())
+            return measurementResults;
+
+        var data = measurementResults
+            .Where(d => d.Value.HasValue)
+            .OrderBy(d => d.TimeStamp)
+            .ToList();
+
+        //var start = data.First().TimeStamp.Date.AddHours(data.First().TimeStamp.Hour);
+        //var end = data.Last().TimeStamp.Date.AddHours(data.Last().TimeStamp.Hour);
+        start = start.Date.AddHours(start.Hour);
+        var now = DateTime.Now;
+        var end = now.Date.AddHours(now.Hour);
+
+        var result = new List<MeasurementResultDataItem>();
+
+        for (var currentHour = start; currentHour <= end; currentHour = currentHour.AddHours(1))
+        {
+            var from = currentHour.AddHours(-24);
+            var to = currentHour;
+
+            var count = data.Count(d => d.TimeStamp >= from && d.TimeStamp < to);
+            result.Add(new MeasurementResultDataItem
+            {
+                TimeStamp = currentHour,
+                Value = count
+            });
+        }
+
+        return result;
     }
 
     public AccountSensorMeasurementController(IMediator mediator)
