@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMeasurementLevelRepository, MeasurementLevelRepository>();
         services.AddScoped<IMeasurementDetectRepository, MeasurementDetectRepository>();
         services.AddScoped<IMeasurementMoistureRepository, MeasurementMoistureRepository>();
+        services.AddScoped<IMeasurementThermometerRepository, MeasurementThermometerRepository>();
         services.AddScoped<IMessenger, Messenger>();
         services.AddScoped<IUrlBuilder, UrlBuilder>();
 

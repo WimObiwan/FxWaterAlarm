@@ -1,0 +1,25 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model Core.Util.MeasurementThermometerEx
+@inject IViewLocalizer Loc
+
+@{
+    var uniqueId = Guid.NewGuid().ToString("N");
+}
+
+<div>
+    @{
+        var tempC = (double?)Model.TempC;
+        var humPrc = (double?)Model.HumPrc;
+        var timestamp = Model.Timestamp;
+    }
+
+    @if (tempC.HasValue)
+    {
+        <div style="font-size: xx-large">@Math.Round(tempC.Value, 1) @Loc["°C"]</div>
+    }
+    @if (humPrc.HasValue)
+    {
+        <div style="font-size: size">@humPrc.Value @Loc["%"]</div>
+    }
+    <div>@timestamp.ToLocalTime().ToString("G")</div>
+</div>

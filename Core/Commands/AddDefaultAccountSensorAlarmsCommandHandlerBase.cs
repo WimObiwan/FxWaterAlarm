@@ -22,7 +22,7 @@ public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
 
         if (accountSensor.Alarms.Count > 0)
         {
-            _logger.LogWarning("Skip accountsensor {AccountUid} {SensorUid} because there are already alarms", 
+            _logger.LogWarning("Skip accountsensor {AccountUid} {SensorUid} because there are already alarms",
                 accountSensor.Account.Uid, accountSensor.Sensor.Uid);
             return;
         }
@@ -46,8 +46,11 @@ public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
             case SensorType.Moisture:
                 CreateMoistureAlarms(accountSensor);
                 break;
+            case SensorType.Thermometer:
+                CreateThermometerAlarms(accountSensor);
+                break;
             default:
-                _logger.LogWarning("Skip accountsensor {AccountUid} {SensorUid} because the sensor type is not supported", 
+                _logger.LogWarning("Skip accountsensor {AccountUid} {SensorUid} because the sensor type is not supported",
                     accountSensor.Account.Uid, accountSensor.Sensor.Uid);
                 break;
         }
@@ -74,10 +77,9 @@ public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
 
     private void CreateMoistureAlarms(AccountSensor accountSensor)
     {
-        accountSensor.AddAlarm(new AccountSensorAlarm
-        {
-            Uid = Guid.NewGuid(),
-            AlarmType = AccountSensorAlarmType.DetectOn
-        });
-   }
+    }
+
+    private void CreateThermometerAlarms(AccountSensor accountSensor)
+    {
+    }
 }

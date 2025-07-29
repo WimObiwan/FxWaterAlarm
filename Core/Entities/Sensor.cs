@@ -1,10 +1,11 @@
 namespace Core.Entities;
 
 public enum SensorType
-{ 
-    Level = 0, 
+{
+    Level = 0,
     Detect = 1,
-    Moisture = 2
+    Moisture = 2,
+    Thermometer = 3
 }
 
 public class Sensor
@@ -24,11 +25,12 @@ public class Sensor
     public bool SupportsCapacity => Type == SensorType.Level;
     public bool SupportsDistance => Type == SensorType.Level;
     public bool SupportsPercentage => Type == SensorType.Level || Type == SensorType.Moisture;
-    public bool SupportsTemperature => Type == SensorType.Moisture;
+    public bool SupportsTemperature => Type == SensorType.Moisture || Type == SensorType.Thermometer;
     public bool SupportsConductivity => Type == SensorType.Moisture;
     public bool SupportsStatus => Type == SensorType.Detect;
-    public bool SupportsGraph => Type == SensorType.Level || Type == SensorType.Moisture || Type == SensorType.Detect;
+    public bool SupportsGraph => Type == SensorType.Level || Type == SensorType.Moisture || Type == SensorType.Detect || Type == SensorType.Thermometer;
     public bool SupportsMinMaxConstraints => Type == SensorType.Level;
     public bool SupportsTrend => Type == SensorType.Level;
+    public bool SupportsDiagram => Type == SensorType.Level;
     public bool SupportsAlerts => Type == SensorType.Level || Type == SensorType.Detect;
 }

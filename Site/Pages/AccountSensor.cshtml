@@ -76,10 +76,17 @@
                     @await Component.InvokeAsync("Moisture", new { measurementMoistureEx = measurementMoistureEx })
                 </div>
             }
+            else if (lastMeasurement is MeasurementThermometerEx measurementThermometerEx)
+            {
+                <div>
+                    @await Component.InvokeAsync("Thermometer", new { measurementThermometerEx = measurementThermometerEx })
+                </div>
+            }
         }
 
         bool hasGraph = accountSensor.Sensor.SupportsGraph == true;
         bool hasTrend = accountSensor.Sensor.SupportsTrend == true;
+        bool hasDiagram = accountSensor.Sensor.SupportsDiagram == true;
 
         string? ConstructUrlFilter(AccountSensor.PageTypeEnum? pageType = null, int? fromDays = null)
         {
@@ -229,7 +236,7 @@
                     <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Trend)) href="?page=trend">@Loc["Trend"]</a>
                 </li>
             }
-            @if (true)
+            @if (hasDiagram)
             {
                 <li class="nav-item">
                     <a @Html.Raw(PageTypeMenu(AccountSensor.PageTypeEnum.Diagram)) href="?page=diagram">@Loc["Diagram"]</a>
@@ -270,6 +277,8 @@
                     pageType = AccountSensor.PageTypeEnum.GraphHeight;
                 else if (accountSensor.HasDistance)
                     pageType = AccountSensor.PageTypeEnum.GraphDistance;
+                else if (accountSensor.HasTemperature)
+                    pageType = AccountSensor.PageTypeEnum.GraphTemperature;
                 else if (accountSensor.HasStatus)
                     pageType = AccountSensor.PageTypeEnum.GraphStatus;
             }

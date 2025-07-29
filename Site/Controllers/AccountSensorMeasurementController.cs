@@ -111,6 +111,8 @@ public class AccountSensorMeasurementController : Controller
                     {
                         if (measurementEx is MeasurementMoistureEx measurementMoistureEx)
                             value = measurementMoistureEx.SoilTemperatureC;
+                        else if (measurementEx is MeasurementThermometerEx measurementThermometerEx)
+                            value = measurementThermometerEx.TempC;
                         else
                             value = null;
                         break;

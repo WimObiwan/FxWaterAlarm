@@ -108,7 +108,8 @@ public enum SensorType
 {
     Level = 0, 
     Detect = 1,
-    Moisture = 2
+    Moisture = 2,
+    Thermometer = 3
 }
 
 public class Sensor
