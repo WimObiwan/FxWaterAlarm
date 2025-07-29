@@ -118,7 +118,7 @@
     xhr.send();
 };
 
-getJSON('/api@(Model.AccountSensorEntity.RestPath)/m?fromDays=@(Model.FromDays)&graphType=@(Model.GraphType)', 
+getJSON('@(Model.AccountSensorEntity.ApiRestPath)/m?fromDays=@(Model.FromDays)&graphType=@(Model.GraphType)', 
     function(err, data2) {
 
     unit = data2.unit;
