@@ -34,12 +34,15 @@ public class Account
 
     public void AddSensor(Sensor sensor)
     {
-        _accountSensors.Add(
+        int lastOrder = _accountSensors.Select(@as => (int?)@as.Order).Max() ?? -1;
+
+        _accountSensors.Add(            
             new AccountSensor
             {
                 Account = this,
                 Sensor = sensor,
-                CreateTimestamp = DateTime.UtcNow
+                CreateTimestamp = DateTime.UtcNow,
+                Order = lastOrder + 1
             });
     }
 
