@@ -19,7 +19,7 @@ public class Short : PageModel
         }
         else
         {
-            var parts = context.Split();
+            var parts = context.Split('|');
             if (parts.Length < 3)
             {
                 // Invalid context format
