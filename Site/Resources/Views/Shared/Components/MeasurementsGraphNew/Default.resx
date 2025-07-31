@@ -63,6 +63,10 @@
         <value>Signal</value>
         <comment>Signal</comment>
     </data>
+    <data name="Reception per 24h" xml:space="preserve">
+        <value>Reception per 24h</value>
+        <comment>Reception per 24h</comment>
+    </data>
     <data name="Battery" xml:space="preserve">
         <value>Battery</value>
         <comment>Battery</comment>

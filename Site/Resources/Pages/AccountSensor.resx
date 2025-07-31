@@ -64,11 +64,15 @@
         <comment>Status</comment>
     </data>
     <data name="Signal" xml:space="preserve">
-        <value>Signaal</value>
+        <value>Signal</value>
         <comment>Signal</comment>
     </data>
+    <data name="Reception" xml:space="preserve">
+        <value>Reception</value>
+        <comment>Reception</comment>
+    </data>
     <data name="Battery" xml:space="preserve">
-        <value>Batterij</value>
+        <value>Battery</value>
         <comment>Battery</comment>
     </data>
     <data name="Details" xml:space="preserve">

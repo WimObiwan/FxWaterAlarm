@@ -58,6 +58,10 @@
         <value>Signaal</value>
         <comment>Signal</comment>
     </data>
+    <data name="Reception" xml:space="preserve">
+        <value>Ontvangst</value>
+        <comment>Reception</comment>
+    </data>
     <data name="Battery" xml:space="preserve">
         <value>Batterij</value>
         <comment>Battery</comment>
