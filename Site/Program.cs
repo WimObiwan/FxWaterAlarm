@@ -79,6 +79,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 builder.Services.AddRazorPages(o =>
         o.Conventions
+            .AddPageRoute("/Short", "/s")
             .AddPageRoute("/Account", "/a/{AccountLink}")
             .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
             .AddPageRoute("/AdminOverview", "/adm")
