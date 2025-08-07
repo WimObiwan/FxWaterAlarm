@@ -85,6 +85,7 @@ builder.Services.AddRazorPages(o =>
             .AddPageRoute("/AdminOverview", "/adm")
             .AddPageRoute("/AdminAccounts", "/adm/accounts")
             .AddPageRoute("/AdminSensors", "/adm/sensors")
+            .AddPageRoute("/AdminQr", "/adm/qr")
             .AddPageRoute("/AccountLoginMessage", "/account/loginmessage")
             .AddPageRoute("/AccountLoginMessageConfirmation", "/account/loginmessageconfirmation")
     )
