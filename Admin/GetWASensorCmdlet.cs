@@ -106,10 +106,11 @@ public class GetWASensorCmdlet : DependencyCmdlet<Startup>
 
 public enum SensorType
 {
-    Level = 0, 
+    Level = 0,
     Detect = 1,
     Moisture = 2,
-    Thermometer = 3
+    Thermometer = 3,
+    LevelPressure = 4
 }
 
 public class Sensor

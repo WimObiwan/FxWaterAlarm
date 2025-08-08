@@ -35,10 +35,12 @@ public class AccountSensor : PageModel
         QrCode
     }
 
-    public enum SaveResultEnum { None, Saved, NotAuthorized, Error,
+    public enum SaveResultEnum
+    {
+        None, Saved, NotAuthorized, Error,
         InvalidData
     }
-    
+
     private readonly IMediator _mediator;
     private readonly IUserInfo _userInfo;
     private readonly ITrendService _trendService;
@@ -64,10 +66,10 @@ public class AccountSensor : PageModel
     public bool Preview { get; private set; }
     public SaveResultEnum SaveResult { get; private set; }
     public int FromDays { get; private set; }
-    
+
     public string? QrBaseUrl { get; private set; }
 
-    public async Task OnGet(string accountLink, string sensorLink, 
+    public async Task OnGet(string accountLink, string sensorLink,
         [FromQuery] PageTypeEnum page = PageTypeEnum.GraphDefault,
         [FromQuery] bool preview = false,
         [FromQuery] SaveResultEnum saveResult = SaveResultEnum.None,
@@ -106,7 +108,7 @@ public class AccountSensor : PageModel
                                 TimeSpan.FromHours(24),
                                 TimeSpan.FromDays(7),
                                 TimeSpan.FromDays(30));
-                            
+
                             //TrendMeasurement1H = trendMeasurements[0];
                             TrendMeasurement6H = trendMeasurements[0];
                             TrendMeasurement24H = trendMeasurements[1];
@@ -255,68 +257,106 @@ public class AccountSensor : PageModel
         [FromForm] bool? alertsEnabled,
         [FromForm] bool? noMinMaxConstraints)
     {
-        SaveResultEnum result = SaveResultEnum.Error;
-        if (page == PageTypeEnum.Settings)
-        {
-            if (!_userInfo.IsAuthenticated())
-            {
-                result = SaveResultEnum.NotAuthorized;
-            }
-            else if (sensorName == null
-                     || capacityL is <= 0
-                     || distanceMmFull is <= 0
-                     || distanceMmEmpty is <= 0
-                     || unusableHeightMm is < 0
-                     || distanceMmFull.HasValue && distanceMmEmpty.HasValue
-                        && (distanceMmEmpty.Value - (unusableHeightMm ?? 0)) <= distanceMmFull.Value)
-            {
-                result = SaveResultEnum.InvalidData;
-            }
-            else
-            {
-                var accountSensor = await mediator.Send(new AccountSensorByLinkQuery
-                {
-                    SensorLink = sensorLink,
-                    AccountLink = accountLink
-                });
+        SaveResultEnum result =
+            await UpdateSettings(
+                mediator, accountLink, sensorLink, page, sensorName, order,
+                distanceMmFull, distanceMmEmpty, unusableHeightMm, capacityL,
+                alertsEnabled, noMinMaxConstraints);
 
-                if (accountSensor == null)
-                {
-                    // AccountSensor not found
-                    result = SaveResultEnum.Error;
-                }
-                else if (!await _userInfo.CanUpdateAccountSensor(accountSensor))
-                {
-                    // Login not allowed to update AccountSensor
-                    result = SaveResultEnum.NotAuthorized;
-                }
-                else
-                {
-                    try
-                    {
-                        await mediator.Send(new UpdateAccountSensorCommand
-                        {
-                            AccountUid = accountSensor.Account.Uid,
-                            SensorUid = accountSensor.Sensor.Uid,
-                            CapacityL = new Optional<int?>(true, capacityL),
-                            DistanceMmFull = new Optional<int?>(true, distanceMmFull),
-                            DistanceMmEmpty = new Optional<int?>(true, distanceMmEmpty),
-                            UnusableHeightMm = new Optional<int?>(true, unusableHeightMm),
-                            Name = Optional.From(sensorName),
-                            Order = new Optional<int>(true, order ?? 0),
-                            AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false),
-                            NoMinMaxConstraints = new Optional<bool>(true, noMinMaxConstraints ?? false)
-                        });
-                        result = SaveResultEnum.Saved;
-                    }
-                    catch (Exception)
-                    {
-                        result = SaveResultEnum.Error;
-                    }
-                }
+        return Redirect($"?page={page}&saveResult={result}");
+    }
+
+    public async Task<SaveResultEnum> UpdateSettings(
+        IMediator mediator,
+        string accountLink,
+        string sensorLink,
+        PageTypeEnum? page,
+        string? sensorName,
+        int? order,
+        int? distanceMmFull,
+        int? distanceMmEmpty,
+        int? unusableHeightMm,
+        int? capacityL,
+        bool? alertsEnabled,
+        bool? noMinMaxConstraints)
+    {
+        if (page != PageTypeEnum.Settings)
+        {
+            return SaveResultEnum.Error;
+        }
+
+        if (!_userInfo.IsAuthenticated())
+        {
+            return SaveResultEnum.NotAuthorized;
+        }
+
+        // Basic validation
+        else if (sensorName == null
+                || capacityL is <= 0
+                || distanceMmFull is <= 0
+                || distanceMmEmpty is <= 0
+                || unusableHeightMm is < 0)
+        {
+            return SaveResultEnum.InvalidData;
+        }
+
+        var accountSensor = await mediator.Send(new AccountSensorByLinkQuery
+        {
+            SensorLink = sensorLink,
+            AccountLink = accountLink
+        });
+
+        if (accountSensor == null)
+        {
+            // AccountSensor not found
+            return SaveResultEnum.Error;
+        }
+
+        if (!await _userInfo.CanUpdateAccountSensor(accountSensor))
+        {
+            // Login not allowed to update AccountSensor
+            return SaveResultEnum.NotAuthorized;
+        }
+
+        // Sensor-specific validation
+        if (accountSensor.Sensor.Type == SensorType.Level)
+        {
+            if (distanceMmFull.HasValue && distanceMmEmpty.HasValue
+                && (distanceMmEmpty.Value - (unusableHeightMm ?? 0)) <= distanceMmFull.Value)
+            {
+                return SaveResultEnum.InvalidData;
+            }
+        }
+        else if (accountSensor.Sensor.Type == SensorType.LevelPressure)
+        {
+            if (distanceMmFull.HasValue
+                && ((unusableHeightMm ?? 0) >= ((distanceMmEmpty ?? 0) + distanceMmFull.Value)))
+            {
+                return SaveResultEnum.InvalidData;
             }
         }
 
-        return Redirect($"?page={page}&saveResult={result}");
+        try
+        {
+            await mediator.Send(new UpdateAccountSensorCommand
+            {
+                AccountUid = accountSensor.Account.Uid,
+                SensorUid = accountSensor.Sensor.Uid,
+                CapacityL = new Optional<int?>(true, capacityL),
+                DistanceMmFull = new Optional<int?>(true, distanceMmFull),
+                DistanceMmEmpty = new Optional<int?>(true, distanceMmEmpty),
+                UnusableHeightMm = new Optional<int?>(true, unusableHeightMm),
+                Name = Optional.From(sensorName),
+                Order = new Optional<int>(true, order ?? 0),
+                AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false),
+                NoMinMaxConstraints = new Optional<bool>(true, noMinMaxConstraints ?? false)
+            });
+
+            return SaveResultEnum.Saved;
+        }
+        catch (Exception)
+        {
+            return SaveResultEnum.Error;
+        }
     }
 }

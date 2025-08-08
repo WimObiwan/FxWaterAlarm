@@ -5,7 +5,8 @@ public enum SensorType
     Level = 0,
     Detect = 1,
     Moisture = 2,
-    Thermometer = 3
+    Thermometer = 3,
+    LevelPressure = 4
 }
 
 public class Sensor
@@ -22,15 +23,15 @@ public class Sensor
     public IReadOnlyCollection<AccountSensor> AccountSensors => _accountSensors.AsReadOnly();
     public IReadOnlyCollection<Account> Accounts => _accounts.AsReadOnly();
 
-    public bool SupportsCapacity => Type == SensorType.Level;
-    public bool SupportsDistance => Type == SensorType.Level;
-    public bool SupportsPercentage => Type == SensorType.Level || Type == SensorType.Moisture;
+    public bool SupportsCapacity => Type == SensorType.Level || Type == SensorType.LevelPressure;
+    public bool SupportsDistance => Type == SensorType.Level || Type == SensorType.LevelPressure;
+    public bool SupportsPercentage => Type == SensorType.Level || Type == SensorType.LevelPressure || Type == SensorType.Moisture;
     public bool SupportsTemperature => Type == SensorType.Moisture || Type == SensorType.Thermometer;
     public bool SupportsConductivity => Type == SensorType.Moisture;
     public bool SupportsStatus => Type == SensorType.Detect;
-    public bool SupportsGraph => Type == SensorType.Level || Type == SensorType.Moisture || Type == SensorType.Detect || Type == SensorType.Thermometer;
-    public bool SupportsMinMaxConstraints => Type == SensorType.Level;
-    public bool SupportsTrend => Type == SensorType.Level;
-    public bool SupportsDiagram => Type == SensorType.Level;
-    public bool SupportsAlerts => Type == SensorType.Level || Type == SensorType.Detect;
+    public bool SupportsGraph => Type == SensorType.Level || Type == SensorType.LevelPressure || Type == SensorType.Moisture || Type == SensorType.Detect || Type == SensorType.Thermometer;
+    public bool SupportsMinMaxConstraints => Type == SensorType.Level || Type == SensorType.LevelPressure;
+    public bool SupportsTrend => Type == SensorType.Level || Type == SensorType.LevelPressure;
+    public bool SupportsDiagram => Type == SensorType.Level || Type == SensorType.LevelPressure;
+    public bool SupportsAlerts => Type == SensorType.Level || Type == SensorType.LevelPressure || Type == SensorType.Detect;
 }
