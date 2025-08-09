@@ -83,7 +83,7 @@
                             </div>
                         </td>
                     </tr>
-                    @if (Model.AccountSensor.Sensor.SupportsDistance)
+                    @if (Model.AccountSensor.Sensor.SupportsDistance || Model.AccountSensor.Sensor.SupportsHeight)
                     {
                         <tr>
                             <td>
