@@ -37,6 +37,7 @@ public class MeasurementsQueryHandler : IRequestHandler<MeasurementsQuery, IMeas
         switch (accountSensor.Sensor.Type)
         {
             case SensorType.Level:
+            case SensorType.LevelPressure:
                 return await GetMeasurementsLevel(accountSensor, request.From, request.Till, cancellationToken);
             case SensorType.Detect:
                 return await GetMeasurementsDetect(accountSensor, request.From, request.Till, cancellationToken);

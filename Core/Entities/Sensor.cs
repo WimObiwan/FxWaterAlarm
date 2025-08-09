@@ -24,7 +24,8 @@ public class Sensor
     public IReadOnlyCollection<Account> Accounts => _accounts.AsReadOnly();
 
     public bool SupportsCapacity => Type == SensorType.Level || Type == SensorType.LevelPressure;
-    public bool SupportsDistance => Type == SensorType.Level || Type == SensorType.LevelPressure;
+    public bool SupportsDistance => Type == SensorType.Level;
+    public bool SupportsHeight => Type == SensorType.LevelPressure;
     public bool SupportsPercentage => Type == SensorType.Level || Type == SensorType.LevelPressure || Type == SensorType.Moisture;
     public bool SupportsTemperature => Type == SensorType.Moisture || Type == SensorType.Thermometer;
     public bool SupportsConductivity => Type == SensorType.Moisture;

@@ -39,10 +39,24 @@ public class AccountSensor
     {
         get
         {
-            if (!DistanceMmEmpty.HasValue || !DistanceMmFull.HasValue || !CapacityL.HasValue)
-                return null;
+            if (Sensor.Type == SensorType.Level)
+            {
+                if (!DistanceMmEmpty.HasValue || !DistanceMmFull.HasValue || !CapacityL.HasValue)
+                    return null;
 
-            return 1.0 / (DistanceMmEmpty.Value - DistanceMmFull.Value) * CapacityL.Value;
+                return 1.0 / (DistanceMmEmpty.Value - DistanceMmFull.Value) * CapacityL.Value;
+            }
+
+
+            if (Sensor.Type == SensorType.LevelPressure)
+            {
+                if (!DistanceMmFull.HasValue || !CapacityL.HasValue)
+                    return null;
+
+                return 1.0 / ((DistanceMmEmpty ?? 0) + DistanceMmFull.Value) * CapacityL.Value;
+            }
+
+            return null;
         }
     }
 
@@ -61,21 +75,29 @@ public class AccountSensor
     public bool HasDistance =>
         Sensor.SupportsDistance;
 
-    public bool HasHeight => 
-        Sensor.SupportsDistance
-        && DistanceMmEmpty.HasValue
-        && DistanceMmEmpty.Value > 0;
+    public bool HasHeight =>
+        Sensor.SupportsHeight
+        || (Sensor.SupportsDistance && DistanceMmEmpty.HasValue && DistanceMmEmpty.Value > 0);
 
-    private bool HasPercentageUsingHeight => 
-        HasHeight
-        && DistanceMmEmpty.HasValue
-        && DistanceMmFull.HasValue 
-        && DistanceMmFull.Value < DistanceMmEmpty.Value;
+    private bool HasPercentageUsingHeight =>
+        (
+            Sensor.Type == SensorType.Level
+            && HasHeight
+            && DistanceMmEmpty.HasValue
+            && DistanceMmFull.HasValue
+            && DistanceMmFull.Value < DistanceMmEmpty.Value
+        )
+        ||
+        (
+            Sensor.Type == SensorType.LevelPressure
+            && HasHeight
+            && DistanceMmFull.HasValue
+        );
 
-    public bool HasPercentage => 
+    public bool HasPercentage =>
         Sensor.SupportsPercentage
         && (
-            Sensor.Type != SensorType.Level
+            Sensor.Type != SensorType.Level && Sensor.Type != SensorType.LevelPressure
             || HasPercentageUsingHeight
         );
 

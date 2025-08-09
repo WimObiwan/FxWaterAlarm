@@ -35,6 +35,7 @@ public class LastMeasurementQueryHandler : IRequestHandler<LastMeasurementQuery,
         switch (accountSensor.Sensor.Type)
         {
             case SensorType.Level:
+            case SensorType.LevelPressure:
                 return await GetLastMeasurementLevel(accountSensor, cancellationToken);
             case SensorType.Detect:
                 return await GetLastMeasurementDetect(accountSensor, cancellationToken);

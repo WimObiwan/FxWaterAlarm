@@ -1,3 +1,5 @@
+using Core.Entities;
+
 namespace Core.Util;
 
 public class MeasurementDistance
@@ -16,8 +18,19 @@ public class MeasurementDistance
     {
         get
         {
-            if (DistanceMm.HasValue && _accountSensor is { DistanceMmEmpty: not null })
-                return _accountSensor.DistanceMmEmpty.Value - DistanceMm.Value;
+            if (!DistanceMm.HasValue)
+                return null;
+                
+            if (_accountSensor.Sensor.Type == SensorType.Level)
+            {
+                if (_accountSensor is { DistanceMmEmpty: not null })
+                    return _accountSensor.DistanceMmEmpty.Value - DistanceMm.Value;
+            }
+            else if (_accountSensor.Sensor.Type == SensorType.LevelPressure)
+            {
+                return DistanceMm.Value + (_accountSensor.DistanceMmEmpty ?? 0);
+            }
+
             return null;
         }
     }
@@ -26,11 +39,26 @@ public class MeasurementDistance
     {
         get
         {
-            if (DistanceMm.HasValue && _accountSensor is { DistanceMmEmpty: not null, DistanceMmFull: not null })
+            if (!DistanceMm.HasValue)
+                return null;
+
+            if (_accountSensor.Sensor.Type == SensorType.Level)
             {
-                return ((double)_accountSensor.DistanceMmEmpty.Value - DistanceMm.Value - (_accountSensor.UnusableHeightMm ?? 0))
-                       / ((double)_accountSensor.DistanceMmEmpty.Value - _accountSensor.DistanceMmFull.Value - (_accountSensor.UnusableHeightMm ?? 0));
+                if (_accountSensor is { DistanceMmEmpty: not null, DistanceMmFull: not null })
+                {
+                    return ((double)_accountSensor.DistanceMmEmpty.Value - DistanceMm.Value - (_accountSensor.UnusableHeightMm ?? 0))
+                           / ((double)_accountSensor.DistanceMmEmpty.Value - _accountSensor.DistanceMmFull.Value - (_accountSensor.UnusableHeightMm ?? 0));
+                }
             }
+            else if (_accountSensor.Sensor.Type == SensorType.LevelPressure)
+            {
+                if (_accountSensor is { DistanceMmFull: not null })
+                {
+                    return (((double)(_accountSensor.DistanceMmEmpty ?? 0)) + DistanceMm.Value - (_accountSensor.UnusableHeightMm ?? 0))
+                           / (((double)(_accountSensor.DistanceMmEmpty ?? 0)) + _accountSensor.DistanceMmFull.Value - (_accountSensor.UnusableHeightMm ?? 0));
+                }
+            }
+
             return null;
         }
     }

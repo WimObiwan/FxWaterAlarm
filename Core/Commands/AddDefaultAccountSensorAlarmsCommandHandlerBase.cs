@@ -38,6 +38,7 @@ public abstract class AddDefaultAccountSensorAlarmsCommandHandlerBase
         switch (accountSensor.Sensor.Type)
         {
             case SensorType.Level:
+            case SensorType.LevelPressure:
                 CreateLevelAlarms(accountSensor);
                 break;
             case SensorType.Detect:
