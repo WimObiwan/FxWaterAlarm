@@ -29,11 +29,15 @@ public class TrendService : ITrendService
         //         DevEui = lastMeasurementLevelEx.AccountSensor.Sensor.DevEui,
         //         Timestamp = lastMeasurementLevelEx.Timestamp.Add(-timeSpan)
         //     });
-        // if (trendMeasurement == null)
-        //     return null;
-        // return new TrendMeasurementEx(timeSpan, trendMeasurement, lastMeasurementLevelEx);        
-        
-        return null;
+        var trendMeasurement = await _mediator.Send(
+            new LastMeasurementBeforeQuery
+            {
+                AccountSensor = lastMeasurementLevelEx.AccountSensor,
+                Timestamp = lastMeasurementLevelEx.Timestamp.Add(-timeSpan)
+            }) as MeasurementLevelEx;
+        if (trendMeasurement == null)
+            return null;
+        return new TrendMeasurementEx(timeSpan, trendMeasurement, lastMeasurementLevelEx);        
     }
 
     public async Task<TrendMeasurementEx?[]> GetTrendMeasurements(MeasurementLevelEx lastMeasurementLevelEx, params TimeSpan[] fromHours)

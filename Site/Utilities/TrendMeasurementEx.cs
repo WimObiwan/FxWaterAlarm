@@ -9,11 +9,11 @@ public class TrendMeasurementEx
     private readonly MeasurementLevelEx _measurementLevelEx;
     private readonly MeasurementLevelEx _trendMeasurementEx;
 
-    public TrendMeasurementEx(TimeSpan timeSpan, MeasurementLevel trend, MeasurementLevelEx measurementLevelEx)
+    public TrendMeasurementEx(TimeSpan timeSpan, MeasurementLevelEx trend, MeasurementLevelEx measurementLevelEx)
     {
         _timeSpan = timeSpan;
         _measurementLevelEx = measurementLevelEx;
-        _trendMeasurementEx = new MeasurementLevelEx(trend, measurementLevelEx.AccountSensor);
+        _trendMeasurementEx = trend;
     }
 
     public double? DifferenceWaterL => 
