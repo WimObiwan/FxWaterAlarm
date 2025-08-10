@@ -20,18 +20,20 @@ public class TrendService : ITrendService
     {
         _mediator = mediator;
     }
-    
+
     public async Task<TrendMeasurementEx?> GetTrendMeasurement(TimeSpan timeSpan, MeasurementLevelEx lastMeasurementLevelEx)
     {
-        var trendMeasurement = await _mediator.Send(
-            new MeasurementLastBeforeQuery<MeasurementLevel>
-            {
-                DevEui = lastMeasurementLevelEx.AccountSensor.Sensor.DevEui,
-                Timestamp = lastMeasurementLevelEx.Timestamp.Add(-timeSpan)
-            });
-        if (trendMeasurement == null)
-            return null;
-        return new TrendMeasurementEx(timeSpan, trendMeasurement, lastMeasurementLevelEx);        
+        // var trendMeasurement = await _mediator.Send(
+        //     new MeasurementLastBeforeQuery<MeasurementLevel>
+        //     {
+        //         DevEui = lastMeasurementLevelEx.AccountSensor.Sensor.DevEui,
+        //         Timestamp = lastMeasurementLevelEx.Timestamp.Add(-timeSpan)
+        //     });
+        // if (trendMeasurement == null)
+        //     return null;
+        // return new TrendMeasurementEx(timeSpan, trendMeasurement, lastMeasurementLevelEx);        
+        
+        return null;
     }
 
     public async Task<TrendMeasurementEx?[]> GetTrendMeasurements(MeasurementLevelEx lastMeasurementLevelEx, params TimeSpan[] fromHours)
