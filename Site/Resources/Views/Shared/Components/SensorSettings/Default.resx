@@ -90,9 +90,9 @@
         <value>Sensor order</value>
         <comment>Sensor order</comment>
     </data>
-    <data name="Active sensor alarms" xml:space="preserve">
-        <value>Active sensor alarms</value>
-        <comment>Active sensor alarms</comment>
+    <data name="Sensor alarms" xml:space="preserve">
+        <value>Sensor alarms</value>
+        <comment>Sensor alarms</comment>
     </data>
     <data name="No data received" xml:space="preserve">
         <value>No data received</value>
