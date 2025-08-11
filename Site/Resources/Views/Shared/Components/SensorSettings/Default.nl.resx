@@ -138,4 +138,104 @@
         <value>Hoogte boven</value>
         <comment>Height above</comment>
     </data>
+        <data name="No alarms configured" xml:space="preserve">
+            <value>Geen alarmen geconfigureerd</value>
+            <comment>No alarms configured</comment>
+        </data>
+        <data name="Test email alert" xml:space="preserve">
+            <value>Test e-mailmelding</value>
+            <comment>Test email alert</comment>
+        </data>
+        <data name="Battery low" xml:space="preserve">
+            <value>Batterij laag</value>
+            <comment>Battery low</comment>
+        </data>
+        <data name="Percentage low" xml:space="preserve">
+            <value>Percentage laag</value>
+            <comment>Percentage low</comment>
+        </data>
+        <data name="Percentage high" xml:space="preserve">
+            <value>Percentage hoog</value>
+            <comment>Percentage high</comment>
+        </data>
+        <data name="Height low" xml:space="preserve">
+            <value>Hoogte laag</value>
+            <comment>Height low</comment>
+        </data>
+        <data name="Height high" xml:space="preserve">
+            <value>Hoogte hoog</value>
+            <comment>Height high</comment>
+        </data>
+        <data name="Alarm type" xml:space="preserve">
+            <value>Alarmtype</value>
+            <comment>Alarm type</comment>
+        </data>
+        <data name="Select alarm type" xml:space="preserve">
+            <value>Selecteer alarmtype</value>
+            <comment>Select alarm type</comment>
+        </data>
+        <data name="Threshold" xml:space="preserve">
+            <value>Drempelwaarde</value>
+            <comment>Threshold</comment>
+        </data>
+        <data name="Add new alarm" xml:space="preserve">
+            <value>Nieuw alarm toevoegen</value>
+            <comment>Add new alarm</comment>
+        </data>
+        <data name="Add" xml:space="preserve">
+            <value>Toevoegen</value>
+            <comment>Add</comment>
+        </data>
+        <data name="Edit" xml:space="preserve">
+            <value>Bewerken</value>
+            <comment>Edit</comment>
+        </data>
+        <data name="Delete" xml:space="preserve">
+            <value>Verwijderen</value>
+            <comment>Delete</comment>
+        </data>
+        <data name="Save changes" xml:space="preserve">
+            <value>Wijzigingen opslaan</value>
+            <comment>Save changes</comment>
+        </data>
+        <data name="Cancel" xml:space="preserve">
+            <value>Annuleren</value>
+            <comment>Cancel</comment>
+        </data>
+        <data name="Active" xml:space="preserve">
+            <value>Actief</value>
+            <comment>Active</comment>
+        </data>
+        <data name="Unknown alarm type" xml:space="preserve">
+            <value>Onbekend alarmtype</value>
+            <comment>Unknown alarm type</comment>
+        </data>
+        <data name="Please select an alarm type" xml:space="preserve">
+            <value>Selecteer een alarmtype</value>
+            <comment>Please select an alarm type</comment>
+        </data>
+        <data name="Please enter a threshold value" xml:space="preserve">
+            <value>Geef een drempelwaarde in</value>
+            <comment>Please enter a threshold value</comment>
+        </data>
+        <data name="Failed to add alarm" xml:space="preserve">
+            <value>Toevoegen van alarm mislukt</value>
+            <comment>Failed to add alarm</comment>
+        </data>
+        <data name="Unknown error" xml:space="preserve">
+            <value>Onbekende fout</value>
+            <comment>Unknown error</comment>
+        </data>
+        <data name="Failed to update alarm" xml:space="preserve">
+            <value>Bijwerken van alarm mislukt</value>
+            <comment>Failed to update alarm</comment>
+        </data>
+        <data name="Are you sure you want to delete this alarm?" xml:space="preserve">
+            <value>Weet je zeker dat je dit alarm wilt verwijderen?</value>
+            <comment>Are you sure you want to delete this alarm?</comment>
+        </data>
+        <data name="Failed to delete alarm" xml:space="preserve">
+            <value>Verwijderen van alarm mislukt</value>
+            <comment>Failed to delete alarm</comment>
+        </data>
 </root>
