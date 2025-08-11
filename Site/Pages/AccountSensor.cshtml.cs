@@ -152,6 +152,135 @@ public class AccountSensor : PageModel
         return new JsonResult(new { success = true });
     }
 
+    public async Task<IActionResult> OnPostAddAlarmAsync(
+        string accountLink,
+        string sensorLink,
+        [FromForm] string alarmType,
+        [FromForm] double? alarmThreshold)
+    {
+        try
+        {
+            var accountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
+            {
+                SensorLink = sensorLink,
+                AccountLink = accountLink
+            });
+
+            if (accountSensorEntity == null)
+                return new JsonResult(new { success = false, message = "Sensor not found" });
+
+            if (!await _userInfo.CanUpdateAccountSensor(accountSensorEntity))
+                return new JsonResult(new { success = false, message = "Not authorized" });
+
+            if (!Enum.TryParse<AccountSensorAlarmType>(alarmType, out var parsedAlarmType))
+                return new JsonResult(new { success = false, message = "Invalid alarm type" });
+
+            // Validate threshold for alarm types that require it
+            if (parsedAlarmType != AccountSensorAlarmType.DetectOn && !alarmThreshold.HasValue)
+                return new JsonResult(new { success = false, message = "Threshold is required for this alarm type" });
+
+            await _mediator.Send(new AddAccountSensorAlarmCommand
+            {
+                AccountId = accountSensorEntity.Account.Uid,
+                SensorId = accountSensorEntity.Sensor.Uid,
+                AlarmId = Guid.NewGuid(),
+                AlarmType = parsedAlarmType,
+                AlarmThreshold = alarmThreshold
+            });
+
+            return new JsonResult(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            return new JsonResult(new { success = false, message = ex.Message });
+        }
+    }
+
+    public async Task<IActionResult> OnPostUpdateAlarmAsync(
+        string accountLink,
+        string sensorLink,
+        [FromForm] string alarmUid,
+        [FromForm] string alarmType,
+        [FromForm] double? alarmThreshold)
+    {
+        try
+        {
+            var accountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
+            {
+                SensorLink = sensorLink,
+                AccountLink = accountLink
+            });
+
+            if (accountSensorEntity == null)
+                return new JsonResult(new { success = false, message = "Sensor not found" });
+
+            if (!await _userInfo.CanUpdateAccountSensor(accountSensorEntity))
+                return new JsonResult(new { success = false, message = "Not authorized" });
+
+            if (!Guid.TryParse(alarmUid, out var parsedAlarmUid))
+                return new JsonResult(new { success = false, message = "Invalid alarm ID" });
+
+            if (!Enum.TryParse<AccountSensorAlarmType>(alarmType, out var parsedAlarmType))
+                return new JsonResult(new { success = false, message = "Invalid alarm type" });
+
+            // Validate threshold for alarm types that require it
+            if (parsedAlarmType != AccountSensorAlarmType.DetectOn && !alarmThreshold.HasValue)
+                return new JsonResult(new { success = false, message = "Threshold is required for this alarm type" });
+
+            await _mediator.Send(new UpdateAccountSensorAlarmCommand
+            {
+                AccountUid = accountSensorEntity.Account.Uid,
+                SensorUid = accountSensorEntity.Sensor.Uid,
+                AlarmUid = parsedAlarmUid,
+                AlarmType = new Optional<AccountSensorAlarmType>(true, parsedAlarmType),
+                AlarmThreshold = new Optional<double?>(true, alarmThreshold)
+            });
+
+            return new JsonResult(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            return new JsonResult(new { success = false, message = ex.Message });
+        }
+    }
+
+    public async Task<IActionResult> OnPostDeleteAlarmAsync(
+        string accountLink,
+        string sensorLink,
+        [FromForm] string alarmUid)
+    {
+        try
+        {
+            var accountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
+            {
+                SensorLink = sensorLink,
+                AccountLink = accountLink
+            });
+
+            if (accountSensorEntity == null)
+                return new JsonResult(new { success = false, message = "Sensor not found" });
+
+            if (!await _userInfo.CanUpdateAccountSensor(accountSensorEntity))
+                return new JsonResult(new { success = false, message = "Not authorized" });
+
+            if (!Guid.TryParse(alarmUid, out var parsedAlarmUid))
+                return new JsonResult(new { success = false, message = "Invalid alarm ID" });
+
+            await _mediator.Send(new RemoveAlarmFromAccountSensorCommand
+            {
+                AccountUid = accountSensorEntity.Account.Uid,
+                SensorUid = accountSensorEntity.Sensor.Uid,
+                AlarmUid = parsedAlarmUid
+            });
+
+            return new JsonResult(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            return new JsonResult(new { success = false, message = ex.Message });
+        }
+    }
+
     public async Task<IActionResult> OnGetExportCsv(string accountLink, string sensorLink)
     {
         // https://swimburger.net/blog/dotnet/create-zip-files-on-http-request-without-intermediate-files-using-aspdotnet-mvc-razor-pages-and-endpoints#better-mvc
