@@ -216,39 +216,353 @@
                 });
             </script>
 
-            <h3>@Loc["Active sensor alarms"]</h3>
-            <ul>
-                @foreach (var alarm in Model.AccountSensor.Alarms)
-                {
-                    switch (alarm.AlarmType)
+            <h3>@Loc["Sensor alarms"]</h3>
+            
+            @if (Model.AccountSensor.Alarms.Count == 0)
+            {
+                <p>@Loc["No alarms configured"]</p>
+            }
+            else
+            {
+                <div class="mb-3">
+                    @foreach (var alarm in Model.AccountSensor.Alarms)
                     {
-                        case Core.Entities.AccountSensorAlarmType.Data:
-                            <div>@Loc["No data received"] @alarm.AlarmThreshold @Loc["hours"]</div>
-                            break;
-                        case Core.Entities.AccountSensorAlarmType.Battery:
-                            <div>@Loc["Battery below"] @alarm.AlarmThreshold @Loc["Volt"]</div>
-                            break;
-                        case Core.Entities.AccountSensorAlarmType.DetectOn:
-                            <div>@Loc["Detect on"]</div>
-                            break;
-                        case Core.Entities.AccountSensorAlarmType.PercentageLow:
-                            <div>@Loc["Percentage below"] @alarm.AlarmThreshold @Loc["%"]</div>
-                            break;
-                        case Core.Entities.AccountSensorAlarmType.PercentageHigh:
-                            <div>@Loc["Percentage above"] @alarm.AlarmThreshold @Loc["%"]</div>
-                            break;
-                        case Core.Entities.AccountSensorAlarmType.HeightLow:
-                            <div>@Loc["Height below"] @alarm.AlarmThreshold @Loc["mm"]</div>
-                            break;
-                        case Core.Entities.AccountSensorAlarmType.HeightHigh:
-                            <div>@Loc["Height above"] @alarm.AlarmThreshold @Loc["mm"]</div>
-                            break;
-                        default:
-                            <div>@Loc["Unknown alarm type"]</div>
-                            break;
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        @switch (alarm.AlarmType)
+                                        {
+                                            case Core.Entities.AccountSensorAlarmType.Data:
+                                                <span>@Loc["No data received"] @alarm.AlarmThreshold @Loc["hours"]</span>
+                                                break;
+                                            case Core.Entities.AccountSensorAlarmType.Battery:
+                                                <span>@Loc["Battery below"] @alarm.AlarmThreshold @Loc["Volt"]</span>
+                                                break;
+                                            case Core.Entities.AccountSensorAlarmType.DetectOn:
+                                                <span>@Loc["Detect on"]</span>
+                                                break;
+                                            case Core.Entities.AccountSensorAlarmType.PercentageLow:
+                                                <span>@Loc["Percentage below"] @alarm.AlarmThreshold @Loc["%"]</span>
+                                                break;
+                                            case Core.Entities.AccountSensorAlarmType.PercentageHigh:
+                                                <span>@Loc["Percentage above"] @alarm.AlarmThreshold @Loc["%"]</span>
+                                                break;
+                                            case Core.Entities.AccountSensorAlarmType.HeightLow:
+                                                <span>@Loc["Height below"] @alarm.AlarmThreshold @Loc["mm"]</span>
+                                                break;
+                                            case Core.Entities.AccountSensorAlarmType.HeightHigh:
+                                                <span>@Loc["Height above"] @alarm.AlarmThreshold @Loc["mm"]</span>
+                                                break;
+                                            default:
+                                                <span>@Loc["Unknown alarm type"]</span>
+                                                break;
+                                        }
+                                        @if (alarm.IsCurrentlyTriggered)
+                                        {
+                                            <span class="badge bg-danger ms-2">@Loc["Active"]</span>
+                                        }
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editAlarm('@alarm.Uid', '@alarm.AlarmType', '@alarm.AlarmThreshold')">
+                                            <i class="bi bi-pencil"></i> @Loc["Edit"]
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteAlarm('@alarm.Uid')">
+                                            <i class="bi bi-trash"></i> @Loc["Delete"]
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Add new alarm section -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">@Loc["Add new alarm"]</h5>
+                </div>
+                <div class="card-body">
+                    <form id="addAlarmForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="alarmType" class="form-label">@Loc["Alarm type"]</label>
+                                <select class="form-select" id="alarmType" name="alarmType" onchange="updateThresholdField()" required>
+                                    <option value="">@Loc["Select alarm type"]</option>
+                                    <option value="Data">@Loc["No data received"]</option>
+                                    <option value="Battery">@Loc["Battery low"]</option>
+                                    @if (Model.AccountSensor.Sensor.Type == Core.Entities.SensorType.Detect)
+                                    {
+                                        <option value="DetectOn">@Loc["Detect on"]</option>
+                                    }
+                                    @if (Model.AccountSensor.HasPercentage)
+                                    {
+                                        <option value="PercentageLow">@Loc["Percentage low"]</option>
+                                        <option value="PercentageHigh">@Loc["Percentage high"]</option>
+                                    }
+                                    @if (Model.AccountSensor.HasHeight)
+                                    {
+                                        <option value="HeightLow">@Loc["Height low"]</option>
+                                        <option value="HeightHigh">@Loc["Height high"]</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="alarmThreshold" class="form-label">@Loc["Threshold"] <span id="thresholdUnit"></span></label>
+                                <input type="number" class="form-control" id="alarmThreshold" name="alarmThreshold" step="0.1" />
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-success" onclick="addAlarm()">
+                                    <i class="bi bi-plus"></i> @Loc["Add"]
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit alarm modal -->
+            <div class="modal fade" id="editAlarmModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">@Loc["Edit alarm"]</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editAlarmForm">
+                                <input type="hidden" id="editAlarmUid" />
+                                <div class="mb-3">
+                                    <label for="editAlarmType" class="form-label">@Loc["Alarm type"]</label>
+                                    <select class="form-select" id="editAlarmType" name="alarmType" onchange="updateEditThresholdField()" required>
+                                        <option value="Data">@Loc["No data received"]</option>
+                                        <option value="Battery">@Loc["Battery low"]</option>
+                                        @if (Model.AccountSensor.Sensor.Type == Core.Entities.SensorType.Detect)
+                                        {
+                                            <option value="DetectOn">@Loc["Detect on"]</option>
+                                        }
+                                        @if (Model.AccountSensor.HasPercentage)
+                                        {
+                                            <option value="PercentageLow">@Loc["Percentage low"]</option>
+                                            <option value="PercentageHigh">@Loc["Percentage high"]</option>
+                                        }
+                                        @if (Model.AccountSensor.HasHeight)
+                                        {
+                                            <option value="HeightLow">@Loc["Height low"]</option>
+                                            <option value="HeightHigh">@Loc["Height high"]</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editAlarmThreshold" class="form-label">@Loc["Threshold"] <span id="editThresholdUnit"></span></label>
+                                    <input type="number" class="form-control" id="editAlarmThreshold" name="alarmThreshold" step="0.1" />
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Loc["Cancel"]</button>
+                            <button type="button" class="btn btn-primary" onclick="updateAlarm()">@Loc["Save changes"]</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function updateThresholdField() {
+                    const alarmType = document.getElementById('alarmType').value;
+                    const thresholdField = document.getElementById('alarmThreshold');
+                    const thresholdUnit = document.getElementById('thresholdUnit');
+                    
+                    if (alarmType === 'DetectOn') {
+                        thresholdField.style.display = 'none';
+                        thresholdField.required = false;
+                        thresholdUnit.textContent = '';
+                    } else {
+                        thresholdField.style.display = 'block';
+                        thresholdField.required = true;
+                        
+                        switch (alarmType) {
+                            case 'Data':
+                                thresholdUnit.textContent = '(@Loc["hours"])';
+                                break;
+                            case 'Battery':
+                                thresholdUnit.textContent = '(@Loc["Volt"])';
+                                break;
+                            case 'PercentageLow':
+                            case 'PercentageHigh':
+                                thresholdUnit.textContent = '(@Loc["%"])';
+                                break;
+                            case 'HeightLow':
+                            case 'HeightHigh':
+                                thresholdUnit.textContent = '(@Loc["mm"])';
+                                break;
+                            default:
+                                thresholdUnit.textContent = '';
+                        }
                     }
                 }
-            </ul>
+
+                function updateEditThresholdField() {
+                    const alarmType = document.getElementById('editAlarmType').value;
+                    const thresholdField = document.getElementById('editAlarmThreshold');
+                    const thresholdUnit = document.getElementById('editThresholdUnit');
+                    
+                    if (alarmType === 'DetectOn') {
+                        thresholdField.style.display = 'none';
+                        thresholdField.required = false;
+                        thresholdUnit.textContent = '';
+                    } else {
+                        thresholdField.style.display = 'block';
+                        thresholdField.required = true;
+                        
+                        switch (alarmType) {
+                            case 'Data':
+                                thresholdUnit.textContent = '(@Loc["hours"])';
+                                break;
+                            case 'Battery':
+                                thresholdUnit.textContent = '(@Loc["Volt"])';
+                                break;
+                            case 'PercentageLow':
+                            case 'PercentageHigh':
+                                thresholdUnit.textContent = '(@Loc["%"])';
+                                break;
+                            case 'HeightLow':
+                            case 'HeightHigh':
+                                thresholdUnit.textContent = '(@Loc["mm"])';
+                                break;
+                            default:
+                                thresholdUnit.textContent = '';
+                        }
+                    }
+                }
+
+                function addAlarm() {
+                    const alarmType = document.getElementById('alarmType').value;
+                    const alarmThreshold = document.getElementById('alarmThreshold').value;
+                    
+                    if (!alarmType) {
+                        alert('@Loc["Please select an alarm type"]');
+                        return;
+                    }
+                    
+                    if (alarmType !== 'DetectOn' && !alarmThreshold) {
+                        alert('@Loc["Please enter a threshold value"]');
+                        return;
+                    }
+
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    const formData = new FormData();
+                    formData.append('alarmType', alarmType);
+                    if (alarmType !== 'DetectOn') {
+                        formData.append('alarmThreshold', alarmThreshold);
+                    }
+
+                    fetch('?handler=AddAlarm', {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': token
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('@Loc["Failed to add alarm"]: ' + (data.message || '@Loc["Unknown error"]'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('@Loc["Failed to add alarm"]');
+                    });
+                }
+
+                function editAlarm(alarmUid, alarmType, alarmThreshold) {
+                    document.getElementById('editAlarmUid').value = alarmUid;
+                    document.getElementById('editAlarmType').value = alarmType;
+                    document.getElementById('editAlarmThreshold').value = alarmThreshold || '';
+                    updateEditThresholdField();
+                    
+                    var modal = new bootstrap.Modal(document.getElementById('editAlarmModal'));
+                    modal.show();
+                }
+
+                function updateAlarm() {
+                    const alarmUid = document.getElementById('editAlarmUid').value;
+                    const alarmType = document.getElementById('editAlarmType').value;
+                    const alarmThreshold = document.getElementById('editAlarmThreshold').value;
+                    
+                    if (alarmType !== 'DetectOn' && !alarmThreshold) {
+                        alert('@Loc["Please enter a threshold value"]');
+                        return;
+                    }
+
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    const formData = new FormData();
+                    formData.append('alarmUid', alarmUid);
+                    formData.append('alarmType', alarmType);
+                    if (alarmType !== 'DetectOn') {
+                        formData.append('alarmThreshold', alarmThreshold);
+                    }
+
+                    fetch('?handler=UpdateAlarm', {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': token
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('@Loc["Failed to update alarm"]: ' + (data.message || '@Loc["Unknown error"]'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('@Loc["Failed to update alarm"]');
+                    });
+                }
+
+                function deleteAlarm(alarmUid) {
+                    if (!confirm('@Loc["Are you sure you want to delete this alarm?"]')) {
+                        return;
+                    }
+
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    const formData = new FormData();
+                    formData.append('alarmUid', alarmUid);
+
+                    fetch('?handler=DeleteAlarm', {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': token
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('@Loc["Failed to delete alarm"]: ' + (data.message || '@Loc["Unknown error"]'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('@Loc["Failed to delete alarm"]');
+                    });
+                }
+
+                // Initialize threshold field visibility on page load
+                document.addEventListener('DOMContentLoaded', function() {
+                    updateThresholdField();
+                });
+            </script>
         }
 
     </div>
