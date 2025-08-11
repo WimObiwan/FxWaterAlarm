@@ -1,4 +1,6 @@
 *.db
+*.db-shm
+*.db-wal
 healthchecksdb
 .idea
 .vs
