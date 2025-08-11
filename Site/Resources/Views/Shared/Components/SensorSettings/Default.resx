@@ -22,6 +22,110 @@
         <value>Please log in before updating your settings.  WaterAlarm.be will send you an e-mail with a link to verify your identity.  When you click the link, you will get back to this page.</value>
         <comment>Please log in before updating your settings.  WaterAlarm.be will send you an e-mail with a link to verify your identity.  When you click the link, you will get back to this page.</comment>
     </data>
+        <data name="No alarms configured" xml:space="preserve">
+            <value>No alarms configured</value>
+            <comment>No alarms configured</comment>
+        </data>
+        <data name="Test email alert" xml:space="preserve">
+            <value>Test email alert</value>
+            <comment>Test email alert</comment>
+        </data>
+        <data name="No min/max constraints" xml:space="preserve">
+            <value>No min/max constraints</value>
+            <comment>No min/max constraints</comment>
+        </data>
+        <data name="Battery low" xml:space="preserve">
+            <value>Battery low</value>
+            <comment>Battery low</comment>
+        </data>
+        <data name="Percentage low" xml:space="preserve">
+            <value>Percentage low</value>
+            <comment>Percentage low</comment>
+        </data>
+        <data name="Percentage high" xml:space="preserve">
+            <value>Percentage high</value>
+            <comment>Percentage high</comment>
+        </data>
+        <data name="Height low" xml:space="preserve">
+            <value>Height low</value>
+            <comment>Height low</comment>
+        </data>
+        <data name="Height high" xml:space="preserve">
+            <value>Height high</value>
+            <comment>Height high</comment>
+        </data>
+        <data name="Alarm type" xml:space="preserve">
+            <value>Alarm type</value>
+            <comment>Alarm type</comment>
+        </data>
+        <data name="Select alarm type" xml:space="preserve">
+            <value>Select alarm type</value>
+            <comment>Select alarm type</comment>
+        </data>
+        <data name="Threshold" xml:space="preserve">
+            <value>Threshold</value>
+            <comment>Threshold</comment>
+        </data>
+        <data name="Add new alarm" xml:space="preserve">
+            <value>Add new alarm</value>
+            <comment>Add new alarm</comment>
+        </data>
+        <data name="Add" xml:space="preserve">
+            <value>Add</value>
+            <comment>Add</comment>
+        </data>
+        <data name="Edit" xml:space="preserve">
+            <value>Edit</value>
+            <comment>Edit</comment>
+        </data>
+        <data name="Delete" xml:space="preserve">
+            <value>Delete</value>
+            <comment>Delete</comment>
+        </data>
+        <data name="Save changes" xml:space="preserve">
+            <value>Save changes</value>
+            <comment>Save changes</comment>
+        </data>
+        <data name="Cancel" xml:space="preserve">
+            <value>Cancel</value>
+            <comment>Cancel</comment>
+        </data>
+        <data name="Active" xml:space="preserve">
+            <value>Active</value>
+            <comment>Active</comment>
+        </data>
+        <data name="Unknown alarm type" xml:space="preserve">
+            <value>Unknown alarm type</value>
+            <comment>Unknown alarm type</comment>
+        </data>
+        <data name="Please select an alarm type" xml:space="preserve">
+            <value>Please select an alarm type</value>
+            <comment>Please select an alarm type</comment>
+        </data>
+        <data name="Please enter a threshold value" xml:space="preserve">
+            <value>Please enter a threshold value</value>
+            <comment>Please enter a threshold value</comment>
+        </data>
+        <data name="Failed to add alarm" xml:space="preserve">
+            <value>Failed to add alarm</value>
+            <comment>Failed to add alarm</comment>
+        </data>
+        <data name="Unknown error" xml:space="preserve">
+            <value>Unknown error</value>
+            <comment>Unknown error</comment>
+        </data>
+        <data name="Failed to update alarm" xml:space="preserve">
+            <value>Failed to update alarm</value>
+            <comment>Failed to update alarm</comment>
+        </data>
+        <data name="Are you sure you want to delete this alarm?" xml:space="preserve">
+            <value>Are you sure you want to delete this alarm?</value>
+            <comment>Are you sure you want to delete this alarm?</comment>
+        </data>
+        <data name="Failed to delete alarm" xml:space="preserve">
+            <value>Failed to delete alarm</value>
+            <comment>Failed to delete alarm</comment>
+        </data>
     <data name="Submit changes" xml:space="preserve">
         <value>Submit changes</value>
         <comment>Submit changes</comment>
