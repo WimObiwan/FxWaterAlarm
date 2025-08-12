@@ -2,6 +2,10 @@
 
 # WaterAlarm
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/WimObiwan/FxWaterAlarm.svg)](https://github.com/WimObiwan/FxWaterAlarm/commits/main)
+[![GitHub issues](https://img.shields.io/github/issues/WimObiwan/FxWaterAlarm.svg)](https://github.com/WimObiwan/FxWaterAlarm/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/WimObiwan/FxWaterAlarm.svg)](https://github.com/WimObiwan/FxWaterAlarm/pulls)
 [![Build Status](https://github.com/WimObiwan/FxWaterAlarm/actions/workflows/build.yml/badge.svg)](https://github.com/WimObiwan/FxWaterAlarm/actions)
 
 Welcome to **WaterAlarm** – a project that started as a hobby and has grown into a mature, reliable solution with many installations in the field. The system helps monitor water usage and detect leaks, providing peace of mind for users and valuable insights for people involved in home automation.
