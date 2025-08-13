@@ -150,6 +150,22 @@ public class AddMeasurementCommandHandler : IRequestHandler<AddMeasurementComman
                 
                 try
                 {
+                    // Handle JSON number conversion
+                    if (typeof(T) == typeof(double) && value is System.Text.Json.JsonElement jsonElement)
+                    {
+                        if (jsonElement.ValueKind == System.Text.Json.JsonValueKind.Number)
+                        {
+                            return (T)(object)jsonElement.GetDouble();
+                        }
+                    }
+                    else if (typeof(T) == typeof(int) && value is System.Text.Json.JsonElement jsonElementInt)
+                    {
+                        if (jsonElementInt.ValueKind == System.Text.Json.JsonValueKind.Number)
+                        {
+                            return (T)(object)jsonElementInt.GetInt32();
+                        }
+                    }
+                    
                     return (T)Convert.ChangeType(value, typeof(T));
                 }
                 catch (Exception ex)
