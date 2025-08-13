@@ -188,6 +188,12 @@ public abstract class MeasurementRepositoryBase<TRecord, TAggregatedRecord, TMea
 
     // ReSharper restore UnusedAutoPropertyAccessor.Local
 
+    public async Task Write(TRecord record, CancellationToken cancellationToken)
+    {
+        using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
+        await influxClient.WriteAsync("wateralarm", GetTableName(), new[] { record }, cancellationToken);
+    }
+
     protected abstract string GetTableName();
     protected abstract TMeasurement ReturnMeasurement(InfluxSeries<TRecord> series, TRecord record);
     protected abstract TAggregatedMeasurement ReturnAggregatedMeasurement(InfluxSeries<TAggregatedRecord> series, TAggregatedRecord record);
