@@ -20,7 +20,7 @@ public class DevEuiController : Controller
         _mediator = mediator;
     }
 
-    [HttpPost("{devEui}")]
+    [HttpPost("{devEui}/Measurements")]
     public async Task<IActionResult> AddMeasurement(string devEui, [FromBody] AddMeasurementRequest request)
     {
         try
