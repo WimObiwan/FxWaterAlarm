@@ -1,21 +1,24 @@
 @using Microsoft.AspNetCore.Mvc.Localization
-@model Core.Util.MeasurementMoistureEx
+@using Site.ViewComponents
+@model MeasurementDisplayModel<Core.Util.MeasurementMoistureEx>
 @inject IViewLocalizer Loc
 
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
+    var measurement = Model.Measurement;
+    var backgroundClass = Model.IsOldMeasurement ? " bg-warning" : "";
 }
 
-<div>
+<div class="@backgroundClass">
     <div>
         <svg id="fillGauge-@uniqueId" width="200" height="200" onclick=""></svg>
     </div>
 
     @{
-        var soilConductivity = (int?)Model.SoilConductivity;
-        var soilMoisturePrc = (double?)Model.SoilMoisturePrc;
-        var soilTemperatureC = (double?)Model.SoilTemperatureC;
-        var timestamp = Model.Timestamp;
+        var soilConductivity = (int?)measurement.SoilConductivity;
+        var soilMoisturePrc = (double?)measurement.SoilMoisturePrc;
+        var soilTemperatureC = (double?)measurement.SoilTemperatureC;
+        var timestamp = measurement.Timestamp;
     }
 
     @if (soilMoisturePrc.HasValue)

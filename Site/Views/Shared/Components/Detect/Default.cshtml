@@ -1,19 +1,22 @@
 @using Microsoft.AspNetCore.Mvc.Localization
-@model Core.Util.MeasurementDetectEx
+@using Site.ViewComponents
+@model MeasurementDisplayModel<Core.Util.MeasurementDetectEx>
 @inject IViewLocalizer Loc
 
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
+    var measurement = Model.Measurement;
+    var backgroundClass = Model.IsOldMeasurement ? " bg-warning" : "";
 }
 
-<div>
+<div class="@backgroundClass">
     <div>
         <svg id="fillGauge-@uniqueId" width="200" height="200" onclick=""></svg>
     </div>
 
     @{
-        var status = (int?)Model.Status;
-        var timestamp = Model.Timestamp;
+        var status = (int?)measurement.Status;
+        var timestamp = measurement.Timestamp;
     }
 
     @if (status.HasValue)
