@@ -57,8 +57,10 @@ builder.Services.Configure<RequestLocalizationOptions>(o =>
 
 builder.Services.Configure<AccountLoginMessageOptions>(builder.Configuration.GetSection(AccountLoginMessageOptions.Location));
 builder.Services.Configure<MeasurementDisplayOptions>(builder.Configuration.GetSection(MeasurementDisplayOptions.Location));
+builder.Services.Configure<ApiKeysOptions>(builder.Configuration.GetSection(ApiKeysOptions.Location));
 
 builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
+builder.Services.AddScoped<ApiKeyAuthenticationMiddleware>();
 
 builder.Services.Configure<DataProtectionTokenProviderOptions>(
     x =>
@@ -165,6 +167,8 @@ app.UseRequestLocalization();
 app.UseRequestLocalizationCookies();
 
 app.UseRouting();
+
+app.UseApiKeyAuthentication();
 
 app.UseAuthentication();
 app.UseAuthorization();
