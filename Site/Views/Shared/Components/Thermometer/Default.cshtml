@@ -1,16 +1,19 @@
 @using Microsoft.AspNetCore.Mvc.Localization
-@model Core.Util.MeasurementThermometerEx
+@using Site.ViewComponents
+@model MeasurementDisplayModel<Core.Util.MeasurementThermometerEx>
 @inject IViewLocalizer Loc
 
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
+    var measurement = Model.Measurement;
+    var backgroundClass = Model.IsOldMeasurement ? " bg-warning" : "";
 }
 
-<div>
+<div class="@backgroundClass">
     @{
-        var tempC = (double?)Model.TempC;
-        var humPrc = (double?)Model.HumPrc;
-        var timestamp = Model.Timestamp;
+        var tempC = (double?)measurement.TempC;
+        var humPrc = (double?)measurement.HumPrc;
+        var timestamp = measurement.Timestamp;
     }
 
     @if (tempC.HasValue)

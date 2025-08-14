@@ -56,6 +56,7 @@ builder.Services.Configure<RequestLocalizationOptions>(o =>
 });
 
 builder.Services.Configure<AccountLoginMessageOptions>(builder.Configuration.GetSection(AccountLoginMessageOptions.Location));
+builder.Services.Configure<MeasurementDisplayOptions>(builder.Configuration.GetSection(MeasurementDisplayOptions.Location));
 
 builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
 

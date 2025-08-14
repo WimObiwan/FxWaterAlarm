@@ -1,22 +1,25 @@
 @using Microsoft.AspNetCore.Mvc.Localization
-@model Core.Util.MeasurementLevelEx
+@using Site.ViewComponents
+@model MeasurementDisplayModel<Core.Util.MeasurementLevelEx>
 @inject IViewLocalizer Loc
 
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
+    var measurement = Model.Measurement;
+    var backgroundClass = Model.IsOldMeasurement ? " bg-warning" : "";
 }
 
-<div>
+<div class="@backgroundClass">
     <div>
         <svg id="fillGauge-@uniqueId" width="200" height="200" onclick=""></svg>
     </div>
 
     @{
-        var levelFraction = Model.Distance.LevelFraction;
-        var realLevelFraction = Model.Distance.RealLevelFraction;
-        var waterL = Model.Distance.WaterL;
-        var height = Model.Distance.HeightMm;
-        var timestamp = Model.Timestamp;
+        var levelFraction = measurement.Distance.LevelFraction;
+        var realLevelFraction = measurement.Distance.RealLevelFraction;
+        var waterL = measurement.Distance.WaterL;
+        var height = measurement.Distance.HeightMm;
+        var timestamp = measurement.Timestamp;
     }
 
     @{
