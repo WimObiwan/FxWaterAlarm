@@ -1,5 +1,6 @@
 using Core.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Site.Controllers;
@@ -21,6 +22,7 @@ public class DevEuiController : Controller
     }
 
     [HttpPost("{devEui}/Measurements")]
+    [Authorize(Policy = "ApiKey")]
     public async Task<IActionResult> AddMeasurement(string devEui, [FromBody] AddMeasurementRequest request)
     {
         try
