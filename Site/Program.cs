@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Site;
+using Site.Authentication;
 using Site.Identity;
 using Site.Middlewares;
 using Site.Pages;
@@ -60,7 +61,6 @@ builder.Services.Configure<MeasurementDisplayOptions>(builder.Configuration.GetS
 builder.Services.Configure<ApiKeysOptions>(builder.Configuration.GetSection(ApiKeysOptions.Location));
 
 builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
-builder.Services.AddScoped<ApiKeyAuthenticationMiddleware>();
 
 builder.Services.Configure<DataProtectionTokenProviderOptions>(
     x =>
@@ -124,16 +124,23 @@ builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
         options.LoginPath = "/Account/LoginMessage";
         options.ExpireTimeSpan = accountLoginMessageOptions.TokenLifespan;
         options.SlidingExpiration = false;
-    });
+    })
+    .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 builder.Services.AddSingleton<IAuthorizationHandler, AdminRequirementHandler>(); 
 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin", policy =>
         policy.Requirements.Add(new AdminRequirement()));
+    options.AddPolicy("ApiKey", policy =>
+    {
+        policy.AuthenticationSchemes.Add("ApiKey");
+        policy.RequireAuthenticatedUser();
+    });
 });
 
 //builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IUserInfo, UserInfo>();
 
 var app = builder.Build();
@@ -167,8 +174,6 @@ app.UseRequestLocalization();
 app.UseRequestLocalizationCookies();
 
 app.UseRouting();
-
-app.UseApiKeyAuthentication();
 
 app.UseAuthentication();
 app.UseAuthorization();
