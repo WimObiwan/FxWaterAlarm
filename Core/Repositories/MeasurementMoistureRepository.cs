@@ -20,6 +20,8 @@ public interface IMeasurementMoistureRepository
         CancellationToken cancellationToken);
 
     Task<AggregatedMeasurement?> GetLastMedian(string devEui, DateTime from, CancellationToken cancellationToken);
+
+    Task Write(RecordMoisture record, CancellationToken cancellationToken);
 }
 
 public class MeasurementMoistureRepository : MeasurementRepositoryBase<RecordMoisture, AggregatedRecordMoisture, MeasurementMoisture, AggregatedMeasurement>, IMeasurementMoistureRepository
