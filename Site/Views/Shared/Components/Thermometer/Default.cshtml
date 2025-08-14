@@ -6,10 +6,19 @@
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
     var measurement = Model.Measurement;
-    var backgroundClass = Model.IsOldMeasurement ? " bg-warning" : "";
+    var backgroundClass = Model.IsOldMeasurement ? " bg-warning-inline" : "";
 }
 
-<div class="@backgroundClass">
+<style>
+.bg-warning-inline {
+    background-color: orange;
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    border-radius: 0.25em;
+}
+</style>
+
+<div>
     @{
         var tempC = (double?)measurement.TempC;
         var humPrc = (double?)measurement.HumPrc;
@@ -24,5 +33,5 @@
     {
         <div style="font-size: size">@humPrc.Value @Loc["%"]</div>
     }
-    <div>@timestamp.ToLocalTime().ToString("G")</div>
+    <div class="@backgroundClass">@timestamp.ToLocalTime().ToString("G")</div>
 </div>
