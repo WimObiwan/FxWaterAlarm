@@ -6,10 +6,19 @@
 @{
     var uniqueId = Guid.NewGuid().ToString("N");
     var measurement = Model.Measurement;
-    var backgroundClass = Model.IsOldMeasurement ? " bg-warning" : "";
+    var backgroundClass = Model.IsOldMeasurement ? " bg-warning-inline" : "";
 }
 
-<div class="@backgroundClass">
+<style>
+.bg-warning-inline {
+    background-color: orange;
+    display: inline-block;
+    padding: 0.25em 0.5em;
+    border-radius: 0.25em;
+}
+</style>
+
+<div>
     <div>
         <svg id="fillGauge-@uniqueId" width="200" height="200" onclick=""></svg>
     </div>
@@ -32,7 +41,7 @@
             }
         </div>
     }
-    <div>@timestamp.ToLocalTime().ToString("G")</div>
+    <div class="@backgroundClass">@timestamp.ToLocalTime().ToString("G")</div>
 </div>
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
