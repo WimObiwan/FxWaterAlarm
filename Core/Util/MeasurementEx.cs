@@ -23,6 +23,7 @@ public class MeasurementEx<T> : IMeasurementEx where T : Measurement
 
     public AccountSensor AccountSensor => _accountSensor;
     protected T Measurement => _measurement;
+    public IReadOnlyDictionary<string, object> GetValues() => _measurement.GetValues();
 
     public string DevEui => _accountSensor.Sensor.DevEui;
     public DateTime Timestamp => _measurement.Timestamp;

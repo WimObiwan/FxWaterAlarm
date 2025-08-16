@@ -24,7 +24,8 @@ public class AccountSensorByLinkQueryHandler : IRequestHandler<AccountSensorByLi
     {
         var query = _dbContext.Sensors
             .Where(s => s.Link == request.SensorLink || s.DevEui == request.SensorLink)
-            .SelectMany(s => s.AccountSensors);
+            .SelectMany(s => s.AccountSensors)
+            .Where(@as => !@as.Disabled);
 
         if (request.AccountLink != null)
             query = query.Where(as2 => as2.Account.Link == request.AccountLink);
@@ -36,9 +37,6 @@ public class AccountSensorByLinkQueryHandler : IRequestHandler<AccountSensorByLi
             .Include(@as => @as.Sensor)
             .SingleOrDefaultAsync(cancellationToken);
         
-        if (accountSensor != null)
-            accountSensor.EnsureEnabled();
-
         return accountSensor;
     }
 }
