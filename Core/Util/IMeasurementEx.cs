@@ -1,3 +1,4 @@
+using System.Collections;
 using Core.Entities;
 
 namespace Core.Util;
@@ -12,4 +13,5 @@ public interface IMeasurementEx
     double RssiDbm { get; }
     double RssiPrc { get; }
     double BatteryPrc { get; }
+    IReadOnlyDictionary<string, object> GetValues();
 }
