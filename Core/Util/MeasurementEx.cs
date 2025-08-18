@@ -15,10 +15,10 @@ public class MeasurementEx<T> : IMeasurementEx where T : Measurement
 
     public DateTime EstimateNextRefresh()
     {
-        // Refresh every 20 minutes
-        const int refreshIntervalMinutes = 20;
-        int nextRefreshMinutes = ((int)(DateTime.UtcNow - Timestamp).TotalMinutes / refreshIntervalMinutes + 1) * refreshIntervalMinutes;
-        return Timestamp.AddSeconds(nextRefreshMinutes * 60 + 5);
+        // Use the sensor's expected interval instead of hardcoded value
+        int refreshIntervalSecs = _accountSensor.Sensor.ExpectedIntervalSecs;
+        int nextRefreshSecs = ((int)(DateTime.UtcNow - Timestamp).TotalSeconds / refreshIntervalSecs + 1) * refreshIntervalSecs;
+        return Timestamp.AddSeconds(nextRefreshSecs + 5);
     }
 
     public AccountSensor AccountSensor => _accountSensor;
