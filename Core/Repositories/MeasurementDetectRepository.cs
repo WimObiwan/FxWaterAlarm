@@ -31,12 +31,12 @@ public class MeasurementDetectRepository : MeasurementRepositoryBase<RecordDetec
     {
     }
 
-   protected override string GetTableName()
+    protected override string GetTableName()
     {
         return "detect";
     }
 
-     protected override MeasurementDetect ReturnMeasurement(InfluxSeries<RecordDetect> series, RecordDetect record)
+    protected override MeasurementDetect ReturnMeasurement(InfluxSeries<RecordDetect> series, RecordDetect record)
     {
         return new MeasurementDetect
         {
