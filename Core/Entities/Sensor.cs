@@ -20,6 +20,7 @@ public class Sensor
     public required DateTime CreateTimestamp { get; init; }
     public required SensorType Type { get; init; }
     public string? Link { get; set; }
+    public int ExpectedIntervalSecs { get; set; } = 1200; // Default 20 minutes
     public IReadOnlyCollection<AccountSensor> AccountSensors => _accountSensors.AsReadOnly();
     public IReadOnlyCollection<Account> Accounts => _accounts.AsReadOnly();
 

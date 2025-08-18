@@ -18,6 +18,7 @@ class AccountSensorDto
     public int? UnusableHeightMm { get; init; } = null;
     public double? UnusableCapacity { get; init; } = null;
     public double? UsableCapacity { get; init; } = null;
+    public int ExpectedIntervalSecs { get; init; }
 
 }
 
@@ -158,7 +159,8 @@ public class AccountSensorController : Controller
                     DistanceMmFull = accountSensor.DistanceMmFull,
                     UnusableHeightMm = accountSensor.UnusableHeightMm,
                     UnusableCapacity = accountSensor.UnusableCapacityL,
-                    UsableCapacity = accountSensor.UsableCapacityL
+                    UsableCapacity = accountSensor.UsableCapacityL,
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
                 },
                 LastMeasurement = lastMeasurementDto,
                 Trends = trendsDto
@@ -189,7 +191,8 @@ public class AccountSensorController : Controller
                 AccountSensor = new AccountSensorDto
                 {
                     Name = accountSensor.Name,
-                    CreateTimestamp = accountSensor.CreateTimestamp
+                    CreateTimestamp = accountSensor.CreateTimestamp,
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
                 },
                 LastMeasurement = lastMeasurementDto,
                 Trends = null
