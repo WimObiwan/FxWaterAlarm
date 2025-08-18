@@ -48,7 +48,7 @@ public class SetWASensorCmdlet : DependencyCmdlet<Startup>
         await _mediator.Send(new UpdateSensorCommand() 
         { 
             Uid = sensorId,
-            ExpectedIntervalSecs = Optional.From(ExpectedIntervalSecs)
+            ExpectedIntervalSecs = Optional.From(ExpectedIntervalSecs, -1)
         }, cancellationToken);
     }
 }

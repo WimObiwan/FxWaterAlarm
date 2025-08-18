@@ -18,7 +18,7 @@ class AccountSensorDto
     public int? UnusableHeightMm { get; init; } = null;
     public double? UnusableCapacity { get; init; } = null;
     public double? UsableCapacity { get; init; } = null;
-    public int ExpectedIntervalSecs { get; init; }
+    public int? ExpectedIntervalSecs { get; init; }
 
 }
 
