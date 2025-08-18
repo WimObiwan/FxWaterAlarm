@@ -16,7 +16,7 @@ public class MeasurementEx<T> : IMeasurementEx where T : Measurement
     public DateTime EstimateNextRefresh()
     {
         // Use the sensor's expected interval instead of hardcoded value
-        int refreshIntervalSecs = _accountSensor.Sensor.ExpectedIntervalSecs;
+        int refreshIntervalSecs = _accountSensor.Sensor.ExpectedIntervalSecs ?? 1200;
         int nextRefreshSecs = ((int)(DateTime.UtcNow - Timestamp).TotalSeconds / refreshIntervalSecs + 1) * refreshIntervalSecs;
         return Timestamp.AddSeconds(nextRefreshSecs + 5);
     }

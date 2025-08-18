@@ -14,8 +14,7 @@ namespace Core.Migrations
                 name: "ExpectedIntervalSecs",
                 table: "Sensor",
                 type: "INTEGER",
-                nullable: false,
-                defaultValue: 1200);
+                nullable: true);
         }
 
         /// <inheritdoc />

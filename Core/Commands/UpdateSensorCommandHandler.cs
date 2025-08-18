@@ -9,7 +9,7 @@ namespace Core.Commands;
 public record UpdateSensorCommand : IRequest
 {
     public required Guid Uid { get; init; }
-    public Optional<int> ExpectedIntervalSecs { get; init; }
+    public Optional<int?> ExpectedIntervalSecs { get; init; }
 }
 
 public class UpdateSensorCommandHandler : IRequestHandler<UpdateSensorCommand>

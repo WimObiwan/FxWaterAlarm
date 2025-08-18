@@ -148,7 +148,7 @@ namespace Core.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ExpectedIntervalSecs")
+                    b.Property<int?>("ExpectedIntervalSecs")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Link")
