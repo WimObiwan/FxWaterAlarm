@@ -20,7 +20,7 @@ public class DetectViewComponent : ViewComponent
         var model = new MeasurementDisplayModel<MeasurementDetectEx>
         {
             Measurement = measurementDetectEx,
-            IsOldMeasurement = measurementDetectEx.IsOld(_options.OldMeasurementThreshold)
+            IsOldMeasurement = measurementDetectEx.IsOld(_options.OldMeasurementThresholdIntervals)
         };
         
         return await Task.FromResult(View(model));

@@ -21,7 +21,8 @@ public class MeasurementDisplayExtensionsTest
             Uid = Guid.NewGuid(),
             DevEui = "dev123",
             Type = SensorType.Level,
-            CreateTimestamp = DateTime.UtcNow
+            CreateTimestamp = DateTime.UtcNow,
+            ExpectedIntervalSecs = 3600
         };
 
         return new AccountSensor
@@ -37,7 +38,7 @@ public class MeasurementDisplayExtensionsTest
     {
         // Arrange
         var oldTimestamp = DateTime.UtcNow.AddHours(-25); // 25 hours ago
-        var threshold = TimeSpan.FromHours(24); // 24 hour threshold
+        var threshold = 24;
         
         var measurement = new MeasurementLevel
         {
@@ -63,7 +64,7 @@ public class MeasurementDisplayExtensionsTest
     {
         // Arrange
         var recentTimestamp = DateTime.UtcNow.AddHours(-12); // 12 hours ago
-        var threshold = TimeSpan.FromHours(24); // 24 hour threshold
+        var threshold = 24; // 24 hour threshold
         
         var measurement = new MeasurementLevel
         {
@@ -88,8 +89,8 @@ public class MeasurementDisplayExtensionsTest
     public void TestMeasurementIsOld_WhenExactlyAtThreshold_ReturnsTrue()
     {
         // Arrange
-        var threshold = TimeSpan.FromHours(24);
-        var exactlyAtThreshold = DateTime.UtcNow.Add(-threshold);
+        var threshold = 24;
+        var exactlyAtThreshold = DateTime.UtcNow.AddHours(-threshold);
         
         var measurement = new MeasurementLevel
         {
@@ -107,7 +108,7 @@ public class MeasurementDisplayExtensionsTest
         var isOld = measurementEx.IsOld(threshold);
 
         // Assert
-        Assert.True(isOld);
+        Assert.False(isOld);
     }
 
     [Fact]

@@ -20,7 +20,7 @@ public class WaterlevelNewViewComponent : ViewComponent
         var model = new MeasurementDisplayModel<MeasurementLevelEx>
         {
             Measurement = measurementLevelEx,
-            IsOldMeasurement = measurementLevelEx.IsOld(_options.OldMeasurementThreshold)
+            IsOldMeasurement = measurementLevelEx.IsOld(_options.OldMeasurementThresholdIntervals)
         };
         
         return await Task.FromResult(View(model));

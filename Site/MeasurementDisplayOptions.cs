@@ -6,6 +6,6 @@ public class MeasurementDisplayOptions
 {
     public const string Location = "MeasurementDisplay";
 
-    [ConfigurationKeyName("OldMeasurementThreshold")]
-    public required TimeSpan? OldMeasurementThreshold { get; init; }
+    [ConfigurationKeyName("OldMeasurementThresholdIntervals")]
+    public required int? OldMeasurementThresholdIntervals { get; init; }
 }
