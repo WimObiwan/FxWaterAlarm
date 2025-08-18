@@ -42,7 +42,7 @@ public class MeasurementLevelRepository : MeasurementRepositoryBase<RecordLevel,
         {
             DevEui = (string)series.GroupedTags["DevEUI"],
             Timestamp = record.Timestamp,
-            DistanceMm = record.Distance,
+            DistanceMm = (int)record.Distance,
             BatV = record.BatV,
             RssiDbm = record.Rssi
         };
@@ -54,10 +54,10 @@ public class MeasurementLevelRepository : MeasurementRepositoryBase<RecordLevel,
         {
             DevEui = (string)series.GroupedTags["DevEUI"],
             Timestamp = record.Timestamp,
-            MinDistanceMm = record.MinDistance,
-            MeanDistanceMm = record.MeanDistance,
-            MaxDistanceMm = record.MaxDistance,
-            LastDistanceMm = record.LastDistance,
+            MinDistanceMm = (int?)record.MinDistance,
+            MeanDistanceMm = (int?)record.MeanDistance,
+            MaxDistanceMm = (int?)record.MaxDistance,
+            LastDistanceMm = (int?)record.LastDistance,
             BatV = record.BatV,
             RssiDbm = record.Rssi
         };
@@ -74,9 +74,9 @@ public class RecordLevel
 
     [InfluxField("batV")] public double BatV { get; set; }
 
-    [InfluxField("distance")] public int Distance { get; set; }
+    [InfluxField("distance")] public double Distance { get; set; }
 
-    [InfluxField("RSSI")] public int Rssi { get; set; }
+    [InfluxField("RSSI")] public double Rssi { get; set; }
 }
 
 public class AggregatedRecordLevel
@@ -87,12 +87,12 @@ public class AggregatedRecordLevel
 
     [InfluxField("last_batV")] public double BatV { get; set; }
 
-    [InfluxField("min_distance")] public int? MinDistance { get; set; }
-    [InfluxField("mean_distance")] public int? MeanDistance { get; set; }
-    [InfluxField("max_distance")] public int? MaxDistance { get; set; }
-    [InfluxField("last_distance")] public int? LastDistance { get; set; }
+    [InfluxField("min_distance")] public double? MinDistance { get; set; }
+    [InfluxField("mean_distance")] public double? MeanDistance { get; set; }
+    [InfluxField("max_distance")] public double? MaxDistance { get; set; }
+    [InfluxField("last_distance")] public double? LastDistance { get; set; }
 
-    [InfluxField("last_RSSI")] public int Rssi { get; set; }
+    [InfluxField("last_RSSI")] public double Rssi { get; set; }
 }
 
 // ReSharper restore UnusedAutoPropertyAccessor.Local
