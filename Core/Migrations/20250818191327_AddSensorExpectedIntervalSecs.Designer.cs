@@ -3,6 +3,7 @@ using System;
 using Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core.Migrations
 {
     [DbContext(typeof(WaterAlarmDbContext))]
-    partial class WaterAlarmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250818191327_AddSensorExpectedIntervalSecs")]
+    partial class AddSensorExpectedIntervalSecs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.19");
@@ -148,7 +151,7 @@ namespace Core.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ExpectedIntervalSecs")
+                    b.Property<int>("ExpectedIntervalSecs")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Link")

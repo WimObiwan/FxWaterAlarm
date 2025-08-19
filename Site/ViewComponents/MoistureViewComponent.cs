@@ -20,7 +20,7 @@ public class MoistureViewComponent : ViewComponent
         var model = new MeasurementDisplayModel<MeasurementMoistureEx>
         {
             Measurement = measurementMoistureEx,
-            IsOldMeasurement = measurementMoistureEx.IsOld(_options.OldMeasurementThreshold)
+            IsOldMeasurement = measurementMoistureEx.IsOld(_options.OldMeasurementThresholdIntervals)
         };
         
         return await Task.FromResult(View(model));

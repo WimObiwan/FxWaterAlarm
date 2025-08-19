@@ -20,7 +20,7 @@ public class ThermometerViewComponent : ViewComponent
         var model = new MeasurementDisplayModel<MeasurementThermometerEx>
         {
             Measurement = measurementThermometerEx,
-            IsOldMeasurement = measurementThermometerEx.IsOld(_options.OldMeasurementThreshold)
+            IsOldMeasurement = measurementThermometerEx.IsOld(_options.OldMeasurementThresholdIntervals)
         };
         
         return await Task.FromResult(View(model));
