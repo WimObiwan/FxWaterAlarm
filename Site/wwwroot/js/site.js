@@ -127,7 +127,7 @@ function showActiveTheme(theme) {
     }
 
     if (activeThemeIcon && iconOfActiveBtn) {
-        activeThemeIcon.className = iconOfActiveBtn.className;
+        activeThemeIcon.className = `theme-icon-active ${iconOfActiveBtn.className.replace(/\s*me-2$/, '')}`;
     }
 }
 
