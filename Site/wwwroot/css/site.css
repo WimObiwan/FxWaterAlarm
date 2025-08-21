@@ -70,6 +70,10 @@ body {
     color: var(--bs-white);
 }
 
+[data-bs-theme="dark"] .navbar-light .navbar-nav .nav-link.active {
+    font-weight: bold;
+}
+
 [data-bs-theme="dark"] .border-top {
     border-color: var(--bs-gray-600) !important;
 }

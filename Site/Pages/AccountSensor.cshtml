@@ -138,7 +138,8 @@
             return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("", query);
         }
 
-        <ul class="nav nav-tabs">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <ul class="navbar-nav mr-auto">
             @{
                 bool IsPageTypeInGraphDropDown()
                 {
@@ -296,7 +297,8 @@
                     </li>
                 </ul>
             </li>
-        </ul>
+    </ul>
+    </nav>
 
         @if (hasGraph && IsPageTypeInGraphDropDown())
         {
