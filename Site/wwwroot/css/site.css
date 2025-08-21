@@ -77,3 +77,14 @@ body {
 [data-bs-theme="dark"] .text-muted {
     color: var(--bs-gray-400) !important;
 }
+
+/* General dark mode background and text color */
+[data-bs-theme="dark"] body {
+    background-color: #181a1b !important;
+    color: #e0e0e0;
+}
+[data-bs-theme="dark"] .container,
+[data-bs-theme="dark"] main {
+    background-color: transparent;
+    color: inherit;
+}
