@@ -87,3 +87,70 @@ if ('serviceWorker' in navigator) {
 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
     installContainer.classList.toggle('hidden', true);
 }
+
+// Dark mode functionality
+function getStoredTheme() {
+    return localStorage.getItem('theme');
+}
+
+function setStoredTheme(theme) {
+    localStorage.setItem('theme', theme);
+}
+
+function getPreferredTheme() {
+    const storedTheme = getStoredTheme();
+    if (storedTheme) {
+        return storedTheme;
+    }
+    return 'light'; // Default to light mode as required
+}
+
+function setTheme(theme) {
+    if (theme === 'auto') {
+        document.documentElement.setAttribute('data-bs-theme', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    } else {
+        document.documentElement.setAttribute('data-bs-theme', theme);
+    }
+}
+
+function showActiveTheme(theme) {
+    const activeThemeIcon = document.querySelector('.theme-icon-active');
+    const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`);
+    const iconOfActiveBtn = btnToActive ? btnToActive.querySelector('i') : null;
+
+    document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+        element.classList.remove('active');
+    });
+
+    if (btnToActive) {
+        btnToActive.classList.add('active');
+    }
+
+    if (activeThemeIcon && iconOfActiveBtn) {
+        activeThemeIcon.className = `theme-icon-active ${iconOfActiveBtn.className.replace(/\s*me-2$/, '')}`;
+    }
+}
+
+// Initialize theme on page load
+window.addEventListener('DOMContentLoaded', () => {
+    const theme = getPreferredTheme();
+    setTheme(theme);
+    showActiveTheme(theme);
+
+    document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            const theme = toggle.getAttribute('data-bs-theme-value');
+            setStoredTheme(theme);
+            setTheme(theme);
+            showActiveTheme(theme);
+        });
+    });
+});
+
+// Listen for system theme changes when in auto mode
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    const storedTheme = getStoredTheme();
+    if (storedTheme !== 'light' && storedTheme !== 'dark') {
+        setTheme(getPreferredTheme());
+    }
+});

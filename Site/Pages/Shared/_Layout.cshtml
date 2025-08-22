@@ -6,7 +6,7 @@
 @inject IOptionsSnapshot<MessagesOptions> MessagesOptions
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data->
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -93,6 +93,32 @@
                             </a>
                     </li>
 
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="theme-icon-active bi bi-sun-fill"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center" type="button" data-bs-theme-value="light">
+                                    <i class="bi bi-sun-fill me-2"></i>
+                                    Light
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center" type="button" data-bs-theme-value="dark">
+                                    <i class="bi bi-moon-stars-fill me-2"></i>
+                                    Dark
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center" type="button" data-bs-theme-value="auto">
+                                    <i class="bi bi-circle-half me-2"></i>
+                                    Auto
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                    
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             @Loc["Language"]
