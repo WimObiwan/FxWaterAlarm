@@ -55,6 +55,10 @@ body {
     color: var(--bs-white);
 }
 
+.card {
+    background-color: transparent;
+}
+
 /* Ensure proper contrast for dark mode */
 [data-bs-theme="dark"] .navbar-light {
     background-color: var(--bs-dark) !important;
@@ -91,4 +95,80 @@ body {
 [data-bs-theme="dark"] main {
     background-color: transparent;
     color: inherit;
+}
+
+#breadcrumb-nav {
+    --breadcrumb-divider-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E");
+    --breadcrumb-divider-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%23b0b0b0'/%3E%3C/svg%3E");
+    --bs-breadcrumb-divider: var(--breadcrumb-divider-light);
+}
+@@media (prefers-color-scheme: dark) {
+    #breadcrumb-nav {
+        --bs-breadcrumb-divider: var(--breadcrumb-divider-dark);
+    }
+}
+.breadcrumb {
+    background: transparent;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+}
+.breadcrumb-item a {
+    color: var(--breadcrumb-link, #007bff);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.breadcrumb-item.active {
+    color: var(--breadcrumb-active, #6c757d);
+}
+[data-bs-theme="dark"] .breadcrumb-item a {
+    color: #90caf9;
+}
+[data-bs-theme="dark"] .breadcrumb-item.active {
+    color: #b0b0b0;
+}
+/* a {
+    color: var(--breadcrumb-link, #007bff);
+}
+[data-bs-theme="dark"] a {
+    color: #90caf9;
+} */
+[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+    color: #e0e0e0;
+    background-color: transparent;
+    border-color: #888 #888 #181a1b;
+}
+
+[data-bs-theme="dark"] .nav-tabs .nav-link {
+    color: #90caf9;
+}
+
+[data-bs-theme="dark"] .nav-tabs {
+    border-bottom: 1px solid #888;
+}
+
+[data-bs-theme="dark"] table {
+    color: inherit;
+}
+
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: #181a1b;
+    border-color: #888;
+}
+
+[data-bs-theme="dark"] .dropdown-divider {
+    color: #888;
+    opacity: 1.0;
+    background-color: currentColor;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: #90caf9;
+}
+
+[data-bs-theme="dark"] .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.85)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+[data-bs-theme="dark"] .link-preset {
+    color: #90caf9;
 }
