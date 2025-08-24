@@ -102,7 +102,7 @@ body {
     --breadcrumb-divider-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%23b0b0b0'/%3E%3C/svg%3E");
     --bs-breadcrumb-divider: var(--breadcrumb-divider-light);
 }
-@@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
     #breadcrumb-nav {
         --bs-breadcrumb-divider: var(--breadcrumb-divider-dark);
     }
@@ -171,4 +171,14 @@ body {
 
 [data-bs-theme="dark"] .link-preset {
     color: #90caf9;
+}
+
+/* Dark mode for SVG diagrams */
+[data-bs-theme="dark"] .diagram-svg {
+    --diagram-stroke: #e0e0e0;
+    --diagram-dimmed: #808080;
+    --diagram-blue: #90caf9;
+    --diagram-dimmed-blue: #416079;
+    --diagram-magenta: #f76bf7;
+    --diagram-dimmed-magenta: #7c327c;
 }

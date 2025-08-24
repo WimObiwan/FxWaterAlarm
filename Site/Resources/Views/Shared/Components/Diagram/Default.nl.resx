@@ -24,7 +24,7 @@
             <br/>
             De verticale grijze stippellijn geeft het 'zicht' van de sensor weer.
             <br/>
-            Als de put leeg is (0%), meet de sensor een afstand van <span style="font-weight: bold; color: gray;">{0} mm</span> tot het wateroppervlak.
+            Als de put leeg is (0%), meet de sensor een afstand van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span> tot het wateroppervlak.
             ]]>
         </value>
         <comment>This diagram visualizes...</comment>
@@ -32,7 +32,7 @@
     <data name="When full..." xml:space="preserve">
         <value>
             <![CDATA[
-            Als de put volledig vol is (100%), meet de sensor <span style="font-weight: bold; color: gray;">{0} mm</span>.
+            Als de put volledig vol is (100%), meet de sensor <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span>.
             ]]>
         </value>
         <comment>When full...</comment>
@@ -40,7 +40,7 @@
     <data name="Currently..." xml:space="preserve">
         <value>
             <![CDATA[
-            Op dit moment meet de sensor een afstand van <span style="font-weight: bold; color: gray;">{0} mm</span>, wat betekent dat het water <span style="font-weight: bold; color: blue;">{1} mm</span> hoog staat.
+            Op dit moment meet de sensor een afstand van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span>, wat betekent dat het water <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{1} mm</span> hoog staat.
             ]]>
         </value>
         <comment>Currently...</comment>
@@ -48,9 +48,9 @@
     <data name="Capacity..." xml:space="preserve">
         <value>
             <![CDATA[
-            De totale capaciteit van de put bedraagt <span style="font-weight: bold; color: black;">{0} l</span>.
+            De totale capaciteit van de put bedraagt <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-stroke, black);">{0} l</span>.
             <br/>
-            Bij de huidige stand is de put voor <span style="font-weight: bold; color: blue;">{1}%</span> gevuld, goed voor <span style="font-weight: bold; color: blue;">{2} l</span> water.
+            Bij de huidige stand is de put voor <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{1}%</span> gevuld, goed voor <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{2} l</span> water.
             ]]>
         </value>
         <comment>Capacity...</comment>
@@ -58,11 +58,11 @@
     <data name="Unusable..." xml:space="preserve">
         <value>
             <![CDATA[
-            De onderste <span style="font-weight: bold; color: purple;">{0} mm</span> van de put is niet bruikbaar. Dat komt overeen met <span style="font-weight: bold; color: purple;">{1} l</span>.
+            De onderste <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-magenta, purple);">{0} mm</span> van de put is niet bruikbaar. Dat komt overeen met <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-magenta, purple);">{1} l</span>.
             <br/>
-            Daarom is de bruikbare capaciteit van de put <span style="font-weight: bold; color: black;">{2} l</span>.
+            Daarom is de bruikbare capaciteit van de put <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-stroke, black);">{2} l</span>.
             <br/>
-            Van die bruikbare inhoud is de put momenteel voor <span style="font-weight: bold; color: blue;">{3}%</span> gevuld, ofwel <span style="font-weight: bold; color: blue;">{4} l</span> bruikbaar water.
+            Van die bruikbare inhoud is de put momenteel voor <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{3}%</span> gevuld, ofwel <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{4} l</span> bruikbaar water.
             ]]>
         </value>
         <comment>Unusable...</comment>
