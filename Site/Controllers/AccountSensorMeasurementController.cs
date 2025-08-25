@@ -1,8 +1,10 @@
+using Core.Commands;
 using Core.Entities;
 using Core.Queries;
 using Core.Util;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Site.Utilities;
 
 namespace Site.Controllers;
 
@@ -253,6 +255,47 @@ public class AccountSensorMeasurementController : Controller
         }
 
         return result;
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> Delete(
+        string accountLink, string sensorLink,
+        [FromQuery] DateTime timestamp)
+    {
+        // Check if user is admin
+        var userInfo = HttpContext.RequestServices.GetRequiredService<IUserInfo>();
+        if (!await userInfo.IsAdmin())
+        {
+            return Forbid("Admin access required for measurement deletion");
+        }
+
+        try
+        {
+            var accountSensor = await _mediator.Send(new AccountSensorByLinkQuery()
+            {
+                AccountLink = accountLink,
+                SensorLink = sensorLink
+            });
+
+            if (accountSensor == null)
+                return NotFound("Account sensor not found");
+
+            await _mediator.Send(new RemoveMeasurementCommand
+            {
+                SensorUid = accountSensor.Sensor.Uid,
+                Timestamp = timestamp
+            });
+
+            return Ok(new { success = true, message = "Measurement deleted successfully" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { success = false, message = "An error occurred while deleting the measurement" });
+        }
     }
 
     public AccountSensorMeasurementController(IMediator mediator)
