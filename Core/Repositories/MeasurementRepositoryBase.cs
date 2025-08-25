@@ -194,6 +194,67 @@ public abstract class MeasurementRepositoryBase<TRecord, TAggregatedRecord, TMea
         await influxClient.WriteAsync("wateralarm", GetTableName(), new[] { record }, cancellationToken);
     }
 
+    public async Task<TMeasurement[]> GetMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken)
+    {
+        using var influxClient = new InfluxClient(_options.Endpoint, _options.Username, _options.Password);
+        var result = await influxClient.ReadAsync<TRecord>("wateralarm",
+            $"SELECT * FROM {GetTableName()} WHERE DevEUI = $devEui AND time >= $from AND time <= $till ORDER BY time",
+            new { devEui, from, till },
+            cancellationToken);
+
+        var measurements = new List<TMeasurement>();
+        if (result?.Results?.FirstOrDefault()?.Series != null)
+        {
+            foreach (var series in result.Results.First().Series)
+            {
+                if (series.Rows != null)
+                {
+                    measurements.AddRange(series.Rows.Select(record => ReturnMeasurement(series, record)));
+                }
+            }
+        }
+
+        return measurements.ToArray();
+    }
+
+    public async Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken)
+    {
+        // InfluxDB v1.x does support DELETE, but we need to use the HTTP API directly
+        // since Vibrant.InfluxDB.Client doesn't expose delete operations
+        
+        using var httpClient = new HttpClient();
+        var endpoint = _options.Endpoint;
+        
+        // Format timestamps for InfluxDB (RFC3339 format)
+        var fromTimestamp = from.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+        var tillTimestamp = till.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+        
+        // Construct the delete query
+        var deleteQuery = $"DELETE FROM {GetTableName()} WHERE \"DevEUI\" = '{devEui}' AND time >= '{fromTimestamp}' AND time <= '{tillTimestamp}'";
+        
+        // Create the request URL
+        var requestUrl = $"{endpoint}/query?db=wateralarm";
+        if (!string.IsNullOrEmpty(_options.Username))
+        {
+            requestUrl += $"&u={_options.Username}&p={_options.Password}";
+        }
+        
+        // Create form content with the query
+        var formContent = new FormUrlEncodedContent(new[]
+        {
+            new KeyValuePair<string, string>("q", deleteQuery)
+        });
+        
+        // Execute the delete request
+        var response = await httpClient.PostAsync(requestUrl, formContent, cancellationToken);
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new InvalidOperationException($"Failed to delete measurement from InfluxDB: {response.StatusCode} - {errorContent}");
+        }
+    }
+
     protected abstract string GetTableName();
     protected abstract TMeasurement ReturnMeasurement(InfluxSeries<TRecord> series, TRecord record);
     protected abstract TAggregatedMeasurement ReturnAggregatedMeasurement(InfluxSeries<TAggregatedRecord> series, TAggregatedRecord record);
