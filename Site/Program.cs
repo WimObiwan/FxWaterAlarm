@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Net;
 using Core;
+using Core.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
@@ -58,6 +59,7 @@ builder.Services.Configure<RequestLocalizationOptions>(o =>
 
 builder.Services.Configure<AccountLoginMessageOptions>(builder.Configuration.GetSection(AccountLoginMessageOptions.Location));
 builder.Services.Configure<MeasurementDisplayOptions>(builder.Configuration.GetSection(MeasurementDisplayOptions.Location));
+builder.Services.Configure<MeasurementRemovalOptions>(builder.Configuration.GetSection(MeasurementRemovalOptions.Location));
 builder.Services.Configure<ApiKeysOptions>(builder.Configuration.GetSection(ApiKeysOptions.Location));
 
 builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();

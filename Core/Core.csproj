@@ -22,6 +22,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.19" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
         <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+        <PackageReference Include="System.Reflection" Version="4.3.0" />
         <PackageReference Include="Vibrant.InfluxDB.Client" Version="4.0.4" />
     </ItemGroup>
 
