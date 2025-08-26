@@ -67,4 +67,8 @@
         </value>
         <comment>Unusable...</comment>
     </data>
+    <data name="The diagram cannot be displayed because the required data is missing." xml:space="preserve">
+        <value>Het diagram kan niet worden weergegeven omdat vereiste gegevens ontbreken.</value>
+        <comment>The diagram cannot be displayed because the required data is missing.</comment>
+    </data>
 </root>
