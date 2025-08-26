@@ -156,10 +156,16 @@ public class AccountSensor : PageModel
         string accountLink,
         string sensorLink,
         [FromForm] string alarmType,
-        [FromForm] double? alarmThreshold)
+        [FromForm] string? alarmThreshold)
     {
         try
         {
+            double? alarmThresholdNumber;
+            if (!string.IsNullOrWhiteSpace(alarmThreshold) && double.TryParse(alarmThreshold, NumberStyles.Float, CultureInfo.InvariantCulture, out double alarmThreshold2))
+                alarmThresholdNumber = alarmThreshold2;
+            else
+                alarmThresholdNumber = null;
+
             var accountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
             {
                 SensorLink = sensorLink,
@@ -176,7 +182,7 @@ public class AccountSensor : PageModel
                 return new JsonResult(new { success = false, message = "Invalid alarm type" });
 
             // Validate threshold for alarm types that require it
-            if (parsedAlarmType != AccountSensorAlarmType.DetectOn && !alarmThreshold.HasValue)
+            if (parsedAlarmType != AccountSensorAlarmType.DetectOn && !alarmThresholdNumber.HasValue)
                 return new JsonResult(new { success = false, message = "Threshold is required for this alarm type" });
 
             await _mediator.Send(new AddAccountSensorAlarmCommand
@@ -185,7 +191,7 @@ public class AccountSensor : PageModel
                 SensorId = accountSensorEntity.Sensor.Uid,
                 AlarmId = Guid.NewGuid(),
                 AlarmType = parsedAlarmType,
-                AlarmThreshold = alarmThreshold
+                AlarmThreshold = alarmThresholdNumber
             });
 
             return new JsonResult(new { success = true });

@@ -455,7 +455,7 @@
                     const formData = new FormData();
                     formData.append('alarmType', alarmType);
                     if (alarmType !== 'DetectOn') {
-                        formData.append('alarmThreshold', alarmThreshold);
+                        formData.append('alarmThreshold', String(Number(alarmThreshold)));
                     }
 
                     fetch('?handler=AddAlarm', {
@@ -504,7 +504,7 @@
                     formData.append('alarmUid', alarmUid);
                     formData.append('alarmType', alarmType);
                     if (alarmType !== 'DetectOn') {
-                        formData.append('alarmThreshold', alarmThreshold);
+                        formData.append('alarmThreshold', String(Number(alarmThreshold)));
                     }
 
                     fetch('?handler=UpdateAlarm', {
