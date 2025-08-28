@@ -22,6 +22,10 @@ public interface IMeasurementMoistureRepository
     Task<AggregatedMeasurement?> GetLastMedian(string devEui, DateTime from, CancellationToken cancellationToken);
 
     Task Write(RecordMoisture record, CancellationToken cancellationToken);
+
+    Task<MeasurementMoisture[]> GetMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken);
+
+    Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken);
 }
 
 public class MeasurementMoistureRepository : MeasurementRepositoryBase<RecordMoisture, AggregatedRecordMoisture, MeasurementMoisture, AggregatedMeasurement>, IMeasurementMoistureRepository
@@ -38,9 +42,15 @@ public class MeasurementMoistureRepository : MeasurementRepositoryBase<RecordMoi
 
     protected override MeasurementMoisture ReturnMeasurement(InfluxSeries<RecordMoisture> series, RecordMoisture record)
     {
+        string devEui;
+        if (series.GroupedTags.TryGetValue("DevEUI", out var devEuiObject))
+            devEui = (string)devEuiObject;
+        else
+            devEui = record.DevEui;
+
         return new MeasurementMoisture
         {
-            DevEui = (string)series.GroupedTags["DevEUI"],
+            DevEui = devEui,
             Timestamp = record.Timestamp,
             BatV = record.BatV,
             RssiDbm = record.Rssi,
@@ -52,9 +62,15 @@ public class MeasurementMoistureRepository : MeasurementRepositoryBase<RecordMoi
 
     protected override AggregatedMeasurement ReturnAggregatedMeasurement(InfluxSeries<AggregatedRecordMoisture> series, AggregatedRecordMoisture record)
     {
+        string devEui;
+        if (series.GroupedTags.TryGetValue("DevEUI", out var devEuiObject))
+            devEui = (string)devEuiObject;
+        else
+            devEui = record.DevEui;
+
         return new AggregatedMeasurement
         {
-            DevEui = (string)series.GroupedTags["DevEUI"],
+            DevEui = devEui,
             Timestamp = record.Timestamp,
             // MinDistanceMm = record.MinDistance,
             // MeanDistanceMm = record.MeanDistance,

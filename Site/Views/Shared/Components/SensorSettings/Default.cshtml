@@ -563,6 +563,92 @@
                     updateThresholdField();
                 });
             </script>
+
+            @if (await UserInfo.IsAdmin())
+            {
+                <h3>@Loc["Measurement Management"] <span class="badge bg-danger">Admin Only</span></h3>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">@Loc["Remove Individual Measurement"]</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <strong>@Loc["Warning:"]</strong> @Loc["This action permanently removes measurement data from the database. Use with extreme caution."]
+                        </div>
+                        <form id="removeMeasurementForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="measurementTimestamp" class="form-label">@Loc["Timestamp (UTC)"]</label>
+                                    <input type="datetime-local" class="form-control" id="measurementTimestamp" name="timestamp" required 
+                                           title="@Loc["Enter the approximate timestamp of the measurement to remove"]" />
+                                    <div class="form-text">@Loc["Format: YYYY-MM-DD HH:MM (UTC timezone)"]</div>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="button" class="btn btn-danger" onclick="removeMeasurement()">
+                                        <i class="bi bi-trash"></i> @Loc["Remove Measurement"]
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="removeMeasurementResult" class="mt-3" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <script>
+                    function removeMeasurement() {
+                        const timestampInput = document.getElementById('measurementTimestamp');
+                        const timestamp = timestampInput.value;
+                        
+                        if (!timestamp) {
+                            alert('@Loc["Please enter a timestamp"]');
+                            return;
+                        }
+                        
+                        if (!confirm('@Loc["Are you sure you want to permanently remove this measurement? This action cannot be undone."]')) {
+                            return;
+                        }
+
+                        const resultDiv = document.getElementById('removeMeasurementResult');
+                        resultDiv.style.display = 'block';
+                        resultDiv.innerHTML = '<div class="alert alert-info">@Loc["Processing removal request..."]</div>';
+
+                        // Convert local datetime to UTC ISO string for API
+                        const utcTimestamp = new Date(timestamp + 'Z').toISOString();
+                        
+                        // Get API path from current URL
+                        const pathParts = window.location.pathname.split('/');
+                        const accountLink = pathParts[pathParts.length - 2];
+                        const sensorLink = pathParts[pathParts.length - 1];
+                        const apiUrl = `/api/a/${accountLink}/s/${sensorLink}/m?timestamp=${encodeURIComponent(utcTimestamp)}`;
+
+                        fetch(apiUrl, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                resultDiv.innerHTML = '<div class="alert alert-success">' +
+                                    '<strong>@Loc["Success:"]</strong> ' + (data.message || '@Loc["Measurement removed successfully"]') +
+                                    '</div>';
+                                timestampInput.value = '';
+                            } else {
+                                resultDiv.innerHTML = '<div class="alert alert-danger">' +
+                                    '<strong>@Loc["Error:"]</strong> ' + (data.message || '@Loc["Failed to remove measurement"]') +
+                                    '</div>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            resultDiv.innerHTML = '<div class="alert alert-danger">' +
+                                '<strong>@Loc["Error:"]</strong> @Loc["Network error occurred while removing measurement"]' +
+                                '</div>';
+                        });
+                    }
+                </script>
+            }
         }
 
     </div>

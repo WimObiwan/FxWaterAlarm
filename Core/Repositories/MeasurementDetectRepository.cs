@@ -22,6 +22,10 @@ public interface IMeasurementDetectRepository
     Task<AggregatedMeasurement?> GetLastMedian(string devEui, DateTime from, CancellationToken cancellationToken);
 
     Task Write(RecordDetect record, CancellationToken cancellationToken);
+
+    Task<MeasurementDetect[]> GetMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken);
+
+    Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken);
 }
 
 public class MeasurementDetectRepository : MeasurementRepositoryBase<RecordDetect, AggregatedRecordDetect, MeasurementDetect, AggregatedMeasurement>, IMeasurementDetectRepository
@@ -38,9 +42,15 @@ public class MeasurementDetectRepository : MeasurementRepositoryBase<RecordDetec
 
     protected override MeasurementDetect ReturnMeasurement(InfluxSeries<RecordDetect> series, RecordDetect record)
     {
+        string devEui;
+        if (series.GroupedTags.TryGetValue("DevEUI", out var devEuiObject))
+            devEui = (string)devEuiObject;
+        else
+            devEui = record.DevEui;
+
         return new MeasurementDetect
         {
-            DevEui = (string)series.GroupedTags["DevEUI"],
+            DevEui = devEui,
             Timestamp = record.Timestamp,
             Status = record.Status,
             BatV = record.BatV,
@@ -50,9 +60,15 @@ public class MeasurementDetectRepository : MeasurementRepositoryBase<RecordDetec
 
     protected override AggregatedMeasurement ReturnAggregatedMeasurement(InfluxSeries<AggregatedRecordDetect> series, AggregatedRecordDetect record)
     {
+        string devEui;
+        if (series.GroupedTags.TryGetValue("DevEUI", out var devEuiObject))
+            devEui = (string)devEuiObject;
+        else
+            devEui = record.DevEui;
+
         return new AggregatedMeasurement
         {
-            DevEui = (string)series.GroupedTags["DevEUI"],
+            DevEui = devEui,
             Timestamp = record.Timestamp,
             // MinDistanceMm = record.MinDistance,
             // MeanDistanceMm = record.MeanDistance,
