@@ -42,9 +42,15 @@ public class MeasurementLevelRepository : MeasurementRepositoryBase<RecordLevel,
 
     protected override MeasurementLevel ReturnMeasurement(InfluxSeries<RecordLevel> series, RecordLevel record)
     {
+        string devEui;
+        if (series.GroupedTags.TryGetValue("DevEUI", out var devEuiObject))
+            devEui = (string)devEuiObject;
+        else
+            devEui = record.DevEui;
+
         return new MeasurementLevel
         {
-            DevEui = (string)series.GroupedTags["DevEUI"],
+            DevEui = devEui,
             Timestamp = record.Timestamp,
             DistanceMm = (int)record.Distance,
             BatV = record.BatV,
@@ -54,9 +60,15 @@ public class MeasurementLevelRepository : MeasurementRepositoryBase<RecordLevel,
 
     protected override AggregatedMeasurementLevel ReturnAggregatedMeasurement(InfluxSeries<AggregatedRecordLevel> series, AggregatedRecordLevel record)
     {
+        string devEui;
+        if (series.GroupedTags.TryGetValue("DevEUI", out var devEuiObject))
+            devEui = (string)devEuiObject;
+        else
+            devEui = record.DevEui;
+
         return new AggregatedMeasurementLevel
         {
-            DevEui = (string)series.GroupedTags["DevEUI"],
+            DevEui = devEui,
             Timestamp = record.Timestamp,
             MinDistanceMm = (int?)record.MinDistance,
             MeanDistanceMm = (int?)record.MeanDistance,
