@@ -45,10 +45,18 @@
         </value>
         <comment>When full...</comment>
     </data>
-    <data name="Currently..." xml:space="preserve">
+    <data name="Currently... (distance)" xml:space="preserve">
         <value>
             <![CDATA[
             Currently, the sensor measures a distance of <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span>, which means the water is <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{1} mm</span> high.
+            ]]>
+        </value>
+        <comment>Currently...</comment>
+    </data>
+    <data name="Currently... (distance)" xml:space="preserve">
+        <value>
+            <![CDATA[
+            Currently, the sensor measures a height of <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{0} mm</span>.
             ]]>
         </value>
         <comment>Currently...</comment>

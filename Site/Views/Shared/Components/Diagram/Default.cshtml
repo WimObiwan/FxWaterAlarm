@@ -19,13 +19,13 @@ else
 {
 
 var accountSensor = measurementLevelEx.AccountSensor;
-var distance = measurementLevelEx.Distance;
+var measurementDistance = measurementLevelEx.Distance;
 
 int? origEmpty = accountSensor.DistanceMmEmpty;
 int? empty = origEmpty;
 int? unusable = accountSensor.UnusableHeightMm;
-int? current = distance.DistanceMm;
-int? height = distance.HeightMm;
+int? distance = measurementDistance.DistanceMm;
+int? height = measurementDistance.HeightMm;
 int? origFull = accountSensor.DistanceMmFull;
 int full;
 
@@ -35,26 +35,39 @@ if (accountSensor.Sensor.Type == Core.Entities.SensorType.Level)
 }
 else if (accountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
 {
-  full = 50;
   if (origFull.HasValue)
   {
-    empty = origFull.Value + 50;
+    // adjust full level based on current height
+
+    const int baseFull = 200;
+    const int baseFull2 = 200;
+    if (height > origFull.Value + baseFull)
+    {
+      full = ((height ?? 0) - origFull.Value) + baseFull2;
+    }
+    else
+    {
+      full = baseFull + baseFull2;
+    }
+    empty = origFull.Value + full;
+    distance = empty - height;
   }
   else
   {
     empty = null;
-
+    distance = null;
+    full = 0;
   }
 }
 else
 {
   empty = null;
-  current = null;
+  distance = null;
   height = null;
   full = 0;
 }
 
-if (empty == null || current == null || height == null)
+if (empty == null || distance == null || height == null)
 {
     <div class="alert alert-warning">
         @Loc["The diagram cannot be displayed because the required data is missing."]
@@ -62,7 +75,7 @@ if (empty == null || current == null || height == null)
     return;
 }
 
-int? volume = (int?)distance.WaterL;
+int? volume = (int?)measurementDistance.WaterL;
 int? usableCapacityL = (int?)accountSensor.UsableCapacityL;
 int? unusableCapacityL = (int?)accountSensor.UnusableCapacityL;
 int? capacity = (int?)accountSensor.CapacityL;
@@ -73,25 +86,9 @@ int? capacity = (int?)accountSensor.CapacityL;
     WaterAlarm.be
   </text>
 
-  <text x="245" y="55" text-anchor="end" font-size="0.8rem" font-weight="bold" dominant-baseline="hanging">
+  <text x="245" y="55" text-anchor="end" font-size="0.8rem" font-weight="bold" fill="var(--diagram-stroke, black)" dominant-baseline="hanging">
     @accountSensor.Name
   </text>
-
-  <!-- Well -->
-  <path d="
-    M 50 30 
-    V @(50 + full / 10)
-    H 30
-    V @(50 + empty / 10)
-    H 255
-    V @(50 + full / 10)
-    H 130
-    V 30
-    " 
-    fill="none"
-    stroke="var(--diagram-stroke, black)"
-    stroke-width="3"
-    />  
 
 @if (accountSensor.Sensor.Type == Core.Entities.SensorType.Level)
 {
@@ -179,11 +176,11 @@ else if (accountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
   }
 }
 
-@if (current > full)
+@if (distance > full)
 {
-
+  // water is below full level
   <path d="
-    M 30 @(50 + current / 10)
+    M 30 @(50 + distance / 10)
     q 12.5 -3 25 0
     q 12.5  3 25 0
     q 12.5 -3 25 0
@@ -202,7 +199,7 @@ else if (accountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
     />
 
   <path d="
-    M 30 @(50 + current / 10)
+    M 30 @(50 + distance / 10)
     q 12.5 -3 25 0
     q 12.5  3 25 0
     q 12.5 -3 25 0
@@ -219,7 +216,7 @@ else if (accountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
     />
 
   <path d="
-    M 130 @(50 + current / 10)
+    M 130 @(50 + distance / 10)
     V @(50 + empty / 10)
     "
     fill="none"
@@ -231,7 +228,32 @@ else if (accountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
 else
 {
   <path d="
-    M 50 @(50 + current / 10)
+    M 50 @(50 + distance / 10)
+    q 10 -3 20 0
+    q 10  3 20 0
+    q 10 -3 20 0
+    q 10  3 20 0
+    L 130 @(50 + full / 10)
+    H 50
+    Z
+    " 
+    fill="var(--diagram-dimmed-blue, rgba(0, 0, 255, 0.2))"
+    stroke="none"
+    />
+
+  <path d="
+    M 30 @(50 + full / 10)
+    H 255
+    V @(50 + (empty - (unusable ?? 0)) / 10)
+    H 30
+    Z
+    " 
+    fill="var(--diagram-dimmed-blue, rgba(0, 0, 255, 0.2))"
+    stroke="none"
+    />
+
+  <path d="
+    M 50 @(50 + distance / 10)
     q 10 -3 20 0
     q 10  3 20 0
     q 10 -3 20 0
@@ -243,7 +265,7 @@ else
     />
 
   <path d="
-    M 120 @(50 + current / 10)
+    M 120 @(50 + distance / 10)
     V @(50 + empty / 10)
     "
     fill="none"
@@ -256,13 +278,13 @@ else
   @if (accountSensor.Sensor.Type == Core.Entities.SensorType.Level)
   {
     <text> 
-      <text x="65" y="@(50 + current / 10 - 5)" text-anchor="left" font-size="0.8rem" fill="var(--diagram-dimmed, gray)">
-        @current mm
+      <text x="65" y="@(50 + distance / 10 - 5)" text-anchor="left" font-size="0.8rem" fill="var(--diagram-dimmed, gray)">
+        @distance mm
       </text>
     </text>
   }
 
-  @if (accountSensor.DistanceMmFull.HasValue && current - accountSensor.DistanceMmFull.Value > 140)
+  @if (accountSensor.DistanceMmFull.HasValue && distance - accountSensor.DistanceMmFull.Value > 140)
   {
     <text> 
       <text x="65" y="@(50 + full / 10 - 5)" text-anchor="left" font-size="0.8rem" fill="var(--diagram-dimmed, gray)">
@@ -273,7 +295,7 @@ else
 
   @if (accountSensor.Sensor.Type == Core.Entities.SensorType.Level)
   {
-    @if (empty - current > 140)
+    @if (empty - distance > 140)
     {
       <text> 
         <text x="65" y="@(50 + empty / 10 - 5)" text-anchor="left" font-size="0.8rem" fill="var(--diagram-dimmed, gray)">
@@ -294,14 +316,14 @@ else
     }
   }
 
-  <text x="135" y="@(50 + current / 10 + 5)" text-anchor="left" font-size="0.8rem" font-weight="bold" fill="var(--diagram-blue, blue)" dominant-baseline="hanging">
+  <text x="135" y="@(50 + distance / 10 + 5)" text-anchor="left" font-size="0.8rem" font-weight="bold" fill="var(--diagram-blue, blue)" dominant-baseline="hanging">
     @height mm
   </text>
 
   @if (volume.HasValue)
   {
     <text> 
-        <text x="245" y="@(50 + (empty - (unusable ?? 0) + current) / 20)" text-anchor="end" font-size="1rem" font-weight="bold" fill="var(--diagram-blue, blue)" dominant-baseline="middle">
+        <text x="245" y="@(50 + (empty - (unusable ?? 0) + distance) / 20)" text-anchor="end" font-size="1rem" font-weight="bold" fill="var(--diagram-blue, blue)" dominant-baseline="middle">
             @volume l
         </text>
     </text>
@@ -317,7 +339,7 @@ else
   }
   {
     <text> 
-        <text x="245" y="@(50 + (empty - (unusable ?? 0) + current) / 20)" text-anchor="end" font-size="1rem" font-weight="bold" fill="var(--diagram-blue, blue)" dominant-baseline="middle">
+        <text x="245" y="@(50 + (empty - (unusable ?? 0) + distance) / 20)" text-anchor="end" font-size="1rem" font-weight="bold" fill="var(--diagram-blue, blue)" dominant-baseline="middle">
             @volume l
         </text>
     </text>
@@ -332,6 +354,22 @@ else
     </text>
 }
 
+  <!-- Well -->
+  <path d="
+    M 50 30 
+    V @(50 + full / 10)
+    H 30
+    V @(50 + empty / 10)
+    H 255
+    V @(50 + full / 10)
+    H 130
+    V 30
+    " 
+    fill="none"
+    stroke="var(--diagram-stroke, black)"
+    stroke-width="3"
+    />  
+
 </svg>
 
 <p>
@@ -342,7 +380,14 @@ else
     @Html.Raw(Loc.GetString("When full...", @accountSensor.DistanceMmFull))
   }
   <br/>
-  @Html.Raw(Loc.GetString("Currently...", @current, @height))
+  @if (accountSensor.Sensor.Type == Core.Entities.SensorType.Level)
+  {
+    @Html.Raw(Loc.GetString("Currently... (distance)", @distance, @height))
+  }
+  else if (accountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
+  {
+    @Html.Raw(Loc.GetString("Currently... (pressure)", @height))
+  }
   @if (capacity.HasValue && volume.HasValue && measurementLevelEx.Distance.LevelFractionIncludingUnusableHeight is {} levelFractionIncludingUnusableHeight)
   {
     <br/>

@@ -37,13 +37,21 @@
         </value>
         <comment>When full...</comment>
     </data>
-    <data name="Currently..." xml:space="preserve">
+    <data name="Currently... (distance)" xml:space="preserve">
         <value>
             <![CDATA[
             Op dit moment meet de sensor een afstand van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span>, wat betekent dat het water <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{1} mm</span> hoog staat.
             ]]>
         </value>
-        <comment>Currently...</comment>
+        <comment>Currently... (distance)</comment>
+    </data>
+    <data name="Currently... (pressure)" xml:space="preserve">
+        <value>
+            <![CDATA[
+            Op dit moment meet de sensor een hoogte van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{0} mm</span>.
+            ]]>
+        </value>
+        <comment>Currently... (pressure)</comment>
     </data>
     <data name="Capacity..." xml:space="preserve">
         <value>
