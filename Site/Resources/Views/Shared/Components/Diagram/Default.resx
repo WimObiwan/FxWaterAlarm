@@ -53,7 +53,7 @@
         </value>
         <comment>Currently...</comment>
     </data>
-    <data name="Currently... (distance)" xml:space="preserve">
+    <data name="Currently... (pressure)" xml:space="preserve">
         <value>
             <![CDATA[
             Currently, the sensor measures a height of <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{0} mm</span>.
