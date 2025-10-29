@@ -170,6 +170,10 @@ public class MeasurementDistance
         if (!capacityL.HasValue || !resolutionL.HasValue)
             return realLevelFraction;
         
+        // Defensive check: only apply compensation for overflow scenarios
+        if (realLevelFraction <= 1.0)
+            return realLevelFraction;
+        
         // Calculate the height in mm
         var heightMm = (capacityL.Value / resolutionL.Value);
         
