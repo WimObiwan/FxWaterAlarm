@@ -156,47 +156,34 @@ public class MeasurementDistance
 
     private double? ApplyManholeCompensationToFraction(double realLevelFraction)
     {
-        // When level exceeds 100%, calculate the actual water volume considering manhole
-        if (!_accountSensor.UsableCapacityL.HasValue || !_accountSensor.ResolutionL.HasValue)
-            return realLevelFraction;
-        
-        // Calculate the usable height in mm
-        var usableHeightMm = (_accountSensor.UsableCapacityL.Value / _accountSensor.ResolutionL.Value);
-        
-        // Overflow height above 100%
-        var overflowFraction = realLevelFraction - 1.0;
-        var overflowHeightMm = overflowFraction * usableHeightMm;
-        
-        // Volume in manhole (overflow * manhole resolution)
-        var manholeVolumeL = overflowHeightMm * ManholeResolutionLPerMm;
-        
-        // Total volume = full well + manhole
-        var totalVolumeL = _accountSensor.UsableCapacityL.Value + manholeVolumeL;
-        
-        // Return as equivalent fraction
-        return totalVolumeL / _accountSensor.UsableCapacityL.Value;
+        return ApplyManholeCompensation(realLevelFraction, _accountSensor.UsableCapacityL, _accountSensor.ResolutionL);
     }
 
     private double? ApplyManholeCompensationToFractionIncludingUnusableHeight(double realLevelFraction)
     {
+        return ApplyManholeCompensation(realLevelFraction, _accountSensor.CapacityL, _accountSensor.ResolutionL);
+    }
+
+    private double? ApplyManholeCompensation(double realLevelFraction, double? capacityL, double? resolutionL)
+    {
         // When level exceeds 100%, calculate the actual water volume considering manhole
-        if (!_accountSensor.CapacityL.HasValue || !_accountSensor.ResolutionL.HasValue)
+        if (!capacityL.HasValue || !resolutionL.HasValue)
             return realLevelFraction;
         
-        // Calculate the total height in mm (including unusable)
-        var totalHeightMm = (_accountSensor.CapacityL.Value / _accountSensor.ResolutionL.Value);
+        // Calculate the height in mm
+        var heightMm = (capacityL.Value / resolutionL.Value);
         
         // Overflow height above 100%
         var overflowFraction = realLevelFraction - 1.0;
-        var overflowHeightMm = overflowFraction * totalHeightMm;
+        var overflowHeightMm = overflowFraction * heightMm;
         
         // Volume in manhole (overflow * manhole resolution)
         var manholeVolumeL = overflowHeightMm * ManholeResolutionLPerMm;
         
         // Total volume = full well + manhole
-        var totalVolumeL = _accountSensor.CapacityL.Value + manholeVolumeL;
+        var totalVolumeL = capacityL.Value + manholeVolumeL;
         
         // Return as equivalent fraction
-        return totalVolumeL / _accountSensor.CapacityL.Value;
+        return totalVolumeL / capacityL.Value;
     }
 }
