@@ -23,7 +23,7 @@
         <PackageReference Include="IPAddressRange" Version="6.2.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="QRCoder-ImageSharp" Version="0.10.0" />
-        <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.24.0" />
+        <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.30.0" />
     </ItemGroup>
 
     <ItemGroup>
