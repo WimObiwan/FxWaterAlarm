@@ -21,13 +21,33 @@
             <b>Uitleg bij het diagram van de waterput</b>
             <br/>
             Het diagram toont het waterniveau in de waterput, gemeten door een sensor.
-            <br/>
-            De verticale grijze stippellijn geeft het 'zicht' van de sensor weer.
-            <br/>
-            Als de put leeg is (0%), meet de sensor een afstand van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span> tot het wateroppervlak.
             ]]>
         </value>
         <comment>This diagram visualizes...</comment>
+    </data>
+    <data name="The grey line..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            De verticale grijze stippellijn geeft het 'zicht' van de sensor weer.
+            ]]>
+        </value>
+        <comment>The grey line...</comment>
+    </data>
+    <data name="When empty... (level)" xml:space="preserve">
+        <value>
+            <![CDATA[
+            Als de put leeg is, meet de sensor een afstand van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span> tot het wateroppervlak.
+            ]]>
+        </value>
+        <comment>When empty... (level)</comment>
+    </data>
+    <data name="When empty... (pressure)" xml:space="preserve">
+        <value>
+            <![CDATA[
+            Als de put leeg is, hangt de sensor op een afstand van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span> boven de bodem.
+            ]]>
+        </value>
+        <comment>When empty... (pressure)</comment>
     </data>
     <data name="When full..." xml:space="preserve">
         <value>
@@ -40,7 +60,8 @@
     <data name="Currently... (distance)" xml:space="preserve">
         <value>
             <![CDATA[
-            Op dit moment meet de sensor een afstand van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span>, wat betekent dat het water <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{1} mm</span> hoog staat.
+            Op dit moment meet de sensor een afstand van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span>,
+            wat betekent dat het water <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{1} mm</span> hoog staat.
             ]]>
         </value>
         <comment>Currently... (distance)</comment>
@@ -48,7 +69,8 @@
     <data name="Currently... (pressure)" xml:space="preserve">
         <value>
             <![CDATA[
-            Op dit moment meet de sensor een hoogte van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{0} mm</span>.
+            Op dit moment meet de sensor een hoogte van <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span>,
+            wat betekent dat het water <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{1} mm</span> hoog staat.
             ]]>
         </value>
         <comment>Currently... (pressure)</comment>

@@ -37,6 +37,7 @@ else if (accountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
 {
   if (origFull.HasValue)
   {
+    origFull += origEmpty ?? 0;
     // adjust full level based on current height
 
     const int baseFull = 200;
@@ -373,7 +374,22 @@ else
 </svg>
 
 <p>
-  @Html.Raw(Loc.GetString("This diagram visualizes...", @origEmpty ?? 0))
+  @Html.Raw(Loc.GetString("This diagram visualizes..."))
+  @if (accountSensor.Sensor.Type == Core.Entities.SensorType.Level)
+  {
+    <br/>
+    @Html.Raw(Loc.GetString("The grey line..."))
+  }
+  @if (accountSensor.Sensor.Type == Core.Entities.SensorType.Level)
+  {
+    <br/>
+    @Html.Raw(Loc.GetString("When empty... (level)", @origEmpty ?? 0))
+  }
+  else if (accountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
+  {
+    <br/>
+    @Html.Raw(Loc.GetString("When empty... (pressure)", @origEmpty ?? 0))
+  }
   @if (accountSensor.DistanceMmFull.HasValue)
   {
     <br/>
@@ -386,7 +402,7 @@ else
   }
   else if (accountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
   {
-    @Html.Raw(Loc.GetString("Currently... (pressure)", @height))
+    @Html.Raw(Loc.GetString("Currently... (pressure)", @height - (@origEmpty ?? 0), @height))
   }
   @if (capacity.HasValue && volume.HasValue && measurementLevelEx.Distance.LevelFractionIncludingUnusableHeight is {} levelFractionIncludingUnusableHeight)
   {

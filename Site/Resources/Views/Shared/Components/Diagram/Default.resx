@@ -29,13 +29,33 @@
             <b>Explanation of the Water Well Diagram</b>
             <br/>
             The diagram shows the water level in the well, measured by a sensor.
-            <br/>
-            The vertical grey dashed line represents the sensor’s "line of sight."
-            <br/>
-            When the well is empty (0%), the sensor measures a distance of <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span> to the water surface.
             ]]>
         </value>
         <comment>This diagram visualizes...</comment>
+    </data>
+    <data name="The grey line..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            The vertical grey dashed line represents the sensor’s "line of sight."
+            ]]>
+        </value>
+        <comment>The grey line...</comment>
+    </data>
+    <data name="When empty... (level)" xml:space="preserve">
+        <value>
+            <![CDATA[
+            When the well is completely empty, the sensor measures a distance of <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span> to the water surface.
+            ]]>
+        </value>
+        <comment>When empty... (level)</comment>
+    </data>
+    <data name="When empty... (pressure)" xml:space="preserve">
+        <value>
+            <![CDATA[
+            When the well is completely empty, the sensor hangs at a distance of <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span> above the bottom.
+            ]]>
+        </value>
+        <comment>When empty... (pressure)</comment>
     </data>
     <data name="When full..." xml:space="preserve">
         <value>
@@ -48,7 +68,8 @@
     <data name="Currently... (distance)" xml:space="preserve">
         <value>
             <![CDATA[
-            Currently, the sensor measures a distance of <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span>, which means the water is <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{1} mm</span> high.
+            Currently, the sensor measures a distance of <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span>,
+            which means the water is <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{1} mm</span> high.
             ]]>
         </value>
         <comment>Currently...</comment>
@@ -56,7 +77,8 @@
     <data name="Currently... (pressure)" xml:space="preserve">
         <value>
             <![CDATA[
-            Currently, the sensor measures a height of <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{0} mm</span>.
+            Currently, the sensor measures a height of <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-dimmed, gray);">{0} mm</span>,
+            which means the water is <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{1} mm</span> high.
             ]]>
         </value>
         <comment>Currently...</comment>

@@ -85,11 +85,26 @@ public class MeasurementDistance
     {
         get
         {
-            if (DistanceMm.HasValue && _accountSensor is { DistanceMmEmpty: not null, DistanceMmFull: not null })
+            if (!DistanceMm.HasValue)
+                return null;
+
+            if (_accountSensor.Sensor.Type == SensorType.Level)
             {
-                return ((double)_accountSensor.DistanceMmEmpty.Value - DistanceMm.Value)
-                       / ((double)_accountSensor.DistanceMmEmpty.Value - _accountSensor.DistanceMmFull.Value);
+                if (_accountSensor is { DistanceMmEmpty: not null, DistanceMmFull: not null })
+                {
+                    return ((double)_accountSensor.DistanceMmEmpty.Value - DistanceMm.Value)
+                           / ((double)_accountSensor.DistanceMmEmpty.Value - _accountSensor.DistanceMmFull.Value);
+                }
             }
+            else if (_accountSensor.Sensor.Type == SensorType.LevelPressure)
+            {
+                if (_accountSensor is { DistanceMmFull: not null })
+                {
+                    return (((double)(_accountSensor.DistanceMmEmpty ?? 0)) + DistanceMm.Value)
+                           / (((double)(_accountSensor.DistanceMmEmpty ?? 0)) + _accountSensor.DistanceMmFull.Value);
+                }
+            }
+
             return null;
         }
     }
