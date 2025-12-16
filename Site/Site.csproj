@@ -20,7 +20,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="IPAddressRange" Version="6.2.0" />
+        <PackageReference Include="IPAddressRange" Version="6.3.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="QRCoder-ImageSharp" Version="0.10.0" />
         <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.30.0" />
