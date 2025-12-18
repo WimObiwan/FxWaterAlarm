@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Site.Services;
 using Site;
 using Site.Authentication;
 using Site.Identity;
@@ -95,7 +96,11 @@ builder.Services.AddRazorPages(o =>
             .AddPageRoute("/AccountLoginMessageConfirmation", "/account/loginmessageconfirmation")
     )
     .AddViewLocalization();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
 
 builder.Services.AddMarkdown(config =>
         // just add a folder as is
@@ -114,6 +119,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 builder.Services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 builder.Services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
 builder.Services.AddTransient<ITrendService, TrendService>();
+builder.Services.AddSingleton<IMcpDocumentationService, McpDocumentationService>();
 
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)  
     .AddCookie(options =>
