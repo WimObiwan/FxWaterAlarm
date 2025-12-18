@@ -1,13 +1,13 @@
 # WaterAlarm - Water Level Monitoring System
 
-WaterAlarm is a .NET 8.0 water level monitoring system for LoRaWAN sensors that provides web-based dashboards, email alarms, and PowerShell administrative tools. The system uses Entity Framework Core with SQLite for data storage and serves both a public web interface and REST API.
+WaterAlarm is a .NET 10.0 water level monitoring system for LoRaWAN sensors that provides web-based dashboards, email alarms, and PowerShell administrative tools. The system uses Entity Framework Core with SQLite for data storage and serves both a public web interface and REST API.
 
 Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
 
 ## Working Effectively
 
 ### Bootstrap, Build, and Test the Repository
-- Install .NET 8.0 SDK if not available: `wget https://dot.net/v1/dotnet-install.sh && bash dotnet-install.sh --version 8.0.118`
+- Install .NET 10.0 SDK if not available: `wget https://dot.net/v1/dotnet-install.sh && bash dotnet-install.sh --version 10.0`
 - Navigate to repository root: `/home/runner/work/FxWaterAlarm/FxWaterAlarm`
 - Restore dependencies: `dotnet restore` -- takes 75 seconds. NEVER CANCEL. Set timeout to 120+ seconds.
 - Build solution: `dotnet build --configuration Release --no-restore` -- takes 17 seconds. NEVER CANCEL. Set timeout to 60+ seconds.
@@ -23,8 +23,8 @@ Always reference these instructions first and fallback to search or bash command
 
 ### PowerShell Admin Tools
 - Build admin module: `cd Admin && dotnet publish --configuration Release`
-- Navigate to: `cd Admin/bin/Release/net8.0/linux-x64/publish`
-- Import module: `pwsh -c "Import-Module ./WaterAlarmAdmin.dll -Force"`
+- Navigate to: `cd Admin/bin/Release/net10.0/linux-x64/publish`
+- Import module: `pwsh -c "Import-Module ./WaterAlarmAdmin.dll -Force"``
 - Available commands: `Get-WAInfo`, `New-WAAccount`, `Add-WAAccountSensor`, `Set-WAAccountSensorAlarm`, etc.
 - Admin tools require the database to be initialized (run web app first to create database)
 
@@ -83,8 +83,8 @@ Always reference these instructions first and fallback to search or bash command
 ## Technologies and Dependencies
 
 ### Core Technologies
-- .NET 8.0 with C# (nullable reference types enabled)
-- Entity Framework Core 8.0 with SQLite provider
+- .NET 10.0 with C# (nullable reference types enabled)
+- Entity Framework Core 10.0 with SQLite provider
 - ASP.NET Core with Razor Pages
 - MediatR for CQRS pattern
 - PowerShell Standard Library for admin cmdlets
@@ -113,7 +113,7 @@ Always reference these instructions first and fallback to search or bash command
 
 ### GitHub Actions
 - Workflow file: `.github/workflows/build.yml`
-- Runs on: Ubuntu latest with .NET 7.0.x (note: solution uses .NET 8.0 but CI uses 7.0.x)
+- Runs on: Ubuntu latest with .NET 10.0.x
 - Steps: Checkout → Setup .NET → Restore → Build → Test
 - Always run `dotnet restore && dotnet build --configuration Release && dotnet test` before pushing changes
 
@@ -121,7 +121,7 @@ Always reference these instructions first and fallback to search or bash command
 - Production deployment via `scripts/deploy.sh` 
 - Requires parameters: .NET version, target server, paths, service name
 - Handles: Site web app, PowerShell admin module, service restart
-- Example: `./scripts/deploy.sh "net8.0" "user@server" "/var/www/site" "kestrel-service" "/opt/admin" "/opt/console"`
+- Example: `./scripts/deploy.sh "net10.0" "user@server" "/var/www/site" "kestrel-service" "/opt/admin" "/opt/console"`
 
 ## Development Workflow
 - Always build and test changes: `dotnet restore && dotnet build --configuration Release && dotnet test`

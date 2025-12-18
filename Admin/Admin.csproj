@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>WaterAlarmAdmin</AssemblyName>
     <Nullable>enable</Nullable>
     <!-- To fix 'The type initializer for 'Microsoft.Data.Sqlite.SqliteConnection' threw an exception.' -->

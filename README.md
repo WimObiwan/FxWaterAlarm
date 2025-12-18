@@ -23,7 +23,7 @@ Welcome to **WaterAlarm** – a project that started as a hobby and has grown in
 
 WaterAlarm is built with modern, robust technologies and software engineering practices:
 
-- **.NET 8**: Leveraging the latest features and performance improvements of the .NET ecosystem.
+- **.NET 10**: Leveraging the latest features and performance improvements of the .NET ecosystem.
 - **ASP.NET Core**: For building scalable web applications and APIs.
 - **Entity Framework Core**: For data access and migrations, using SQLite as the primary database.
 - **MediatR**: Implements the CQRS (Command Query Responsibility Segregation) pattern for clean separation of concerns.
