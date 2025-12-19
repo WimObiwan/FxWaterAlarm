@@ -4,6 +4,7 @@ namespace Core.Util;
 
 public class MeasurementDistance
 {
+    private const double ManholeResolutionLPerMm = 1.0; // 1 m² area = 1,000,000 mm² = 1 L/mm
     private readonly Core.Entities.AccountSensor _accountSensor;
     
     public MeasurementDistance(int? distanceMm, Core.Entities.AccountSensor accountSensor)
@@ -77,6 +78,13 @@ public class MeasurementDistance
                 if (realLevelFraction.Value < 0.0)
                     return 0.0;
             }
+            
+            // Apply manhole compensation when NoMinMaxConstraints is true and level exceeds 100%
+            if (_accountSensor.NoMinMaxConstraints && realLevelFraction.Value > 1.0)
+            {
+                return ApplyManholeCompensationToFraction(realLevelFraction.Value);
+            }
+            
             return realLevelFraction;
         }
     }
@@ -123,6 +131,13 @@ public class MeasurementDistance
                 if (realLevelFraction.Value < 0.0)
                     return 0.0;
             }
+            
+            // Apply manhole compensation when NoMinMaxConstraints is true and level exceeds 100%
+            if (_accountSensor.NoMinMaxConstraints && realLevelFraction.Value > 1.0)
+            {
+                return ApplyManholeCompensationToFractionIncludingUnusableHeight(realLevelFraction.Value);
+            }
+            
             return realLevelFraction;
         }
     }
@@ -137,5 +152,42 @@ public class MeasurementDistance
 
             return null;
         }
+    }
+
+    private double? ApplyManholeCompensationToFraction(double realLevelFraction)
+    {
+        return ApplyManholeCompensation(realLevelFraction, _accountSensor.UsableCapacityL, _accountSensor.ResolutionL);
+    }
+
+    private double? ApplyManholeCompensationToFractionIncludingUnusableHeight(double realLevelFraction)
+    {
+        return ApplyManholeCompensation(realLevelFraction, _accountSensor.CapacityL, _accountSensor.ResolutionL);
+    }
+
+    private double? ApplyManholeCompensation(double realLevelFraction, double? capacityL, double? resolutionL)
+    {
+        // When level exceeds 100%, calculate the actual water volume considering manhole
+        if (!capacityL.HasValue || !resolutionL.HasValue)
+            return realLevelFraction;
+        
+        // Defensive check: only apply compensation for overflow scenarios
+        if (realLevelFraction <= 1.0)
+            return realLevelFraction;
+        
+        // Calculate the height in mm
+        var heightMm = (capacityL.Value / resolutionL.Value);
+        
+        // Overflow height above 100%
+        var overflowFraction = realLevelFraction - 1.0;
+        var overflowHeightMm = overflowFraction * heightMm;
+        
+        // Volume in manhole (overflow * manhole resolution)
+        var manholeVolumeL = overflowHeightMm * ManholeResolutionLPerMm;
+        
+        // Total volume = full well + manhole
+        var totalVolumeL = capacityL.Value + manholeVolumeL;
+        
+        // Return as equivalent fraction
+        return totalVolumeL / capacityL.Value;
     }
 }
