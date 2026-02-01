@@ -4,7 +4,6 @@ namespace Core.Util;
 
 public class MeasurementDistance
 {
-    private const double ManholeResolutionLPerMm = 1.0; // 1 m² area = 1,000,000 mm² = 1 L/mm
     private readonly Core.Entities.AccountSensor _accountSensor;
     
     public MeasurementDistance(int? distanceMm, Core.Entities.AccountSensor accountSensor)
@@ -168,6 +167,10 @@ public class MeasurementDistance
         if (realLevelFraction <= 1.0)
             return realLevelFraction;
         
+        // If ManholeAreaM2 is null or 0, don't apply manhole compensation (treat as no manhole)
+        if (!_accountSensor.ManholeAreaM2.HasValue || _accountSensor.ManholeAreaM2.Value <= 0.0)
+            return realLevelFraction;
+        
         // Calculate the height in mm
         var heightMm = (capacityL.Value / resolutionL.Value);
         
@@ -175,8 +178,11 @@ public class MeasurementDistance
         var overflowFraction = realLevelFraction - 1.0;
         var overflowHeightMm = overflowFraction * heightMm;
         
+        // Calculate manhole resolution: ManholeAreaM2 (m²) * 1,000,000 (mm² per m²) / 1,000,000 (mm³ per L) = ManholeAreaM2 (L/mm)
+        var manholeResolutionLPerMm = _accountSensor.ManholeAreaM2.Value;
+        
         // Volume in manhole (overflow * manhole resolution)
-        var manholeVolumeL = overflowHeightMm * ManholeResolutionLPerMm;
+        var manholeVolumeL = overflowHeightMm * manholeResolutionLPerMm;
         
         // Total volume = full well + manhole
         var totalVolumeL = capacityL.Value + manholeVolumeL;

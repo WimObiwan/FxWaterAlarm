@@ -389,13 +389,14 @@ public class AccountSensor : PageModel
         [FromForm] int? distanceMmEmpty,
         [FromForm] int? unusableHeightMm,
         [FromForm] int? capacityL,
-        [FromForm] bool? alertsEnabled)
+        [FromForm] bool? alertsEnabled,
+        [FromForm] double? manholeAreaM2)
     {
         SaveResultEnum result =
             await UpdateSettings(
                 mediator, accountLink, sensorLink, page, sensorName, order,
                 distanceMmFull, distanceMmEmpty, unusableHeightMm, capacityL,
-                alertsEnabled);
+                alertsEnabled, manholeAreaM2);
 
         return Redirect($"?page={page}&saveResult={result}");
     }
@@ -411,7 +412,8 @@ public class AccountSensor : PageModel
         int? distanceMmEmpty,
         int? unusableHeightMm,
         int? capacityL,
-        bool? alertsEnabled)
+        bool? alertsEnabled,
+        double? manholeAreaM2)
     {
         if (page != PageTypeEnum.Settings)
         {
@@ -481,7 +483,8 @@ public class AccountSensor : PageModel
                 UnusableHeightMm = new Optional<int?>(true, unusableHeightMm),
                 Name = Optional.From(sensorName),
                 Order = new Optional<int>(true, order ?? 0),
-                AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false)
+                AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false),
+                ManholeAreaM2 = new Optional<double?>(true, manholeAreaM2)
             });
 
             return SaveResultEnum.Saved;

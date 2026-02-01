@@ -85,6 +85,9 @@ namespace Core.Migrations
                     b.Property<bool>("NoMinMaxConstraints")
                         .HasColumnType("INTEGER");
 
+
+                    b.Property<double?>("ManholeAreaM2")
+                        .HasColumnType("REAL");
                     b.Property<int>("Order")
                         .HasColumnType("INTEGER");
 

@@ -32,6 +32,7 @@ public class AccountSensor
     public int? UnusableHeightMm { get; set; }
     public bool AlertsEnabled { get; set; }
     public bool NoMinMaxConstraints { get; set; }
+    public double? ManholeAreaM2 { get; set; }
     
     public IReadOnlyCollection<AccountSensorAlarm> Alarms => _alarms?.AsReadOnly()!;
 

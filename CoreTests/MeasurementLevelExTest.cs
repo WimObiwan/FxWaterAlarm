@@ -148,7 +148,8 @@ public class MeasurementLevelExTest
             CapacityL = 10000,
             CreateTimestamp = DateTime.UtcNow,
             Account = account,
-            NoMinMaxConstraints = true  // Enable overflow
+            NoMinMaxConstraints = true,  // No longer used but kept for backward compatibility
+            ManholeAreaM2 = 1.0  // 1 m² manhole area
         };
 
         // Act
@@ -224,7 +225,8 @@ public class MeasurementLevelExTest
             CapacityL = 9000,
             CreateTimestamp = DateTime.UtcNow,
             Account = account,
-            NoMinMaxConstraints = true
+            NoMinMaxConstraints = true,  // No longer used but kept for backward compatibility
+            ManholeAreaM2 = 1.0  // 1 m² manhole area
         };
 
         // Act
@@ -282,7 +284,8 @@ public class MeasurementLevelExTest
             CapacityL = 10000,
             CreateTimestamp = DateTime.UtcNow,
             Account = account,
-            NoMinMaxConstraints = false  // Value no longer matters - always treated as true
+            NoMinMaxConstraints = false,  // No longer used
+            ManholeAreaM2 = 1.0  // 1 m² manhole area - compensation applied when this is set
         };
 
         // Act
@@ -301,5 +304,59 @@ public class MeasurementLevelExTest
         Assert.Equal(expectedRealLevelFraction, ex.Distance.RealLevelFraction!.Value, 3);
         Assert.Equal(expectedLevelFraction, ex.Distance.LevelFraction!.Value, 3);
         Assert.Equal(expectedTotalVolumeL, ex.Distance.WaterL!.Value, 2);
+    }
+
+    [Fact]
+    public void TestLevelWithOverflow_NoManholeAreaSet()
+    {
+        // Test that when ManholeAreaM2 is null, no compensation is applied (overflow allowed but no manhole)
+        var measurement = new MeasurementLevel
+        {
+            DevEui = "dev888",
+            Timestamp = new DateTime(2025, 8, 9, 17, 0, 0),
+            BatV = 3.6,
+            RssiDbm = -75,
+            DistanceMm = 300 // 125% if not compensated
+        };
+        var sensor = new Sensor
+        {
+            Uid = Guid.NewGuid(),
+            DevEui = "dev888",
+            CreateTimestamp = DateTime.UtcNow,
+            Type = SensorType.Level
+        };
+        var account = new Account
+        {
+            Uid = Guid.NewGuid(),
+            Email = "no-manhole@example.com",
+            CreationTimestamp = DateTime.UtcNow
+        };
+        var accountSensor = new AccountSensor
+        {
+            Sensor = sensor,
+            DistanceMmEmpty = 3000,
+            DistanceMmFull = 800,
+            UnusableHeightMm = 200,
+            CapacityL = 10000,
+            CreateTimestamp = DateTime.UtcNow,
+            Account = account,
+            ManholeAreaM2 = null  // No manhole area set - no compensation
+        };
+
+        // Act
+        var ex = new MeasurementLevelEx(measurement, accountSensor);
+
+        // Assert - should NOT apply manhole compensation when ManholeAreaM2 is null
+        // RealLevelFraction = 1.25 (125%)
+        var expectedRealLevelFraction = 1.25;
+        var usableCapacityL = 10000.0 * (2000.0 / 2200.0);
+        
+        // Without manhole compensation, LevelFraction should equal RealLevelFraction
+        Assert.Equal(expectedRealLevelFraction, ex.Distance.RealLevelFraction!.Value, 3);
+        Assert.Equal(expectedRealLevelFraction, ex.Distance.LevelFraction!.Value, 3);
+        
+        // Water volume is just the fraction times capacity (no manhole adjustment)
+        var expectedWaterL = expectedRealLevelFraction * usableCapacityL;
+        Assert.Equal(expectedWaterL, ex.Distance.WaterL!.Value, 2);
     }
 }

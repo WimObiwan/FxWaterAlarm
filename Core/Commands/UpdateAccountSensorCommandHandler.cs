@@ -20,6 +20,7 @@ public record UpdateAccountSensorCommand : IRequest
     public Optional<int?> CapacityL { get; init; }
     public Optional<bool> AlertsEnabled { get; init; }
     public Optional<bool> NoMinMaxConstraints { get; init; }
+    public Optional<double?> ManholeAreaM2 { get; init; }
 }
 
 public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSensorCommand>
@@ -61,6 +62,8 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
             accountSensor.AlertsEnabled = request.AlertsEnabled.Value;
         if (request.NoMinMaxConstraints is { Specified: true})
             accountSensor.NoMinMaxConstraints = request.NoMinMaxConstraints.Value;
+        if (request.ManholeAreaM2 is { Specified: true})
+            accountSensor.ManholeAreaM2 = request.ManholeAreaM2.Value;
 
         if (request.Order is { Specified: true})
         {
