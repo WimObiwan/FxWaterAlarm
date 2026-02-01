@@ -239,7 +239,7 @@
             <comment>Failed to delete alarm</comment>
         </data>
     <data name="Manhole area" xml:space="preserve">
-        <value>Putdeksel oppervlakte</value>
-        <comment>Putdeksel oppervlakte (voor overloopberekeningen)</comment>
+        <value>Mangat oppervlakte</value>
+        <comment>Mangat oppervlakte (voor overloopberekeningen)</comment>
     </data>
 </root>
