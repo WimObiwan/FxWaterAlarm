@@ -71,19 +71,16 @@ public class MeasurementDistance
             var realLevelFraction = RealLevelFraction;
             if (!realLevelFraction.HasValue)
                 return null;
-            if (!_accountSensor.NoMinMaxConstraints)
-            {
-                if (realLevelFraction.Value > 1.0)
-                    return 1.0;
-                if (realLevelFraction.Value < 0.0)
-                    return 0.0;
-            }
             
-            // Apply manhole compensation when NoMinMaxConstraints is true and level exceeds 100%
-            if (_accountSensor.NoMinMaxConstraints && realLevelFraction.Value > 1.0)
+            // Apply manhole compensation when level exceeds 100%
+            if (realLevelFraction.Value > 1.0)
             {
                 return ApplyManholeCompensationToFraction(realLevelFraction.Value);
             }
+            
+            // Clamp to 0.0 minimum
+            if (realLevelFraction.Value < 0.0)
+                return 0.0;
             
             return realLevelFraction;
         }
@@ -124,19 +121,16 @@ public class MeasurementDistance
             var realLevelFraction = RealLevelFractionIncludingUnusableHeight;
             if (!realLevelFraction.HasValue)
                 return null;
-            if (!_accountSensor.NoMinMaxConstraints)
-            {
-                if (realLevelFraction.Value > 1.0)
-                    return 1.0;
-                if (realLevelFraction.Value < 0.0)
-                    return 0.0;
-            }
             
-            // Apply manhole compensation when NoMinMaxConstraints is true and level exceeds 100%
-            if (_accountSensor.NoMinMaxConstraints && realLevelFraction.Value > 1.0)
+            // Apply manhole compensation when level exceeds 100%
+            if (realLevelFraction.Value > 1.0)
             {
                 return ApplyManholeCompensationToFractionIncludingUnusableHeight(realLevelFraction.Value);
             }
+            
+            // Clamp to 0.0 minimum
+            if (realLevelFraction.Value < 0.0)
+                return 0.0;
             
             return realLevelFraction;
         }

@@ -249,16 +249,16 @@ public class MeasurementLevelExTest
     }
 
     [Fact]
-    public void TestLevelWithoutManholeCompensation_Over100Percent()
+    public void TestLevelWithOverflow_AlwaysAppliesManholeCompensation()
     {
-        // Test that when NoMinMaxConstraints is false, overflow is capped at 100%
+        // Test that overflow always applies manhole compensation (NoMinMaxConstraints always true behavior)
         var measurement = new MeasurementLevel
         {
             DevEui = "dev999",
             Timestamp = new DateTime(2025, 8, 9, 16, 0, 0),
             BatV = 3.5,
             RssiDbm = -85,
-            DistanceMm = 300 // Would be 125% if not capped
+            DistanceMm = 300 // 125% if not compensated
         };
         var sensor = new Sensor
         {
@@ -270,7 +270,7 @@ public class MeasurementLevelExTest
         var account = new Account
         {
             Uid = Guid.NewGuid(),
-            Email = "capped@example.com",
+            Email = "overflow@example.com",
             CreationTimestamp = DateTime.UtcNow
         };
         var accountSensor = new AccountSensor
@@ -282,15 +282,24 @@ public class MeasurementLevelExTest
             CapacityL = 10000,
             CreateTimestamp = DateTime.UtcNow,
             Account = account,
-            NoMinMaxConstraints = false  // Disable overflow
+            NoMinMaxConstraints = false  // Value no longer matters - always treated as true
         };
 
         // Act
         var ex = new MeasurementLevelEx(measurement, accountSensor);
 
-        // Assert - should be capped at 100%
-        Assert.Equal(1.0, ex.Distance.LevelFraction!.Value);
-        var expectedWaterL = 10000.0 * (2000.0 / 2200.0); // 100% of usable capacity
-        Assert.Equal(expectedWaterL, ex.Distance.WaterL!.Value, 2);
+        // Assert - should apply manhole compensation even though NoMinMaxConstraints is false
+        // RealLevelFraction = 1.25 (125%)
+        var expectedRealLevelFraction = 1.25;
+        var usableCapacityL = 10000.0 * (2000.0 / 2200.0);
+        var overflowFraction = 0.25;
+        var overflowHeightMm = overflowFraction * 2000.0;
+        var manholeVolumeL = overflowHeightMm * 1.0;
+        var expectedTotalVolumeL = usableCapacityL + manholeVolumeL;
+        var expectedLevelFraction = expectedTotalVolumeL / usableCapacityL;
+        
+        Assert.Equal(expectedRealLevelFraction, ex.Distance.RealLevelFraction!.Value, 3);
+        Assert.Equal(expectedLevelFraction, ex.Distance.LevelFraction!.Value, 3);
+        Assert.Equal(expectedTotalVolumeL, ex.Distance.WaterL!.Value, 2);
     }
 }

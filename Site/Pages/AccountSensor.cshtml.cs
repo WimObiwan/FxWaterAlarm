@@ -389,14 +389,13 @@ public class AccountSensor : PageModel
         [FromForm] int? distanceMmEmpty,
         [FromForm] int? unusableHeightMm,
         [FromForm] int? capacityL,
-        [FromForm] bool? alertsEnabled,
-        [FromForm] bool? noMinMaxConstraints)
+        [FromForm] bool? alertsEnabled)
     {
         SaveResultEnum result =
             await UpdateSettings(
                 mediator, accountLink, sensorLink, page, sensorName, order,
                 distanceMmFull, distanceMmEmpty, unusableHeightMm, capacityL,
-                alertsEnabled, noMinMaxConstraints);
+                alertsEnabled);
 
         return Redirect($"?page={page}&saveResult={result}");
     }
@@ -412,8 +411,7 @@ public class AccountSensor : PageModel
         int? distanceMmEmpty,
         int? unusableHeightMm,
         int? capacityL,
-        bool? alertsEnabled,
-        bool? noMinMaxConstraints)
+        bool? alertsEnabled)
     {
         if (page != PageTypeEnum.Settings)
         {
@@ -483,8 +481,7 @@ public class AccountSensor : PageModel
                 UnusableHeightMm = new Optional<int?>(true, unusableHeightMm),
                 Name = Optional.From(sensorName),
                 Order = new Optional<int>(true, order ?? 0),
-                AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false),
-                NoMinMaxConstraints = new Optional<bool>(true, noMinMaxConstraints ?? false)
+                AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false)
             });
 
             return SaveResultEnum.Saved;
