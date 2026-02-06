@@ -2,6 +2,10 @@ name: build
 
 on: [push]
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   build:
 
