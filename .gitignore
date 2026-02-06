@@ -47,3 +47,5 @@ upgrade.sh
 CoverageResults/
 
 .lens
+
+scripts/deploy-wateralarm-prd.sh
