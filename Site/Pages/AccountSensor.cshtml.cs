@@ -390,13 +390,13 @@ public class AccountSensor : PageModel
         [FromForm] int? unusableHeightMm,
         [FromForm] int? capacityL,
         [FromForm] bool? alertsEnabled,
-        [FromForm] bool? noMinMaxConstraints)
+        [FromForm] string? manholeAreaM2)
     {
         SaveResultEnum result =
             await UpdateSettings(
                 mediator, accountLink, sensorLink, page, sensorName, order,
                 distanceMmFull, distanceMmEmpty, unusableHeightMm, capacityL,
-                alertsEnabled, noMinMaxConstraints);
+                alertsEnabled, manholeAreaM2);
 
         return Redirect($"?page={page}&saveResult={result}");
     }
@@ -413,7 +413,7 @@ public class AccountSensor : PageModel
         int? unusableHeightMm,
         int? capacityL,
         bool? alertsEnabled,
-        bool? noMinMaxConstraints)
+        string? manholeAreaM2)
     {
         if (page != PageTypeEnum.Settings)
         {
@@ -424,7 +424,6 @@ public class AccountSensor : PageModel
         {
             return SaveResultEnum.NotAuthorized;
         }
-
         // Basic validation
         else if (sensorName == null
                 || capacityL is <= 0
@@ -471,6 +470,21 @@ public class AccountSensor : PageModel
             }
         }
 
+        double? manholeAreaM2Parsed;
+        if (manholeAreaM2 == null)
+        {
+            manholeAreaM2Parsed = null;
+        }
+        else
+        {
+            if (!double.TryParse(manholeAreaM2, CultureInfo.InvariantCulture.NumberFormat, out double manholeAreaM2Parsed2)
+                || manholeAreaM2Parsed2 < 0.0)
+            {
+                return SaveResultEnum.InvalidData;
+            }
+            manholeAreaM2Parsed = manholeAreaM2Parsed2;
+        }
+
         try
         {
             await mediator.Send(new UpdateAccountSensorCommand
@@ -484,7 +498,7 @@ public class AccountSensor : PageModel
                 Name = Optional.From(sensorName),
                 Order = new Optional<int>(true, order ?? 0),
                 AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false),
-                NoMinMaxConstraints = new Optional<bool>(true, noMinMaxConstraints ?? false)
+                ManholeAreaM2 = new Optional<double?>(true, manholeAreaM2Parsed)
             });
 
             return SaveResultEnum.Saved;

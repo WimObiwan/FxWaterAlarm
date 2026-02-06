@@ -153,14 +153,18 @@
                     {
                         <tr>
                             <td>
-                                @Loc["No min/max constraints"] <span class="badge bg-warning">beta</span>
+                                @Loc["Manhole area"]
                             </td>
                             <td>
-                                <div class="form-check form-switch">
-                                    <input type="checkbox" class="form-check-input" 
-                                            name="noMinMaxConstraints"
-                                            value="true"
-                                            @(Model.AccountSensor.NoMinMaxConstraints ? "checked" : "")/>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" style="width: 100px;" 
+                                        aria-describedby="basic-addon-ManholeAreaM2" name="manholeAreaM2"
+                                        inputmode="decimal"
+                                        pattern="[0-9]*[.,]?[0-9]*"
+                                        value="@Model.AccountSensor.ManholeAreaM2?.ToString(System.Globalization.CultureInfo.CurrentCulture)"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="basic-addon-ManholeAreaM2">m²</span>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -193,6 +197,16 @@
                 </table>
                 @Html.AntiForgeryToken()
             </form>
+            <script>
+                // Normalize decimal separator for manholeAreaM2 input (allow both comma and dot)
+                document.querySelector('form[action="?page=Settings"]').addEventListener('submit', function(e) {
+                    const manholeInput = document.querySelector('input[name="manholeAreaM2"]');
+                    if (manholeInput && manholeInput.value) {
+                        // Replace comma with dot for server-side parsing
+                        manholeInput.value = manholeInput.value.replace(',', '.');
+                    }
+                });
+            </script>
 
 
             <script>

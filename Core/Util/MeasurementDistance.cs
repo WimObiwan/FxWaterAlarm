@@ -70,13 +70,17 @@ public class MeasurementDistance
             var realLevelFraction = RealLevelFraction;
             if (!realLevelFraction.HasValue)
                 return null;
-            if (!_accountSensor.NoMinMaxConstraints)
+            
+            // Apply manhole compensation when level exceeds 100%
+            if (realLevelFraction.Value > 1.0)
             {
-                if (realLevelFraction.Value > 1.0)
-                    return 1.0;
-                if (realLevelFraction.Value < 0.0)
-                    return 0.0;
+                return ApplyManholeCompensationToFraction(realLevelFraction.Value);
             }
+            
+            // Clamp to 0.0 minimum
+            if (realLevelFraction.Value < 0.0)
+                return 0.0;
+            
             return realLevelFraction;
         }
     }
@@ -116,13 +120,17 @@ public class MeasurementDistance
             var realLevelFraction = RealLevelFractionIncludingUnusableHeight;
             if (!realLevelFraction.HasValue)
                 return null;
-            if (!_accountSensor.NoMinMaxConstraints)
+            
+            // Apply manhole compensation when level exceeds 100%
+            if (realLevelFraction.Value > 1.0)
             {
-                if (realLevelFraction.Value > 1.0)
-                    return 1.0;
-                if (realLevelFraction.Value < 0.0)
-                    return 0.0;
+                return ApplyManholeCompensationToFractionIncludingUnusableHeight(realLevelFraction.Value);
             }
+            
+            // Clamp to 0.0 minimum
+            if (realLevelFraction.Value < 0.0)
+                return 0.0;
+            
             return realLevelFraction;
         }
     }
@@ -137,5 +145,49 @@ public class MeasurementDistance
 
             return null;
         }
+    }
+
+    private double? ApplyManholeCompensationToFraction(double realLevelFraction)
+    {
+        return ApplyManholeCompensation(realLevelFraction, _accountSensor.UsableCapacityL, _accountSensor.ResolutionL);
+    }
+
+    private double? ApplyManholeCompensationToFractionIncludingUnusableHeight(double realLevelFraction)
+    {
+        return ApplyManholeCompensation(realLevelFraction, _accountSensor.CapacityL, _accountSensor.ResolutionL);
+    }
+
+    private double? ApplyManholeCompensation(double realLevelFraction, double? capacityL, double? resolutionL)
+    {
+        // When level exceeds 100%, calculate the actual water volume considering manhole
+        if (!capacityL.HasValue || !resolutionL.HasValue)
+            return realLevelFraction;
+        
+        // Defensive check: only apply compensation for overflow scenarios
+        if (realLevelFraction <= 1.0)
+            return realLevelFraction;
+        
+        // If ManholeAreaM2 is null or 0, don't apply manhole compensation (treat as no manhole)
+        if (!_accountSensor.ManholeAreaM2.HasValue || _accountSensor.ManholeAreaM2.Value <= 0.0)
+            return 1.0;
+        
+        // Calculate the height in mm
+        var heightMm = (capacityL.Value / resolutionL.Value);
+        
+        // Overflow height above 100%
+        var overflowFraction = realLevelFraction - 1.0;
+        var overflowHeightMm = overflowFraction * heightMm;
+        
+        // Calculate manhole resolution: ManholeAreaM2 (m²) * 1,000,000 (mm² per m²) / 1,000,000 (mm³ per L) = ManholeAreaM2 (L/mm)
+        var manholeResolutionLPerMm = _accountSensor.ManholeAreaM2.Value;
+        
+        // Volume in manhole (overflow * manhole resolution)
+        var manholeVolumeL = overflowHeightMm * manholeResolutionLPerMm;
+        
+        // Total volume = full well + manhole
+        var totalVolumeL = capacityL.Value + manholeVolumeL;
+        
+        // Return as equivalent fraction
+        return totalVolumeL / capacityL.Value;
     }
 }

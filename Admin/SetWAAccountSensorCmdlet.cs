@@ -73,6 +73,9 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
     [Parameter]
     public bool? NoMinMaxConstraints { get; set; }
 
+    [Parameter]
+    public double? ManholeAreaM2 { get; set; }
+
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
         Guid accountId, sensorId;
@@ -108,6 +111,7 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
             CapacityL = Optional.From(CapacityL, -1),
             AlertsEnabled = Optional.From(AlertsEnabled),
             NoMinMaxConstraints = Optional.From(NoMinMaxConstraints),
+            ManholeAreaM2 = Optional.From(ManholeAreaM2, -1.0),
         });
     }
 }

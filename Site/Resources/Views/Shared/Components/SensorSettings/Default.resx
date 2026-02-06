@@ -238,4 +238,8 @@
         <value>Height above</value>
         <comment>Height above</comment>
     </data>
+    <data name="Manhole area" xml:space="preserve">
+        <value>Manhole area</value>
+        <comment>Manhole area (for overflow calculations)</comment>
+    </data>
 </root>

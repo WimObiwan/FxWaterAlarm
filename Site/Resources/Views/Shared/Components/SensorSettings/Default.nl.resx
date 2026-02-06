@@ -238,4 +238,8 @@
             <value>Verwijderen van alarm mislukt</value>
             <comment>Failed to delete alarm</comment>
         </data>
+    <data name="Manhole area" xml:space="preserve">
+        <value>Mangat oppervlakte</value>
+        <comment>Mangat oppervlakte (voor overloopberekeningen)</comment>
+    </data>
 </root>
