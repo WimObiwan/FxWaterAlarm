@@ -169,7 +169,7 @@ public class MeasurementDistance
         
         // If ManholeAreaM2 is null or 0, don't apply manhole compensation (treat as no manhole)
         if (!_accountSensor.ManholeAreaM2.HasValue || _accountSensor.ManholeAreaM2.Value <= 0.0)
-            return realLevelFraction;
+            return 1.0;
         
         // Calculate the height in mm
         var heightMm = (capacityL.Value / resolutionL.Value);
