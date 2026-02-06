@@ -351,12 +351,13 @@ public class MeasurementLevelExTest
         var expectedRealLevelFraction = 1.25;
         var usableCapacityL = 10000.0 * (2000.0 / 2200.0);
         
-        // Without manhole compensation, LevelFraction should equal RealLevelFraction
+        // Without manhole compensation, RealLevelFraction should equal RealLevelFraction
         Assert.Equal(expectedRealLevelFraction, ex.Distance.RealLevelFraction!.Value, 3);
-        Assert.Equal(expectedRealLevelFraction, ex.Distance.LevelFraction!.Value, 3);
+        // Without manhole compensation, LevelFraction should be capped at 1.0 (100%)
+        Assert.Equal(1.0, ex.Distance.LevelFraction!.Value, 3);
         
         // Water volume is just the fraction times capacity (no manhole adjustment)
-        var expectedWaterL = expectedRealLevelFraction * usableCapacityL;
+        var expectedWaterL = usableCapacityL;
         Assert.Equal(expectedWaterL, ex.Distance.WaterL!.Value, 2);
     }
 }
