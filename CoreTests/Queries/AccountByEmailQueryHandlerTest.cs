@@ -33,7 +33,7 @@ public class AccountByEmailQueryHandlerTest
     public async Task Handle_IncludesAccountSensorsAndSensor()
     {
         await using var db = TestDbContext.Create();
-        var (account, sensor, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context, email: "inc@test.com");
+        var (_, sensor, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context, email: "inc@test.com");
         var handler = new AccountByEmailQueryHandler(db.Context);
 
         var result = await handler.Handle(new AccountByEmailQuery { Email = "inc@test.com" }, CancellationToken.None);

@@ -502,7 +502,7 @@ public class CheckAccountSensorAlarmsCommandHandlerTest
     [Fact]
     public async Task PercentageLowAlarm_HighLevel_ClearsAlarm()
     {
-        var (db, handler, messenger, mediator, account, sensor) =
+        var (db, handler, _, mediator, account, sensor) =
             await SetupWithAlarm(AccountSensorAlarmType.PercentageLow, 25.0,
                 lastTriggered: DateTime.UtcNow.AddHours(-1));
         await using var _ = db;
@@ -597,7 +597,7 @@ public class CheckAccountSensorAlarmsCommandHandlerTest
     [Fact]
     public async Task PercentageHighAlarm_LowLevel_ClearsAlarm()
     {
-        var (db, handler, messenger, mediator, account, sensor) =
+        var (db, handler, _, mediator, account, sensor) =
             await SetupWithAlarm(AccountSensorAlarmType.PercentageHigh, 80.0,
                 lastTriggered: DateTime.UtcNow.AddHours(-1));
         await using var _ = db;
@@ -692,7 +692,7 @@ public class CheckAccountSensorAlarmsCommandHandlerTest
     [Fact]
     public async Task HeightLowAlarm_HighHeight_AboveHysteresis_ClearsAlarm()
     {
-        var (db, handler, messenger, mediator, account, sensor) =
+        var (db, handler, _, mediator, account, sensor) =
             await SetupWithAlarm(AccountSensorAlarmType.HeightLow, 500.0,
                 lastTriggered: DateTime.UtcNow.AddHours(-1));
         await using var _ = db;
