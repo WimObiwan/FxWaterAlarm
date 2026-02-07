@@ -122,10 +122,19 @@ public class MessengerTest
             await File.WriteAllTextAsync(Path.Combine(tempDir, "mail.html"), "<html>{{CONTENTS}}</html>");
             await File.WriteAllBytesAsync(Path.Combine(imagesDir, "wateralarm.png"), new byte[] { 0x89, 0x50, 0x4E, 0x47 });
 
-            var options = CreateOptions(mailContentPath: tempDir);
+            // Use invalid host to ensure deterministic SMTP failure
+            var options = new MessengerOptions
+            {
+                Sender = "noreply@wateralarm.be",
+                Bcc = "admin@wateralarm.be",
+                SmtpServer = "invalid.example.invalid",
+                SmtpUsername = "user",
+                SmtpPassword = "pass",
+                MailContentPath = tempDir
+            };
             var messenger = CreateMessenger(options);
 
-            // Content exists but SMTP will fail (no server at localhost:587)
+            // Content exists but SMTP will fail (invalid host)
             // This verifies the template processing completes before SMTP
             var ex = await Assert.ThrowsAnyAsync<Exception>(() =>
                 messenger.SendAuthenticationMailAsync("test@example.com", "https://example.com/login", "123456"));
@@ -151,7 +160,16 @@ public class MessengerTest
             await File.WriteAllTextAsync(Path.Combine(tempDir, "mail.html"), "<html>{{CONTENTS}}</html>");
             await File.WriteAllBytesAsync(Path.Combine(imagesDir, "wateralarm.png"), new byte[] { 0x89, 0x50, 0x4E, 0x47 });
 
-            var options = CreateOptions(mailContentPath: tempDir);
+            // Use invalid host to ensure deterministic SMTP failure
+            var options = new MessengerOptions
+            {
+                Sender = "noreply@wateralarm.be",
+                Bcc = "admin@wateralarm.be",
+                SmtpServer = "invalid.example.invalid",
+                SmtpUsername = "user",
+                SmtpPassword = "pass",
+                MailContentPath = tempDir
+            };
             var messenger = CreateMessenger(options);
 
             var ex = await Assert.ThrowsAnyAsync<Exception>(() =>
@@ -177,7 +195,16 @@ public class MessengerTest
             await File.WriteAllTextAsync(Path.Combine(tempDir, "mail.html"), "<html>{{CONTENTS}}</html>");
             await File.WriteAllBytesAsync(Path.Combine(imagesDir, "wateralarm.png"), new byte[] { 0x89, 0x50, 0x4E, 0x47 });
 
-            var options = CreateOptions(mailContentPath: tempDir);
+            // Use invalid host to ensure deterministic SMTP failure
+            var options = new MessengerOptions
+            {
+                Sender = "noreply@wateralarm.be",
+                Bcc = "admin@wateralarm.be",
+                SmtpServer = "invalid.example.invalid",
+                SmtpUsername = "user",
+                SmtpPassword = "pass",
+                MailContentPath = tempDir
+            };
             var messenger = CreateMessenger(options);
 
             var ex = await Assert.ThrowsAnyAsync<Exception>(() =>
