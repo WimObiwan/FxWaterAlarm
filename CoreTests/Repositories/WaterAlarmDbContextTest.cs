@@ -58,7 +58,7 @@ public class WaterAlarmDbContextTest
     public async Task AccountSensor_JoinEntity_CanBeCreated()
     {
         await using var db = TestDbContext.Create();
-        var (account, sensor, accountSensor) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+        var (account, sensor, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
             email: "join@test.com", accountLink: "joinlink", sensorLink: "joinsensor");
 
         var result = await db.Context.Set<AccountSensor>()

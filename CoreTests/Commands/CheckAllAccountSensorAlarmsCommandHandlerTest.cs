@@ -107,7 +107,7 @@ public class CheckAllAccountSensorAlarmsCommandHandlerTest
     public async Task Handle_EnabledSensorWithoutAlerts_DoesNotSend()
     {
         await using var db = TestDbContext.Create();
-        var (_, _, accountSensor) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+        await TestEntityFactory.SeedAccountWithSensor(db.Context,
             email: "chkall2@test.com", accountLink: "chkall2link", sensorLink: "chkall2sensor");
 
         // AlertsEnabled defaults to false, so even with an alarm, no alerts should be sent

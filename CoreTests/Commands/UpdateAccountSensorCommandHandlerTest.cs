@@ -151,7 +151,7 @@ public class UpdateAccountSensorCommandHandlerTest
     public async Task Handle_UpdateOrder_ResetsAccountSensorOrder()
     {
         await using var db = TestDbContext.Create();
-        var (account, sensor1, as1) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+        var (account, _, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
             email: "uasorder@test.com", accountLink: "uasolink", sensorLink: "uasosensor1", order: 0);
 
         // Add a second sensor to the account
