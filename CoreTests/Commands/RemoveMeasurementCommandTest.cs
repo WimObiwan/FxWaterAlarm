@@ -2,7 +2,7 @@ using System;
 using Core.Configuration;
 using Xunit;
 
-namespace CoreTests;
+namespace CoreTests.Commands;
 
 public class RemoveMeasurementCommandTest
 {

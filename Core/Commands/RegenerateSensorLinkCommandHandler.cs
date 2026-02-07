@@ -24,8 +24,8 @@ public class RegenerateSensorLinkCommandHandler : IRequestHandler<RegenerateSens
     public async Task Handle(RegenerateSensorLinkCommand request, CancellationToken cancellationToken)
     {
         var sensor =
-            await _dbContext.Sensors.SingleOrDefaultAsync(a => a.Uid == request.SensorUid, cancellationToken)
-            ?? throw new AccountNotFoundException("The account cannot be found.") { AccountUid = request.SensorUid };
+            await _dbContext.Sensors.SingleOrDefaultAsync(s => s.Uid == request.SensorUid, cancellationToken)
+            ?? throw new SensorNotFoundException("The sensor cannot be found.") { SensorUid = request.SensorUid };
 
         var link = request.Link ?? RandomLinkGenerator.Get();
 
