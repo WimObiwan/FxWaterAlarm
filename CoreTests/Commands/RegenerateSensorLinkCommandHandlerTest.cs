@@ -46,13 +46,12 @@ public class RegenerateSensorLinkCommandHandlerTest
     }
 
     [Fact]
-    public async Task Handle_SensorNotFound_ThrowsAccountNotFoundException()
+    public async Task Handle_SensorNotFound_ThrowsSensorNotFoundException()
     {
         await using var db = TestDbContext.Create();
         var handler = new RegenerateSensorLinkCommandHandler(db.Context);
 
-        // Note: the source code throws AccountNotFoundException (not Sensor) — testing as-is
-        await Assert.ThrowsAsync<AccountNotFoundException>(() =>
+        await Assert.ThrowsAsync<SensorNotFoundException>(() =>
             handler.Handle(new RegenerateSensorLinkCommand
             {
                 SensorUid = Guid.NewGuid()
