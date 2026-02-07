@@ -36,7 +36,7 @@ public class RandomLinkGeneratorTest
     {
         var results = Enumerable.Range(0, 10).Select(_ => RandomLinkGenerator.Get()).ToList();
 
-        // At least 2 distinct values should be generated (deterministic, non-flaky assertion)
-        Assert.True(results.Distinct().Count() >= 2, "Expected at least 2 distinct values from multiple calls");
+        // At least 8 distinct values should be generated (allows rare collisions, remains deterministic)
+        Assert.True(results.Distinct().Count() >= 8, "Expected at least 8 distinct values from 10 calls");
     }
 }
