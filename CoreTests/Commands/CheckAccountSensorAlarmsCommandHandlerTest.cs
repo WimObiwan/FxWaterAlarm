@@ -787,7 +787,7 @@ public class CheckAccountSensorAlarmsCommandHandlerTest
     [Fact]
     public async Task HeightHighAlarm_LowHeight_BelowHysteresis_ClearsAlarm()
     {
-        var (db, handler, messenger, mediator, account, sensor) =
+        var (db, handler, _, mediator, account, sensor) =
             await SetupWithAlarm(AccountSensorAlarmType.HeightHigh, 1500.0,
                 lastTriggered: DateTime.UtcNow.AddHours(-1));
         await using var _ = db;
