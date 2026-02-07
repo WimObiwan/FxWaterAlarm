@@ -35,16 +35,17 @@ jobs:
           reporter: dotnet-trx
       - name: CI Badges
         uses: gaelgirodon/ci-badges-action@v1
-        if: always()
+        if: always() && vars.GIST_ID != '' && secrets.GIST_TOKEN != ''
         with:
           gist-id: ${{ vars.GIST_ID }}
           token: ${{ secrets.GIST_TOKEN }}
       - name: Upload test results to Codecov
         uses: codecov/test-results-action@v1
+        if: secrets.CODECOV_TOKEN != ''
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload code coverage results to Codecov
         uses: codecov/codecov-action@v5
+        if: secrets.CODECOV_TOKEN != ''
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true # optional (default = false)

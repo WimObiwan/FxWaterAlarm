@@ -13,10 +13,10 @@ public class AddAllDefaultAccountSensorAlarmsCommandHandlerTest
     {
         await using var db = TestDbContext.Create();
         // Seed two account-sensor combos with different sensor types
-        var (account1, sensor1, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+        await TestEntityFactory.SeedAccountWithSensor(db.Context,
             email: "all1@test.com", accountLink: "all1link", sensorLink: "all1sensor",
             sensorType: SensorType.Level);
-        var (account2, sensor2, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+        await TestEntityFactory.SeedAccountWithSensor(db.Context,
             email: "all2@test.com", accountLink: "all2link", sensorLink: "all2sensor",
             sensorType: SensorType.Detect);
 
@@ -47,7 +47,7 @@ public class AddAllDefaultAccountSensorAlarmsCommandHandlerTest
     public async Task Handle_SkipsAccountSensorsWithExistingAlarms()
     {
         await using var db = TestDbContext.Create();
-        var (account, sensor, accountSensor) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+        var (_, _, accountSensor) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
             email: "allskip@test.com", accountLink: "allskiplink", sensorLink: "allskipsensor",
             sensorType: SensorType.Level);
 
