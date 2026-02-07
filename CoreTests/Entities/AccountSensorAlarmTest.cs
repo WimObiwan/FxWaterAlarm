@@ -2,7 +2,7 @@ using Core.Entities;
 using System.Reflection;
 using Xunit;
 
-namespace CoreTests;
+namespace CoreTests.Entities;
 
 public class AccountSensorAlarmTest
 {

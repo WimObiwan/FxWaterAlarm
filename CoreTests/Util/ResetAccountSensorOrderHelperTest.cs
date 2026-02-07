@@ -3,7 +3,7 @@ using Core.Util;
 using System.Reflection;
 using Xunit;
 
-namespace CoreTests;
+namespace CoreTests.Util;
 
 public class ResetAccountSensorOrderHelperTest
 {

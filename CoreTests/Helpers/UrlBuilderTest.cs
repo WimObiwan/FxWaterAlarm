@@ -2,7 +2,7 @@ using Core.Helpers;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
-namespace CoreTests;
+namespace CoreTests.Helpers;
 
 public class UrlBuilderTest
 {
