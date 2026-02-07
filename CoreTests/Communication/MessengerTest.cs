@@ -16,6 +16,11 @@ public class MessengerTest
         {
             throw new SmtpException("Simulated SMTP failure");
         }
+
+        public void Dispose()
+        {
+            // Nothing to dispose in fake implementation
+        }
     }
 
     private class FakeFailingSmtpClientFactory : ISmtpClientFactory

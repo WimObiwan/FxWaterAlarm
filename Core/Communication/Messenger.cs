@@ -21,7 +21,7 @@ public class MessengerOptions
     public string[]? IgnoreBcc { get; init; }
 }
 
-public interface ISmtpClientWrapper
+public interface ISmtpClientWrapper : IDisposable
 {
     Task SendMailAsync(MailMessage message);
 }
@@ -29,6 +29,7 @@ public interface ISmtpClientWrapper
 internal class SmtpClientWrapper : ISmtpClientWrapper
 {
     private readonly SmtpClient _smtpClient;
+    private bool _disposed;
 
     public SmtpClientWrapper(string server, int port, string username, string password, bool enableSsl)
     {
@@ -43,6 +44,15 @@ internal class SmtpClientWrapper : ISmtpClientWrapper
     public async Task SendMailAsync(MailMessage message)
     {
         await _smtpClient.SendMailAsync(message);
+    }
+
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            _smtpClient.Dispose();
+            _disposed = true;
+        }
     }
 }
 
@@ -203,7 +213,7 @@ public class Messenger : IMessenger
             emailAddress = overruleDestination;
         }
 
-        var smtpClient = _smtpClientFactory.CreateClient();
+        using var smtpClient = _smtpClientFactory.CreateClient();
 
         var message = new MailMessage
         {
