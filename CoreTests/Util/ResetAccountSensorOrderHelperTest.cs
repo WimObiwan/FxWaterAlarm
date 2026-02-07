@@ -139,9 +139,7 @@ public class ResetAccountSensorOrderHelperTest
 
     private static bool InvokeResetOrder(Account account, AccountSensor? preferredSensor = null)
     {
-        // ResetAccountSensorOrderHelper is internal, so we need reflection
-        var helperType = typeof(MeasurementLevelEx).Assembly.GetType("Core.Util.ResetAccountSensorOrderHelper")!;
-        var resetMethod = helperType.GetMethod("ResetOrder", BindingFlags.Public | BindingFlags.Static)!;
-        return (bool)resetMethod.Invoke(null, [null, account, preferredSensor])!;
+        // ResetAccountSensorOrderHelper is internal but accessible via InternalsVisibleTo
+        return ResetAccountSensorOrderHelper.ResetOrder(null, account, preferredSensor);
     }
 }
