@@ -8,24 +8,41 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         dotnet-version: [ '10.0.x' ]
 
+    # 👇 Define once, reuse everywhere
+    env:
+      GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
     steps:
       - uses: actions/checkout@v3
+
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+
       - name: Install dependencies
         run: dotnet restore
+
       - name: Build
         run: dotnet build --configuration Release --no-restore
+
       - name: Test
-        run: dotnet test --no-restore --verbosity normal --logger "trx;LogFileName=test-results.trx" --logger "junit;LogFileName=TEST-results.xml" --collect:"XPlat Code Coverage" --settings CoreTests/coverlet.runsettings
+        run: >
+          dotnet test
+          --no-restore
+          --verbosity normal
+          --logger "trx;LogFileName=test-results.trx"
+          --logger "junit;LogFileName=TEST-results.xml"
+          --collect:"XPlat Code Coverage"
+          --settings CoreTests/coverlet.runsettings
+
       - name: Publish Test Results
         uses: dorny/test-reporter@v1
         if: always()
@@ -33,19 +50,22 @@ jobs:
           name: Unit Tests
           path: '**/test-results.trx'
           reporter: dotnet-trx
+
       - name: CI Badges
         uses: gaelgirodon/ci-badges-action@v1
-        if: ${{ always() && vars.GIST_ID != '' && secrets.GIST_TOKEN != '' }}
+        if: ${{ always() && vars.GIST_ID != '' && env.GIST_TOKEN != '' }}
         with:
           gist-id: ${{ vars.GIST_ID }}
-          token: ${{ secrets.GIST_TOKEN }}
+          token: ${{ env.GIST_TOKEN }}
+
       - name: Upload test results to Codecov
-        if: ${{ secrets.CODECOV_TOKEN != '' }}
         uses: codecov/test-results-action@v1
+        if: ${{ env.CODECOV_TOKEN != '' }}
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ env.CODECOV_TOKEN }}
+
       - name: Upload code coverage results to Codecov
-        if: ${{ secrets.CODECOV_TOKEN != '' }}
         uses: codecov/codecov-action@v5
+        if: ${{ env.CODECOV_TOKEN != '' }}
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ env.CODECOV_TOKEN }}
