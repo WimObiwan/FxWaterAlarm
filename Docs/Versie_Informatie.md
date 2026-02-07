@@ -22,6 +22,43 @@ title: Versie Informatie
 > *
 -->
 
+### v1.7
+> 2026-02-07
+> * Bij overflow wordt het volume water in het mangat correct meegeteld. De oppervlakte van het
+>   mangat kan ingesteld worden (sensor instellingen), en het volume water in het mangat wordt
+>   meegeteld bij de berekening van het totale volume water in de put wanneer het waterniveau 100%
+>   overschrijdt.  Hierdoor kunnen ook putten die frequent overstromen correct gemonitord worden.
+
+### v1.6
+> 2026-12-16
+> * Correcties op het diagram bij de dieptesensor wanneer het niveau hoger is dan 100%.
+> * Bijhouden van het sensor-interval, voor beter refresh-gedrag en alarmering.
+
+### v1.5
+> 2026-08-10
+> * Diagram pagina (met de visuele voorstelling van je put) is nu algemeen beschikbaar.
+> * Ondersteuning voor dieptesensoren, die het waterniveau meten met een sensor die onderaan in
+>   de put hangt.
+
+### v1.4
+> 2026-06-07
+> * Volledige administratotieve interface voor beheerders
+
+### v1.3
+> 2026-05-28
+> * Eerste versie van de diagram pagina, met een visuele voorstelling van je put en het
+>   waterniveau.  Deze pagina is voorlopig enkel beschikbaar als "beta" --> alle feedback
+>   is welkom!
+
+### v1.2
+> 2026-05-14
+> * De alarmen worden nu getoond in de instellingen van de sensor.
+
+### v1.1
+> 2026-03-18
+> * Ondersteuning voor bodemvochtigheidssensoren, die het vochtgehalte van de bodem meten.
+>   Bijkomend wordt de verzilting en de elektrische geleidbaarheid van de bodem gemeten.
+
 ### v1.0
 > 2025-02-22
 > * Ondersteuning voor nieuwe sensoren voor "Detectie" LWL02, LWL03.  Inclusief alarmen, maar voorlopig zonder grafiek.
