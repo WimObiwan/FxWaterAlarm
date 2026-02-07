@@ -138,4 +138,68 @@ public class AccountSensorAlarmTest
         Assert.Contains(accountSensor.Alarms, a => a.AlarmType == AccountSensorAlarmType.Battery);
         Assert.Contains(accountSensor.Alarms, a => a.AlarmType == AccountSensorAlarmType.PercentageLow);
     }
+
+    [Fact]
+    public void IsCurrentlyTriggered_NeverTriggered_ReturnsFalse()
+    {
+        var alarm = new AccountSensorAlarm
+        {
+            Uid = Guid.NewGuid(),
+            AlarmType = AccountSensorAlarmType.Data,
+            LastTriggered = null,
+            LastCleared = null
+        };
+        Assert.False(alarm.IsCurrentlyTriggered);
+    }
+
+    [Fact]
+    public void IsCurrentlyCleared_NeverCleared_ReturnsFalse()
+    {
+        var alarm = new AccountSensorAlarm
+        {
+            Uid = Guid.NewGuid(),
+            AlarmType = AccountSensorAlarmType.Data,
+            LastTriggered = null,
+            LastCleared = null
+        };
+        Assert.False(alarm.IsCurrentlyCleared);
+    }
+
+    [Fact]
+    public void IsCurrentlyCleared_ClearedNoTriggered_ReturnsTrue()
+    {
+        var alarm = new AccountSensorAlarm
+        {
+            Uid = Guid.NewGuid(),
+            AlarmType = AccountSensorAlarmType.Battery,
+            LastTriggered = null,
+            LastCleared = DateTime.UtcNow
+        };
+        Assert.True(alarm.IsCurrentlyCleared);
+    }
+
+    [Fact]
+    public void IsCurrentlyTriggered_TriggeredAfterCleared_ReturnsTrue()
+    {
+        var alarm = new AccountSensorAlarm
+        {
+            Uid = Guid.NewGuid(),
+            AlarmType = AccountSensorAlarmType.Data,
+            LastTriggered = DateTime.UtcNow,
+            LastCleared = DateTime.UtcNow.AddMinutes(-10)
+        };
+        Assert.True(alarm.IsCurrentlyTriggered);
+    }
+
+    [Fact]
+    public void AlarmThreshold_CanBeNull()
+    {
+        var alarm = new AccountSensorAlarm
+        {
+            Uid = Guid.NewGuid(),
+            AlarmType = AccountSensorAlarmType.DetectOn,
+            AlarmThreshold = null
+        };
+        Assert.Null(alarm.AlarmThreshold);
+    }
 }
