@@ -3,7 +3,7 @@ using Core.Exceptions;
 using System.Reflection;
 using Xunit;
 
-namespace CoreTests;
+namespace CoreTests.Entities;
 
 public class AccountTest
 {

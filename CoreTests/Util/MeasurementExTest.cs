@@ -2,7 +2,7 @@ using Core.Entities;
 using Core.Util;
 using Xunit;
 
-namespace CoreTests;
+namespace CoreTests.Util;
 
 public class MeasurementExTest
 {

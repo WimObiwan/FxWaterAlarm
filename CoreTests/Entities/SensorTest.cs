@@ -1,7 +1,7 @@
 using Core.Entities;
 using Xunit;
 
-namespace CoreTests;
+namespace CoreTests.Entities;
 
 public class SensorTest
 {

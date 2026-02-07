@@ -4,7 +4,7 @@ using Core.Util;
 using System.Reflection;
 using Xunit;
 
-namespace CoreTests;
+namespace CoreTests.Queries;
 
 public class LastMeasurementQueryHandlerTest
 {
