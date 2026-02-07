@@ -21,6 +21,56 @@ public class MessengerOptions
     public string[]? IgnoreBcc { get; init; }
 }
 
+public interface ISmtpClientWrapper
+{
+    Task SendMailAsync(MailMessage message);
+}
+
+internal class SmtpClientWrapper : ISmtpClientWrapper
+{
+    private readonly SmtpClient _smtpClient;
+
+    public SmtpClientWrapper(string server, int port, string username, string password, bool enableSsl)
+    {
+        _smtpClient = new SmtpClient(server)
+        {
+            Port = port,
+            Credentials = new NetworkCredential(username, password),
+            EnableSsl = enableSsl
+        };
+    }
+
+    public async Task SendMailAsync(MailMessage message)
+    {
+        await _smtpClient.SendMailAsync(message);
+    }
+}
+
+public interface ISmtpClientFactory
+{
+    ISmtpClientWrapper CreateClient();
+}
+
+internal class SmtpClientFactory : ISmtpClientFactory
+{
+    private readonly MessengerOptions _options;
+
+    public SmtpClientFactory(MessengerOptions options)
+    {
+        _options = options;
+    }
+
+    public ISmtpClientWrapper CreateClient()
+    {
+        return new SmtpClientWrapper(
+            _options.SmtpServer,
+            587,
+            _options.SmtpUsername,
+            _options.SmtpPassword,
+            true);
+    }
+}
+
 public interface IMessenger
 {
     Task SendAuthenticationMailAsync(string emailAddress, string url, string code);
@@ -32,13 +82,16 @@ public class Messenger : IMessenger
 {
     private readonly MessengerOptions _messengerOptions;
     private readonly ILogger<Messenger> _logger;
+    private readonly ISmtpClientFactory _smtpClientFactory;
 
     public Messenger(
         IOptions<MessengerOptions> messengerOptions,
-        ILogger<Messenger> logger)
+        ILogger<Messenger> logger,
+        ISmtpClientFactory? smtpClientFactory = null)
     {
         _messengerOptions = messengerOptions.Value;
         _logger = logger;
+        _smtpClientFactory = smtpClientFactory ?? new SmtpClientFactory(_messengerOptions);
     }
 
     private string GetContentPath(string path)
@@ -150,13 +203,7 @@ public class Messenger : IMessenger
             emailAddress = overruleDestination;
         }
 
-        var smtpClient = new SmtpClient(_messengerOptions.SmtpServer)
-        {
-            Port = 587,
-            Credentials = new NetworkCredential(_messengerOptions.SmtpUsername,
-                _messengerOptions.SmtpPassword),
-            EnableSsl = true,
-        };
+        var smtpClient = _smtpClientFactory.CreateClient();
 
         var message = new MailMessage
         {
