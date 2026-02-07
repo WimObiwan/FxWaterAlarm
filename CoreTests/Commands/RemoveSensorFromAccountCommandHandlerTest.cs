@@ -63,12 +63,8 @@ public class RemoveSensorFromAccountCommandHandlerTest
     }
 
     [Fact]
-    public async Task Handle_SensorNotLinked_ThrowsNullReferenceException()
+    public async Task Handle_SensorNotLinked_ThrowsSensorCouldNotBeRemovedException()
     {
-        // NOTE: The handler loads AccountSensors but calls account.RemoveSensor(sensor)
-        // which uses the _sensors backing field (skip-navigation). Since _sensors is never
-        // explicitly loaded, this throws NullReferenceException instead of the intended
-        // SensorCouldNotBeRemovedException. This is a known quirk in the source code.
         await using var db = TestDbContext.Create();
         var account = TestEntityFactory.CreateAccount("notlinked@test.com", "nllink");
         var sensor = TestEntityFactory.CreateSensor(link: "nlsensor");
@@ -80,7 +76,7 @@ public class RemoveSensorFromAccountCommandHandlerTest
         await using var freshCtx = db.CreateFreshContext();
         var handler = new RemoveSensorFromAccountCommandHandler(freshCtx);
 
-        await Assert.ThrowsAsync<NullReferenceException>(() =>
+        await Assert.ThrowsAsync<SensorCouldNotBeRemovedException>(() =>
             handler.Handle(new RemoveSensorFromAccountCommand
             {
                 AccountUid = account.Uid,

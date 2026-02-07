@@ -40,14 +40,12 @@ jobs:
           gist-id: ${{ vars.GIST_ID }}
           token: ${{ secrets.GIST_TOKEN }}
       - name: Upload test results to Codecov
-        if: ${{ secrets.CODECOV_TOKEN != '' }}
-        uses: codecov/test-results-action@v1
         if: secrets.CODECOV_TOKEN != ''
+        uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload code coverage results to Codecov
-        if: ${{ secrets.CODECOV_TOKEN != '' }}
-        uses: codecov/codecov-action@v5
         if: secrets.CODECOV_TOKEN != ''
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
