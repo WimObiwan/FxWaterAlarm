@@ -25,17 +25,26 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
       - name: Test
-        run: dotnet test --no-restore --verbosity normal --logger "trx;LogFileName=test-results.trx" --logger "junit;LogFileName=TEST-results.xml"
-      - name: Publish Test Results
-        uses: dorny/test-reporter@v1
-        if: always()
+        run: dotnet test --no-restore --verbosity normal --logger "trx;LogFileName=test-results.trx" --logger "junit;LogFileName=TEST-results.xml" --collect:"XPlat Code Coverage"
+      # - name: Publish Test Results
+      #   uses: dorny/test-reporter@v1
+      #   if: always()
+      #   with:
+      #     name: Unit Tests
+      #     path: '**/test-results.trx'
+      #     reporter: dotnet-trx
+      # - name: CI Badges
+      #   uses: gaelgirodon/ci-badges-action@v1
+      #   if: always()
+      #   with:
+      #     gist-id: ${{ vars.GIST_ID }}
+      #     token: ${{ secrets.GIST_TOKEN }}
+      - name: Upload test results to Codecov
+        uses: codecov/test-results-action@v1
         with:
-          name: Unit Tests
-          path: '**/test-results.trx'
-          reporter: dotnet-trx
-      - name: CI Badges
-        uses: gaelgirodon/ci-badges-action@v1
-        if: always()
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload code coverage results to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          gist-id: ${{ vars.GIST_ID }}
-          token: ${{ secrets.GIST_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true # optional (default = false)
