@@ -132,4 +132,23 @@ public class AutoTest
         var redirect = Assert.IsType<RedirectResult>(result);
         Assert.Equal("/auto", redirect.Url);
     }
+
+    [Fact]
+    public async Task OnGet_UpdatesCookie_WhenCanonicalUrlDiffersFromCookie()
+    {
+        var mediator = new ConfigurableFakeMediator();
+        var accountSensor = TestEntityFactory.CreateAccountSensor();
+        mediator.SetResponse<AccountSensorByLinkQuery, Core.Entities.AccountSensor?>(accountSensor);
+
+        // Cookie has trailing extra path that will be stripped by TestAutoLink
+        var model = CreateModel(mediator, "/a/test-link/s/test-sensor-link/extra-stuff");
+
+        var result = await model.OnGet();
+
+        var redirect = Assert.IsType<RedirectResult>(result);
+        // TestAutoLink canonicalizes to /a/test-link/s/test-sensor-link
+        Assert.Equal("/a/test-link/s/test-sensor-link", redirect.Url);
+        // Cookie should be updated (Set-Cookie header present)
+        Assert.True(model.HttpContext.Response.Headers.ContainsKey("Set-Cookie"));
+    }
 }
