@@ -201,6 +201,43 @@ public static class TestEntityFactory
             accountSensor);
     }
 
+    public static MeasurementMoistureEx CreateMeasurementMoistureEx(
+        AccountSensor? accountSensor = null,
+        double moisturePrc = 50, double soilTemp = 20, double conductivity = 100)
+    {
+        accountSensor ??= CreateAccountSensor(sensor: CreateSensor(type: SensorType.Moisture));
+        return new MeasurementMoistureEx(
+            new MeasurementMoisture
+            {
+                DevEui = accountSensor.Sensor.DevEui,
+                Timestamp = DateTime.UtcNow,
+                BatV = 3.3,
+                RssiDbm = -90,
+                SoilMoisturePrc = moisturePrc,
+                SoilTemperature = soilTemp,
+                SoilConductivity = conductivity
+            },
+            accountSensor);
+    }
+
+    public static MeasurementThermometerEx CreateMeasurementThermometerEx(
+        AccountSensor? accountSensor = null,
+        double tempC = 22.5, double humPrc = 65)
+    {
+        accountSensor ??= CreateAccountSensor(sensor: CreateSensor(type: SensorType.Thermometer));
+        return new MeasurementThermometerEx(
+            new MeasurementThermometer
+            {
+                DevEui = accountSensor.Sensor.DevEui,
+                Timestamp = DateTime.UtcNow,
+                BatV = 3.3,
+                RssiDbm = -90,
+                TempC = tempC,
+                HumPrc = humPrc
+            },
+            accountSensor);
+    }
+
     public static void SetupPageContext(PageModel model, DefaultHttpContext? httpContext = null)
     {
         httpContext ??= new DefaultHttpContext();

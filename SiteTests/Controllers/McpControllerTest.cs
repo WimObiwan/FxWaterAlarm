@@ -352,6 +352,46 @@ public class McpControllerTest
 
         Assert.NotNull(response.Id);
     }
+
+    [Fact]
+    public async Task ResourcesRead_ReturnsError_WhenEmptyUri()
+    {
+        var controller = CreateController();
+        var request = CreateRequest("resources/read", new { uri = "" });
+
+        var result = await controller.HandleRequest(request);
+        var response = GetResponse(result);
+
+        Assert.NotNull(response.Error);
+        Assert.Equal(-32602, response.Error!.Code);
+    }
+
+    [Fact]
+    public async Task ResourcesRead_ReturnsInternalError_WhenMissingUriProperty()
+    {
+        var controller = CreateController();
+        // Params with valid JsonElement but no "uri" key → KeyNotFoundException → internal error
+        var request = CreateRequest("resources/read", new { notUri = "value" });
+
+        var result = await controller.HandleRequest(request);
+        var response = GetResponse(result);
+
+        Assert.NotNull(response.Error);
+        Assert.Equal(-32603, response.Error!.Code);
+    }
+
+    [Fact]
+    public async Task ToolsCall_ReturnsError_WhenEmptyName()
+    {
+        var controller = CreateController();
+        var request = CreateRequest("tools/call", new { name = "" });
+
+        var result = await controller.HandleRequest(request);
+        var response = GetResponse(result);
+
+        Assert.NotNull(response.Error);
+        Assert.Equal(-32602, response.Error!.Code);
+    }
 }
 
 public class McpMethodNotFoundExceptionTest

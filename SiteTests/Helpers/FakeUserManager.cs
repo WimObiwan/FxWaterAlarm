@@ -50,6 +50,11 @@ public class FakeUserManager : UserManager<IdentityUser>
         return Task.FromResult(VerifyTokenResult);
     }
 
+    public override Task<IdentityResult> UpdateSecurityStampAsync(IdentityUser user)
+    {
+        return Task.FromResult(IdentityResult.Success);
+    }
+
     private class FakeUserStore : IUserStore<IdentityUser>
     {
         public void Dispose() { }
