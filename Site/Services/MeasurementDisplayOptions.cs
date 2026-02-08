@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Site;
+namespace Site.Services;
 
 public class MeasurementDisplayOptions
 {
