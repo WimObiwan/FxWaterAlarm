@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="SiteTests" />
+    </ItemGroup>
+
+    <ItemGroup>
         <None Include="appsettings.Local.json" />
         <None Include="wwwroot\js\Index.js" />
     </ItemGroup>
