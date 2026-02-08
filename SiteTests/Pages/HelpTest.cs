@@ -119,24 +119,20 @@ public class HelpTest
 
         await model.OnPost("sensor-id");
 
-        // account.RestPath (/a/account-link) is used as fallback
-        // But Link is set on account, so RestPath = "/a/account-link" — but Wait... 
-        // the accountSensor.RestPath is null because sensor.Link is null.
-        // So restPath = accountSensor.RestPath (null), then restPath ??= account.RestPath
-        // account.RestPath requires both Account.Link and... actually, Account.RestPath is defined on Account:
-        // We need to check Account entity. Actually, let me check the Help.cshtml code again.
-        // In the Help code: restPath = accountSensor.RestPath → null.
-        // Then: restPath ??= account.RestPath
-        // Account.RestPath checks Account.Link + what? Let's just verify mail was sent.
+        // account.RestPath is used as fallback when accountSensor.RestPath is null
         Assert.Single(messenger.LinkMails);
+        var mail = messenger.LinkMails[0];
+        Assert.Equal("owner@example.com", mail.Email);
+        Assert.Contains("/a/account-link", mail.Url);
     }
 
     [Fact]
-    public async Task OnPost_FallsBackToFPrefixedId_WhenSensorNotFound()
+    public async Task OnPost_SendsLinkMail_WhenSensorFoundById()
     {
         var (model, mediator, messenger) = CreateModel();
-        // First SensorByLinkQuery (id = "sensor123") returns null
-        // Second SensorByLinkQuery (id = "Fsensor123") returns a sensor
+        // Note: ConfigurableFakeMediator returns the same response for any SensorByLinkQuery,
+        // so we cannot actually test the F-prefixed fallback behavior with this setup.
+        // This test verifies that a mail is sent when a sensor is found by ID.
         var account = TestEntityFactory.CreateAccount(link: "account-link", email: "owner@example.com");
         var sensor = TestEntityFactory.CreateSensor(devEui: "Fsensor123");
         var accountSensor = TestEntityFactory.CreateAccountSensor(account: account, sensor: sensor);
@@ -146,10 +142,6 @@ public class HelpTest
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
         field.SetValue(sensorWithAccounts, new List<Core.Entities.AccountSensor> { accountSensor });
 
-        // ConfigurableFakeMediator returns the same response for any SensorByLinkQuery
-        // So both the first and "F"-prefixed queries will return the same sensor.
-        // To properly test the fallback, we'd need a more sophisticated mediator.
-        // For now, just verify the path works with the sensor found.
         mediator.SetResponse<SensorByLinkQuery, Core.Entities.Sensor?>(sensorWithAccounts);
 
         await model.OnPost("sensor123");

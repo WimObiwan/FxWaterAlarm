@@ -68,7 +68,7 @@ public class AdminSensorsTest
     [Fact]
     public async Task OnPostAddSensor_ReturnsNotFound_WhenSensorNotCreated()
     {
-        var (model, mediator) = CreateModel();
+        var (model, _) = CreateModel();
         // SensorQuery returns null
 
         var result = await model.OnPostAddSensor("AA:BB:CC:DD", SensorType.Level);
