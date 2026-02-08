@@ -301,7 +301,7 @@ public class AccountSensorMeasurementControllerTest
     public async Task Delete_ReturnsForbid_WhenNotAdmin()
     {
         var userInfo = new FakeUserInfo { Admin = false };
-        var (controller, mediator) = CreateController(userInfo);
+        var (controller, _) = CreateController(userInfo);
 
         var result = await controller.Delete("a", "s", DateTime.UtcNow);
 
@@ -312,7 +312,7 @@ public class AccountSensorMeasurementControllerTest
     public async Task Delete_ReturnsNotFound_WhenAccountSensorMissing()
     {
         var userInfo = new FakeUserInfo { Admin = true };
-        var (controller, mediator) = CreateController(userInfo);
+        var (controller, _) = CreateController(userInfo);
 
         var result = await controller.Delete("a", "s", DateTime.UtcNow);
 

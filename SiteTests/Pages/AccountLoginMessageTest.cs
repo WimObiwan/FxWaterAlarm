@@ -166,7 +166,7 @@ public class AccountLoginMessageTest
 
         var result = await model.OnGet(mode: 3, emailAddress: null);
 
-        var redirect = Assert.IsType<RedirectResult>(result);
+        Assert.IsType<RedirectResult>(result);
         Assert.Single(messenger.AuthMails);
         Assert.Equal("admin@test.com", messenger.AuthMails[0].Email);
     }
@@ -219,7 +219,7 @@ public class AccountLoginMessageTest
 
         var result = await model.OnGet(mode: 1, accountLink: "demo-link");
 
-        var redirect = Assert.IsType<RedirectResult>(result);
+        Assert.IsType<RedirectResult>(result);
         // Demo email should not have a mail sent
         Assert.Empty(messenger.AuthMails);
     }
@@ -382,10 +382,9 @@ public class AccountLoginMessageTest
             {
                 var page = rvd.TryGetValue("page", out var p) ? p?.ToString() : null;
                 var queryParts = new List<string>();
-                foreach (var kv in rvd)
+                foreach (var kv in rvd.Where(x => x.Key != "page" && x.Key != "handler" && x.Value != null))
                 {
-                    if (kv.Key != "page" && kv.Key != "handler" && kv.Value != null)
-                        queryParts.Add($"{kv.Key}={Uri.EscapeDataString(kv.Value.ToString()!)}");
+                    queryParts.Add($"{kv.Key}={Uri.EscapeDataString(kv.Value.ToString()!)}");
                 }
                 var qs = queryParts.Count > 0 ? "?" + string.Join("&", queryParts) : "";
                 return $"https://localhost{page}{qs}";

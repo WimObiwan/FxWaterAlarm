@@ -142,7 +142,7 @@ public class MeasurementRepositoryBaseTest
     {
         var repo = new TestableMeasurementRepositoryBase();
         var devEui = "A81758FFFE04D4F0";
-        var (filterText, parameters) = repo.TestGetFilter(devEui, null, null);
+        var (_, parameters) = repo.TestGetFilter(devEui, null, null);
 
         var dict = (Dictionary<string, object>)parameters;
         Assert.Equal(devEui, dict["devEui"]);
