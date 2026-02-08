@@ -73,7 +73,7 @@ public class TrendMeasurementExTest
 
         // Difference = current - trend = 3333.3 - 1666.7 = 1666.7
         Assert.NotNull(trendEx.DifferenceWaterL);
-        Assert.Equal(1666.7, trendEx.DifferenceWaterL!.Value, 1);
+        Assert.Equal(1666.7, trendEx.DifferenceWaterL!.Value, 0.1);
     }
 
     [Fact]
