@@ -384,7 +384,8 @@ public class AccountLoginMessageTest
                 var queryParts = new List<string>();
                 foreach (var kv in rvd.Where(x => x.Key != "page" && x.Key != "handler" && x.Value != null))
                 {
-                    queryParts.Add($"{kv.Key}={Uri.EscapeDataString(kv.Value.ToString()!)}");
+                    // Value is guaranteed non-null by the Where filter above
+                    queryParts.Add($"{kv.Key}={Uri.EscapeDataString(kv.Value!.ToString()!)}");
                 }
                 var qs = queryParts.Count > 0 ? "?" + string.Join("&", queryParts) : "";
                 return $"https://localhost{page}{qs}";
