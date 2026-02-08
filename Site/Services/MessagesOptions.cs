@@ -1,4 +1,4 @@
-namespace Site;
+namespace Site.Services;
 
 class MessagesOptions
 {

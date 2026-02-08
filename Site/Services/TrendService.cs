@@ -4,7 +4,7 @@ using Core.Util;
 using MediatR;
 using Site.Utilities;
 
-namespace Site;
+namespace Site.Services;
 
 public interface ITrendService
 {
