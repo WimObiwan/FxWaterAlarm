@@ -70,7 +70,7 @@ public class AdminAccountsTest
     [Fact]
     public async Task OnPostAddAccount_ReturnsNotFound_WhenAccountNotCreated()
     {
-        var (model, mediator) = CreateModel();
+        var (model, _) = CreateModel();
         // AccountQuery returns null
         var result = await model.OnPostAddAccount("Test", "test@test.com");
 

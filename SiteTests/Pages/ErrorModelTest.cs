@@ -30,11 +30,19 @@ public class ErrorModelTest
         httpContext.TraceIdentifier = "trace-456";
         TestEntityFactory.SetupPageContext(model, httpContext);
 
-        // Ensure no current activity
-        Activity.Current = null;
-        model.OnGet();
+        // Store original Activity to restore later
+        var originalActivity = Activity.Current;
+        try
+        {
+            Activity.Current = null;
+            model.OnGet();
 
-        Assert.Equal("trace-456", model.RequestId);
+            Assert.Equal("trace-456", model.RequestId);
+        }
+        finally
+        {
+            Activity.Current = originalActivity;
+        }
     }
 
     [Fact]

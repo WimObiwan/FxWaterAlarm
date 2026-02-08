@@ -115,7 +115,7 @@ public class AccountSensorPageHandlersTest
 
         var result = await model.OnPostTestMailAlertAsync(mediator, messenger, "a", "s");
 
-        var json = Assert.IsType<JsonResult>(result);
+        Assert.IsType<JsonResult>(result);
         Assert.Single(messenger.AlertMails);
     }
 
@@ -124,7 +124,7 @@ public class AccountSensorPageHandlersTest
     [Fact]
     public async Task OnPostAddAlarm_ReturnsNotFound_WhenAccountSensorMissing()
     {
-        var (model, mediator, _, _, _) = CreateModel();
+        var (model, _, _, _, _) = CreateModel();
 
         var result = await model.OnPostAddAlarmAsync("a", "s", "Data", "50");
 
@@ -243,7 +243,6 @@ public class AccountSensorPageHandlersTest
         // Actually, looking at ConfigurableFakeMediator: ThrowOnSend + ExceptionToThrow throws
         // before checking _responses. Let me use a custom mediator instead.
 
-        var throwMediator = new CommandThrowingMediator(acctSensor);
         // Need to call via the model's private _mediator. OnPostAddAlarmAsync uses _mediator directly.
         // Can't swap _mediator on the model. Let me reconsider.
         // The OnPostAddAlarmAsync uses _mediator (the one from constructor), not a parameter.
@@ -259,7 +258,7 @@ public class AccountSensorPageHandlersTest
     [Fact]
     public async Task OnPostUpdateAlarm_ReturnsNotFound_WhenAccountSensorMissing()
     {
-        var (model, mediator, _, _, _) = CreateModel();
+        var (model, _, _, _, _) = CreateModel();
 
         var result = await model.OnPostUpdateAlarmAsync("a", "s",
             Guid.NewGuid().ToString(), "Data", 50.0);
@@ -361,7 +360,7 @@ public class AccountSensorPageHandlersTest
     [Fact]
     public async Task OnPostDeleteAlarm_ReturnsNotFound_WhenAccountSensorMissing()
     {
-        var (model, mediator, _, _, _) = CreateModel();
+        var (model, _, _, _, _) = CreateModel();
 
         var result = await model.OnPostDeleteAlarmAsync("a", "s", Guid.NewGuid().ToString());
 
@@ -417,7 +416,7 @@ public class AccountSensorPageHandlersTest
     [Fact]
     public async Task OnGetExportCsv_ReturnsNotFound_WhenAccountSensorMissing()
     {
-        var (model, mediator, _, _, _) = CreateModel();
+        var (model, _, _, _, _) = CreateModel();
 
         var result = await model.OnGetExportCsv("a", "s");
 
@@ -463,7 +462,8 @@ public class AccountSensorPageHandlersTest
         Assert.IsType<EmptyResult>(result);
 
         ms.Position = 0;
-        var csv = new StreamReader(ms).ReadToEnd();
+        using var reader = new StreamReader(ms);
+        var csv = reader.ReadToEnd();
         Assert.Contains("DevEui", csv);
         Assert.Contains("Timestamp", csv);
         Assert.Contains("DistanceMm", csv);

@@ -166,7 +166,7 @@ public class AccountCallbackTest
     [Fact]
     public async Task OnGet_UsesTokenLifespanFromConfig()
     {
-        var (model, userManager, httpContext) = CreateModel();
+        var (model, userManager, _) = CreateModel();
         userManager.AddUser("user@test.com");
         userManager.VerifyTokenResult = true;
 

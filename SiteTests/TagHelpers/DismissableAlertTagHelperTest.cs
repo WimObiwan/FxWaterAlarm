@@ -142,8 +142,6 @@ public class DismissableAlertTagHelperTest
 
         var classAttr = output.Attributes["class"]?.Value?.ToString();
         Assert.NotNull(classAttr);
-        // When AlertClass is null, the expression "alert-" + AlertClass ?? "success"
-        // evaluates to "alert-" (due to operator precedence: ("alert-" + null) ?? "success" = "alert-")
-        Assert.Contains("alert", classAttr);
+        Assert.Contains("alert-success", classAttr);
     }
 }

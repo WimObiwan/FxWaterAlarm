@@ -21,7 +21,7 @@ public class DismissableAlertTagHelper : TagHelper
         output.TagName = "div";
         output.Attributes.SetAttribute("id", Id);
         output.AddClass("alert", HtmlEncoder.Default);
-        output.AddClass("alert-" + AlertClass ?? "success", HtmlEncoder.Default);
+        output.AddClass("alert-" + (AlertClass ?? "success"), HtmlEncoder.Default);
         output.AddClass("alert-dismissible", HtmlEncoder.Default);
         output.AddClass("fade", HtmlEncoder.Default);
         output.AddClass("in", HtmlEncoder.Default);
