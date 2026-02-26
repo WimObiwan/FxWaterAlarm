@@ -416,6 +416,35 @@ else
     @Html.Raw(Loc.GetString("Unusable...", unusable.Value, unusableCapacityL.Value, capacity.Value - unusableCapacityL.Value,
       Math.Round(levelFraction * 100, 2), volume.Value))
   }
+  @{
+    int? overflowMm = null;
+    if (accountSensor.DistanceMmFull.HasValue && height.HasValue)
+    {
+      if (accountSensor.Sensor.Type == Core.Entities.SensorType.Level)
+      {
+        int fullHeightMm = (accountSensor.DistanceMmEmpty ?? 0) - accountSensor.DistanceMmFull.Value;
+        if (height.Value > fullHeightMm)
+          overflowMm = height.Value - fullHeightMm;
+      }
+      else if (accountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
+      {
+        int fullHeightMm = accountSensor.DistanceMmFull.Value + (accountSensor.DistanceMmEmpty ?? 0);
+        if (height.Value > fullHeightMm)
+          overflowMm = height.Value - fullHeightMm;
+      }
+    }
+  }
+  @if (overflowMm.HasValue && overflowMm.Value > 0)
+  {
+    <br/>
+    @Html.Raw(Loc.GetString("Overflow...", overflowMm.Value))
+    @if (accountSensor.ManholeAreaM2.HasValue && accountSensor.ManholeAreaM2.Value > 0)
+    {
+      var overflowVolumeL = Math.Round(overflowMm.Value * accountSensor.ManholeAreaM2.Value, 0);
+      <br/>
+      @Html.Raw(Loc.GetString("Overflow volume...", overflowVolumeL))
+    }
+  }
 </p>
 <hr>
 @*

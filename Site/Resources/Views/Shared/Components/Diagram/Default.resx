@@ -109,4 +109,20 @@
         <value>The diagram cannot be displayed because the required data is missing.</value>
         <comment>The diagram cannot be displayed because the required data is missing.</comment>
     </data>
+    <data name="Overflow..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            The water is currently higher than the top edge of the water well. Currently there is <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{0} mm</span> of water in the manhole.
+            ]]>
+        </value>
+        <comment>Overflow...</comment>
+    </data>
+    <data name="Overflow volume..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            This corresponds to <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{0} l</span> extra.
+            ]]>
+        </value>
+        <comment>Overflow volume...</comment>
+    </data>
 </root>

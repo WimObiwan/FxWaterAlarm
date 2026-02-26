@@ -101,4 +101,20 @@
         <value>Het diagram kan niet worden weergegeven omdat vereiste gegevens ontbreken.</value>
         <comment>The diagram cannot be displayed because the required data is missing.</comment>
     </data>
+    <data name="Overflow..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            Het water staat momenteel hoger dan de bovenste rand van de waterput. Momenteel staat er <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{0} mm</span> water in het mangat.
+            ]]>
+        </value>
+        <comment>Overflow...</comment>
+    </data>
+    <data name="Overflow volume..." xml:space="preserve">
+        <value>
+            <![CDATA[
+            Dit komt overeen met <span class="diagram-svg" style="font-weight: bold; color: var(--diagram-blue, blue);">{0} l</span> extra.
+            ]]>
+        </value>
+        <comment>Overflow volume...</comment>
+    </data>
 </root>
