@@ -1,0 +1,11 @@
+# https://github.com/Huachao/vscode-restclient/blob/master/README.md
+
+# Variables
+@baseUrl = https://www.wateralarm.be
+@accountId = demo
+@sensorId = f2y616afaEA
+
+###
+# Get sensor data
+
+GET {{baseUrl}}/api/a/{{accountId}}/s/{{sensorId}}
