@@ -48,4 +48,5 @@ CoverageResults/
 
 .lens
 
+scripts/deploy-wateralarm-dev.sh
 scripts/deploy-wateralarm-prd.sh
