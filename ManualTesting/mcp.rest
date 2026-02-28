@@ -1,0 +1,42 @@
+# https://github.com/Huachao/vscode-restclient/blob/master/README.md
+
+# Variables
+@baseUrl = https://www.wateralarm.be
+@accountId = demo
+@sensorId = f2y616afaEA
+
+
+###
+# MCP initialize 
+
+POST {{baseUrl}}/mcp
+Content-Type: application/json
+
+{
+    "jsonrpc": "2.0",
+    "method": "initialize"
+}
+
+
+###
+# MCP resources/list 
+
+POST {{baseUrl}}/mcp
+Content-Type: application/json
+
+{
+    "jsonrpc": "2.0",
+    "method": "resources/list"
+}
+
+
+###
+# MCP tools/list 
+
+POST {{baseUrl}}/mcp
+Content-Type: application/json
+
+{
+    "jsonrpc": "2.0",
+    "method": "tools/list"
+}
