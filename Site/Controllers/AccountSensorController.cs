@@ -68,8 +68,15 @@ class TrendsDto
     public required Trend Trend30D { get; init; }
 }
 
+class SensorDto
+{
+    public required string SensorType { get; init; }
+    public int? ExpectedIntervalSecs { get; init; }
+}
+
 class AccountSensorResult
 {
+    public required SensorDto Sensor { get; init; }
     public required AccountSensorDto AccountSensor { get; init; }
     public required LastMeasurementDto? LastMeasurement { get; init; }
     public required TrendsDto? Trends { get; init; }
@@ -150,6 +157,11 @@ public class AccountSensorController : Controller
 
             result = new AccountSensorResult
             {
+                Sensor = new SensorDto
+                {
+                    SensorType = accountSensor.Sensor.Type.ToString(),
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
+                },
                 AccountSensor = new AccountSensorDto
                 {
                     Name = accountSensor.Name,
@@ -189,6 +201,11 @@ public class AccountSensorController : Controller
 
             result = new AccountSensorResult
             {
+                Sensor = new SensorDto
+                {
+                    SensorType = accountSensor.Sensor.Type.ToString(),
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
+                },
                 AccountSensor = new AccountSensorDto
                 {
                     Name = accountSensor.Name,
