@@ -37,6 +37,11 @@ class LastMeasurementDto
     public double? RealLevelFraction { get; init; }
     public DateTime EstimatedNextRefresh { get; init; }
     public int? Status { get; init; }
+    public double? SoilMoisturePrc { get; init; }
+    public double? SoilConductivity { get; init; }
+    public double? SoilTemperatureC { get; init; }
+    public double? TempC { get; init; }
+    public double? HumPrc { get; init; }
 }
 
 class Trend
@@ -192,6 +197,85 @@ public class AccountSensorController : Controller
                     RssiDbm = measurementDetectEx.RssiDbm,
                     RssiPrc = measurementDetectEx.RssiPrc,
                     Status = measurementDetectEx.Status,
+                };
+            }
+            else
+            {
+                lastMeasurementDto = null;
+            }
+
+            result = new AccountSensorResult
+            {
+                Sensor = new SensorDto
+                {
+                    SensorType = accountSensor.Sensor.Type.ToString(),
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
+                },
+                AccountSensor = new AccountSensorDto
+                {
+                    Name = accountSensor.Name,
+                    CreateTimestamp = accountSensor.CreateTimestamp,
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
+                },
+                LastMeasurement = lastMeasurementDto,
+                Trends = null
+            };
+        }
+        else if (measurementEx is MeasurementMoistureEx measurementMoistureEx)
+        {
+            LastMeasurementDto? lastMeasurementDto;
+            if (measurementMoistureEx != null)
+            {
+                lastMeasurementDto = new LastMeasurementDto
+                {
+                    TimeStamp = measurementMoistureEx.Timestamp,
+                    BatV = measurementMoistureEx.BatV,
+                    BatteryPrc = measurementMoistureEx.BatteryPrc,
+                    RssiDbm = measurementMoistureEx.RssiDbm,
+                    RssiPrc = measurementMoistureEx.RssiPrc,
+                    SoilMoisturePrc = measurementMoistureEx.SoilMoisturePrc,
+                    SoilConductivity = measurementMoistureEx.SoilConductivity,
+                    SoilTemperatureC = measurementMoistureEx.SoilTemperatureC,
+                    EstimatedNextRefresh = measurementMoistureEx.EstimateNextRefresh()
+                };
+            }
+            else
+            {
+                lastMeasurementDto = null;
+            }
+
+            result = new AccountSensorResult
+            {
+                Sensor = new SensorDto
+                {
+                    SensorType = accountSensor.Sensor.Type.ToString(),
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
+                },
+                AccountSensor = new AccountSensorDto
+                {
+                    Name = accountSensor.Name,
+                    CreateTimestamp = accountSensor.CreateTimestamp,
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
+                },
+                LastMeasurement = lastMeasurementDto,
+                Trends = null
+            };
+        }
+        else if (measurementEx is MeasurementThermometerEx measurementThermometerEx)
+        {
+            LastMeasurementDto? lastMeasurementDto;
+            if (measurementThermometerEx != null)
+            {
+                lastMeasurementDto = new LastMeasurementDto
+                {
+                    TimeStamp = measurementThermometerEx.Timestamp,
+                    BatV = measurementThermometerEx.BatV,
+                    BatteryPrc = measurementThermometerEx.BatteryPrc,
+                    RssiDbm = measurementThermometerEx.RssiDbm,
+                    RssiPrc = measurementThermometerEx.RssiPrc,
+                    TempC = measurementThermometerEx.TempC,
+                    HumPrc = measurementThermometerEx.HumPrc,
+                    EstimatedNextRefresh = measurementThermometerEx.EstimateNextRefresh()
                 };
             }
             else
