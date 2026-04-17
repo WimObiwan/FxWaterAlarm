@@ -3,5 +3,9 @@
         "plaintext": true,
         "markdown": true
     },
-    "github.copilot.nextEditSuggestions.enabled": true
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "chat.tools.terminal.autoApprove": {
+        "dotnet build": true,
+        "dotnet test": true
+    }
 }
