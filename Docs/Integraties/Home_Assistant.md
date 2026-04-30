@@ -4,66 +4,79 @@ title: API
 
 # Home Assistant
 
-Om de data van WaterAlarm in te lezen met Home-Assistant dien je de configuratie
-manueel aan te passen.
+WaterAlarm heeft een Home Assistant integratie gemaakt.  Deze integratie is nog in een vroege fase, en er kunnen nog dingen veranderen.  De integratie is beschikbaar via HACS - Home Assistant Community Store, een grote verzameling van community-made integraties voor Home Assistant.  Volg deze stappan om de integratie te installeren.
 
-## Stap 1: Configuratie-bestand openen
+## Stap 1: Installeer HACS
 
-Dit hangt af van je soort installatie:  
-https://www.home-assistant.io/docs/configuration/
+Eerst moet je "HACS" installeren.  De kans is groot dat je dit al hebt, want dit biedt een groot aantal extra integraties.
+Als je het niet kent is het sowieso zeer interessant, ook zonder WaterAlarm.
+Wanneer je HACS hebt, is dit beschikbaar via de sidebar.
+Uitleg over de installatie van HACS vind je hier: https://www.hacs.xyz/docs/use/download/download/ 
 
-Als je Home Assistant OS gebruikte, kan deze video ook nuttig zijn:  
-https://www.youtube.com/watch?v=7AU5i-WUUxw
+## Stap 2: WaterAlarm integratie installeren via HACS
 
-Het configuratie-bestand dat je nodig hebt is `configuration.yaml`.
-Let goed op de spaties om de lijnen te laten inspringen.  Die zijn belangrijk.  De syntax is in *yaml*, meer info vind je op [Wikipedia](https://en.wikipedia.org/wiki/YAML).
+Daarna moet je instellen in HACS waar de integratie zich bevindt.
 
-## Stap 2: Configuratie file aanpassen
+1. Custom repository toevoegen
 
-Voeg onderaan in de file deze blok toe:
+  - In je Home Assistant ga je via de sidebar naar HACS
+  - Klik rechtsboven op de "..."
+  - Kies daar "Custom repositories"
+  - Je krijgt een popup window "Custom repositories"
+  - En voeg een nieuwe repository toe:  
+    https://github.com/WimObiwan/FxWaterAlarm-HomeAssistant  
+    Kies als type "Integration"  
+    Klik op Add  
+    Sluit deze popup window  
+    ![Screenshot](Home_Assistant_2a.png)
+    ![Screenshot](Home_Assistant_2b.png)
+2. Integratie installeren via HACS
+  - In HACS zoek je bovenaan naar "WaterAlarm"  
+    Je vindt normaal één resultaat.
+  - Klik rechts op de "..."
+  - Kies "Download"
+    ![Screenshot](Home_Assistant_2c.png)
+3. Nu kun je installeren in Home Assistant via de normale weg
+  - Ga naar "Settings" --> "Devices & Services"
+  - Klik op "Integrations"
+  - Klik op "Add Integration"
+  - Zoek naar "WaterAlarm", je vindt normaal één resultaat
+  - Klik op "WaterAlarm"
+    ![Screenshot](Home_Assistant_2d.png)
 
-``` yaml
-rest:
-  - resource: https://www.wateralarm.be/api/a/abc1234567/s/xyz7654321
-    scan_interval: 10
-    sensor:
-      - name: "WaterAlarm Regenput Volume"
-        icon: mdi:water-pump
-        value_template: "{{ value_json.lastMeasurement.waterL }}"
-        unit_of_measurement: "L"
-      - name: "WaterAlarm Regenput Niveau"
-        icon: mdi:water-pump
-        value_template: "{{ (value_json.lastMeasurement.levelFraction * 100.0) | round(2) }}"
-        unit_of_measurement: "%"
-```
+Dit voegt WaterAlarm toe als integratie in Home Assistant.
 
-Je moet de link aanpassen voor jou sensor.  Jouw link vind je terug op je sensor pagina: ga naar *Details*, en daar vind je de *API Link*.  
-In het voorbeeld hierboven worden 2 waarden uitgelezen voor de sensor: *Volume* (`waterL`) en *Niveau* (`levelFraction`).  
-Je kunt het volledige resource blok (`- resource:...`) herhalen voor meerdere sensoren.  Geef ze dan wel een verschillende naam (`name`), bvb 'WaterAlarm Woning ...' en 'WaterAlarm Garage ...'.  
-Zet het scan_interval niet lager dan 20 (= 20 minuten).  
+## Stap 3: Sensoren toevoegen in WaterAlarm integratie
 
-Hoe je het bestand kunt bewaren en opnieuw inlezen is uitgelegd in de link in Stap 1.
+Nu moet je nog de sensoren toevoegen die je wilt gebruiken in Home Assistant.  Hiervoor heb je de persoonlijke link nodig van je sensor.  Deze heeft het formaat: https://www.wateralarm.be/a/abc1234567/s/xyz7654321 .
 
-## Stap 3: De sensor-gegevens op je Home-Assistant dashboard plaasen
+- Open de WaterAlarm integratie
+- Klik op "Add Hub"
+- Plak de link van je sensor, en voeg optioneel een naam toe.  Als je geen naam toevoegt, zal deze automatisch worden afgeleid van de naam van je sensor in WaterAlarm.  Je kunt deze later ook nog aanpassen.  Het type sensor wordt automatisch afgeleid van de data die beschikbaar is in de link.
+- Klik op "Submit"
 
-Na het opnieuw inlezen van het configuratie-bestand kun je de ingelezen waarden gebruiken.
+![Screenshot](Home_Assistant_3a.png)
 
-``` json
-type: vertical-stack
-cards:
-  - type: gauge
-    entity: sensor.wateralarm_regenput_niveau
-    min: 0
-    max: 100
-    severity:
-      green: 40
-      yellow: 20
-      red: 0
-    needle: true
-    name: Garage
-  - type: history-graph
-    entities:
-      - entity: sensor.wateralarm_regenput_volume
-```
+Dit is alles.  Je sensor is nu toegevoegd, en je kunt deze gebruiken in Home Assistant.  De sensor-waarden zijn nu beschikbaar in Automations, Dashboards,...  Je kunt een eerste controle doen door op de sensor te klikken.
 
-![Screenshot](Home_Assistant_0.png)
+![Screenshot](Home_Assistant_3b.png)
+
+Herhaal deze stap voor elke sensor die je wilt toevoegen.
+
+## Stap 4: De sensor-gegevens op je Home-Assistant dashboard plaatsen
+
+De WaterAlarm integratie bevat ook enkele dashboard kaarten die je kunt gebruiken.
+
+- Ga naar het dashboard waar je de sensor-gegevens wilt plaatsen
+- Klik rechtsboven op de 3 puntjes, en kies "Edit Dashboard"
+- Klik op "Add Card"
+- Zoek naar "WaterAlarm", en kies de kaart die je wilt gebruiken
+  Momenteel zijn er 4 kaarten beschikbaar:
+  - WaterAlarm Level
+  - WaterAlarm Soil Moisture
+  - WaterAlarm Temperature
+  - WaterAlarm Water Detection
+- Standaard zal deze kaart de eerste WaterAlarm sensor tonen die je hebt toegevoegd.  Je kunt dit aanpassen door een andere sensor te kiezen.
+- Klik op "Save"
+
+![Screenshot](Home_Assistant_4a.png)

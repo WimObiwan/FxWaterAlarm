@@ -16,3 +16,4 @@ title: Integraties
 ## Toepassingen
 
 * [Home Assistant](Home_Assistant.md)
+* [Home Assistant Oud](Home_Assistant_Oud.md)
