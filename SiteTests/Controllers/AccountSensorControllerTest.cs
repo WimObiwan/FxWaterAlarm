@@ -83,30 +83,18 @@ public class AccountSensorControllerTest
     }
 
     [Fact]
-    public async Task Index_Throws_WithUnknownMeasurementType()
+    public async Task Index_ReturnsOk_WithMoistureMeasurement()
     {
         var mediator = new ConfigurableFakeMediator();
-        var accountSensor = TestEntityFactory.CreateAccountSensor();
-        mediator.SetResponse<AccountSensorByLinkQuery, Core.Entities.AccountSensor?>(accountSensor);
-        // Use a moisture measurement, which is not handled by the controller
         var sensor = TestEntityFactory.CreateSensor(type: SensorType.Moisture);
-        var moistureAccountSensor = TestEntityFactory.CreateAccountSensor(sensor: sensor);
-        var moisture = new MeasurementMoistureEx(
-            new MeasurementMoisture
-            {
-                DevEui = "test",
-                Timestamp = DateTime.UtcNow,
-                BatV = 3.3,
-                RssiDbm = -90,
-                SoilMoisturePrc = 50,
-                SoilTemperature = 20,
-                SoilConductivity = 100
-            },
-            moistureAccountSensor);
+        var accountSensor = TestEntityFactory.CreateAccountSensor(sensor: sensor);
+        mediator.SetResponse<AccountSensorByLinkQuery, Core.Entities.AccountSensor?>(accountSensor);
+        var moisture = TestEntityFactory.CreateMeasurementMoistureEx(accountSensor);
         mediator.SetResponse<LastMeasurementQuery, IMeasurementEx?>(moisture);
 
         var controller = CreateController(mediator);
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            controller.Index("test-link", "test-sensor-link"));
+        var result = await controller.Index("test-link", "test-sensor-link");
+
+        Assert.IsType<OkObjectResult>(result);
     }
 }
