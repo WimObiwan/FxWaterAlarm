@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using NetTools;
+using Site.Security;
 
 namespace Site.Pages;
 
@@ -64,6 +65,8 @@ public class AccountLoginMessage : PageModel
     private readonly IMediator _mediator;
     private readonly IMessenger _messenger;
     private readonly AccountLoginMessageOptions _options;
+    private readonly ILoginSecurityService _loginSecurityService;
+    private readonly ILogger<AccountLoginMessage> _logger;
     public string? EmailAddress { get; set; }
     public string? AccountLink { get; set; }
     public string? ReturnUrl { get; set; }
@@ -73,12 +76,16 @@ public class AccountLoginMessage : PageModel
 
     public AccountLoginMessage(UserManager<IdentityUser> userManager, IMediator mediator, 
         IMessenger messenger,
-        IOptions<AccountLoginMessageOptions> options)
+        IOptions<AccountLoginMessageOptions> options,
+        ILoginSecurityService loginSecurityService,
+        ILogger<AccountLoginMessage> logger)
     {
         _userManager = userManager;
         _mediator = mediator;
         _messenger = messenger;
         _options = options.Value;
+        _loginSecurityService = loginSecurityService;
+        _logger = logger;
     }
     
     public async Task<IActionResult> OnGet(
@@ -93,12 +100,25 @@ public class AccountLoginMessage : PageModel
             case 1:
                 if (accountLink != null)
                 {
+                    if (!CanSendCode(accountLink, out var retryAfter))
+                    {
+                        _logger.LogWarning("Code send throttled for account link from IP {IpAddress}; retry after {RetryAfterSeconds}s", GetClientIpAddress(), Math.Max(1, (int)retryAfter.TotalSeconds));
+                        return StatusCode(StatusCodes.Status429TooManyRequests);
+                    }
+
                     var result = await SendMailToAccountLink(accountLink, returnUrl);
                     return Redirect(2, accountLink, result.EmailAddress, result.Cookie, returnUrl);
                 }
                 return BadRequest();
             case 3:
                 {
+                    var adminTarget = emailAddress ?? "admin-default";
+                    if (!CanSendCode(adminTarget, out var retryAfter))
+                    {
+                        _logger.LogWarning("Admin code send throttled from IP {IpAddress}; retry after {RetryAfterSeconds}s", GetClientIpAddress(), Math.Max(1, (int)retryAfter.TotalSeconds));
+                        return StatusCode(StatusCodes.Status429TooManyRequests);
+                    }
+
                     var result = await SendMailToAdmin(emailAddress, returnUrl);
                     return Redirect(2, accountLink, result.EmailAddress, result.Cookie, returnUrl);
                 }
@@ -157,6 +177,12 @@ public class AccountLoginMessage : PageModel
     {
         if (mode == 21 && !string.IsNullOrEmpty(emailAddress))
         {
+            if (!CanSendCode(emailAddress, out var retryAfter))
+            {
+                _logger.LogWarning("Code resend throttled for email from IP {IpAddress}; retry after {RetryAfterSeconds}s", GetClientIpAddress(), Math.Max(1, (int)retryAfter.TotalSeconds));
+                return StatusCode(StatusCodes.Status429TooManyRequests);
+            }
+
             var result = await SendMail(emailAddress, null, returnUrl);
 
             return Redirect(11, accountLink, result.EmailAddress, result.Cookie, returnUrl);
@@ -167,10 +193,25 @@ public class AccountLoginMessage : PageModel
             if (string.IsNullOrEmpty(cookie))
                 throw new InvalidOperationException();
 
-            if (!ValidateCookie(cookie, accountLink ?? emailAddress ?? string.Empty, code))
+            var target = accountLink ?? emailAddress ?? string.Empty;
+            if (string.IsNullOrEmpty(target))
+                throw new InvalidOperationException("No account link or email address provided.");
+
+            if (!CanVerifyCode(target, out var retryAfter))
             {
+                _logger.LogWarning("Code verification throttled from IP {IpAddress}; retry after {RetryAfterSeconds}s", GetClientIpAddress(), Math.Max(1, (int)retryAfter.TotalSeconds));
                 return Redirect(12, accountLink, emailAddress, cookie, returnUrl);
             }
+
+            if (!ValidateCookie(cookie, target, code))
+            {
+                _loginSecurityService.RecordVerifyResult(GetClientIpAddress(), target, success: false);
+                _logger.LogWarning("Code verification failed for login target from IP {IpAddress}", GetClientIpAddress());
+                return Redirect(12, accountLink, emailAddress, cookie, returnUrl);
+            }
+
+            _loginSecurityService.RecordVerifyResult(GetClientIpAddress(), target, success: true);
+            _logger.LogInformation("Code verification succeeded for login target from IP {IpAddress}", GetClientIpAddress());
 
             // This can be more efficient, by eliminating one redirect...
             string emailAddressLogin;
@@ -229,6 +270,8 @@ public class AccountLoginMessage : PageModel
         string code = GenerateCode();
         string url = await GetLoginCallbackUrl(emailAddress, returnUrl);
 
+        _logger.LogInformation("Authentication code requested for email {Email} from IP {IpAddress}", emailAddress, GetClientIpAddress());
+
         if (!Core.Entities.Account.IsDemoEmail(emailAddress))
         {
             await _messenger.SendAuthenticationMailAsync(emailAddress, url, code);
@@ -244,6 +287,21 @@ public class AccountLoginMessage : PageModel
             EmailAddress = emailAddress,
             Cookie = GenerateCookie(accountLink ?? emailAddress, code)
         };
+    }
+
+    private bool CanSendCode(string target, out TimeSpan retryAfter)
+    {
+        return _loginSecurityService.CanSendCode(GetClientIpAddress(), target, out retryAfter);
+    }
+
+    private bool CanVerifyCode(string target, out TimeSpan retryAfter)
+    {
+        return _loginSecurityService.CanVerifyCode(GetClientIpAddress(), target, out retryAfter);
+    }
+
+    private string GetClientIpAddress()
+    {
+        return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
     }
 
     private async Task<string> GetEmailAddress(string accountLink)

@@ -9,11 +9,13 @@ namespace Site.Pages;
 public class AccountCallback : PageModel
 {
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly ILogger<AccountCallback> _logger;
     public string? EmailAddress { get; set; }
 
-    public AccountCallback(UserManager<IdentityUser> userManager)
+    public AccountCallback(UserManager<IdentityUser> userManager, ILogger<AccountCallback> logger)
     {
         _userManager = userManager;
+        _logger = logger;
     }
 
     public async Task<IActionResult> OnGet(string token, string email, string? url,
@@ -22,6 +24,7 @@ public class AccountCallback : PageModel
         if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
         {
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            _logger.LogInformation("User signed out from IP {IpAddress}", HttpContext.Connection.RemoteIpAddress);
             if (url == null)
                 return Redirect("/");
 
@@ -52,11 +55,14 @@ public class AccountCallback : PageModel
                     ExpiresUtc = DateTimeOffset.UtcNow.Add(accountLoginMessageOptions.TokenLifespan) // Adjust the expiration as needed
                 }
             );
+            _logger.LogInformation("Passwordless login succeeded for email {Email} from IP {IpAddress}", email, HttpContext.Connection.RemoteIpAddress);
             if (url == null)
                 return Redirect("/");
             
             return Redirect(Uri.UnescapeDataString(url));
         }
+
+        _logger.LogWarning("Passwordless login failed due to invalid token for email {Email} from IP {IpAddress}", email, HttpContext.Connection.RemoteIpAddress);
 
         return Redirect("Error");
     }

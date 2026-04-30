@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging.Abstractions;
 using Site.Pages;
+using Site.Security;
 using SiteTests.Helpers;
 
 namespace SiteTests.Pages;
@@ -38,7 +40,14 @@ public class AccountLoginMessageTest
         var mediator = new ConfigurableFakeMediator();
         var messenger = new FakeMessenger();
         options ??= CreateOptions();
-        var model = new AccountLoginMessage(userManager, mediator, messenger, Options.Create(options));
+        var loginSecurityService = new AllowAllLoginSecurityService();
+        var model = new AccountLoginMessage(
+            userManager,
+            mediator,
+            messenger,
+            Options.Create(options),
+            loginSecurityService,
+            NullLogger<AccountLoginMessage>.Instance);
 
         // Set up PageContext with routing so Url.PageLink works for relative page paths
         var httpContext = new DefaultHttpContext();
@@ -58,6 +67,25 @@ public class AccountLoginMessageTest
         model.Url = new FakeUrlHelper(actionContext);
 
         return (model, userManager, mediator, messenger);
+    }
+
+    private sealed class AllowAllLoginSecurityService : ILoginSecurityService
+    {
+        public bool CanSendCode(string clientIp, string target, out TimeSpan retryAfter)
+        {
+            retryAfter = TimeSpan.Zero;
+            return true;
+        }
+
+        public bool CanVerifyCode(string clientIp, string target, out TimeSpan retryAfter)
+        {
+            retryAfter = TimeSpan.Zero;
+            return true;
+        }
+
+        public void RecordVerifyResult(string clientIp, string target, bool success)
+        {
+        }
     }
 
     // ---- OnGet mode 2: displays form, sets properties ----

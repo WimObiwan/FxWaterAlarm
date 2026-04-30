@@ -14,6 +14,7 @@ using Site.Authentication;
 using Site.Identity;
 using Site.Middlewares;
 using Site.Pages;
+using Site.Security;
 using Site.Utilities;
 using Westwind.AspNetCore.Markdown;
 
@@ -59,6 +60,7 @@ builder.Services.Configure<RequestLocalizationOptions>(o =>
 });
 
 builder.Services.Configure<AccountLoginMessageOptions>(builder.Configuration.GetSection(AccountLoginMessageOptions.Location));
+builder.Services.Configure<LoginSecurityOptions>(builder.Configuration.GetSection(LoginSecurityOptions.Location));
 builder.Services.Configure<MeasurementDisplayOptions>(builder.Configuration.GetSection(MeasurementDisplayOptions.Location));
 builder.Services.Configure<MeasurementRemovalOptions>(builder.Configuration.GetSection(MeasurementRemovalOptions.Location));
 builder.Services.Configure<ApiKeysOptions>(builder.Configuration.GetSection(ApiKeysOptions.Location));
@@ -120,6 +122,8 @@ builder.Services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 builder.Services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
 builder.Services.AddTransient<ITrendService, TrendService>();
 builder.Services.AddSingleton<IMcpDocumentationService, McpDocumentationService>();
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ILoginSecurityService, LoginSecurityService>();
 
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)  
     .AddCookie(options =>
@@ -132,6 +136,12 @@ builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
         options.LoginPath = "/Account/LoginMessage";
         options.ExpireTimeSpan = accountLoginMessageOptions.TokenLifespan;
         options.SlidingExpiration = false;
+        options.Cookie.Name = "__Host-WaterAlarm.Auth";
+        options.Cookie.Path = "/";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.IsEssential = true;
     })
     .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 builder.Services.AddSingleton<IAuthorizationHandler, AdminRequirementHandler>(); 

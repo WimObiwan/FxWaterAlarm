@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Site.Pages;
 using SiteTests.Helpers;
 
@@ -20,7 +21,7 @@ public class AccountCallbackTest
         CreateModel()
     {
         var userManager = new FakeUserManager();
-        var model = new AccountCallback(userManager);
+        var model = new AccountCallback(userManager, NullLogger<AccountCallback>.Instance);
 
         var httpContext = new DefaultHttpContext();
 
