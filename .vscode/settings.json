@@ -6,6 +6,7 @@
     "github.copilot.nextEditSuggestions.enabled": true,
     "chat.tools.terminal.autoApprove": {
         "dotnet build": true,
-        "dotnet test": true
+        "dotnet test": true,
+        "printf": true
     }
 }
