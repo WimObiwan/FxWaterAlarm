@@ -1,10 +1,14 @@
 @using System.Reflection
+@using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Mvc.Localization
 @using Microsoft.Extensions.Options
+@using Site.Pages
 @using Site.Services
+@using Site.Utilities
 @inject IConfiguration Config
 @inject IViewLocalizer Loc
 @inject IOptionsSnapshot<MessagesOptions> MessagesOptions
+@inject IUserInfo UserInfo
 
 <!DOCTYPE html>
 <html lang="en" data->
@@ -89,6 +93,31 @@
             
             <div class="navbar-collapse collapse d-sm-inline-flex flex-row-reverse justify-content-between">
                 <ul class="navbar-nav mr-auto">
+
+                    @if (UserInfo.IsAuthenticated())
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-fill"></i> @UserInfo.GetLoginEmail()
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="@AccountLoginMessage.GetLogoutUrl(Url, Context.Request.Scheme, Context.Request.GetEncodedPathAndQuery())">
+                                        <i class="bi bi-box-arrow-right me-1"></i>@Loc["Logout"]
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login?r=@Uri.EscapeDataString(Context.Request.GetEncodedPathAndQuery())">
+                                <i class="bi bi-person"></i> @Loc["Login"]
+                            </a>
+                        </li>
+                    }
+
                     <li class="nav-item">
                         <a class="nav-link" href="/auto?update=true">@Loc["Set link"]
                             </a>

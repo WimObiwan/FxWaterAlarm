@@ -253,15 +253,16 @@ public class AccountLoginMessage : PageModel
     
     public static string GetLogoutUrl(PageModel page, string? returnUrl)
     {
-        string? escapedReturnUrl;
-        if (returnUrl == null)
-            escapedReturnUrl = null;
-        else
-            escapedReturnUrl = Uri.EscapeDataString(returnUrl);
-        
-        var url = page.Url.PageLink("AccountCallback", pageHandler: null, 
+        return GetLogoutUrl(page.Url, page.Request.Scheme, returnUrl);
+    }
+
+    public static string GetLogoutUrl(IUrlHelper urlHelper, string scheme, string? returnUrl)
+    {
+        string? escapedReturnUrl = returnUrl != null ? Uri.EscapeDataString(returnUrl) : null;
+
+        var url = urlHelper.PageLink("/AccountCallback", pageHandler: null,
             values: new { token = "", email = "", url = escapedReturnUrl },
-            protocol: page.Request.Scheme);
+            protocol: scheme);
         return url ?? throw new InvalidOperationException("Could not generate URL for AccountCallback");
     }
     

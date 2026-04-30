@@ -38,4 +38,12 @@
         <value>Link instellen</value>
         <comment>Set link</comment>
     </data>
+    <data name="Login" xml:space="preserve">
+        <value>Aanmelden</value>
+        <comment>Login button in navbar</comment>
+    </data>
+    <data name="Logout" xml:space="preserve">
+        <value>Afmelden</value>
+        <comment>Logout menu item in navbar</comment>
+    </data>
 </root>
