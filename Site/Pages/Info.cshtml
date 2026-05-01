@@ -40,4 +40,10 @@
     <tr>
         <td><strong>DateTimeUTC</strong></td><td>@DateTime.UtcNow.ToLongDateString() @DateTime.UtcNow.ToLongTimeString()</td>
     </tr>
+    <tr>
+        <td><strong>Environment</strong></td><td>@Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")</td>
+    </tr>
+    <tr>
+        <td><strong>UseDevBranding</strong></td><td>@Model.UseDevBranding</td>
+    </tr>
 </table>

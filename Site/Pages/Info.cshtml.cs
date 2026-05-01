@@ -2,12 +2,20 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 
 namespace Site.Pages;
 
 [AllowAnonymous]
 public class Info : PageModel
 {
+    private readonly IConfiguration _config;
+
+    public Info(IConfiguration config)
+    {
+        _config = config;
+    }
+
     public string? RequestHost { get; set; }
     public string? Server { get; set; }
     public string? Version { get; set; }
@@ -15,6 +23,7 @@ public class Info : PageModel
     public string? DotNetVersion { get; set; }
     public string? UserAuthId { get; set; }
     public string? UserAgent { get; set; }
+    public bool UseDevBranding { get; set; }
 
     public void OnGet()
     {
@@ -27,5 +36,6 @@ public class Info : PageModel
         DotNetVersion = RuntimeInformation.FrameworkDescription;
         UserAuthId = HttpContext.User.Identity?.Name;
         UserAgent = HttpContext.Request.Headers.UserAgent;
+        UseDevBranding = _config.GetValue<bool>("UiBranding:UseDevBranding");
     }
 }

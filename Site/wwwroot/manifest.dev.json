@@ -1,0 +1,21 @@
+{
+  "short_name": "WaterAlarm Dev",
+  "name": "WaterAlarm Development",
+  "icons": [
+    {
+      "src": "/icons/icon-dev.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ],
+  "id": "/?utm_source=pwa-dev",
+  "start_url": "/auto?utm_source=pwa-dev",
+  "display": "standalone",
+  "scope": "/",
+  "shortcuts": [],
+  "description": "WaterAlarm Development",
+  "screenshots": [],
+  "theme_color": "#b42318",
+  "background_color": "#b42318"
+}
