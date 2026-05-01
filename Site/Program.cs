@@ -95,7 +95,7 @@ builder.Services.AddRazorPages(o =>
             .AddPageRoute("/AdminSensors", "/adm/sensors")
             .AddPageRoute("/AdminQr", "/adm/qr")
             .AddPageRoute("/AccountLoginMessage", "/account/loginmessage")
-            .AddPageRoute("/AccountLoginMessageConfirmation", "/account/loginmessageconfirmation")
+        .AddPageRoute("/AccountLoginMessageConfirmation", "/account/loginmessageconfirmation")
     )
     .AddViewLocalization();
 builder.Services.AddControllers()
@@ -125,7 +125,10 @@ builder.Services.AddSingleton<IMcpDocumentationService, McpDocumentationService>
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<ILoginSecurityService, LoginSecurityService>();
 
-builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)  
+builder.Services.Configure<GoogleAuthOptions>(builder.Configuration.GetSection(GoogleAuthOptions.Location));
+var googleAuthOptions = builder.Configuration.GetSection(GoogleAuthOptions.Location).Get<GoogleAuthOptions>() ?? new GoogleAuthOptions();
+
+var authBuilder = builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
     .AddCookie(options =>
     {
         AccountLoginMessageOptions accountLoginMessageOptions =
@@ -143,7 +146,37 @@ builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.IsEssential = true;
     })
+    .AddCookie("ExternalCookie", options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+        options.Cookie.Name = "__Host-WaterAlarm.External";
+        options.Cookie.Path = "/";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.IsEssential = true;
+    })
     .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
+
+if (googleAuthOptions.IsConfigured)
+{
+    authBuilder.AddGoogle(options =>
+    {
+        options.ClientId = googleAuthOptions.ClientId!;
+        options.ClientSecret = googleAuthOptions.ClientSecret!;
+        options.SignInScheme = "ExternalCookie";
+        // Let the Google middleware handle this path internally, then redirect to /GoogleCallback.
+        options.CallbackPath = "/signin-google";
+        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Events.OnRemoteFailure = context =>
+        {
+            context.HandleResponse();
+            context.Response.Redirect("/login?error=google_failed");
+            return Task.CompletedTask;
+        };
+    });
+}
 builder.Services.AddSingleton<IAuthorizationHandler, AdminRequirementHandler>(); 
 
 builder.Services.AddAuthorization(options =>

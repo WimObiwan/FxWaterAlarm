@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Site.Pages;
 using SiteTests.Helpers;
 
@@ -6,10 +7,13 @@ namespace SiteTests.Pages;
 
 public class InfoTest
 {
+    private static Info CreateModel() =>
+        new Info(new ConfigurationBuilder().Build());
+
     [Fact]
     public void OnGet_SetsServerToMachineName()
     {
-        var model = new Info();
+        var model = CreateModel();
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Host = new HostString("localhost", 5000);
         httpContext.Request.Headers.UserAgent = "TestAgent/1.0";
@@ -23,7 +27,7 @@ public class InfoTest
     [Fact]
     public void OnGet_SetsRequestHost()
     {
-        var model = new Info();
+        var model = CreateModel();
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Host = new HostString("myhost.example.com");
         TestEntityFactory.SetupPageContext(model, httpContext);
@@ -36,7 +40,7 @@ public class InfoTest
     [Fact]
     public void OnGet_SetsUserAgent()
     {
-        var model = new Info();
+        var model = CreateModel();
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Headers.UserAgent = "CustomAgent/2.0";
         TestEntityFactory.SetupPageContext(model, httpContext);
@@ -49,7 +53,7 @@ public class InfoTest
     [Fact]
     public void OnGet_SetsOsVersion()
     {
-        var model = new Info();
+        var model = CreateModel();
         TestEntityFactory.SetupPageContext(model);
 
         model.OnGet();
@@ -61,7 +65,7 @@ public class InfoTest
     [Fact]
     public void OnGet_SetsDotNetVersion()
     {
-        var model = new Info();
+        var model = CreateModel();
         TestEntityFactory.SetupPageContext(model);
 
         model.OnGet();
@@ -73,7 +77,7 @@ public class InfoTest
     [Fact]
     public void OnGet_SetsVersion()
     {
-        var model = new Info();
+        var model = CreateModel();
         TestEntityFactory.SetupPageContext(model);
 
         model.OnGet();
@@ -84,7 +88,7 @@ public class InfoTest
     [Fact]
     public void OnGet_UserAuthId_IsNullForAnonymous()
     {
-        var model = new Info();
+        var model = CreateModel();
         TestEntityFactory.SetupPageContext(model);
 
         model.OnGet();

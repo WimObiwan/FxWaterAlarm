@@ -13,6 +13,14 @@
 
         <h2 class="mb-4">@Loc["Login"]</h2>
 
+        @if (Model.Error != null)
+        {
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>@Loc["Error_" + Model.Error]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
         @* ── Email code ────────────────────────────────────── *@
         <div class="card mb-3">
             <div class="card-body">
@@ -45,7 +53,7 @@
             </div>
         </div>
 
-        @* ── Google (Phase 2 placeholder) ─────────────────── *@
+        @* ── Google ───────────────────────────────────────── *@
         <div class="card mb-3">
             <div class="card-body">
                 <h5 class="card-title">
@@ -56,12 +64,28 @@
                         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                     </svg>@Loc["Login with Google"]
                 </h5>
-                <p class="card-text text-muted small">
-                    @Loc["Google login is not yet available. It will be introduced in a future update."]
-                </p>
-                <button class="btn btn-outline-secondary" disabled title="@Loc["Coming soon"].Value">
-                    @Loc["Continue with Google"]
-                </button>
+                @if (Model.GoogleEnabled)
+                {
+                    <form method="get" action="/login">
+                        <input type="hidden" name="handler" value="Google" />
+                        @if (Model.ReturnUrl != null)
+                        {
+                            <input type="hidden" name="r" value="@Model.ReturnUrl" />
+                        }
+                        <button type="submit" class="btn btn-outline-secondary">
+                            @Loc["Continue with Google"]
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <p class="card-text text-muted small">
+                        @Loc["Google login is not yet available. It will be introduced in a future update."]
+                    </p>
+                    <button class="btn btn-outline-secondary" disabled title="@Loc["Coming soon"].Value">
+                        @Loc["Continue with Google"]
+                    </button>
+                }
             </div>
         </div>
 

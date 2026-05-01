@@ -43,4 +43,16 @@
     <data name="Continue with Google" xml:space="preserve">
         <value>Doorgaan met Google</value>
     </data>
+    <data name="Error_google_failed" xml:space="preserve">
+        <value>Google-aanmelding mislukt. Probeer het opnieuw.</value>
+    </data>
+    <data name="Error_email_not_verified" xml:space="preserve">
+        <value>Het e-mailadres van uw Google-account is niet geverifieerd. Verifieer het in Google en probeer opnieuw.</value>
+    </data>
+    <data name="Error_no_account" xml:space="preserve">
+        <value>Er is geen WaterAlarm-account gekoppeld aan uw Google-account. Meld u aan via uw e-mailcode.</value>
+    </data>
+    <data name="Error_google_not_configured" xml:space="preserve">
+        <value>Google-aanmelding is momenteel niet beschikbaar.</value>
+    </data>
 </root>

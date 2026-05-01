@@ -43,4 +43,16 @@
     <data name="Continue with Google" xml:space="preserve">
         <value>Continue with Google</value>
     </data>
+    <data name="Error_google_failed" xml:space="preserve">
+        <value>Google login failed. Please try again.</value>
+    </data>
+    <data name="Error_email_not_verified" xml:space="preserve">
+        <value>Your Google account email address is not verified. Please verify it in Google and try again.</value>
+    </data>
+    <data name="Error_no_account" xml:space="preserve">
+        <value>No WaterAlarm account is associated with your Google account. Please log in with your email code instead.</value>
+    </data>
+    <data name="Error_google_not_configured" xml:space="preserve">
+        <value>Google login is not available at this time.</value>
+    </data>
 </root>
