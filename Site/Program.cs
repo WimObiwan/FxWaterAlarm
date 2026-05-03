@@ -90,6 +90,7 @@ builder.Services.AddRazorPages(o =>
             .AddPageRoute("/Short", "/s")
             .AddPageRoute("/Account", "/a/{AccountLink}")
             .AddPageRoute("/AccountSensor", "/a/{AccountLink}/s/{SensorLink}")
+            .AddPageRoute("/AccountUsers", "/a/{AccountLink}/users")
             .AddPageRoute("/AdminOverview", "/adm")
             .AddPageRoute("/AdminAccounts", "/adm/accounts")
             .AddPageRoute("/AdminSensors", "/adm/sensors")
@@ -128,24 +129,29 @@ builder.Services.AddSingleton<ILoginSecurityService, LoginSecurityService>();
 builder.Services.Configure<GoogleAuthOptions>(builder.Configuration.GetSection(GoogleAuthOptions.Location));
 var googleAuthOptions = builder.Configuration.GetSection(GoogleAuthOptions.Location).Get<GoogleAuthOptions>() ?? new GoogleAuthOptions();
 
-var authBuilder = builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
-    .AddCookie(options =>
+{
+    AccountLoginMessageOptions accountLoginMessageOptions =
+        builder.Configuration
+            .GetSection(AccountLoginMessageOptions.Location)
+            .Get<AccountLoginMessageOptions>()
+        ?? throw new Exception("AccountLoginMessageOptions not configured");
+    builder.Services.ConfigureApplicationCookie(options =>
     {
-        AccountLoginMessageOptions accountLoginMessageOptions =
-            builder.Configuration
-                .GetSection(AccountLoginMessageOptions.Location)
-                .Get<AccountLoginMessageOptions>()
-            ?? throw new Exception("AccountLoginMessageOptions not configured");
-        options.LoginPath = "/Account/LoginMessage";
+        options.LoginPath = "/login";
+        options.ReturnUrlParameter = "r";
         options.ExpireTimeSpan = accountLoginMessageOptions.TokenLifespan;
         options.SlidingExpiration = false;
-        options.Cookie.Name = "__Host-WaterAlarm.Auth";
+        options.Cookie.Name = "WaterAlarm.Auth";
         options.Cookie.Path = "/";
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.IsEssential = true;
-    })
+    });
+}
+
+// AddIdentity already registered the default scheme; just get the builder to add extra schemes
+var authBuilder = builder.Services.AddAuthentication()
     .AddCookie("ExternalCookie", options =>
     {
         options.ExpireTimeSpan = TimeSpan.FromMinutes(10);

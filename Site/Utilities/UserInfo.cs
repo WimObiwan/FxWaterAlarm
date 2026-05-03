@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using Core.Entities;
+using Core.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
@@ -18,14 +20,17 @@ public class UserInfo : IUserInfo
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IAuthorizationService _authorizationService;
+    private readonly IMediator _mediator;
     private readonly Pages.AccountLoginMessageOptions _options;
 
     public UserInfo(IHttpContextAccessor httpContextAccessor,
         IAuthorizationService authorizationService,
+        IMediator mediator,
         IOptions<Pages.AccountLoginMessageOptions> options)
     {
         _httpContextAccessor = httpContextAccessor;
         _authorizationService = authorizationService;
+        _mediator = mediator;
         _options = options.Value;
     }
 
@@ -44,12 +49,24 @@ public class UserInfo : IUserInfo
         if (await IsAdmin())
             return true;
 
-        var loginEmail = GetLoginEmail();
-
-        if (string.IsNullOrEmpty(loginEmail))
+        var user = _httpContextAccessor.HttpContext?.User;
+        if (user?.Identity?.IsAuthenticated != true)
             return false;
 
-        return string.Equals(loginEmail, account.Email, StringComparison.OrdinalIgnoreCase);
+        var email = user.FindFirstValue("email");
+        var provider = user.FindFirstValue("provider");
+        var providerSub = user.FindFirstValue("provider_sub");
+
+        var accountUsers = await _mediator.Send(new AccountUsersByAccountQuery { AccountId = account.Id });
+        return accountUsers.Any(u =>
+            (u.LoginType == AccountUserLoginType.Mail
+                && email != null
+                && string.Equals(u.Email, email, StringComparison.OrdinalIgnoreCase))
+            ||
+            (u.LoginType == AccountUserLoginType.Google
+                && provider == "google"
+                && providerSub != null
+                && u.ProviderSubjectId == providerSub));
     }
 
     public async Task<bool> CanUpdateAccountSensor(AccountSensor accountSensor)

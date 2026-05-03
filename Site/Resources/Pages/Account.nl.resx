@@ -25,4 +25,7 @@
         <value>Sensor details</value>
         <comment>Sensor details</comment>
     </data>
+    <data name="Manage users" xml:space="preserve">
+        <value>Gebruikers beheren</value>
+    </data>
 </root>

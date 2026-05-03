@@ -31,5 +31,16 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand>
         };
         _dbContext.Accounts.Add(account);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        // Also create the initial mail owner so CanUpdateAccount works via AccountUser table
+        var owner = new AccountUser
+        {
+            AccountId = account.Id,
+            LoginType = AccountUserLoginType.Mail,
+            Email = request.Email,
+            CreationTimestamp = DateTime.UtcNow
+        };
+        _dbContext.AccountUsers.Add(owner);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

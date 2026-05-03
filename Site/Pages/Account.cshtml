@@ -13,6 +13,15 @@
     ViewData["Title"] = "Account";
 }
 
+@if (Model.CanUpdate)
+{
+    <div class="mb-3">
+        <a class="btn btn-outline-secondary btn-sm" href="/a/@Model.AccountEntity?.Link/users">
+            <i class="bi bi-people"></i> @Loc["Manage users"]
+        </a>
+    </div>
+}
+
 @if (await UserInfo.IsAdmin())
 {
 <div class="alert alert-warning small-alert">

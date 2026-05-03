@@ -1,0 +1,132 @@
+@page
+@using Core.Entities
+@using Microsoft.AspNetCore.Mvc.Localization
+@model AccountUsers
+@inject IViewLocalizer Loc
+
+@{
+    ViewData["Title"] = Loc["Account users"];
+}
+
+<div class="mb-3">
+    <a class="btn btn-link p-0" href="/a/@Model.AccountEntity?.Link">
+        <i class="bi bi-arrow-left"></i> @Loc["Back to account"]
+    </a>
+</div>
+
+<h1 class="h3">@Loc["Account users"]</h1>
+<p class="text-muted">@Model.AccountEntity?.Name (@Model.AccountEntity?.Email)</p>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-info" role="alert">
+        @if (Model.Message == "user_added")
+        {
+            @Loc["Message_user_added"]
+        }
+        else if (Model.Message == "user_already_exists")
+        {
+            @Loc["Message_user_already_exists"]
+        }
+        else if (Model.Message == "user_removed")
+        {
+            @Loc["Message_user_removed"]
+        }
+        else if (Model.Message == "user_cannot_remove_current")
+        {
+            @Loc["Message_user_cannot_remove_current"]
+        }
+        else if (Model.Message == "google_linked")
+        {
+            @Loc["Message_google_linked"]
+        }
+        else if (Model.Message == "google_already_linked")
+        {
+            @Loc["Message_google_already_linked"]
+        }
+        else if (Model.Message == "google_conflict")
+        {
+            @Loc["Message_google_conflict"]
+        }
+        else if (Model.Message == "google_not_configured")
+        {
+            @Loc["Message_google_not_configured"]
+        }
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h2 class="h5">@Loc["Account users"]</h2>
+
+        @if (!Model.Users.Any())
+        {
+            <div class="text-muted">@Loc["No users"]</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>@Loc["Login type"]</th>
+                            <th>@Loc["Email address"]</th>
+                            <th>Provider</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr>
+                                <td>
+                                    @(user.LoginType == AccountUserLoginType.Mail ? Loc["Mail"] : Loc["Google"])
+                                </td>
+                                <td>@(user.Email ?? "-")</td>
+                                <td>@(user.Provider ?? "-")</td>
+                                <td class="text-end">
+                                    @if (Model.CanRemoveUser(user))
+                                    {
+                                        <form method="post" asp-page-handler="RemoveUser" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="userId" value="@user.Id" />
+                                            <button class="btn btn-outline-danger btn-sm" type="submit">@Loc["Remove user"]</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h2 class="h5">@Loc["Add user"]</h2>
+        <form method="post" asp-page-handler="AddMailUser">
+            @Html.AntiForgeryToken()
+            <div class="mb-2">
+                <label class="form-label" for="email">@Loc["Email address"]</label>
+                <input class="form-control" type="email" id="email" name="email" required />
+            </div>
+            <button class="btn btn-primary" type="submit">@Loc["Add user"]</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h2 class="h5">Google</h2>
+        @if (Model.GoogleEnabled)
+        {
+            <a class="btn btn-outline-secondary" asp-page-handler="LinkGoogle" asp-route-accountLink="@Model.AccountEntity?.Link">@Loc["Link Google account"]</a>
+        }
+        else
+        {
+            <div class="text-muted">@Loc["Message_google_not_configured"]</div>
+        }
+    </div>
+</div>

@@ -1,9 +1,13 @@
 using System.Security.Claims;
+using Core.Entities;
+using Core.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Site.Pages;
 using Site.Utilities;
+using SiteTests.Helpers;
 using Xunit;
 
 namespace SiteTests.Utilities;
@@ -36,25 +40,35 @@ public class UserInfoTest
 
     private static UserInfo CreateUserInfo(
         HttpContext? httpContext = null,
-        bool authorizationSucceeds = false)
+        bool authorizationSucceeds = false,
+        IMediator? mediator = null)
     {
         var httpContextAccessor = new HttpContextAccessor { HttpContext = httpContext };
         var authService = new FakeAuthorizationService { ShouldSucceed = authorizationSucceeds };
+        mediator ??= new ConfigurableFakeMediator();
         var options = Options.Create(new AccountLoginMessageOptions
         {
             TokenLifespanRaw = TimeSpan.FromHours(1),
             CodeLifespanHoursRaw = 24,
             SaltRaw = "test-salt"
         });
-        return new UserInfo(httpContextAccessor, authService, options);
+        return new UserInfo(httpContextAccessor, authService, mediator, options);
     }
 
-    private static DefaultHttpContext CreateHttpContext(string? email = null, bool authenticated = true)
+    private static DefaultHttpContext CreateHttpContext(
+        string? email = null,
+        bool authenticated = true,
+        string? provider = null,
+        string? providerSub = null)
     {
         var context = new DefaultHttpContext();
         var claims = new List<Claim>();
         if (email != null)
             claims.Add(new Claim("email", email));
+        if (provider != null)
+            claims.Add(new Claim("provider", provider));
+        if (providerSub != null)
+            claims.Add(new Claim("provider_sub", providerSub));
         var identity = authenticated
             ? new ClaimsIdentity(claims, "test")
             : new ClaimsIdentity(claims);
@@ -176,16 +190,28 @@ public class UserInfoTest
     public async Task CanUpdateAccount_ReturnsTrue_WhenAdmin()
     {
         var httpContext = CreateHttpContext(email: "admin@example.com");
-        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: true);
+        var mediator = new ConfigurableFakeMediator();
+        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: true, mediator: mediator);
         var account = CreateAccount("other@example.com");
         Assert.True(await userInfo.CanUpdateAccount(account));
     }
 
     [Fact]
-    public async Task CanUpdateAccount_ReturnsTrue_WhenEmailMatchesAccount()
+    public async Task CanUpdateAccount_ReturnsTrue_WhenMailUserMatchesLoginEmail()
     {
         var httpContext = CreateHttpContext(email: "user@example.com");
-        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false);
+        var mediator = new ConfigurableFakeMediator();
+        mediator.SetResponse<AccountUsersByAccountQuery, IReadOnlyList<AccountUser>>(
+        [
+            new AccountUser
+            {
+                AccountId = 1,
+                LoginType = AccountUserLoginType.Mail,
+                Email = "user@example.com",
+                CreationTimestamp = DateTime.UtcNow
+            }
+        ]);
+        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false, mediator: mediator);
         var account = CreateAccount("user@example.com");
         Assert.True(await userInfo.CanUpdateAccount(account));
     }
@@ -194,25 +220,70 @@ public class UserInfoTest
     public async Task CanUpdateAccount_ReturnsTrue_CaseInsensitiveEmailMatch()
     {
         var httpContext = CreateHttpContext(email: "USER@EXAMPLE.COM");
-        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false);
+        var mediator = new ConfigurableFakeMediator();
+        mediator.SetResponse<AccountUsersByAccountQuery, IReadOnlyList<AccountUser>>(
+        [
+            new AccountUser
+            {
+                AccountId = 1,
+                LoginType = AccountUserLoginType.Mail,
+                Email = "user@example.com",
+                CreationTimestamp = DateTime.UtcNow
+            }
+        ]);
+        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false, mediator: mediator);
         var account = CreateAccount("user@example.com");
         Assert.True(await userInfo.CanUpdateAccount(account));
     }
 
     [Fact]
-    public async Task CanUpdateAccount_ReturnsFalse_WhenEmailDoesNotMatch()
+    public async Task CanUpdateAccount_ReturnsFalse_WhenNoMatchingAccountUser()
     {
         var httpContext = CreateHttpContext(email: "user@example.com");
-        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false);
+        var mediator = new ConfigurableFakeMediator();
+        mediator.SetResponse<AccountUsersByAccountQuery, IReadOnlyList<AccountUser>>(
+        [
+            new AccountUser
+            {
+                AccountId = 1,
+                LoginType = AccountUserLoginType.Mail,
+                Email = "other@example.com",
+                CreationTimestamp = DateTime.UtcNow
+            }
+        ]);
+        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false, mediator: mediator);
         var account = CreateAccount("other@example.com");
         Assert.False(await userInfo.CanUpdateAccount(account));
+    }
+
+    [Fact]
+    public async Task CanUpdateAccount_ReturnsTrue_WhenGoogleProviderMatches()
+    {
+        var httpContext = CreateHttpContext(provider: "google", providerSub: "google-sub-123");
+        var mediator = new ConfigurableFakeMediator();
+        mediator.SetResponse<AccountUsersByAccountQuery, IReadOnlyList<AccountUser>>(
+        [
+            new AccountUser
+            {
+                AccountId = 1,
+                LoginType = AccountUserLoginType.Google,
+                Provider = "google",
+                ProviderSubjectId = "google-sub-123",
+                CreationTimestamp = DateTime.UtcNow
+            }
+        ]);
+        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false, mediator: mediator);
+        var account = CreateAccount("owner@example.com");
+        Assert.True(await userInfo.CanUpdateAccount(account));
     }
 
     [Fact]
     public async Task CanUpdateAccount_ReturnsFalse_WhenNoEmailClaim()
     {
         var httpContext = CreateHttpContext();
-        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false);
+        var mediator = new ConfigurableFakeMediator();
+        mediator.SetResponse<AccountUsersByAccountQuery, IReadOnlyList<AccountUser>>([]);
+        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false, mediator: mediator);
         var account = CreateAccount("test@example.com");
         Assert.False(await userInfo.CanUpdateAccount(account));
     }
@@ -220,7 +291,8 @@ public class UserInfoTest
     [Fact]
     public async Task CanUpdateAccount_ReturnsFalse_WhenNoHttpContext()
     {
-        var userInfo = CreateUserInfo(httpContext: null, authorizationSucceeds: false);
+        var mediator = new ConfigurableFakeMediator();
+        var userInfo = CreateUserInfo(httpContext: null, authorizationSucceeds: false, mediator: mediator);
         var account = CreateAccount("test@example.com");
         Assert.False(await userInfo.CanUpdateAccount(account));
     }
@@ -231,7 +303,18 @@ public class UserInfoTest
     public async Task CanUpdateAccountSensor_ReturnsTrue_WhenCanUpdateAccount()
     {
         var httpContext = CreateHttpContext(email: "user@example.com");
-        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false);
+        var mediator = new ConfigurableFakeMediator();
+        mediator.SetResponse<AccountUsersByAccountQuery, IReadOnlyList<AccountUser>>(
+        [
+            new AccountUser
+            {
+                AccountId = 1,
+                LoginType = AccountUserLoginType.Mail,
+                Email = "user@example.com",
+                CreationTimestamp = DateTime.UtcNow
+            }
+        ]);
+        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false, mediator: mediator);
         var accountSensor = CreateAccountSensor("user@example.com");
         Assert.True(await userInfo.CanUpdateAccountSensor(accountSensor));
     }
@@ -240,7 +323,9 @@ public class UserInfoTest
     public async Task CanUpdateAccountSensor_ReturnsFalse_WhenCannotUpdateAccount()
     {
         var httpContext = CreateHttpContext(email: "user@example.com");
-        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false);
+        var mediator = new ConfigurableFakeMediator();
+        mediator.SetResponse<AccountUsersByAccountQuery, IReadOnlyList<AccountUser>>([]);
+        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false, mediator: mediator);
         var accountSensor = CreateAccountSensor("other@example.com");
         Assert.False(await userInfo.CanUpdateAccountSensor(accountSensor));
     }

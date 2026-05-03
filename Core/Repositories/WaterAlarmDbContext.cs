@@ -13,6 +13,7 @@ public class WaterAlarmDbContext : DbContext
 
     public DbSet<Account> Accounts { get; init; } = null!;
     public DbSet<Sensor> Sensors { get; init; } = null!;
+    public DbSet<AccountUser> AccountUsers { get; init; } = null!;
 
     protected override void OnModelCreating(ModelBuilder m)
     {
@@ -20,6 +21,7 @@ public class WaterAlarmDbContext : DbContext
         m.ApplyConfiguration(new SensorEntityTypeConfiguration());
         m.ApplyConfiguration(new AccountSensorEntityTypeConfiguration());
         m.ApplyConfiguration(new AccountSensorAlarmEntityTypeConfiguration());
+        m.ApplyConfiguration(new AccountUserEntityTypeConfiguration());
 
         base.OnModelCreating(m);
     }

@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Site.Pages;
+using Core.Commands;
+using Core.Entities;
 
 namespace Site.Pages;
 
@@ -22,6 +23,8 @@ public class GoogleCallback : PageModel
 
     public async Task<IActionResult> OnGet(
         [FromQuery(Name = "r")] string? returnUrl,
+        [FromQuery] string? mode,
+        [FromQuery(Name = "a")] string? accountLink,
         [FromServices] IConfiguration configuration)
     {
         var result = await HttpContext.AuthenticateAsync("ExternalCookie");
@@ -53,20 +56,144 @@ public class GoogleCallback : PageModel
             return RedirectToPage("/Login", new { error = "email_not_verified" });
         }
 
-        var account = await _mediator.Send(new AccountByEmailQuery { Email = email });
+        if (string.IsNullOrWhiteSpace(googleSub))
+        {
+            _logger.LogWarning("Google callback: missing sub claim from IP {IpAddress}",
+                HttpContext.Connection.RemoteIpAddress);
+            return RedirectToPage("/Login", new { error = "google_failed" });
+        }
+
+        if (mode == "link" && !string.IsNullOrEmpty(accountLink))
+            return await HandleLinkMode(accountLink, googleSub, email!);
+
+        return await HandleLoginMode(returnUrl, googleSub, email!, configuration);
+    }
+
+    private async Task<IActionResult> HandleLoginMode(
+        string? returnUrl,
+        string googleSub,
+        string email,
+        IConfiguration configuration)
+    {
+        // Check direct Google link first
+        var linkedUser = await _mediator.Send(new AccountUserByProviderQuery
+        {
+            Provider = "google",
+            ProviderSubjectId = googleSub
+        });
+
+        Core.Entities.Account? account = null;
+
+        if (linkedUser != null)
+        {
+            account = await _mediator.Send(new AccountByIdQuery { Id = linkedUser.AccountId });
+        }
+        else
+        {
+            // Fall back: look for a mail AccountUser matching the Google email
+            var mailUser = await _mediator.Send(new AccountUserByEmailQuery { Email = email });
+            if (mailUser != null)
+            {
+                account = await _mediator.Send(new AccountByIdQuery { Id = mailUser.AccountId });
+
+                if (account != null)
+                {
+                    // Auto-link this Google identity to the matched account for next logins
+                    await _mediator.Send(new AddAccountUserCommand
+                    {
+                        AccountId = account.Id,
+                        LoginType = AccountUserLoginType.Google,
+                        Email = email,
+                        Provider = "google",
+                        ProviderSubjectId = googleSub
+                    });
+                }
+            }
+        }
+
         if (account == null)
         {
-            _logger.LogWarning("Google login: no WaterAlarm account found for email {Email}", email);
+            _logger.LogWarning("Google login: no WaterAlarm account found for email {Email} / sub {Sub}", email, googleSub);
             return RedirectToPage("/Login", new { error = "no_account" });
         }
 
+        return await SignInAccount(account, googleSub, returnUrl, configuration);
+    }
+
+    private async Task<IActionResult> HandleLinkMode(
+        string accountLink,
+        string googleSub,
+        string googleEmail)
+    {
+        // Must already be signed in
+        var session = await HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
+        if (!session.Succeeded)
+            return RedirectToPage("/Login", new { error = "not_authenticated" });
+
+        var account = await _mediator.Send(new AccountByLinkQuery { Link = accountLink });
+        if (account == null)
+            return RedirectToPage("/Login", new { error = "no_account" });
+
+        // Verify current session user is authorized on this account
+        var sessionEmail = session.Principal?.FindFirstValue("email");
+        var sessionProvider = session.Principal?.FindFirstValue("provider");
+        var sessionProviderSub = session.Principal?.FindFirstValue("provider_sub");
+
+        var accountUsers = await _mediator.Send(new AccountUsersByAccountQuery { AccountId = account.Id });
+        var isAuthorized = accountUsers.Any(u =>
+            (u.LoginType == AccountUserLoginType.Mail
+                && sessionEmail != null
+                && string.Equals(u.Email, sessionEmail, StringComparison.OrdinalIgnoreCase))
+            || (u.LoginType == AccountUserLoginType.Google
+                && sessionProvider == "google"
+                && sessionProviderSub != null
+                && u.ProviderSubjectId == sessionProviderSub));
+
+        if (!isAuthorized)
+            return Forbid();
+
+        // Check if this Google sub is already linked anywhere
+        var existingLink = await _mediator.Send(new AccountUserByProviderQuery
+        {
+            Provider = "google",
+            ProviderSubjectId = googleSub
+        });
+
+        if (existingLink != null)
+        {
+            var msg = existingLink.AccountId == account.Id ? "google_already_linked" : "google_conflict";
+            return Redirect($"/a/{accountLink}/users?message={msg}");
+        }
+
+        await _mediator.Send(new AddAccountUserCommand
+        {
+            AccountId = account.Id,
+            LoginType = AccountUserLoginType.Google,
+            Email = googleEmail,
+            Provider = "google",
+            ProviderSubjectId = googleSub
+        });
+
+        _logger.LogInformation(
+            "Google account linked for sub {Sub} to account {AccountId} from IP {IpAddress}",
+            googleSub, account.Id, HttpContext.Connection.RemoteIpAddress);
+
+        return Redirect($"/a/{accountLink}/users?message=google_linked");
+    }
+
+    private async Task<IActionResult> SignInAccount(
+        Core.Entities.Account account,
+        string googleSub,
+        string? returnUrl,
+        IConfiguration configuration)
+    {
         var claims = new List<Claim>
         {
             new("sub", account.Uid.ToString()),
             new("email", account.Email),
             new("auth_method", "google"),
             new("provider", "google"),
-            new("provider_sub", googleSub ?? string.Empty)
+            new("provider_sub", googleSub)
         };
 
         var configOptions = configuration

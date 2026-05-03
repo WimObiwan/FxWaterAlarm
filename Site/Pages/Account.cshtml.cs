@@ -16,6 +16,7 @@ public class Account : PageModel
     public Core.Entities.Account? AccountEntity { get; set; }
     public IList<Tuple<Core.Entities.AccountSensor, IMeasurementEx?>>? AccountSensors { get; set; }
     public string? Message { get; set; }
+    public bool CanUpdate { get; set; }
 
     public Account(IMediator mediator, IUserInfo userInfo)
     {
@@ -38,6 +39,7 @@ public class Account : PageModel
         }
         else
         {
+            CanUpdate = await _userInfo.CanUpdateAccount(AccountEntity);
             AccountSensors = (await Task.WhenAll(AccountEntity.AccountSensors.Select(async accountSensor =>
             {
                 return Tuple.Create(
