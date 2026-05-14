@@ -94,6 +94,16 @@
     </p>
     <p><i class="fas fa-clock"></i> @account.CreationTimestamp.ToString("g")</p>
     <p><i class="fas fa-link"></i> <a href="@account.RestPath" target="_blank">View Account</a></p>
+    @if (!string.IsNullOrWhiteSpace(account.Link))
+    {
+      <form method="post" action="?handler=OpenAccount" class="d-inline">
+        <input type="hidden" name="accountLink" value="@account.Link" />
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-outline-secondary btn-sm">
+          <i class="fas fa-arrow-right-to-bracket"></i> Open account
+        </button>
+      </form>
+    }
 
   </div>
   

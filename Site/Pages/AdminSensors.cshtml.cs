@@ -12,13 +12,15 @@ namespace Site.Pages;
 public class AdminSensors : PageModel
 {
     private readonly IMediator _mediator;
+    private readonly ILogger<AdminSensors> _logger;
 
     public string? Message { get; set; }
     public Core.Entities.Sensor? SensorEntity { get; set; }
 
-    public AdminSensors(IMediator mediator)
+    public AdminSensors(IMediator mediator, ILogger<AdminSensors> logger)
     {
         _mediator = mediator;
+        _logger = logger;
     }
 
     public async Task OnGet(string? message, Guid? sensorUid)
@@ -46,6 +48,14 @@ public class AdminSensors : PageModel
             DevEui = devEui,
             SensorType = sensorType
         });
+
+        _logger.LogInformation(
+            "Admin action: sensor created by {AdminEmail} from IP {IpAddress}; sensorUid={SensorUid}, devEui={DevEui}, sensorType={SensorType}",
+            User.FindFirst("email")?.Value,
+            HttpContext.Connection.RemoteIpAddress,
+            sensorUid,
+            devEui,
+            sensorType);
 
         await _mediator.Send(new RegenerateSensorLinkCommand()
         {

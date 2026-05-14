@@ -4,6 +4,7 @@ using Core.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Site.Utilities;
 using CookieOptions = Microsoft.AspNetCore.Http.CookieOptions;
 
 namespace Site.Pages;
@@ -11,11 +12,13 @@ namespace Site.Pages;
 public class Auto : PageModel
 {
     private readonly IMediator _mediator;
+    private readonly IUserInfo _userInfo;
     public string? Link { get; set; } = null;
 
-    public Auto(IMediator mediator)
+    public Auto(IMediator mediator, IUserInfo userInfo)
     {
         _mediator = mediator;
+        _userInfo = userInfo;
     }
     
     public async Task<IActionResult> OnGet(bool update = false)
@@ -52,7 +55,7 @@ public class Auto : PageModel
             var email = User.FindFirstValue("email");
             if (!string.IsNullOrEmpty(email))
             {
-                var accounts = await _mediator.Send(new AccountsByEmailQuery { Email = email });
+                var accounts = await _mediator.Send(new AccountsByEmailQuery { Email = email }) ?? [];
 
                 if (accounts.Count > 1)
                     return Redirect("/account-picker");
@@ -64,6 +67,10 @@ public class Auto : PageModel
                         return Redirect(appPath);
                 }
             }
+
+            // Authenticated admin without account context should land on admin dashboard.
+            if (await _userInfo.IsAdmin())
+                return Redirect("/adm");
         }
 
         Link = url;

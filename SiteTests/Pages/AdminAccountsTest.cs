@@ -1,6 +1,7 @@
 using Core.Commands;
 using Core.Queries;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
 using Site.Pages;
 using SiteTests.Helpers;
 
@@ -11,7 +12,7 @@ public class AdminAccountsTest
     private static (AdminAccounts model, ConfigurableFakeMediator mediator) CreateModel()
     {
         var mediator = new ConfigurableFakeMediator();
-        var model = new AdminAccounts(mediator);
+        var model = new AdminAccounts(mediator, NullLogger<AdminAccounts>.Instance);
         TestEntityFactory.SetupPageContext(model);
         return (model, mediator);
     }
@@ -87,5 +88,26 @@ public class AdminAccountsTest
         var redirect = Assert.IsType<RedirectToPageResult>(result);
         Assert.Equal("Account sensor removed successfully.", redirect.RouteValues?["message"]);
         Assert.Contains(mediator.SentRequests, r => r is RemoveSensorFromAccountCommand);
+    }
+
+    [Fact]
+    public void OnPostOpenAccount_RedirectsToAccountPath()
+    {
+        var (model, _) = CreateModel();
+
+        var result = model.OnPostOpenAccount("abc123");
+
+        var redirect = Assert.IsType<RedirectResult>(result);
+        Assert.Equal("/a/abc123", redirect.Url);
+    }
+
+    [Fact]
+    public void OnPostOpenAccount_ReturnsBadRequest_ForMissingLink()
+    {
+        var (model, _) = CreateModel();
+
+        var result = model.OnPostOpenAccount(" ");
+
+        Assert.IsType<BadRequestResult>(result);
     }
 }

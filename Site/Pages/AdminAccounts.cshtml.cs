@@ -12,13 +12,15 @@ namespace Site.Pages;
 public class AdminAccounts : PageModel
 {
     private readonly IMediator _mediator;
+    private readonly ILogger<AdminAccounts> _logger;
     public IEnumerable<Core.Entities.Account> Accounts { get; set; } = null!;
 
     public string? Message { get; set; }
 
-    public AdminAccounts(IMediator mediator)
+    public AdminAccounts(IMediator mediator, ILogger<AdminAccounts> logger)
     {
         _mediator = mediator;
+        _logger = logger;
     }
 
     public async Task OnGet(string? message, Guid? sensorUid)
@@ -42,6 +44,14 @@ public class AdminAccounts : PageModel
             Name = name,
             Email = email
         });
+
+        _logger.LogInformation(
+            "Admin action: account created by {AdminEmail} from IP {IpAddress}; accountUid={AccountUid}, accountEmail={AccountEmail}, accountName={AccountName}",
+            User.FindFirst("email")?.Value,
+            HttpContext.Connection.RemoteIpAddress,
+            accountUid,
+            email,
+            name);
 
         await _mediator.Send(new RegenerateAccountLinkCommand()
         {
@@ -77,9 +87,30 @@ public class AdminAccounts : PageModel
             AccountUid = accountId,
             SensorUid = sensorId
         });
+
+        _logger.LogInformation(
+            "Admin action: sensor removed from account by {AdminEmail} from IP {IpAddress}; accountUid={AccountUid}, sensorUid={SensorUid}",
+            User.FindFirst("email")?.Value,
+            HttpContext.Connection.RemoteIpAddress,
+            accountId,
+            sensorId);
  
         string message = "Account sensor removed successfully.";
 
         return RedirectToPage(new { message });
+    }
+
+    public IActionResult OnPostOpenAccount(string accountLink)
+    {
+        if (string.IsNullOrWhiteSpace(accountLink))
+            return BadRequest();
+
+        _logger.LogInformation(
+            "Admin action: open account by {AdminEmail} from IP {IpAddress}; accountLink={AccountLink}",
+            User.FindFirst("email")?.Value,
+            HttpContext.Connection.RemoteIpAddress,
+            accountLink);
+
+        return Redirect($"/a/{accountLink}");
     }
 }

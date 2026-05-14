@@ -8,10 +8,11 @@ namespace SiteTests.Pages;
 
 public class AutoTest
 {
-    private static Auto CreateModel(ConfigurableFakeMediator? mediator = null, string? cookieValue = null)
+    private static Auto CreateModel(ConfigurableFakeMediator? mediator = null, string? cookieValue = null, FakeUserInfo? userInfo = null)
     {
         mediator ??= new ConfigurableFakeMediator();
-        var model = new Auto(mediator);
+        userInfo ??= new FakeUserInfo();
+        var model = new Auto(mediator, userInfo);
         var httpContext = new DefaultHttpContext();
         if (cookieValue != null)
         {
@@ -150,5 +151,40 @@ public class AutoTest
         Assert.Equal("/a/test-link/s/test-sensor-link", redirect.Url);
         // Cookie should be updated (Set-Cookie header present)
         Assert.True(model.HttpContext.Response.Headers.ContainsKey("Set-Cookie"));
+    }
+
+    [Fact]
+    public async Task OnGet_RedirectsToAdminDashboard_WhenAuthenticatedAdminWithoutAccountContext()
+    {
+        var mediator = new ConfigurableFakeMediator();
+        var userInfo = new FakeUserInfo { Authenticated = true, Admin = true, LoginEmail = "admin@test.com" };
+        var model = CreateModel(mediator, userInfo: userInfo);
+
+        model.HttpContext.User = new System.Security.Claims.ClaimsPrincipal(
+            new System.Security.Claims.ClaimsIdentity(
+                [new System.Security.Claims.Claim("email", "admin@test.com")],
+                "test-auth"));
+
+        var result = await model.OnGet();
+
+        var redirect = Assert.IsType<RedirectResult>(result);
+        Assert.Equal("/adm", redirect.Url);
+    }
+
+    [Fact]
+    public async Task OnGet_ShowsPage_WhenAuthenticatedNonAdminWithoutAccountContext()
+    {
+        var mediator = new ConfigurableFakeMediator();
+        var userInfo = new FakeUserInfo { Authenticated = true, Admin = false, LoginEmail = "user@test.com" };
+        var model = CreateModel(mediator, userInfo: userInfo);
+
+        model.HttpContext.User = new System.Security.Claims.ClaimsPrincipal(
+            new System.Security.Claims.ClaimsIdentity(
+                [new System.Security.Claims.Claim("email", "user@test.com")],
+                "test-auth"));
+
+        var result = await model.OnGet();
+
+        Assert.IsType<Microsoft.AspNetCore.Mvc.RazorPages.PageResult>(result);
     }
 }

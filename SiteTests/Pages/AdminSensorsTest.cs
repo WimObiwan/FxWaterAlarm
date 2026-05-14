@@ -2,6 +2,7 @@ using Core.Commands;
 using Core.Entities;
 using Core.Queries;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
 using Site.Pages;
 using SiteTests.Helpers;
 
@@ -12,7 +13,7 @@ public class AdminSensorsTest
     private static (AdminSensors model, ConfigurableFakeMediator mediator) CreateModel()
     {
         var mediator = new ConfigurableFakeMediator();
-        var model = new AdminSensors(mediator);
+        var model = new AdminSensors(mediator, NullLogger<AdminSensors>.Instance);
         TestEntityFactory.SetupPageContext(model);
         return (model, mediator);
     }
