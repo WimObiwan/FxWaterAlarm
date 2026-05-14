@@ -97,6 +97,7 @@ builder.Services.AddRazorPages(o =>
             .AddPageRoute("/AdminQr", "/adm/qr")
             .AddPageRoute("/AccountLoginMessage", "/account/loginmessage")
         .AddPageRoute("/AccountLoginMessageConfirmation", "/account/loginmessageconfirmation")
+        .AddPageRoute("/AccountPicker", "/account-picker")
     )
     .AddViewLocalization();
 builder.Services.AddControllers()

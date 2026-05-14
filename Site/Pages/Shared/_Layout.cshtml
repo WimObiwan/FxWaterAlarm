@@ -117,11 +117,40 @@
 
                     @if (UserInfo.IsAuthenticated())
                     {
+                        var accessibleAccounts = await UserInfo.GetAccessibleAccounts();
+                        var currentSub = UserInfo.GetCurrentAccountSub();
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-fill"></i> @UserInfo.GetLoginEmail()
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
+                                @if (accessibleAccounts.Count > 1)
+                                {
+                                    <li><h6 class="dropdown-header">@Loc["Switch account"]</h6></li>
+                                    @foreach (var acc in accessibleAccounts)
+                                    {
+                                        var isCurrent = acc.Uid.ToString() == currentSub;
+                                        <li>
+                                            @if (isCurrent)
+                                            {
+                                                <span class="dropdown-item disabled">
+                                                    <i class="bi bi-check2 me-1"></i>@(acc.Name ?? acc.Email)
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" action="/account-picker?handler=Switch" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="accountId" value="@acc.Id"/>
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="bi bi-arrow-left-right me-1"></i>@(acc.Name ?? acc.Email)
+                                                    </button>
+                                                </form>
+                                            }
+                                        </li>
+                                    }
+                                    <li><hr class="dropdown-divider"/></li>
+                                }
                                 <li>
                                     <a class="dropdown-item" href="@AccountLoginMessage.GetLogoutUrl(Url, Context.Request.Scheme, Context.Request.GetEncodedPathAndQuery())">
                                         <i class="bi bi-box-arrow-right me-1"></i>@Loc["Logout"]

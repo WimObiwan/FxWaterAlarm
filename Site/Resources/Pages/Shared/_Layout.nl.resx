@@ -46,4 +46,8 @@
         <value>Afmelden</value>
         <comment>Logout menu item in navbar</comment>
     </data>
+    <data name="Switch account" xml:space="preserve">
+        <value>Wissel van account</value>
+        <comment>Dropdown header when user has multiple accessible accounts</comment>
+    </data>
 </root>

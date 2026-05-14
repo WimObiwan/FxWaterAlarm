@@ -1,0 +1,45 @@
+@page
+@using Core.Entities
+@using Microsoft.AspNetCore.Mvc.Localization
+@model AccountPicker
+@inject IViewLocalizer Loc
+
+@{
+    ViewData["Title"] = Model.Mode == "google" ? Loc["Choose account"].Value : Loc["Switch account"].Value;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <h1 class="h3 mb-1">@ViewData["Title"]</h1>
+        <p class="text-muted mb-4">@Loc["Picker intro"]</p>
+
+        @if (Model.Accounts.Count == 0)
+        {
+            <div class="alert alert-warning">@Loc["No accounts"]</div>
+        }
+        else
+        {
+            var handler = Model.Mode == "google" ? "Google" : "Switch";
+            @foreach (var account in Model.Accounts)
+            {
+                <form method="post" asp-page-handler="@handler" class="mb-3">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="accountId" value="@account.Id"/>
+                    <button type="submit" class="btn btn-outline-primary w-100 text-start py-3 px-4">
+                        <div class="fw-semibold">@(account.Name ?? account.Email)</div>
+                        @if (account.Name != null)
+                        {
+                            <div class="small text-muted">@account.Email</div>
+                        }
+                    </button>
+                </form>
+            }
+        }
+
+        <div class="mt-4">
+            <a class="btn btn-link p-0 text-secondary" href="/login">
+                <i class="bi bi-arrow-left"></i> @Loc["Back to login"]
+            </a>
+        </div>
+    </div>
+</div>

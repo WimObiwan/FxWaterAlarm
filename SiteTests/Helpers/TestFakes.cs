@@ -77,9 +77,11 @@ public class FakeUserInfo : IUserInfo
 
     public bool IsAuthenticated() => Authenticated;
     public string? GetLoginEmail() => LoginEmail;
+    public string? GetCurrentAccountSub() => null;
     public Task<bool> CanUpdateAccount(Account account) => Task.FromResult(CanUpdate);
     public Task<bool> CanUpdateAccountSensor(AccountSensor accountSensor) => Task.FromResult(CanUpdate);
     public Task<bool> IsAdmin() => Task.FromResult(Admin);
+    public Task<IReadOnlyList<Account>> GetAccessibleAccounts() => Task.FromResult<IReadOnlyList<Account>>(Array.Empty<Account>());
 }
 
 public class FakeUrlBuilder : IUrlBuilder

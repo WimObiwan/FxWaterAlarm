@@ -11,9 +11,11 @@ public interface IUserInfo
 {
     bool IsAuthenticated();
     string? GetLoginEmail();
+    string? GetCurrentAccountSub();
     Task<bool> CanUpdateAccount(Account account);
     Task<bool> CanUpdateAccountSensor(AccountSensor accountSensor);
     Task<bool> IsAdmin();
+    Task<IReadOnlyList<Account>> GetAccessibleAccounts();
 }
 
 public class UserInfo : IUserInfo
@@ -42,6 +44,11 @@ public class UserInfo : IUserInfo
     public string? GetLoginEmail()
     {
         return _httpContextAccessor.HttpContext?.User.FindFirstValue("email");
+    }
+
+    public string? GetCurrentAccountSub()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindFirstValue("sub");
     }
 
     public async Task<bool> CanUpdateAccount(Account account)
@@ -84,5 +91,41 @@ public class UserInfo : IUserInfo
 
         var result = await _authorizationService.AuthorizeAsync(user, "Admin");
         return result.Succeeded;
+    }
+
+    public async Task<IReadOnlyList<Account>> GetAccessibleAccounts()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+        if (user?.Identity?.IsAuthenticated != true)
+            return [];
+
+        var email = user.FindFirstValue("email");
+        var providerSub = user.FindFirstValue("provider_sub");
+
+        var accountsById = new Dictionary<int, Account>();
+
+        if (!string.IsNullOrEmpty(email))
+        {
+            var byEmail = await _mediator.Send(new AccountsByEmailQuery { Email = email });
+            foreach (var a in byEmail)
+                accountsById[a.Id] = a;
+        }
+
+        if (!string.IsNullOrEmpty(providerSub))
+        {
+            var googleUser = await _mediator.Send(new AccountUserByProviderQuery
+            {
+                Provider = "google",
+                ProviderSubjectId = providerSub
+            });
+            if (googleUser != null)
+            {
+                var googleAccount = await _mediator.Send(new AccountByIdQuery { Id = googleUser.AccountId });
+                if (googleAccount != null)
+                    accountsById[googleAccount.Id] = googleAccount;
+            }
+        }
+
+        return accountsById.Values.OrderBy(a => a.Id).ToList();
     }
 }

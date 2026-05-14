@@ -19,6 +19,7 @@ public class UserInfoInterfaceTest
 
         public bool IsAuthenticated() => AuthenticatedResult;
         public string? GetLoginEmail() => EmailResult;
+        public string? GetCurrentAccountSub() => null;
         public Task<bool> IsAdmin() => Task.FromResult(AdminResult);
 
         public Task<bool> CanUpdateAccount(Core.Entities.Account account) =>
@@ -26,6 +27,9 @@ public class UserInfoInterfaceTest
 
         public Task<bool> CanUpdateAccountSensor(Core.Entities.AccountSensor accountSensor) =>
             Task.FromResult(CanUpdateResult);
+
+        public Task<IReadOnlyList<Core.Entities.Account>> GetAccessibleAccounts() =>
+            Task.FromResult<IReadOnlyList<Core.Entities.Account>>(Array.Empty<Core.Entities.Account>());
     }
 
     [Fact]

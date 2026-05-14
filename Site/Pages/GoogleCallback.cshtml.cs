@@ -1,7 +1,9 @@
 using System.Security.Claims;
+using System.Text.Json;
 using Core.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,13 +14,18 @@ namespace Site.Pages;
 
 public class GoogleCallback : PageModel
 {
+    internal const string PickerCookieName = "WaterAlarm.Picker";
+    internal const string PickerProtectionPurpose = "AccountPicker.GoogleToken";
+
     private readonly IMediator _mediator;
     private readonly ILogger<GoogleCallback> _logger;
+    private readonly IDataProtectionProvider _dataProtectionProvider;
 
-    public GoogleCallback(IMediator mediator, ILogger<GoogleCallback> logger)
+    public GoogleCallback(IMediator mediator, ILogger<GoogleCallback> logger, IDataProtectionProvider dataProtectionProvider)
     {
         _mediator = mediator;
         _logger = logger;
+        _dataProtectionProvider = dataProtectionProvider;
     }
 
     public async Task<IActionResult> OnGet(
@@ -82,42 +89,60 @@ public class GoogleCallback : PageModel
             ProviderSubjectId = googleSub
         });
 
-        Core.Entities.Account? account = null;
-
         if (linkedUser != null)
         {
-            account = await _mediator.Send(new AccountByIdQuery { Id = linkedUser.AccountId });
-        }
-        else
-        {
-            // Fall back: look for a mail AccountUser matching the Google email
-            var mailUser = await _mediator.Send(new AccountUserByEmailQuery { Email = email });
-            if (mailUser != null)
+            var linkedAccount = await _mediator.Send(new AccountByIdQuery { Id = linkedUser.AccountId });
+            if (linkedAccount == null)
             {
-                account = await _mediator.Send(new AccountByIdQuery { Id = mailUser.AccountId });
-
-                if (account != null)
-                {
-                    // Auto-link this Google identity to the matched account for next logins
-                    await _mediator.Send(new AddAccountUserCommand
-                    {
-                        AccountId = account.Id,
-                        LoginType = AccountUserLoginType.Google,
-                        Email = email,
-                        Provider = "google",
-                        ProviderSubjectId = googleSub
-                    });
-                }
+                _logger.LogWarning("Google login: linked account not found for sub {Sub}", googleSub);
+                return RedirectToPage("/Login", new { error = "no_account" });
             }
+            return await SignInAccount(linkedAccount, googleSub, returnUrl, configuration);
         }
 
-        if (account == null)
+        // Fall back: look for all mail AccountUsers matching the Google email
+        var accounts = await _mediator.Send(new AccountsByEmailQuery { Email = email });
+
+        if (accounts.Count == 0)
         {
             _logger.LogWarning("Google login: no WaterAlarm account found for email {Email} / sub {Sub}", email, googleSub);
             return RedirectToPage("/Login", new { error = "no_account" });
         }
 
-        return await SignInAccount(account, googleSub, returnUrl, configuration);
+        if (accounts.Count == 1)
+        {
+            var account = accounts[0];
+            // Auto-link this Google identity to the matched account for next logins
+            await _mediator.Send(new AddAccountUserCommand
+            {
+                AccountId = account.Id,
+                LoginType = AccountUserLoginType.Google,
+                Email = email,
+                Provider = "google",
+                ProviderSubjectId = googleSub
+            });
+            return await SignInAccount(account, googleSub, returnUrl, configuration);
+        }
+
+        // Multiple accounts match — redirect to picker
+        _logger.LogInformation(
+            "Google login: multiple accounts ({Count}) found for email {Email}, redirecting to picker",
+            accounts.Count, email);
+
+        var token = new AccountPickerToken { GoogleSub = googleSub, Email = email, ReturnUrl = returnUrl };
+        var protector = _dataProtectionProvider.CreateProtector(PickerProtectionPurpose);
+        var protectedToken = protector.Protect(JsonSerializer.Serialize(token));
+
+        Response.Cookies.Append(PickerCookieName, protectedToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Lax,
+            MaxAge = TimeSpan.FromMinutes(10),
+            Path = "/"
+        });
+
+        return RedirectToPage("/AccountPicker");
     }
 
     private async Task<IActionResult> HandleLinkMode(
@@ -217,4 +242,11 @@ public class GoogleCallback : PageModel
 
         return Redirect(returnUrl ?? "/");
     }
+}
+
+internal record AccountPickerToken
+{
+    public required string GoogleSub { get; init; }
+    public required string Email { get; init; }
+    public string? ReturnUrl { get; init; }
 }
