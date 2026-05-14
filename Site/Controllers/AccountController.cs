@@ -41,7 +41,7 @@ public class AccountController : Controller
                     ExpiresUtc = DateTimeOffset.UtcNow.Add(accountLoginMessageOptions.TokenLifespan) // Adjust the expiration
                 }
             );
-            return Redirect("/");
+            return Redirect("/auto");
         }
 
         return View("Error");

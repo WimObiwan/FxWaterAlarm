@@ -1,9 +1,9 @@
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Core.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using CookieOptions = Microsoft.AspNetCore.Http.CookieOptions;
 
 namespace Site.Pages;
@@ -34,6 +34,35 @@ public class Auto : PageModel
                 }
                 
                 return Redirect(testedUrl);
+            }
+        }
+
+        // No valid link cookie — if authenticated, resolve account from claims
+        if (!update && User.Identity?.IsAuthenticated == true)
+        {
+            var subClaim = User.FindFirstValue("sub");
+            if (Guid.TryParse(subClaim, out var uid))
+            {
+                var account = await _mediator.Send(new AccountByUidQuery { Uid = uid });
+                var appPath = await GetAppPath(account);
+                if (appPath != null)
+                    return Redirect(appPath);
+            }
+
+            var email = User.FindFirstValue("email");
+            if (!string.IsNullOrEmpty(email))
+            {
+                var accounts = await _mediator.Send(new AccountsByEmailQuery { Email = email });
+
+                if (accounts.Count > 1)
+                    return Redirect("/account-picker");
+
+                if (accounts.Count == 1)
+                {
+                    var appPath = await GetAppPath(accounts[0]);
+                    if (appPath != null)
+                        return Redirect(appPath);
+                }
             }
         }
 
@@ -93,5 +122,14 @@ public class Auto : PageModel
         }
 
         return null;
+    }
+
+    private async Task<string?> GetAppPath(Core.Entities.Account? account)
+    {
+        if (account?.Link == null)
+            return null;
+
+        var accountWithSensors = await _mediator.Send(new AccountByLinkQuery { Link = account.Link });
+        return accountWithSensors?.AppPath;
     }
 }

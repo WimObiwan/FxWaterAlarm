@@ -57,7 +57,7 @@ public class AccountCallback : PageModel
             );
             _logger.LogInformation("Passwordless login succeeded for email {Email} from IP {IpAddress}", email, HttpContext.Connection.RemoteIpAddress);
             if (url == null)
-                return Redirect("/");
+                return Redirect("/auto");
             
             return Redirect(Uri.UnescapeDataString(url));
         }

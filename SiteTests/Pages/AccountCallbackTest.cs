@@ -116,7 +116,7 @@ public class AccountCallbackTest
             configuration: CreateConfiguration());
 
         var redirect = Assert.IsType<RedirectResult>(result);
-        Assert.Equal("/", redirect.Url);
+        Assert.Equal("/auto", redirect.Url);
     }
 
     [Fact]
@@ -176,9 +176,9 @@ public class AccountCallbackTest
         var result = await model.OnGet(token: "valid-token", email: "user@test.com", url: null,
             configuration: config);
 
-        // Verify sign-in succeeded (redirects to "/" not "Error")
+        // Verify sign-in succeeded (redirects to "/auto" not "Error")
         var redirect = Assert.IsType<RedirectResult>(result);
-        Assert.Equal("/", redirect.Url);
+        Assert.Equal("/auto", redirect.Url);
     }
 
     /// <summary>

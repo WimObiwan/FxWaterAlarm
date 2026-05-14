@@ -240,7 +240,7 @@ public class GoogleCallback : PageModel
             "Google login succeeded for email {Email} (account {AccountId}) from IP {IpAddress}",
             account.Email, account.Id, HttpContext.Connection.RemoteIpAddress);
 
-        return Redirect(returnUrl ?? "/");
+        return Redirect(returnUrl ?? "/auto");
     }
 }
 

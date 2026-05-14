@@ -18,7 +18,7 @@ public class Login : PageModel
         [FromServices] IOptionsSnapshot<GoogleAuthOptions>? googleOptions = null)
     {
         if (User.Identity?.IsAuthenticated == true)
-            return Redirect(returnUrl ?? "/");
+            return Redirect(returnUrl ?? "/auto");
 
         ReturnUrl = returnUrl;
         Error = error;

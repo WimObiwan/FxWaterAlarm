@@ -213,6 +213,6 @@ public class AccountPicker : PageModel
             "AccountPicker: signed in to account {AccountId} from IP {IpAddress}",
             account.Id, HttpContext.Connection.RemoteIpAddress);
 
-        return Redirect(returnUrl ?? "/");
+        return Redirect(returnUrl ?? "/auto");
     }
 }

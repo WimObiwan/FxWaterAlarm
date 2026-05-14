@@ -89,7 +89,7 @@ public class AccountControllerTest
         var result = await controller.LoginCallback("fake-token", "user@test.com", config);
 
         var redirect = Assert.IsType<RedirectResult>(result);
-        Assert.Equal("/", redirect.Url);
+        Assert.Equal("/auto", redirect.Url);
         Assert.True(authService.SignedIn);
     }
 
