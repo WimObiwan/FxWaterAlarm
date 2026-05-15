@@ -26,7 +26,39 @@
         <td><strong>UserAuthId</strong></td><td>@Model.UserAuthId</td>
     </tr>
     <tr>
+        <td><strong>IsAuthenticated</strong></td><td>@Model.IsAuthenticated</td>
+    </tr>
+    <tr>
+        <td><strong>UserEmail</strong></td><td>@(Model.UserEmail ?? "-")</td>
+    </tr>
+    <tr>
+        <td><strong>GoogleId</strong></td><td>@(Model.GoogleId ?? "-")</td>
+    </tr>
+    <tr>
+        <td><strong>LoginMethod</strong></td><td>@(Model.LoginMethod ?? "-")</td>
+    </tr>
+    <tr>
+        <td><strong>LoginTimestamp</strong></td>
+        <td>@(Model.LoginTimestamp?.ToString("yyyy-MM-dd HH:mm:ss zzz") ?? "unknown")</td>
+    </tr>
+    <tr>
+        <td><strong>SessionExpiresAt</strong></td>
+        <td>@(Model.SessionExpiresAt?.ToString("yyyy-MM-dd HH:mm:ss zzz") ?? "unknown")</td>
+    </tr>
+    <tr>
+        <td><strong>IsAdmin</strong></td><td>@Model.IsAdmin</td>
+    </tr>
+    <tr>
+        <td><strong>ClientIpAddress</strong></td><td>@(Model.ClientIpAddress ?? "-")</td>
+    </tr>
+    <tr>
+        <td><strong>XForwardedFor</strong></td><td>@(Model.ClientForwardedFor ?? "-")</td>
+    </tr>
+    <tr>
         <td><strong>UserAgent</strong></td><td>@Model.UserAgent</td>
+    </tr>
+    <tr>
+        <td><strong>ClaimTypes</strong></td><td>@Model.UserClaimsSummary</td>
     </tr>
     <tr>
         <td><strong>Culture</strong></td><td>@CultureInfo.CurrentCulture.Name</td>
@@ -35,10 +67,10 @@
         <td><strong>UICulture</strong></td><td>@CultureInfo.CurrentUICulture.Name</td>
     </tr>
     <tr>
-        <td><strong>DateTime</strong></td><td>@DateTime.Now.ToLongDateString() @DateTime.Now.ToLongTimeString()</td>
+        <td><strong>DateTime</strong></td><td>@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss zzz")</td>
     </tr>
     <tr>
-        <td><strong>DateTimeUTC</strong></td><td>@DateTime.UtcNow.ToLongDateString() @DateTime.UtcNow.ToLongTimeString()</td>
+        <td><strong>DateTimeUTC</strong></td><td>@DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") UTC</td>
     </tr>
     <tr>
         <td><strong>Environment</strong></td><td>@Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")</td>
@@ -46,4 +78,25 @@
     <tr>
         <td><strong>UseDevBranding</strong></td><td>@Model.UseDevBranding</td>
     </tr>
+    <tr>
+        <td><strong>AutoCookieLink</strong></td><td>@(Model.AutoCookieLink ?? "-")</td>
+    </tr>
 </table>
+
+<div class="mt-3">
+    <textarea id="infoTroubleshootingCopy"
+              class="form-control"
+              rows="14"
+              readonly>@Model.TroubleshootingInfo</textarea>
+</div>
+
+<div class="mt-2 mb-3">
+    <button type="button"
+            class="btn btn-outline-secondary"
+            title="Copy this information"
+            data-clipboard
+            data-clipboard-target="#infoTroubleshootingCopy">
+        <i class="bi bi-clipboard" aria-hidden="true"></i>
+        Copy this information
+    </button>
+</div>
