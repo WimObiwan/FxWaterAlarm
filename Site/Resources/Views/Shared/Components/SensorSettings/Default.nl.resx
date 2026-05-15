@@ -18,10 +18,6 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="Please log in before updating your settings.  WaterAlarm.be will send you an e-mail with a link to verify your identity.  When you click the link, you will get back to this page." xml:space="preserve">
-        <value>Log alstublieft in vooraleer je instellingen te wijzigen.  WaterAlarm.be zal je een  e-mail sturen met een link om je identiteit te bevestigen.  Wanneer je op de link klikt, zul je terugkeren naar deze pagina.</value>
-        <comment>Please log in before updating your settings.  WaterAlarm.be will send you an e-mail with a link to verify your identity.  When you click the link, you will get back to this page.</comment>
-    </data>
     <data name="Submit changes" xml:space="preserve">
         <value>Wijzigingen bewaren</value>
         <comment>Submit changes</comment>
@@ -61,6 +57,14 @@
     <data name="Send login link" xml:space="preserve">
         <value>Login link sturen</value>
         <comment>Send login link</comment>
+    </data>
+    <data name="Please log in before updating your settings." xml:space="preserve">
+        <value>Log alstublieft in vooraleer je instellingen te wijzigen.</value>
+        <comment>Please log in before updating your settings.</comment>
+    </data>
+    <data name="Log in" xml:space="preserve">
+        <value>Aanmelden</value>
+        <comment>Log in</comment>
     </data>
     <data name="Your changes could not be saved." xml:space="preserve">
         <value>Je wijzigingen konden niet bewaard worden.</value>

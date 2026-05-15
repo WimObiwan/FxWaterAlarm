@@ -43,9 +43,9 @@
         
         @if (!UserInfo.IsAuthenticated())
         {
-            <div>@Loc["Please log in before updating your settings.  WaterAlarm.be will send you an e-mail with a link to verify your identity.  When you click the link, you will get back to this page."]</div>
+            <div>@Loc["Please log in before updating your settings."]</div>
             
-            <a href="@Model.LoginUrl" class="btn btn-primary">@Loc["Send login link"]</a>
+            <a href="@Model.LoginUrl" class="btn btn-primary">@Loc["Log in"]</a>
         }
         else if (!await UserInfo.CanUpdateAccountSensor(Model.AccountSensor))
         {
