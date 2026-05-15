@@ -309,7 +309,6 @@ public class ViewComponentsTest
         };
 
         var loginUrl = model.LoginUrl;
-        Assert.Contains("/Account/LoginMessage", loginUrl);
-        Assert.Contains("a=my-acct", loginUrl);
+        Assert.Contains("/login?r=%2Fa%2Fmy-acct%2Fs%2Fsensor1", loginUrl);
     }
 }
