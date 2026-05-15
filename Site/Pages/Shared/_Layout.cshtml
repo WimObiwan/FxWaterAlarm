@@ -91,9 +91,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/auto">@Loc["My sensors"]</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/adm">@Loc["Admin"]</a>
-                    </li>
+                    @if (await UserInfo.IsAdmin())
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/adm">@Loc["Admin"]</a>
+                        </li>
+                    }
                     <li class="nav-item">
                         <a class="nav-link" href="/Docs">@Loc["Documentation"] <span class="badge bg-warning">beta</span></a>
                     </li>
