@@ -28,4 +28,7 @@
     <data name="Manage users" xml:space="preserve">
         <value>Gebruikers beheren</value>
     </data>
+    <data name="Manage who can access this account." xml:space="preserve">
+        <value>Beheer wie toegang heeft tot dit account.</value>
+    </data>
 </root>

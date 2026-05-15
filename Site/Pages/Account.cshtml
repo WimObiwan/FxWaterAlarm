@@ -13,15 +13,6 @@
     ViewData["Title"] = "Account";
 }
 
-@if (Model.CanUpdate)
-{
-    <div class="mb-3">
-        <a class="btn btn-outline-secondary btn-sm" href="/a/@Model.AccountEntity?.Link/users">
-            <i class="bi bi-people"></i> @Loc["Manage users"]
-        </a>
-    </div>
-}
-
 @if (await UserInfo.IsAdmin())
 {
 <div class="alert alert-warning small-alert">
@@ -136,6 +127,18 @@ else
             }
         </div>
     </div>
+
+    @if (Model.CanUpdate)
+    {
+        <div class="d-flex justify-content-center mt-3 mb-2">
+            <div class="text-center">
+                <div class="text-muted mb-2">@Loc["Manage who can access this account."]</div>
+                <a class="btn btn-outline-secondary" href="/a/@Model.AccountEntity?.Link/users">
+                    <i class="bi bi-people"></i> @Loc["Manage users"]
+                </a>
+            </div>
+        </div>
+    }
 }
 
 @*

@@ -28,7 +28,8 @@
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.8" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="QRCoder-ImageSharp" Version="0.10.0" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="4.0.0" />
+        <!-- Don't upgrade SixLabors.ImageSharp beyond 3.1.12 due to licensing -->
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
         <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.40.0" />
     </ItemGroup>
 

@@ -29,4 +29,7 @@
     <data name="Manage users" xml:space="preserve">
         <value>Manage users</value>
     </data>
+    <data name="Manage who can access this account." xml:space="preserve">
+        <value>Manage who can access this account.</value>
+    </data>
 </root>
