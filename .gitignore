@@ -47,6 +47,7 @@ upgrade.sh
 CoverageResults/
 
 .lens
+*.lscache
 
 scripts/deploy-wateralarm-dev.sh
 scripts/deploy-wateralarm-prd.sh
