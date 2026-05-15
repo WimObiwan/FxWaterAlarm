@@ -50,7 +50,6 @@ public class Info : PageModel
                   + " " + ThisAssembly.Git.CommitDate;
         OsVersion = RuntimeInformation.OSDescription;
         DotNetVersion = RuntimeInformation.FrameworkDescription;
-        UserAuthId = HttpContext.User.Identity?.Name;
         UserAgent = HttpContext.Request.Headers.UserAgent;
         UseDevBranding = _config.GetValue<bool>("UiBranding:UseDevBranding");
         AutoCookieLink = HttpContext.Request.Cookies["auto"];
@@ -121,7 +120,6 @@ public class Info : PageModel
             $"IsAdmin: {IsAdmin}",
             $"ClientIpAddress: {Safe(ClientIpAddress)}",
             $"XForwardedFor: {Safe(ClientForwardedFor)}",
-            $"UserAuthId: {Safe(UserAuthId)}",
             $"UserAgent: {Safe(UserAgent)}",
             $"ClaimTypes: {Safe(UserClaimsSummary)}",
             $"UseDevBranding: {UseDevBranding}",
