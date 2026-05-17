@@ -11,10 +11,23 @@
         <td><strong>RequestHost</strong></td><td>@Model.RequestHost</td>
     </tr>
     <tr>
+        <td><strong>RequestScheme</strong></td><td>@Model.RequestScheme</td>
+    </tr>
+    <tr>
+        <td><strong>RequestIsHttps</strong></td><td>@Model.RequestIsHttps</td>
+    </tr>
+    <tr>
         <td><strong>Server</strong></td><td>@Model.Server</td>
     </tr>
     <tr>
         <td><strong>Version</strong></td><td>@Model.Version</td>
+    </tr>
+    <tr>
+        <td><strong>BuildDateTime</strong></td>
+        <td>@(Model.BuildDateTime?.ToString("yyyy-MM-dd HH:mm:ss zzz") ?? "unknown")</td>
+    </tr>
+    <tr>
+        <td><strong>BuildDateTimeSource</strong></td><td>@(Model.BuildDateTimeSource ?? "-")</td>
     </tr>
     <tr>
         <td><strong>OsVersion</strong></td><td>@Model.OsVersion</td>
@@ -23,7 +36,32 @@
         <td><strong>DotNetVersion</strong></td><td>@Model.DotNetVersion</td>
     </tr>
     <tr>
+        <td><strong>ProcessStartTime</strong></td>
+        <td>@(Model.ProcessStartTime?.ToString("yyyy-MM-dd HH:mm:ss zzz") ?? "unknown")</td>
+    </tr>
+    <tr>
+        <td><strong>ConfiguredTokenLifespan</strong></td><td>@(Model.ConfiguredTokenLifespan ?? "-")</td>
+    </tr>
+    <tr>
+        <td><strong>ConfiguredCookieExpireTimeSpan</strong></td><td>@(Model.ConfiguredCookieExpireTimeSpan ?? "-")</td>
+    </tr>
+    <tr>
+        <td><strong>CookieSlidingExpiration</strong></td><td>@Model.CookieSlidingExpiration</td>
+    </tr>
+    <tr>
         <td><strong>IsAuthenticated</strong></td><td>@Model.IsAuthenticated</td>
+    </tr>
+    <tr>
+        <td><strong>HasAuthCookie</strong></td><td>@Model.HasAuthCookie</td>
+    </tr>
+    <tr>
+        <td><strong>AuthCookieLength</strong></td><td>@(Model.AuthCookieLength?.ToString() ?? "-")</td>
+    </tr>
+    <tr>
+        <td><strong>AuthTicketStatus</strong></td><td>@(Model.AuthTicketStatus ?? "-")</td>
+    </tr>
+    <tr>
+        <td><strong>AuthTicketFailure</strong></td><td>@(Model.AuthTicketFailure ?? "-")</td>
     </tr>
     <tr>
         <td><strong>UserEmail</strong></td><td>@(Model.UserEmail ?? "-")</td>
@@ -43,6 +81,12 @@
         <td>@(Model.SessionExpiresAt?.ToString("yyyy-MM-dd HH:mm:ss zzz") ?? "unknown")</td>
     </tr>
     <tr>
+        <td><strong>SessionAge</strong></td><td>@(Model.SessionAge ?? "-")</td>
+    </tr>
+    <tr>
+        <td><strong>SessionRemaining</strong></td><td>@(Model.SessionRemaining ?? "-")</td>
+    </tr>
+    <tr>
         <td><strong>IsAdmin</strong></td><td>@Model.IsAdmin</td>
     </tr>
     <tr>
@@ -50,6 +94,9 @@
     </tr>
     <tr>
         <td><strong>XForwardedFor</strong></td><td>@(Model.ClientForwardedFor ?? "-")</td>
+    </tr>
+    <tr>
+        <td><strong>XForwardedProto</strong></td><td>@(Model.ClientForwardedProto ?? "-")</td>
     </tr>
     <tr>
         <td><strong>UserAgent</strong></td><td>@Model.UserAgent</td>
@@ -80,7 +127,7 @@
     </tr>
 </table>
 
-<div class="mt-3">
+<div class="d-none" aria-hidden="true">
     <textarea id="infoTroubleshootingCopy"
               class="form-control"
               rows="14"

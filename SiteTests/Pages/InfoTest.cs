@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Site.Pages;
 using SiteTests.Helpers;
 
@@ -7,8 +9,17 @@ namespace SiteTests.Pages;
 
 public class InfoTest
 {
+    private class TestOptionsMonitor : IOptionsMonitor<CookieAuthenticationOptions>
+    {
+        public CookieAuthenticationOptions CurrentValue { get; } = new();
+        public CookieAuthenticationOptions Get(string? name) => CurrentValue;
+        public IDisposable? OnChange(Action<CookieAuthenticationOptions, string?> listener) => null;
+    }
+
     private static Info CreateModel() =>
-        new Info(new ConfigurationBuilder().Build());
+        new Info(
+            new ConfigurationBuilder().Build(),
+            new TestOptionsMonitor());
 
     [Fact]
     public void OnGet_SetsServerToMachineName()

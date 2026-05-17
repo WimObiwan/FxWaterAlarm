@@ -120,6 +120,21 @@ builder.Services.AddWaterAlarmCore(builder.Configuration, typeof(Program).Assemb
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     //.AddEntityFrameworkStores<IdentityDbContext>()
     .AddDefaultTokenProviders();
+// The app uses a custom auth flow (manual SignInAsync) with claims that do not include the
+// standard ClaimTypes.NameIdentifier.  AddIdentity registers SecurityStampValidator which
+// fires every 30 minutes, fails to look up the user, and rejects the principal (logging the
+// user out).  Disable periodic re-validation by setting the interval to match the token lifespan.
+{
+    AccountLoginMessageOptions accountLoginMessageOptions =
+        builder.Configuration
+            .GetSection(AccountLoginMessageOptions.Location)
+            .Get<AccountLoginMessageOptions>()
+        ?? throw new Exception("AccountLoginMessageOptions not configured");
+    builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+    {
+        options.ValidationInterval = accountLoginMessageOptions.TokenLifespan;
+    });
+}
 builder.Services.AddTransient<IUserStore<IdentityUser>, UserStore>();
 builder.Services.AddTransient<IRoleStore<IdentityRole>, RoleStore>();
 builder.Services.AddTransient<ITrendService, TrendService>();
