@@ -23,11 +23,11 @@
         <td><strong>Version</strong></td><td>@Model.Version</td>
     </tr>
     <tr>
-        <td><strong>BuildDateTime</strong></td>
-        <td>@(Model.BuildDateTime?.ToString("yyyy-MM-dd HH:mm:ss zzz") ?? "unknown")</td>
+        <td><strong>DeployDateTime</strong></td>
+        <td>@(Model.DeployDateTime?.ToString("yyyy-MM-dd HH:mm:ss zzz") ?? "unknown")</td>
     </tr>
     <tr>
-        <td><strong>BuildDateTimeSource</strong></td><td>@(Model.BuildDateTimeSource ?? "-")</td>
+        <td><strong>DeployDateTimeSource</strong></td><td>@(Model.DeployDateTimeSource ?? "-")</td>
     </tr>
     <tr>
         <td><strong>OsVersion</strong></td><td>@Model.OsVersion</td>

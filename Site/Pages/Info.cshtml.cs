@@ -30,8 +30,8 @@ public class Info : PageModel
     public bool RequestIsHttps { get; set; }
     public string? Server { get; set; }
     public string? Version { get; set; }
-    public DateTimeOffset? BuildDateTime { get; set; }
-    public string? BuildDateTimeSource { get; set; }
+    public DateTimeOffset? DeployDateTime { get; set; }
+    public string? DeployDateTimeSource { get; set; }
     public string? OsVersion { get; set; }
     public string? DotNetVersion { get; set; }
     public string? UserAuthId { get; set; }
@@ -70,7 +70,7 @@ public class Info : PageModel
         Version = ThisAssembly.Git.SemVer.Major + "." + ThisAssembly.Git.SemVer.Minor + "." + ThisAssembly.Git.Commits 
                   + "-" + ThisAssembly.Git.Branch + "+" + ThisAssembly.Git.Commit
                   + " " + ThisAssembly.Git.CommitDate;
-        (BuildDateTime, BuildDateTimeSource) = ResolveBuildOrDeployDateTime();
+        (DeployDateTime, DeployDateTimeSource) = ResolveDeployDateTime();
         OsVersion = RuntimeInformation.OSDescription;
         DotNetVersion = RuntimeInformation.FrameworkDescription;
         try
@@ -163,8 +163,8 @@ public class Info : PageModel
             $"RequestIsHttps: {RequestIsHttps}",
             $"Server: {Safe(Server)}",
             $"Version: {Safe(Version)}",
-            $"BuildDateTime: {FormatTimestamp(BuildDateTime)}",
-            $"BuildDateTimeSource: {Safe(BuildDateTimeSource)}",
+            $"DeployDateTime: {FormatTimestamp(DeployDateTime)}",
+            $"DeployDateTimeSource: {Safe(DeployDateTimeSource)}",
             $"OsVersion: {Safe(OsVersion)}",
             $"DotNetVersion: {Safe(DotNetVersion)}",
             $"ProcessStartTime: {FormatTimestamp(ProcessStartTime)}",
@@ -199,7 +199,7 @@ public class Info : PageModel
         ]);
     }
 
-    private (DateTimeOffset? Value, string? Source) ResolveBuildOrDeployDateTime()
+    private (DateTimeOffset? Value, string? Source) ResolveDeployDateTime()
     {
         var deployStampPath = _config["Deployment:StampFilePath"]
                              ?? Path.Combine(AppContext.BaseDirectory, ".wateralarm-deploy-time");
@@ -207,7 +207,7 @@ public class Info : PageModel
         {
             try
             {
-            var raw = System.IO.File.ReadAllText(deployStampPath).Trim();
+                var raw = System.IO.File.ReadAllText(deployStampPath).Trim();
                 if (DateTimeOffset.TryParse(raw, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var stamp))
                     return (stamp, $"deploy stamp ({deployStampPath})");
             }
