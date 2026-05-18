@@ -77,6 +77,7 @@ class SensorDto
 {
     public required string SensorType { get; init; }
     public int? ExpectedIntervalSecs { get; init; }
+    public required string DevEui { get; init; }
 }
 
 class AccountSensorResult
@@ -165,7 +166,8 @@ public class AccountSensorController : Controller
                 Sensor = new SensorDto
                 {
                     SensorType = accountSensor.Sensor.Type.ToString(),
-                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs,
+                    DevEui = accountSensor.Sensor.DevEui
                 },
                 AccountSensor = new AccountSensorDto
                 {
@@ -209,7 +211,8 @@ public class AccountSensorController : Controller
                 Sensor = new SensorDto
                 {
                     SensorType = accountSensor.Sensor.Type.ToString(),
-                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs,
+                    DevEui = accountSensor.Sensor.DevEui
                 },
                 AccountSensor = new AccountSensorDto
                 {
@@ -249,7 +252,8 @@ public class AccountSensorController : Controller
                 Sensor = new SensorDto
                 {
                     SensorType = accountSensor.Sensor.Type.ToString(),
-                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs,
+                    DevEui = accountSensor.Sensor.DevEui
                 },
                 AccountSensor = new AccountSensorDto
                 {
@@ -288,7 +292,8 @@ public class AccountSensorController : Controller
                 Sensor = new SensorDto
                 {
                     SensorType = accountSensor.Sensor.Type.ToString(),
-                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
+                    ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs,
+                    DevEui = accountSensor.Sensor.DevEui
                 },
                 AccountSensor = new AccountSensorDto
                 {
