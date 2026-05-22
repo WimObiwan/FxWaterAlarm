@@ -96,12 +96,25 @@
             {
                 query.Remove("page");
                 query.Add("page", pageType.Value.ToString().ToLowerInvariant());
+                if (pageType.Value != AccountSensor.PageTypeEnum.Table)
+                    query.Remove("tablePage");
             }
             if (fromDays.HasValue)
             {
                 query.Remove("fromDays");
                 query.Add("fromDays", fromDays.ToString());
             }
+            return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("", query);
+        }
+
+        string? ConstructTableUrl(int tablePage)
+        {
+            var url = new UriBuilder(HttpContext.Request.GetEncodedUrl());
+            var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(url.Query);
+            query.Remove("page");
+            query.Add("page", AccountSensor.PageTypeEnum.Table.ToString().ToLowerInvariant());
+            query.Remove("tablePage");
+            query.Add("tablePage", tablePage.ToString());
             return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("", query);
         }
 
@@ -231,6 +244,11 @@
                     <li>
                         <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphBattery))
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphBattery)">@Loc["Battery"]</a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.Table))
+                            href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.Table)">@Loc["Table"]</a>
                     </li>
                 </ul>
             </li>
@@ -389,6 +407,69 @@
             <div class="grayout">
                 <a asp-page-handler="ExportCsv">Export</a> all measurements of last year to CSV.
             </div>
+        }
+
+        @if (Model.PageType == AccountSensor.PageTypeEnum.Table)
+        {
+            <div class="table-responsive mt-3">
+                <table class="table table-striped table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>@Loc["Timestamp"]</th>
+                            <th>@Loc["Distance (mm)"]</th>
+                            <th>@Loc["Level (%)"]</th>
+                            <th>@Loc["Water (l)"]</th>
+                            <th>@Loc["Bat (V)"]</th>
+                            <th>@Loc["RSSI (dBm)"]</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (Model.TableMeasurements.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="text-muted">@Loc["No measurements available."]</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var row in Model.TableMeasurements)
+                        {
+                            <tr>
+                                <td>@row.Measurement.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td>@row.MeasurementLevel?.Distance.DistanceMm</td>
+                                <td>@(row.MeasurementLevel?.Distance.LevelFraction is { } levelFraction ? (levelFraction * 100).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) : null)</td>
+                                <td>@(row.MeasurementLevel?.Distance.WaterL?.ToString("0", System.Globalization.CultureInfo.InvariantCulture))</td>
+                                <td>@row.Measurement.BatV.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)</td>
+                                <td>@row.Measurement.RssiDbm.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)</td>
+                                <td>
+                                @if (Model.ShowMeasurementDeleteIcon)
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-danger" disabled title="@Loc["Remove measurement"]">
+                                        <i class="bi bi-trash" aria-hidden="true"></i>
+                                    </button>
+                                }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="@Loc["Table pagination"]">
+                <ul class="pagination pagination-sm justify-content-center">
+                    <li class="page-item @(Model.TableHasPreviousPage ? "" : "disabled")">
+                        <a class="page-link" href="@ConstructTableUrl(Model.TablePage - 1)">@Loc["Previous"]</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">@Loc["Page"] @Model.TablePage</span>
+                    </li>
+                    <li class="page-item @(Model.TableHasNextPage ? "" : "disabled")">
+                        <a class="page-link" href="@ConstructTableUrl(Model.TablePage + 1)">@Loc["Next"]</a>
+                    </li>
+                </ul>
+            </nav>
         }
 
         @if (Model.PageType == AccountSensor.PageTypeEnum.Settings)

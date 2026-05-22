@@ -115,4 +115,56 @@
         <value>Year</value>
         <comment>Last year</comment>
     </data>
+    <data name="Table" xml:space="preserve">
+        <value>Table</value>
+        <comment>Table</comment>
+    </data>
+    <data name="Timestamp" xml:space="preserve">
+        <value>Timestamp</value>
+        <comment>Timestamp</comment>
+    </data>
+    <data name="Distance (mm)" xml:space="preserve">
+        <value>Distance (mm)</value>
+        <comment>Distance (mm)</comment>
+    </data>
+    <data name="Bat (V)" xml:space="preserve">
+        <value>Bat (V)</value>
+        <comment>Bat (V)</comment>
+    </data>
+    <data name="RSSI (dBm)" xml:space="preserve">
+        <value>RSSI (dBm)</value>
+        <comment>RSSI (dBm)</comment>
+    </data>
+    <data name="Level (%)" xml:space="preserve">
+        <value>Level (%)</value>
+        <comment>Level (%)</comment>
+    </data>
+    <data name="Water (l)" xml:space="preserve">
+        <value>Water (l)</value>
+        <comment>Water (l)</comment>
+    </data>
+    <data name="No measurements available." xml:space="preserve">
+        <value>No measurements available.</value>
+        <comment>No measurements available.</comment>
+    </data>
+    <data name="Remove measurement" xml:space="preserve">
+        <value>Remove measurement</value>
+        <comment>Remove measurement</comment>
+    </data>
+    <data name="Table pagination" xml:space="preserve">
+        <value>Table pagination</value>
+        <comment>Table pagination</comment>
+    </data>
+    <data name="Previous" xml:space="preserve">
+        <value>Previous</value>
+        <comment>Previous</comment>
+    </data>
+    <data name="Page" xml:space="preserve">
+        <value>Page</value>
+        <comment>Page</comment>
+    </data>
+    <data name="Next" xml:space="preserve">
+        <value>Next</value>
+        <comment>Next</comment>
+    </data>
 </root>

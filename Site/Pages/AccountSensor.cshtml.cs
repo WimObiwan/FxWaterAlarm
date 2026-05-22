@@ -16,6 +16,12 @@ namespace Site.Pages;
 
 public class AccountSensor : PageModel
 {
+    public sealed class TableMeasurementRow
+    {
+        public required IMeasurementEx Measurement { get; init; }
+        public required MeasurementLevelEx? MeasurementLevel { get; init; }
+    }
+
     public enum PageTypeEnum
     {
         GraphDefault,
@@ -29,6 +35,7 @@ public class AccountSensor : PageModel
         GraphSignal,
         GraphReception,
         GraphBattery,
+        Table,
         Diagram,
         Trend,
         Details,
@@ -67,6 +74,11 @@ public class AccountSensor : PageModel
     public bool Preview { get; private set; }
     public SaveResultEnum SaveResult { get; private set; }
     public int FromDays { get; private set; }
+    public int TablePage { get; private set; }
+    public IReadOnlyList<TableMeasurementRow> TableMeasurements { get; private set; } = Array.Empty<TableMeasurementRow>();
+    public bool TableHasPreviousPage => TablePage > 1;
+    public bool TableHasNextPage { get; private set; }
+    public bool ShowMeasurementDeleteIcon { get; private set; }
 
     public string? QrBaseUrl { get; private set; }
 
@@ -74,12 +86,14 @@ public class AccountSensor : PageModel
         [FromQuery] PageTypeEnum page = PageTypeEnum.GraphDefault,
         [FromQuery] bool preview = false,
         [FromQuery] SaveResultEnum saveResult = SaveResultEnum.None,
-        [FromQuery] int fromDays = 21)
+        [FromQuery] int fromDays = 21,
+        [FromQuery] int tablePage = 1)
     {
         PageType = page;
         Preview = preview;
         SaveResult = saveResult;
         FromDays = fromDays;
+        TablePage = tablePage < 1 ? 1 : tablePage;
 
         AccountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
         {
@@ -118,8 +132,66 @@ public class AccountSensor : PageModel
                         }
                     }
                     break;
+                case PageTypeEnum.Table:
+                    ShowMeasurementDeleteIcon = _userInfo.IsAuthenticated()
+                                                && await _userInfo.CanUpdateAccountSensor(AccountSensorEntity);
+                    await LoadTableMeasurements(AccountSensorEntity, TablePage);
+                    break;
             }
         }
+    }
+
+    private async Task LoadTableMeasurements(Core.Entities.AccountSensor accountSensorEntity, int tablePage)
+    {
+        const int pageSize = 100;
+        int skip = (tablePage - 1) * pageSize;
+        int consumedRows = 0;
+        int collectedRows = 0;
+        DateTime from = DateTime.UtcNow.AddYears(-1);
+        DateTime? till = null;
+        List<TableMeasurementRow> rows = new(pageSize);
+
+        for (int safetyCounter = 0; safetyCounter < 100; safetyCounter++)
+        {
+            var result = await _mediator.Send(new MeasurementsQuery
+            {
+                AccountSensor = accountSensorEntity,
+                From = from,
+                Till = till
+            });
+
+            if (result == null || result.Length == 0)
+                break;
+
+            foreach (var measurement in result)
+            {
+                if (consumedRows < skip)
+                {
+                    consumedRows++;
+                    continue;
+                }
+
+                if (collectedRows < pageSize)
+                {
+                    rows.Add(new TableMeasurementRow
+                    {
+                        Measurement = measurement,
+                        MeasurementLevel = measurement as MeasurementLevelEx
+                    });
+                    collectedRows++;
+                }
+                else
+                {
+                    TableHasNextPage = true;
+                    TableMeasurements = rows;
+                    return;
+                }
+            }
+
+            till = result[^1].Timestamp;
+        }
+
+        TableMeasurements = rows;
     }
 
     public async Task<IActionResult> OnPostTestMailAlertAsync(
