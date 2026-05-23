@@ -52,6 +52,14 @@
         {
             @Loc["Message_google_not_configured"]
         }
+        else if (Model.Message == "email_changed")
+        {
+            @Loc["Message_email_changed"]
+        }
+        else if (Model.Message == "email_invalid")
+        {
+            @Loc["Message_email_invalid"]
+        }
     </div>
 }
 
@@ -82,7 +90,32 @@
                                 <td>
                                     @(user.LoginType == AccountUserLoginType.Mail ? Loc["Mail"] : Loc["Google"])
                                 </td>
-                                <td>@(user.Email ?? "-")</td>
+                                <td>
+                                    @if (Model.EditEmailUserId == user.Id && Model.CanEditDefaultEmail(user))
+                                    {
+                                        <form method="post" asp-page-handler="ChangeEmail" class="d-flex align-items-center gap-2">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="userId" value="@user.Id" />
+                                            <input class="form-control form-control-sm" type="email" name="email" value="@(user.Email ?? string.Empty)" required />
+                                            <button class="btn btn-primary btn-sm" type="submit">@Loc["Change email"]</button>
+                                            <a class="btn btn-outline-secondary btn-sm" href="/a/@Model.AccountEntity?.Link/users">@Loc["Cancel"]</a>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span>@(user.Email ?? "-")</span>
+
+                                        @if (Model.CanEditDefaultEmail(user))
+                                        {
+                                            <a class="btn btn-link btn-sm p-0 ms-2 align-baseline"
+                                               href="/a/@Model.AccountEntity?.Link/users?editEmailUserId=@user.Id"
+                                               title="@Loc["Edit email"]"
+                                               aria-label="@Loc["Edit email"]">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        }
+                                    }
+                                </td>
                                 <td>@(user.Provider ?? "-")</td>
                                 <td class="text-end">
                                     @if (Model.CanRemoveUser(user))

@@ -35,5 +35,10 @@
     <data name="Message_google_already_linked" xml:space="preserve"><value>This Google account is already linked to this account.</value></data>
     <data name="Message_google_conflict" xml:space="preserve"><value>This Google account is linked to another account.</value></data>
     <data name="Message_google_not_configured" xml:space="preserve"><value>Google login is not configured.</value></data>
+    <data name="Message_email_changed" xml:space="preserve"><value>Email address changed.</value></data>
+    <data name="Message_email_invalid" xml:space="preserve"><value>Please enter a valid email address.</value></data>
     <data name="Remove user" xml:space="preserve"><value>Remove user</value></data>
+    <data name="Change email" xml:space="preserve"><value>Change email</value></data>
+    <data name="Edit email" xml:space="preserve"><value>Edit email</value></data>
+    <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
 </root>

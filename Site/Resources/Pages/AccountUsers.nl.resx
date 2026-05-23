@@ -35,5 +35,10 @@
     <data name="Message_google_already_linked" xml:space="preserve"><value>Dit Google-account is al gekoppeld aan dit account.</value></data>
     <data name="Message_google_conflict" xml:space="preserve"><value>Dit Google-account is gekoppeld aan een ander account.</value></data>
     <data name="Message_google_not_configured" xml:space="preserve"><value>Google-login is niet geconfigureerd.</value></data>
+    <data name="Message_email_changed" xml:space="preserve"><value>E-mailadres gewijzigd.</value></data>
+    <data name="Message_email_invalid" xml:space="preserve"><value>Vul een geldig e-mailadres in.</value></data>
     <data name="Remove user" xml:space="preserve"><value>Gebruiker verwijderen</value></data>
+    <data name="Change email" xml:space="preserve"><value>E-mailadres wijzigen</value></data>
+    <data name="Edit email" xml:space="preserve"><value>E-mailadres bewerken</value></data>
+    <data name="Cancel" xml:space="preserve"><value>Annuleren</value></data>
 </root>

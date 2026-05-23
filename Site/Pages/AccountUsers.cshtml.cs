@@ -1,6 +1,7 @@
 using Core.Commands;
 using Core.Entities;
 using Core.Queries;
+using Core.Util;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -22,6 +23,8 @@ public class AccountUsers : PageModel
     public Core.Entities.Account? AccountEntity { get; private set; }
     public IReadOnlyList<AccountUser> Users { get; private set; } = [];
     public bool GoogleEnabled { get; private set; }
+    public bool IsAdmin { get; private set; }
+    public int? EditEmailUserId { get; private set; }
     public string? Message { get; private set; }
 
     public AccountUsers(IMediator mediator, IUserInfo userInfo)
@@ -33,6 +36,7 @@ public class AccountUsers : PageModel
     public async Task<IActionResult> OnGet(
         [FromRoute] string accountLink,
         [FromQuery] string? message,
+        [FromQuery] int? editEmailUserId,
         [FromServices] IOptionsSnapshot<GoogleAuthOptions>? googleOptions = null)
     {
         Message = message;
@@ -45,7 +49,17 @@ public class AccountUsers : PageModel
         if (!await _userInfo.CanUpdateAccount(AccountEntity))
             return Forbid();
 
+        IsAdmin = await _userInfo.IsAdmin();
+
         Users = await _mediator.Send(new AccountUsersByAccountQuery { AccountId = AccountEntity.Id });
+
+        if (editEmailUserId.HasValue)
+        {
+            var requestedUser = Users.SingleOrDefault(u => u.Id == editEmailUserId.Value);
+            if (requestedUser != null && CanEditDefaultEmail(requestedUser))
+                EditEmailUserId = requestedUser.Id;
+        }
+
         return Page();
     }
 
@@ -120,9 +134,67 @@ public class AccountUsers : PageModel
         return Redirect($"/a/{accountLink}/users?message=user_removed");
     }
 
+    public async Task<IActionResult> OnPostChangeEmailAsync(
+        [FromRoute] string accountLink,
+        [FromForm] int userId,
+        [FromForm] string email)
+    {
+        var account = await _mediator.Send(new AccountByLinkQuery { Link = accountLink });
+        if (account == null)
+            return NotFound();
+
+        if (!await _userInfo.IsAdmin())
+            return Forbid();
+
+        email = email.Trim();
+        if (string.IsNullOrWhiteSpace(email))
+            return Redirect($"/a/{accountLink}/users?message=email_invalid");
+
+        var users = await _mediator.Send(new AccountUsersByAccountQuery { AccountId = account.Id });
+        var user = users.SingleOrDefault(u => u.Id == userId);
+        if (user == null || !IsDefaultMailUser(account, user))
+            return Redirect($"/a/{accountLink}/users");
+
+        if (users.Any(u => u.Id != user.Id
+            && u.LoginType == AccountUserLoginType.Mail
+            && u.Email != null
+            && string.Equals(u.Email, email, StringComparison.OrdinalIgnoreCase)))
+        {
+            return Redirect($"/a/{accountLink}/users?message=user_already_exists");
+        }
+
+        await _mediator.Send(new UpdateAccountCommand
+        {
+            Uid = account.Uid,
+            Email = Optional.From(email)
+        });
+
+        await _mediator.Send(new RemoveAccountUserCommand { AccountUserId = user.Id });
+        await _mediator.Send(new AddAccountUserCommand
+        {
+            AccountId = account.Id,
+            LoginType = AccountUserLoginType.Mail,
+            Email = email
+        });
+
+        return Redirect($"/a/{accountLink}/users?message=email_changed");
+    }
+
     public bool CanRemoveUser(AccountUser user)
     {
         return !IsCurrentUser(user);
+    }
+
+    public bool CanEditDefaultEmail(AccountUser user)
+    {
+        return IsAdmin && AccountEntity != null && IsDefaultMailUser(AccountEntity, user);
+    }
+
+    private static bool IsDefaultMailUser(Core.Entities.Account account, AccountUser user)
+    {
+        return user.LoginType == AccountUserLoginType.Mail
+            && user.Email != null
+            && string.Equals(user.Email, account.Email, StringComparison.OrdinalIgnoreCase);
     }
 
     private bool IsCurrentUser(AccountUser user)
