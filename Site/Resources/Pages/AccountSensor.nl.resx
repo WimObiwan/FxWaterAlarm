@@ -142,6 +142,10 @@
         <value>Meting verwijderen</value>
         <comment>Remove measurement</comment>
     </data>
+    <data name="Do you want to remove the measurement at" xml:space="preserve">
+        <value>Wil je de meting verwijderen op tijdstip</value>
+        <comment>Confirmation dialog prefix for measurement removal</comment>
+    </data>
     <data name="Table pagination" xml:space="preserve">
         <value>Tabel paginering</value>
         <comment>Table pagination</comment>

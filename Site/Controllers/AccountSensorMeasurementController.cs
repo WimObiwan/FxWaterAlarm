@@ -271,13 +271,7 @@ public class AccountSensorMeasurementController : Controller
         });
         await _auditService.LogAsync(AuditOutcome.Attempted);
 
-        // Check if user is admin
         var userInfo = HttpContext.RequestServices.GetRequiredService<IUserInfo>();
-        if (!await userInfo.IsAdmin())
-        {
-            await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Admin access required" });
-            return Forbid("Admin access required for measurement deletion");
-        }
 
         try
         {
@@ -290,7 +284,13 @@ public class AccountSensorMeasurementController : Controller
             if (accountSensor == null)
             {
                 await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Account sensor not found" });
-                return NotFound("Account sensor not found");
+                return NotFound(new { success = false, message = "Account sensor not found" });
+            }
+
+            if (!await userInfo.CanUpdateAccountSensor(accountSensor))
+            {
+                await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Not authorized" });
+                return Forbid();
             }
 
             await _mediator.Send(new RemoveMeasurementCommand

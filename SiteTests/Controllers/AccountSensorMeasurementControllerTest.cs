@@ -298,14 +298,30 @@ public class AccountSensorMeasurementControllerTest
     // --- Delete tests ---
 
     [Fact]
-    public async Task Delete_ReturnsForbid_WhenNotAdmin()
+    public async Task Delete_ReturnsForbid_WhenNotAuthorized()
     {
-        var userInfo = new FakeUserInfo { Admin = false };
-        var (controller, _) = CreateController(userInfo);
+        var userInfo = new FakeUserInfo { Admin = false, CanUpdate = false };
+        var (controller, mediator) = CreateController(userInfo);
+        var accountSensor = TestEntityFactory.CreateAccountSensor();
+        mediator.AccountSensor = accountSensor;
 
         var result = await controller.Delete("a", "s", DateTime.UtcNow);
 
         Assert.IsType<ForbidResult>(result);
+    }
+
+    [Fact]
+    public async Task Delete_ReturnsOk_WhenOwnerButNotAdmin()
+    {
+        var userInfo = new FakeUserInfo { Admin = false, CanUpdate = true, Authenticated = true };
+        var (controller, mediator) = CreateController(userInfo);
+        var accountSensor = TestEntityFactory.CreateAccountSensor();
+        mediator.AccountSensor = accountSensor;
+
+        var result = await controller.Delete("a", "s", DateTime.UtcNow);
+
+        Assert.IsType<OkObjectResult>(result);
+        Assert.Contains(mediator.SentRequests, r => r is RemoveMeasurementCommand);
     }
 
     [Fact]

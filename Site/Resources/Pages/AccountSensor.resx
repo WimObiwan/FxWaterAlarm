@@ -151,6 +151,10 @@
         <value>Remove measurement</value>
         <comment>Remove measurement</comment>
     </data>
+    <data name="Do you want to remove the measurement at" xml:space="preserve">
+        <value>Do you want to remove the measurement at</value>
+        <comment>Confirmation dialog prefix for measurement removal</comment>
+    </data>
     <data name="Table pagination" xml:space="preserve">
         <value>Table pagination</value>
         <comment>Table pagination</comment>

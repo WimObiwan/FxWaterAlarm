@@ -445,7 +445,12 @@
                                 <td>
                                 @if (Model.ShowMeasurementDeleteIcon)
                                 {
-                                    <button type="button" class="btn btn-sm btn-outline-danger" disabled title="@Loc["Remove measurement"]">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger"
+                                            data-timestamp-utc="@row.Measurement.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")"
+                                            data-timestamp-display="@row.Measurement.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")"
+                                            onclick="removeMeasurement(this)"
+                                            title="@Loc["Remove measurement"]">
                                         <i class="bi bi-trash" aria-hidden="true"></i>
                                     </button>
                                 }
@@ -470,6 +475,35 @@
                     </li>
                 </ul>
             </nav>
+
+            @if (Model.ShowMeasurementDeleteIcon)
+            {
+                <script>
+                function removeMeasurement(btn) {
+                    var timestampDisplay = btn.getAttribute('data-timestamp-display');
+                    var timestampUtc = btn.getAttribute('data-timestamp-utc');
+                    if (!confirm('@Loc["Do you want to remove the measurement at"] ' + timestampDisplay + '?')) return;
+                    var accountLink = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(accountSensor.Account.Link));
+                    var sensorLink = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(accountSensor.Sensor.Link));
+                    var url = '/api/a/' + accountLink + '/s/' + sensorLink + '/m?timestamp=' + encodeURIComponent(timestampUtc);
+                    btn.disabled = true;
+                    fetch(url, { method: 'DELETE' })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (data.success) {
+                                btn.closest('tr').remove();
+                            } else {
+                                alert(data.message || '@Loc["Remove measurement"]' + ' failed');
+                                btn.disabled = false;
+                            }
+                        })
+                        .catch(function() {
+                            alert('Network error');
+                            btn.disabled = false;
+                        });
+                }
+                </script>
+            }
         }
 
         @if (Model.PageType == AccountSensor.PageTypeEnum.Settings)
