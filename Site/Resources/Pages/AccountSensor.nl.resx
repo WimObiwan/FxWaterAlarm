@@ -118,6 +118,18 @@
         <value>Afstand (mm)</value>
         <comment>Distance (mm)</comment>
     </data>
+    <data name="Moisture (%)" xml:space="preserve">
+        <value>Vochtigheid (%)</value>
+        <comment>Moisture (%)</comment>
+    </data>
+    <data name="Temperature (°C)" xml:space="preserve">
+        <value>Temperatuur (°C)</value>
+        <comment>Temperature (°C)</comment>
+    </data>
+    <data name="Conductivity (µS/cm)" xml:space="preserve">
+        <value>Geleidbaarheid (µS/cm)</value>
+        <comment>Conductivity (µS/cm)</comment>
+    </data>
     <data name="Bat (V)" xml:space="preserve">
         <value>Bat (V)</value>
         <comment>Bat (V)</comment>
@@ -141,6 +153,14 @@
     <data name="Remove measurement" xml:space="preserve">
         <value>Meting verwijderen</value>
         <comment>Remove measurement</comment>
+    </data>
+    <data name="Water detected" xml:space="preserve">
+        <value>Water gedetecteerd</value>
+        <comment>Water detected</comment>
+    </data>
+    <data name="No water detected" xml:space="preserve">
+        <value>Geen water gedetecteerd</value>
+        <comment>No water detected</comment>
     </data>
     <data name="Do you want to remove the measurement at" xml:space="preserve">
         <value>Wil je de meting verwijderen op tijdstip</value>

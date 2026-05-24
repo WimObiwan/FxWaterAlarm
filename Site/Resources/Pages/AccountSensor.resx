@@ -127,6 +127,18 @@
         <value>Distance (mm)</value>
         <comment>Distance (mm)</comment>
     </data>
+    <data name="Moisture (%)" xml:space="preserve">
+        <value>Moisture (%)</value>
+        <comment>Moisture (%)</comment>
+    </data>
+    <data name="Temperature (°C)" xml:space="preserve">
+        <value>Temperature (°C)</value>
+        <comment>Temperature (°C)</comment>
+    </data>
+    <data name="Conductivity (µS/cm)" xml:space="preserve">
+        <value>Conductivity (µS/cm)</value>
+        <comment>Conductivity (µS/cm)</comment>
+    </data>
     <data name="Bat (V)" xml:space="preserve">
         <value>Bat (V)</value>
         <comment>Bat (V)</comment>
@@ -150,6 +162,14 @@
     <data name="Remove measurement" xml:space="preserve">
         <value>Remove measurement</value>
         <comment>Remove measurement</comment>
+    </data>
+    <data name="Water detected" xml:space="preserve">
+        <value>Water detected</value>
+        <comment>Water detected</comment>
+    </data>
+    <data name="No water detected" xml:space="preserve">
+        <value>No water detected</value>
+        <comment>No water detected</comment>
     </data>
     <data name="Do you want to remove the measurement at" xml:space="preserve">
         <value>Do you want to remove the measurement at</value>

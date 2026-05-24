@@ -411,14 +411,41 @@
 
         @if (Model.PageType == AccountSensor.PageTypeEnum.Table)
         {
+            var sensorType = accountSensor.Sensor.Type;
+            var extraColumnCount = sensorType switch
+            {
+                SensorType.Moisture => 3,
+                SensorType.Detect => 1,
+                SensorType.Thermometer => 1,
+                _ => 3
+            };
+            var totalColumnCount = 1 + extraColumnCount + 2 + 1;
+
             <div class="table-responsive mt-3">
                 <table class="table table-striped table-sm align-middle">
                     <thead>
                         <tr>
                             <th>@Loc["Timestamp"]</th>
-                            <th>@Loc["Distance (mm)"]</th>
-                            <th>@Loc["Level (%)"]</th>
-                            <th>@Loc["Water (l)"]</th>
+                            @if (sensorType == SensorType.Moisture)
+                            {
+                                <th>@Loc["Moisture (%)"]</th>
+                                <th>@Loc["Temperature (°C)"]</th>
+                                <th>@Loc["Conductivity (µS/cm)"]</th>
+                            }
+                            else if (sensorType == SensorType.Detect)
+                            {
+                                <th>@Loc["Status"]</th>
+                            }
+                            else if (sensorType == SensorType.Thermometer)
+                            {
+                                <th>@Loc["Temperature (°C)"]</th>
+                            }
+                            else
+                            {
+                                <th>@Loc["Distance (mm)"]</th>
+                                <th>@Loc["Level (%)"]</th>
+                                <th>@Loc["Water (l)"]</th>
+                            }
                             <th>@Loc["Bat (V)"]</th>
                             <th>@Loc["RSSI (dBm)"]</th>
                             <th></th>
@@ -428,7 +455,7 @@
                     @if (Model.TableMeasurements.Count == 0)
                     {
                         <tr>
-                            <td colspan="7" class="text-muted">@Loc["No measurements available."]</td>
+                            <td colspan="@totalColumnCount" class="text-muted">@Loc["No measurements available."]</td>
                         </tr>
                     }
                     else
@@ -437,9 +464,29 @@
                         {
                             <tr>
                                 <td>@row.Measurement.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
-                                <td>@row.MeasurementLevel?.Distance.DistanceMm</td>
-                                <td>@(row.MeasurementLevel?.Distance.LevelFraction is { } levelFraction ? (levelFraction * 100).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) : null)</td>
-                                <td>@(row.MeasurementLevel?.Distance.WaterL?.ToString("0", System.Globalization.CultureInfo.InvariantCulture))</td>
+                                @if (sensorType == SensorType.Moisture)
+                                {
+                                    var moisture = row.Measurement as MeasurementMoistureEx;
+                                    <td>@(moisture?.SoilMoisturePrc.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture))</td>
+                                    <td>@(moisture?.SoilTemperatureC.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture))</td>
+                                    <td>@(moisture?.SoilConductivity.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture))</td>
+                                }
+                                else if (sensorType == SensorType.Detect)
+                                {
+                                    var detect = row.Measurement as MeasurementDetectEx;
+                                    <td>@(detect?.Status is { } status ? (status == 0 ? Loc["No water detected"] : Loc["Water detected"]) : null)</td>
+                                }
+                                else if (sensorType == SensorType.Thermometer)
+                                {
+                                    var thermometer = row.Measurement as MeasurementThermometerEx;
+                                    <td>@(thermometer?.TempC.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture))</td>
+                                }
+                                else
+                                {
+                                    <td>@row.MeasurementLevel?.Distance.DistanceMm</td>
+                                    <td>@(row.MeasurementLevel?.Distance.LevelFraction is { } levelFraction ? (levelFraction * 100).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) : null)</td>
+                                    <td>@(row.MeasurementLevel?.Distance.WaterL?.ToString("0", System.Globalization.CultureInfo.InvariantCulture))</td>
+                                }
                                 <td>@row.Measurement.BatV.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)</td>
                                 <td>@row.Measurement.RssiDbm.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)</td>
                                 <td>
