@@ -23,7 +23,56 @@
         var tempC = (double?)measurement.TempC;
         var humPrc = (double?)measurement.HumPrc;
         var timestamp = measurement.Timestamp;
+
+        // Thermometer SVG constants
+        const double minTemp = -10.0;
+        const double maxTemp = 40.0;
+        const int tubeTop = 15;
+        const int tubeBottom = 193;
+        const int tubeHeight = tubeBottom - tubeTop; // 178
+
+        int liquidTopPx = tubeBottom; // default: no liquid visible
+        if (tempC.HasValue)
+        {
+            double clampedTemp = Math.Max(minTemp, Math.Min(maxTemp, tempC.Value));
+            liquidTopPx = (int)Math.Round(tubeTop + (maxTemp - clampedTemp) / (maxTemp - minTemp) * tubeHeight);
+        }
+        int liquidHeightPx = tubeBottom - liquidTopPx;
+
+        var tickTemps = new[] { 40, 30, 20, 10, 0, -10 };
     }
+
+    <div>
+        <svg viewBox="0 0 90 235" width="90" height="235" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <clipPath id="tubeClip-@(uniqueId)">
+                    <rect x="24" y="15" width="12" height="@(tubeHeight)"/>
+                </clipPath>
+            </defs>
+
+            <!-- Tube background (white) -->
+            <rect x="24" y="@(tubeTop)" width="12" height="@(tubeHeight)" rx="6" ry="6" fill="white" stroke="#888" stroke-width="1.5"/>
+            <!-- Bulb background (white) -->
+            <circle cx="30" cy="210" r="17" fill="white" stroke="#888" stroke-width="1.5"/>
+
+            <!-- Liquid in bulb (always red) -->
+            <circle cx="30" cy="210" r="14" fill="#cc0000"/>
+
+            <!-- Liquid in tube (red, clipped to tube area) -->
+            <rect x="25" y="@(liquidTopPx)" width="10" height="@(liquidHeightPx)" fill="#cc0000" clip-path="url(#tubeClip-@(uniqueId))"/>
+
+            <!-- Tube border overlay (no fill, draws over liquid edges) -->
+            <rect x="24" y="@(tubeTop)" width="12" height="@(tubeHeight)" rx="6" ry="6" fill="none" stroke="#888" stroke-width="1.5"/>
+
+            <!-- Tick marks and labels -->
+            @foreach (var t in tickTemps)
+            {
+                int tickY = (int)Math.Round(tubeTop + (maxTemp - t) / (maxTemp - minTemp) * tubeHeight);
+                <line x1="36" y1="@(tickY)" x2="44" y2="@(tickY)" stroke="#666" stroke-width="1"/>
+                @Html.Raw($"<text x=\"47\" y=\"{tickY + 4}\" font-size=\"10\" fill=\"#444\">{t}°</text>")
+            }
+        </svg>
+    </div>
 
     @if (tempC.HasValue)
     {
