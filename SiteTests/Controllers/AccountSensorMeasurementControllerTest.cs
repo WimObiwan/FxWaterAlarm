@@ -50,7 +50,7 @@ public class AccountSensorMeasurementControllerTest
     {
         var mediator = new MeasurementFakeMediator();
         mediator.UserInfo = userInfo;
-        var controller = new AccountSensorMeasurementController(mediator);
+        var controller = new AccountSensorMeasurementController(mediator, new FakeAuditService());
         var httpContext = new DefaultHttpContext();
         if (userInfo != null)
         {

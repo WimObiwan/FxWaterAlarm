@@ -1,3 +1,4 @@
+using Core.Audit;
 using Core.Commands;
 using Core.Entities;
 using Core.Queries;
@@ -19,6 +20,7 @@ public class AccountUsers : PageModel
 {
     private readonly IMediator _mediator;
     private readonly IUserInfo _userInfo;
+    private readonly IAuditService _auditService;
 
     public Core.Entities.Account? AccountEntity { get; private set; }
     public IReadOnlyList<AccountUser> Users { get; private set; } = [];
@@ -27,10 +29,11 @@ public class AccountUsers : PageModel
     public int? EditEmailUserId { get; private set; }
     public string? Message { get; private set; }
 
-    public AccountUsers(IMediator mediator, IUserInfo userInfo)
+    public AccountUsers(IMediator mediator, IUserInfo userInfo, IAuditService auditService)
     {
         _mediator = mediator;
         _userInfo = userInfo;
+        _auditService = auditService;
     }
 
     public async Task<IActionResult> OnGet(
@@ -68,24 +71,40 @@ public class AccountUsers : PageModel
         [FromForm] string email,
         [FromServices] IOptionsSnapshot<GoogleAuthOptions>? googleOptions = null)
     {
+        using var actionScope = _auditService.BeginAction("AccountUser.AddMailUser", new AuditTarget { AccountLink = accountLink });
+        await _auditService.LogAsync(AuditOutcome.Attempted);
+
         GoogleEnabled = googleOptions?.Value.IsConfigured ?? false;
 
         var account = await _mediator.Send(new AccountByLinkQuery { Link = accountLink });
         if (account == null)
+        {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Account not found" });
             return NotFound();
+        }
 
         if (!await _userInfo.CanUpdateAccount(account))
+        {
+            await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Not authorized to update account" },
+                target: new AuditTarget { AccountUid = account.Uid, AccountLink = accountLink });
             return Forbid();
+        }
 
         email = email.Trim();
         if (string.IsNullOrWhiteSpace(email))
+        {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Invalid email" },
+                target: new AuditTarget { AccountUid = account.Uid, AccountLink = accountLink });
             return Redirect($"/a/{accountLink}/users");
+        }
 
         var users = await _mediator.Send(new AccountUsersByAccountQuery { AccountId = account.Id });
         if (users.Any(u => u.LoginType == AccountUserLoginType.Mail
             && u.Email != null
             && string.Equals(u.Email, email, StringComparison.OrdinalIgnoreCase)))
         {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Mail user already exists" },
+                target: new AuditTarget { AccountUid = account.Uid, AccountLink = accountLink });
             return Redirect($"/a/{accountLink}/users?message=user_already_exists");
         }
 
@@ -94,6 +113,12 @@ public class AccountUsers : PageModel
             AccountId = account.Id,
             LoginType = AccountUserLoginType.Mail,
             Email = email.Trim()
+        });
+
+        await _auditService.LogAsync(AuditOutcome.Succeeded, target: new AuditTarget
+        {
+            AccountUid = account.Uid,
+            AccountLink = accountLink
         });
 
         return Redirect($"/a/{accountLink}/users?message=user_added");
@@ -115,22 +140,45 @@ public class AccountUsers : PageModel
         [FromRoute] string accountLink,
         [FromForm] int userId)
     {
+        using var actionScope = _auditService.BeginAction("AccountUser.RemoveUser", new AuditTarget { AccountLink = accountLink });
+        await _auditService.LogAsync(AuditOutcome.Attempted);
+
         var account = await _mediator.Send(new AccountByLinkQuery { Link = accountLink });
         if (account == null)
+        {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Account not found" });
             return NotFound();
+        }
 
         if (!await _userInfo.CanUpdateAccount(account))
+        {
+            await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Not authorized to update account" },
+                target: new AuditTarget { AccountUid = account.Uid, AccountLink = accountLink });
             return Forbid();
+        }
 
         var users = await _mediator.Send(new AccountUsersByAccountQuery { AccountId = account.Id });
         var user = users.SingleOrDefault(u => u.Id == userId);
         if (user == null)
+        {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Account user not found" },
+                target: new AuditTarget { AccountUid = account.Uid, AccountLink = accountLink });
             return NotFound();
+        }
 
         if (IsCurrentUser(user))
+        {
+            await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Cannot remove currently logged-in user" },
+                target: new AuditTarget { AccountUid = account.Uid, AccountLink = accountLink });
             return Redirect($"/a/{accountLink}/users?message=user_cannot_remove_current");
+        }
 
         await _mediator.Send(new RemoveAccountUserCommand { AccountUserId = userId });
+        await _auditService.LogAsync(AuditOutcome.Succeeded, target: new AuditTarget
+        {
+            AccountUid = account.Uid,
+            AccountLink = accountLink
+        });
         return Redirect($"/a/{accountLink}/users?message=user_removed");
     }
 
@@ -139,27 +187,47 @@ public class AccountUsers : PageModel
         [FromForm] int userId,
         [FromForm] string email)
     {
+        using var actionScope = _auditService.BeginAction("AccountUser.ChangeDefaultEmail", new AuditTarget { AccountLink = accountLink });
+        await _auditService.LogAsync(AuditOutcome.Attempted);
+
         var account = await _mediator.Send(new AccountByLinkQuery { Link = accountLink });
         if (account == null)
+        {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Account not found" });
             return NotFound();
+        }
 
         if (!await _userInfo.IsAdmin())
+        {
+            await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Admin required" },
+                target: new AuditTarget { AccountUid = account.Uid, AccountLink = accountLink });
             return Forbid();
+        }
 
         email = email.Trim();
         if (string.IsNullOrWhiteSpace(email))
+        {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Invalid email" },
+                target: new AuditTarget { AccountUid = account.Uid, AccountLink = accountLink });
             return Redirect($"/a/{accountLink}/users?message=email_invalid");
+        }
 
         var users = await _mediator.Send(new AccountUsersByAccountQuery { AccountId = account.Id });
         var user = users.SingleOrDefault(u => u.Id == userId);
         if (user == null || !IsDefaultMailUser(account, user))
+        {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Default mail user not found" },
+                target: new AuditTarget { AccountUid = account.Uid, AccountLink = accountLink });
             return Redirect($"/a/{accountLink}/users");
+        }
 
         if (users.Any(u => u.Id != user.Id
             && u.LoginType == AccountUserLoginType.Mail
             && u.Email != null
             && string.Equals(u.Email, email, StringComparison.OrdinalIgnoreCase)))
         {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Mail user already exists" },
+                target: new AuditTarget { AccountUid = account.Uid, AccountLink = accountLink });
             return Redirect($"/a/{accountLink}/users?message=user_already_exists");
         }
 
@@ -175,6 +243,12 @@ public class AccountUsers : PageModel
             AccountId = account.Id,
             LoginType = AccountUserLoginType.Mail,
             Email = email
+        });
+
+        await _auditService.LogAsync(AuditOutcome.Succeeded, target: new AuditTarget
+        {
+            AccountUid = account.Uid,
+            AccountLink = accountLink
         });
 
         return Redirect($"/a/{accountLink}/users?message=email_changed");

@@ -12,5 +12,5 @@ Next is the removal of measurements.
 
 I want an audit log of all actions done by the end user (later to be extended to admins as well).
 This can be stored in a text file (ILogger? or plain text?)
-Should contain: timestamp, logged in person, wateralarm account, wateralarm sensor (if applicable), action, details (if applicable).
+Should contain: timestamp, logged in person, client IP-address, wateralarm account, wateralarm sensor (if applicable), action, details (if applicable).
 Create a plan for this, both functional and technical.  No implementation yet.

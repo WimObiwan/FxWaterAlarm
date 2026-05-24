@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Site.Controllers;
+using SiteTests.Helpers;
 using Xunit;
 
 namespace SiteTests.Controllers;
@@ -47,7 +48,7 @@ public class DevEuiControllerTest
 
     private static DevEuiController CreateController(FakeMediator mediator)
     {
-        var controller = new DevEuiController(mediator);
+        var controller = new DevEuiController(mediator, new FakeAuditService());
         controller.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext()

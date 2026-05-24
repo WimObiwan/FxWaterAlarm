@@ -15,7 +15,7 @@ public class AccountPageTest
     {
         var mediator = new ConfigurableFakeMediator();
         var userInfo = new FakeUserInfo();
-        var model = new AccountPage(mediator, userInfo);
+        var model = new AccountPage(mediator, userInfo, new FakeAuditService());
         TestEntityFactory.SetupPageContext(model);
         return (model, mediator, userInfo);
     }

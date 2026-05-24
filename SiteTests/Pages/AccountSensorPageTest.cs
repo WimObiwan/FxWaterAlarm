@@ -16,7 +16,7 @@ public class AccountSensorPageTest
         var userInfo = new FakeUserInfo { Authenticated = true, CanUpdate = true };
         var trendService = new FakeTrendService();
         var urlBuilder = new FakeUrlBuilder();
-        var model = new AccountSensorPage(mediator, userInfo, trendService, urlBuilder);
+        var model = new AccountSensorPage(mediator, userInfo, trendService, urlBuilder, new FakeAuditService());
         TestEntityFactory.SetupPageContext(model);
         return (model, mediator, userInfo);
     }

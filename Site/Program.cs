@@ -66,6 +66,7 @@ builder.Services.Configure<MeasurementRemovalOptions>(builder.Configuration.GetS
 builder.Services.Configure<ApiKeysOptions>(builder.Configuration.GetSection(ApiKeysOptions.Location));
 
 builder.Services.AddScoped<RequestLocalizationCookiesMiddleware>();
+builder.Services.AddScoped<AuditContextMiddleware>();
 
 builder.Services.Configure<DataProtectionTokenProviderOptions>(
     x =>
@@ -249,6 +250,7 @@ app.UseRequestLocalizationCookies();
 app.UseRouting();
 
 app.UseAuthentication();
+app.UseAuditContext();
 app.UseAuthorization();
 
 app.MapRazorPages();

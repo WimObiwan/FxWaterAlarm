@@ -1,3 +1,4 @@
+using Core.Audit;
 using Core.Commands;
 using Core.Communication;
 using Core.Entities;
@@ -123,6 +124,36 @@ public class FakeTrendService : ITrendService
 
     public Task<TrendMeasurementEx?[]> GetTrendMeasurements(MeasurementLevelEx lastMeasurementLevelEx, params TimeSpan[] fromHours)
         => Task.FromResult(fromHours.Select(_ => TrendResult).ToArray());
+}
+
+public class FakeAuditService : IAuditService
+{
+    public List<(AuditOutcome Outcome, string? Action, AuditTarget? Target, AuditDetails? Details)> Events { get; } = new();
+
+    public IDisposable BeginAction(string action, AuditTarget? target = null)
+    {
+        Events.Add((AuditOutcome.Attempted, action, target, null));
+        return new NoOpDisposable();
+    }
+
+    public Task LogAsync(
+        AuditOutcome outcome,
+        AuditDetails? details = null,
+        IReadOnlyList<AuditChange>? changes = null,
+        AuditTarget? target = null,
+        string? action = null,
+        CancellationToken cancellationToken = default)
+    {
+        Events.Add((outcome, action, target, details));
+        return Task.CompletedTask;
+    }
+
+    private sealed class NoOpDisposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
 }
 
 public static class TestEntityFactory

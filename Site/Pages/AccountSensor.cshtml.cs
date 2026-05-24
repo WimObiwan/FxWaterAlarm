@@ -1,3 +1,4 @@
+using Core.Audit;
 using System.Globalization;
 using System.Text;
 using Core.Commands;
@@ -53,13 +54,15 @@ public class AccountSensor : PageModel
     private readonly IUserInfo _userInfo;
     private readonly ITrendService _trendService;
     private readonly IUrlBuilder _urlBuilder;
+    private readonly IAuditService _auditService;
 
-    public AccountSensor(IMediator mediator, IUserInfo userInfo, ITrendService trendService, IUrlBuilder urlBuilder)
+    public AccountSensor(IMediator mediator, IUserInfo userInfo, ITrendService trendService, IUrlBuilder urlBuilder, IAuditService auditService)
     {
         _mediator = mediator;
         _userInfo = userInfo;
         _trendService = trendService;
         _urlBuilder = urlBuilder;
+        _auditService = auditService;
     }
 
     public IMeasurementEx? LastMeasurement { get; private set; }
@@ -200,8 +203,18 @@ public class AccountSensor : PageModel
         [FromRoute] string accountLink,
         [FromRoute] string sensorLink)
     {
+        using var actionScope = _auditService.BeginAction("AccountSensor.TestMailAlert", new AuditTarget
+        {
+            AccountLink = accountLink,
+            SensorLink = sensorLink
+        });
+        await _auditService.LogAsync(AuditOutcome.Attempted);
+
         if (!_userInfo.IsAuthenticated())
+        {
+            await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "User is not authenticated" });
             return Unauthorized();
+        }
 
         var accountSensorEntity = await mediator.Send(new AccountSensorByLinkQuery
         {
@@ -210,10 +223,23 @@ public class AccountSensor : PageModel
         });
 
         if (accountSensorEntity == null)
+        {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Sensor not found" });
             return NotFound();
+        }
 
         if (!await _userInfo.CanUpdateAccountSensor(accountSensorEntity))
+        {
+            await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Not authorized" },
+                target: new AuditTarget
+                {
+                    AccountUid = accountSensorEntity.Account.Uid,
+                    SensorUid = accountSensorEntity.Sensor.Uid,
+                    AccountLink = accountLink,
+                    SensorLink = sensorLink
+                });
             return Forbid();
+        }
 
         await messenger.SendAlertMailAsync(
             accountSensorEntity.Account.Email,
@@ -221,6 +247,14 @@ public class AccountSensor : PageModel
             accountSensorEntity.Name,
             "Er is gelukkig geen probleem, dit is een test alert.",
             "Test alert");
+
+        await _auditService.LogAsync(AuditOutcome.Succeeded, target: new AuditTarget
+        {
+            AccountUid = accountSensorEntity.Account.Uid,
+            SensorUid = accountSensorEntity.Sensor.Uid,
+            AccountLink = accountLink,
+            SensorLink = sensorLink
+        });
 
         return new JsonResult(new { success = true });
     }
@@ -231,6 +265,13 @@ public class AccountSensor : PageModel
         [FromForm] string alarmType,
         [FromForm] string? alarmThreshold)
     {
+        using var actionScope = _auditService.BeginAction("AccountSensorAlarm.Add", new AuditTarget
+        {
+            AccountLink = accountLink,
+            SensorLink = sensorLink
+        });
+        await _auditService.LogAsync(AuditOutcome.Attempted);
+
         try
         {
             double? alarmThresholdNumber;
@@ -246,17 +287,32 @@ public class AccountSensor : PageModel
             });
 
             if (accountSensorEntity == null)
+            {
+                await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Sensor not found" });
                 return new JsonResult(new { success = false, message = "Sensor not found" });
+            }
 
             if (!await _userInfo.CanUpdateAccountSensor(accountSensorEntity))
+            {
+                await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Not authorized" },
+                    target: new AuditTarget { AccountUid = accountSensorEntity.Account.Uid, SensorUid = accountSensorEntity.Sensor.Uid, AccountLink = accountLink, SensorLink = sensorLink });
                 return new JsonResult(new { success = false, message = "Not authorized" });
+            }
 
             if (!Enum.TryParse<AccountSensorAlarmType>(alarmType, out var parsedAlarmType))
+            {
+                await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Invalid alarm type" },
+                    target: new AuditTarget { AccountUid = accountSensorEntity.Account.Uid, SensorUid = accountSensorEntity.Sensor.Uid, AccountLink = accountLink, SensorLink = sensorLink });
                 return new JsonResult(new { success = false, message = "Invalid alarm type" });
+            }
 
             // Validate threshold for alarm types that require it
             if (parsedAlarmType != AccountSensorAlarmType.DetectOn && !alarmThresholdNumber.HasValue)
+            {
+                await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Threshold is required for this alarm type" },
+                    target: new AuditTarget { AccountUid = accountSensorEntity.Account.Uid, SensorUid = accountSensorEntity.Sensor.Uid, AccountLink = accountLink, SensorLink = sensorLink });
                 return new JsonResult(new { success = false, message = "Threshold is required for this alarm type" });
+            }
 
             await _mediator.Send(new AddAccountSensorAlarmCommand
             {
@@ -267,10 +323,24 @@ public class AccountSensor : PageModel
                 AlarmThreshold = alarmThresholdNumber
             });
 
+            await _auditService.LogAsync(AuditOutcome.Succeeded, target: new AuditTarget
+            {
+                AccountUid = accountSensorEntity.Account.Uid,
+                SensorUid = accountSensorEntity.Sensor.Uid,
+                AccountLink = accountLink,
+                SensorLink = sensorLink
+            });
+
             return new JsonResult(new { success = true });
         }
         catch (Exception ex)
         {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails
+            {
+                Reason = "Unexpected exception",
+                ExceptionType = ex.GetType().Name,
+                Message = ex.Message
+            });
             return new JsonResult(new { success = false, message = ex.Message });
         }
     }
@@ -282,6 +352,13 @@ public class AccountSensor : PageModel
         [FromForm] string alarmType,
         [FromForm] double? alarmThreshold)
     {
+        using var actionScope = _auditService.BeginAction("AccountSensorAlarm.Update", new AuditTarget
+        {
+            AccountLink = accountLink,
+            SensorLink = sensorLink
+        });
+        await _auditService.LogAsync(AuditOutcome.Attempted);
+
         try
         {
             var accountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
@@ -291,20 +368,39 @@ public class AccountSensor : PageModel
             });
 
             if (accountSensorEntity == null)
+            {
+                await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Sensor not found" });
                 return new JsonResult(new { success = false, message = "Sensor not found" });
+            }
 
             if (!await _userInfo.CanUpdateAccountSensor(accountSensorEntity))
+            {
+                await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Not authorized" },
+                    target: new AuditTarget { AccountUid = accountSensorEntity.Account.Uid, SensorUid = accountSensorEntity.Sensor.Uid, AccountLink = accountLink, SensorLink = sensorLink });
                 return new JsonResult(new { success = false, message = "Not authorized" });
+            }
 
             if (!Guid.TryParse(alarmUid, out var parsedAlarmUid))
+            {
+                await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Invalid alarm ID" },
+                    target: new AuditTarget { AccountUid = accountSensorEntity.Account.Uid, SensorUid = accountSensorEntity.Sensor.Uid, AccountLink = accountLink, SensorLink = sensorLink });
                 return new JsonResult(new { success = false, message = "Invalid alarm ID" });
+            }
 
             if (!Enum.TryParse<AccountSensorAlarmType>(alarmType, out var parsedAlarmType))
+            {
+                await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Invalid alarm type" },
+                    target: new AuditTarget { AccountUid = accountSensorEntity.Account.Uid, SensorUid = accountSensorEntity.Sensor.Uid, AccountLink = accountLink, SensorLink = sensorLink });
                 return new JsonResult(new { success = false, message = "Invalid alarm type" });
+            }
 
             // Validate threshold for alarm types that require it
             if (parsedAlarmType != AccountSensorAlarmType.DetectOn && !alarmThreshold.HasValue)
+            {
+                await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Threshold is required for this alarm type" },
+                    target: new AuditTarget { AccountUid = accountSensorEntity.Account.Uid, SensorUid = accountSensorEntity.Sensor.Uid, AccountLink = accountLink, SensorLink = sensorLink });
                 return new JsonResult(new { success = false, message = "Threshold is required for this alarm type" });
+            }
 
             await _mediator.Send(new UpdateAccountSensorAlarmCommand
             {
@@ -315,10 +411,24 @@ public class AccountSensor : PageModel
                 AlarmThreshold = new Optional<double?>(true, alarmThreshold)
             });
 
+            await _auditService.LogAsync(AuditOutcome.Succeeded, target: new AuditTarget
+            {
+                AccountUid = accountSensorEntity.Account.Uid,
+                SensorUid = accountSensorEntity.Sensor.Uid,
+                AccountLink = accountLink,
+                SensorLink = sensorLink
+            });
+
             return new JsonResult(new { success = true });
         }
         catch (Exception ex)
         {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails
+            {
+                Reason = "Unexpected exception",
+                ExceptionType = ex.GetType().Name,
+                Message = ex.Message
+            });
             return new JsonResult(new { success = false, message = ex.Message });
         }
     }
@@ -328,6 +438,13 @@ public class AccountSensor : PageModel
         string sensorLink,
         [FromForm] string alarmUid)
     {
+        using var actionScope = _auditService.BeginAction("AccountSensorAlarm.Delete", new AuditTarget
+        {
+            AccountLink = accountLink,
+            SensorLink = sensorLink
+        });
+        await _auditService.LogAsync(AuditOutcome.Attempted);
+
         try
         {
             var accountSensorEntity = await _mediator.Send(new AccountSensorByLinkQuery
@@ -337,13 +454,24 @@ public class AccountSensor : PageModel
             });
 
             if (accountSensorEntity == null)
+            {
+                await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Sensor not found" });
                 return new JsonResult(new { success = false, message = "Sensor not found" });
+            }
 
             if (!await _userInfo.CanUpdateAccountSensor(accountSensorEntity))
+            {
+                await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Not authorized" },
+                    target: new AuditTarget { AccountUid = accountSensorEntity.Account.Uid, SensorUid = accountSensorEntity.Sensor.Uid, AccountLink = accountLink, SensorLink = sensorLink });
                 return new JsonResult(new { success = false, message = "Not authorized" });
+            }
 
             if (!Guid.TryParse(alarmUid, out var parsedAlarmUid))
+            {
+                await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Invalid alarm ID" },
+                    target: new AuditTarget { AccountUid = accountSensorEntity.Account.Uid, SensorUid = accountSensorEntity.Sensor.Uid, AccountLink = accountLink, SensorLink = sensorLink });
                 return new JsonResult(new { success = false, message = "Invalid alarm ID" });
+            }
 
             await _mediator.Send(new RemoveAlarmFromAccountSensorCommand
             {
@@ -352,10 +480,24 @@ public class AccountSensor : PageModel
                 AlarmUid = parsedAlarmUid
             });
 
+            await _auditService.LogAsync(AuditOutcome.Succeeded, target: new AuditTarget
+            {
+                AccountUid = accountSensorEntity.Account.Uid,
+                SensorUid = accountSensorEntity.Sensor.Uid,
+                AccountLink = accountLink,
+                SensorLink = sensorLink
+            });
+
             return new JsonResult(new { success = true });
         }
         catch (Exception ex)
         {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails
+            {
+                Reason = "Unexpected exception",
+                ExceptionType = ex.GetType().Name,
+                Message = ex.Message
+            });
             return new JsonResult(new { success = false, message = ex.Message });
         }
     }
@@ -465,11 +607,31 @@ public class AccountSensor : PageModel
         [FromForm] bool? alertsEnabled,
         [FromForm] string? manholeAreaM2)
     {
+        using var actionScope = _auditService.BeginAction("AccountSensor.UpdateSettings", new AuditTarget
+        {
+            AccountLink = accountLink,
+            SensorLink = sensorLink
+        });
+        await _auditService.LogAsync(AuditOutcome.Attempted);
+
         SaveResultEnum result =
             await UpdateSettings(
                 mediator, accountLink, sensorLink, page, sensorName, order,
                 distanceMmFull, distanceMmEmpty, unusableHeightMm, capacityL,
                 alertsEnabled, manholeAreaM2);
+
+        if (result == SaveResultEnum.Saved)
+        {
+            await _auditService.LogAsync(AuditOutcome.Succeeded);
+        }
+        else if (result == SaveResultEnum.NotAuthorized)
+        {
+            await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Not authorized" });
+        }
+        else
+        {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = result.ToString() });
+        }
 
         return Redirect($"?page={page}&saveResult={result}");
     }

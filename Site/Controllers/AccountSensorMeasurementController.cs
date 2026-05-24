@@ -1,3 +1,4 @@
+using Core.Audit;
 using Core.Commands;
 using Core.Entities;
 using Core.Queries;
@@ -25,6 +26,7 @@ public class MeasurementResult
 public class AccountSensorMeasurementController : Controller
 {
     private readonly IMediator _mediator;
+    private readonly IAuditService _auditService;
 
     public async Task<IActionResult> Index(
         string accountLink, string sensorLink, 
@@ -262,10 +264,18 @@ public class AccountSensorMeasurementController : Controller
         string accountLink, string sensorLink,
         [FromQuery] DateTime timestamp)
     {
+        using var actionScope = _auditService.BeginAction("Measurement.Delete", new AuditTarget
+        {
+            AccountLink = accountLink,
+            SensorLink = sensorLink
+        });
+        await _auditService.LogAsync(AuditOutcome.Attempted);
+
         // Check if user is admin
         var userInfo = HttpContext.RequestServices.GetRequiredService<IUserInfo>();
         if (!await userInfo.IsAdmin())
         {
+            await _auditService.LogAsync(AuditOutcome.Denied, new AuditDetails { Reason = "Admin access required" });
             return Forbid("Admin access required for measurement deletion");
         }
 
@@ -278,7 +288,10 @@ public class AccountSensorMeasurementController : Controller
             });
 
             if (accountSensor == null)
+            {
+                await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Account sensor not found" });
                 return NotFound("Account sensor not found");
+            }
 
             await _mediator.Send(new RemoveMeasurementCommand
             {
@@ -286,20 +299,37 @@ public class AccountSensorMeasurementController : Controller
                 Timestamp = timestamp
             });
 
+            await _auditService.LogAsync(AuditOutcome.Succeeded, target: new AuditTarget
+            {
+                AccountUid = accountSensor.Account.Uid,
+                SensorUid = accountSensor.Sensor.Uid,
+                AccountLink = accountLink,
+                SensorLink = sensorLink,
+                DevEui = accountSensor.Sensor.DevEui
+            });
+
             return Ok(new { success = true, message = "Measurement deleted successfully" });
         }
         catch (InvalidOperationException ex)
         {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails
+            {
+                Reason = "Invalid operation",
+                ExceptionType = ex.GetType().Name,
+                Message = ex.Message
+            });
             return BadRequest(new { success = false, message = ex.Message });
         }
         catch (Exception)
         {
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Unexpected exception" });
             return StatusCode(500, new { success = false, message = "An error occurred while deleting the measurement" });
         }
     }
 
-    public AccountSensorMeasurementController(IMediator mediator)
+    public AccountSensorMeasurementController(IMediator mediator, IAuditService auditService)
     {
         _mediator = mediator;
+        _auditService = auditService;
     }
 }

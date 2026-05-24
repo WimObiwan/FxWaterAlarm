@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Core.Audit;
 using Core.Commands;
 using Core.Communication;
 using Core.Helpers;
@@ -20,6 +21,7 @@ public static class ServiceCollectionExtensions
 
         services.Configure<MeasurementInfluxOptions>(configuration.GetSection(MeasurementInfluxOptions.Position));
         services.Configure<MessengerOptions>(configuration.GetSection(MessengerOptions.Location));
+        services.Configure<AuditLogOptions>(configuration.GetSection(AuditLogOptions.Location));
 
         services.AddScoped<IMeasurementLevelRepository, MeasurementLevelRepository>();
         services.AddScoped<IMeasurementDetectRepository, MeasurementDetectRepository>();
@@ -27,6 +29,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMeasurementThermometerRepository, MeasurementThermometerRepository>();
         services.AddScoped<IMessenger, Messenger>();
         services.AddScoped<IUrlBuilder, UrlBuilder>();
+        services.AddSingleton<IAuditScopeAccessor, AuditScopeAccessor>();
+        services.AddSingleton<IAuditLogWriter, FileAuditLogWriter>();
+        services.AddSingleton<IAuditService, AuditService>();
 
         services.AddSingleton<IVersionInfo, VersionInfo>(_ => new VersionInfo(assembly));
 
