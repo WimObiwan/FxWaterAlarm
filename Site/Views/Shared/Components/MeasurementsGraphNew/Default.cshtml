@@ -130,6 +130,8 @@
 getJSON('@(Model.AccountSensorEntity.ApiRestPath)/m?fromDays=@(Model.FromDays)&graphType=@(Model.GraphType)', 
     function(err, data2) {
 
+    const minValue = data2.minValue;
+    const maxValue = data2.maxValue;
     unit = data2.unit;
     data2 = data2.data.map(el => [el.timeStamp, el.value]);
 
@@ -183,7 +185,8 @@ getJSON('@(Model.AccountSensorEntity.ApiRestPath)/m?fromDays=@(Model.FromDays)&g
                 let label = params;
                 return label.toLocaleString() + ' ' + unit;
             },
-            showMinLabel: false
+            showMinLabel: false,
+            showMaxLabel: false
         },
         @if (minValue.HasValue)
         {
@@ -254,6 +257,14 @@ getJSON('@(Model.AccountSensorEntity.ApiRestPath)/m?fromDays=@(Model.FromDays)&g
         }
     ]
     };
+
+    if (minValue !== null && minValue !== undefined) {
+        option.yAxis.min = minValue;
+    }
+
+    if (maxValue !== null && maxValue !== undefined) {
+        option.yAxis.max = maxValue;
+    }
 
 
     if (option && typeof option === 'object') {

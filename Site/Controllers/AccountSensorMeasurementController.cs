@@ -20,11 +20,17 @@ public class MeasurementResult
 {
     public string? Unit { get; init; }
     public IEnumerable<MeasurementResultDataItem>? Data { get; init; }
+    public double? MinValue { get; init; }
+    public double? MaxValue { get; init; }
 }
+
+internal readonly record struct MeasurementAxisBounds(double MinValue, double MaxValue);
 
 [Route("api/a/{AccountLink}/s/{SensorLink}/m")]
 public class AccountSensorMeasurementController : Controller
 {
+    private const double MinimumLevelAxisSpanMm = 300.0;
+
     private readonly IMediator _mediator;
     private readonly IAuditService _auditService;
 
@@ -182,6 +188,8 @@ public class AccountSensorMeasurementController : Controller
             result = RollupCountPerHour(originalFrom, result);
         }
 
+        var axisBounds = CalculateAxisBounds(accountSensor, graphType, result);
+
         string? unit;
         switch (graphType)
         {
@@ -221,8 +229,106 @@ public class AccountSensorMeasurementController : Controller
         return Ok(new MeasurementResult
         {
             Unit = unit,
-            Data = result?.Reverse() 
+            Data = result?.Reverse(),
+            MinValue = axisBounds?.MinValue,
+            MaxValue = axisBounds?.MaxValue
         });
+    }
+
+    private static MeasurementAxisBounds? CalculateAxisBounds(
+        AccountSensor accountSensor,
+        GraphType graphType,
+        IEnumerable<MeasurementResultDataItem>? measurementResults)
+    {
+        if (measurementResults == null)
+            return null;
+
+        var minimumSpan = GetMinimumAxisSpan(accountSensor, graphType);
+        if (!minimumSpan.HasValue || minimumSpan.Value <= 0.0)
+            return null;
+
+        var values = measurementResults
+            .Where(item => item.Value.HasValue)
+            .Select(item => item.Value!.Value)
+            .ToList();
+
+        if (values.Count == 0)
+            return null;
+
+        var minValue = values.Min();
+        var maxValue = values.Max();
+        var span = minimumSpan.Value;
+
+        if (maxValue - minValue < span)
+        {
+            var midpoint = (maxValue + minValue) / 2.0;
+            maxValue = Math.Round(midpoint + span / 2.0, 2);
+            minValue = Math.Round(midpoint - span / 2.0, 2);
+        }
+
+        var (absoluteMin, absoluteMax) = GetAbsoluteAxisBounds(accountSensor, graphType);
+
+        if (absoluteMin.HasValue && minValue < absoluteMin.Value)
+        {
+            minValue = absoluteMin.Value;
+            if (minValue + span > maxValue)
+                maxValue = minValue + span;
+        }
+
+        if (absoluteMax.HasValue && maxValue > absoluteMax.Value)
+        {
+            maxValue = absoluteMax.Value;
+            if (maxValue - span < minValue)
+                minValue = maxValue - span;
+        }
+
+        return new MeasurementAxisBounds(minValue, maxValue);
+    }
+
+    private static double? GetMinimumAxisSpan(AccountSensor accountSensor, GraphType graphType)
+    {
+        if (accountSensor.Sensor.Type is not (SensorType.Level or SensorType.LevelPressure))
+            return null;
+
+        return graphType switch
+        {
+            GraphType.Height => MinimumLevelAxisSpanMm,
+            GraphType.Distance when accountSensor.Sensor.Type == SensorType.Level => MinimumLevelAxisSpanMm,
+            GraphType.Volume => accountSensor.ResolutionL.HasValue
+                ? accountSensor.ResolutionL.Value * MinimumLevelAxisSpanMm
+                : null,
+            GraphType.Percentage => GetUsableHeightMm(accountSensor) is { } usableHeightMm && usableHeightMm > 0.0
+                ? MinimumLevelAxisSpanMm / usableHeightMm * 100.0
+                : null,
+            _ => null
+        };
+    }
+
+    private static (double? MinValue, double? MaxValue) GetAbsoluteAxisBounds(AccountSensor accountSensor, GraphType graphType)
+    {
+        if (accountSensor.NoMinMaxConstraints)
+            return (null, null);
+
+        return graphType switch
+        {
+            GraphType.Height => (0.0, null),
+            GraphType.Distance when accountSensor.Sensor.Type == SensorType.Level => (0.0, null),
+            GraphType.Percentage => (0.0, 100.0),
+            GraphType.Volume => (0.0, accountSensor.UsableCapacityL ?? accountSensor.CapacityL),
+            _ => (null, null)
+        };
+    }
+
+    private static double? GetUsableHeightMm(AccountSensor accountSensor)
+    {
+        return accountSensor.Sensor.Type switch
+        {
+            SensorType.Level when accountSensor.DistanceMmEmpty.HasValue && accountSensor.DistanceMmFull.HasValue
+                => accountSensor.DistanceMmEmpty.Value - accountSensor.DistanceMmFull.Value - (accountSensor.UnusableHeightMm ?? 0),
+            SensorType.LevelPressure when accountSensor.DistanceMmFull.HasValue
+                => (accountSensor.DistanceMmEmpty ?? 0) + accountSensor.DistanceMmFull.Value - (accountSensor.UnusableHeightMm ?? 0),
+            _ => null
+        };
     }
 
     private IEnumerable<MeasurementResultDataItem>? RollupCountPerHour(DateTime start, IEnumerable<MeasurementResultDataItem>? measurementResults)

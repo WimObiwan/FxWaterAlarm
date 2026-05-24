@@ -154,6 +154,60 @@ public class AccountSensorMeasurementControllerTest
         Assert.Equal("mm", measurementResult.Unit);
     }
 
+    [Theory]
+    [InlineData(GraphType.Height, 500.0)]
+    [InlineData(GraphType.Distance, 500.0)]
+    [InlineData(GraphType.Percentage, 33.333333333333336)]
+    [InlineData(GraphType.Volume, 1666.6666666666667)]
+    public async Task Index_EnforcesMinimumAxisSpan_ForLevelGraphs(GraphType graphType, double expectedMinimumSpan)
+    {
+        var (controller, mediator) = CreateController();
+        var accountSensor = TestEntityFactory.CreateAccountSensor(
+            distanceMmEmpty: 2000,
+            distanceMmFull: 500,
+            capacityL: 5000);
+        mediator.AccountSensor = accountSensor;
+        mediator.Measurements =
+        [
+            TestEntityFactory.CreateMeasurementLevelEx(accountSensor, distanceMm: 1000),
+            TestEntityFactory.CreateMeasurementLevelEx(accountSensor, distanceMm: 1010)
+        ];
+
+        var result = await controller.Index("a", "s", graphType: graphType);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var measurementResult = Assert.IsType<MeasurementResult>(ok.Value);
+        Assert.NotNull(measurementResult.MinValue);
+        Assert.NotNull(measurementResult.MaxValue);
+        Assert.True(measurementResult.MaxValue!.Value - measurementResult.MinValue!.Value >= expectedMinimumSpan - 0.01);
+    }
+
+    [Fact]
+    public async Task Index_EnforcesMinimumAxisSpan_ForLevelPressurePercentageGraph()
+    {
+        var (controller, mediator) = CreateController();
+        var sensor = TestEntityFactory.CreateSensor(type: SensorType.LevelPressure);
+        var accountSensor = TestEntityFactory.CreateAccountSensor(
+            sensor: sensor,
+            distanceMmEmpty: 100,
+            distanceMmFull: 1900,
+            capacityL: 10000);
+        mediator.AccountSensor = accountSensor;
+        mediator.Measurements =
+        [
+            TestEntityFactory.CreateMeasurementLevelEx(accountSensor, distanceMm: 1000),
+            TestEntityFactory.CreateMeasurementLevelEx(accountSensor, distanceMm: 1010)
+        ];
+
+        var result = await controller.Index("a", "s", graphType: GraphType.Percentage);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var measurementResult = Assert.IsType<MeasurementResult>(ok.Value);
+        Assert.NotNull(measurementResult.MinValue);
+        Assert.NotNull(measurementResult.MaxValue);
+        Assert.True(measurementResult.MaxValue!.Value - measurementResult.MinValue!.Value >= 25.0 - 0.01);
+    }
+
     [Fact]
     public async Task Index_ReturnsOk_WithStatusData()
     {
