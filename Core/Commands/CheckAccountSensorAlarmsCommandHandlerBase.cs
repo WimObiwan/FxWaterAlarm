@@ -68,6 +68,7 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
     {
         const double AlarmThresholdHisteresisBattery = 5.0;
         const double AlarmThresholdHisteresisPercentage = 5.0;
+        const double AlarmThresholdHisteresisTemperature = 1.0;
         const int AlarmThresholdHisteresisHeight = 50;
 
         foreach (var alarm in alarms)
@@ -241,6 +242,42 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
                     }
                     break;
                 }
+                case AccountSensorAlarmType.TemperatureLow:
+                {
+                    if (!TryGetTemperature(measurementEx, out var temperatureC))
+                    {
+                        _logger.LogWarning("Last measurement is not a temperature measurement");
+                    }
+                    else if (!(alarm.AlarmThreshold is {} alarmThreshold))
+                    {
+                        _logger.LogWarning("No threshold configured for alarm {AlarmType}", alarm.AlarmType);
+                    }
+                    else
+                    {
+                        isTriggered = temperatureC <= alarmThreshold;
+                        isCleared = temperatureC > alarmThreshold + AlarmThresholdHisteresisTemperature;
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.TemperatureLow, measurementEx.AccountSensor, temperatureC, alarmThreshold);
+                    }
+                    break;
+                }
+                case AccountSensorAlarmType.TemperatureHigh:
+                {
+                    if (!TryGetTemperature(measurementEx, out var temperatureC))
+                    {
+                        _logger.LogWarning("Last measurement is not a temperature measurement");
+                    }
+                    else if (!(alarm.AlarmThreshold is {} alarmThreshold))
+                    {
+                        _logger.LogWarning("No threshold configured for alarm {AlarmType}", alarm.AlarmType);
+                    }
+                    else
+                    {
+                        isTriggered = temperatureC >= alarmThreshold;
+                        isCleared = temperatureC < alarmThreshold - AlarmThresholdHisteresisTemperature;
+                        sendAlertFunction = () => SendAlert(AccountSensorAlarmType.TemperatureHigh, measurementEx.AccountSensor, temperatureC, alarmThreshold);
+                    }
+                    break;
+                }
                 // case AccountSensorAlarmType.DetectStatus:
                 // {
                 //     ...
@@ -297,7 +334,8 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
     private async Task SendAlert(AccountSensorAlarmType alertType, AccountSensor accountSensor, double value, double thresholdValue)
     {
         var culture = CultureInfo.GetCultureInfo("nl-BE");
-        var valueString = value.ToString("0", culture);
+        var valueString = value.ToString("0.0", culture);
+        var thresholdValueString = thresholdValue.ToString("0.0", culture);
 
         string message, shortMessage;
         switch (alertType)
@@ -325,6 +363,14 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
             case AccountSensorAlarmType.HeightLow:
                 message = $"Het gemeten niveau van de sensor is gezakt onder <strong>{thresholdValue} mm</strong>";
                 shortMessage = $"Niveau {valueString} mm";
+                break;
+            case AccountSensorAlarmType.TemperatureHigh:
+                message = $"De gemeten temperatuur is gestegen boven <strong>{thresholdValueString} °C</strong>";
+                shortMessage = $"Temperatuur {valueString} °C";
+                break;
+            case AccountSensorAlarmType.TemperatureLow:
+                message = $"De gemeten temperatuur is gezakt onder <strong>{thresholdValueString} °C</strong>";
+                shortMessage = $"Temperatuur {valueString} °C";
                 break;
             // case AccountSensorAlarmType.HeightStatus:
             //     message = $"Het gemeten niveau van de sensor is <strong>{valueString} mm</strong>";
@@ -373,6 +419,22 @@ public abstract class CheckAccountSensorAlarmsCommandHandlerBase
         }
 
         await SendAlert(accountSensor, message, shortMessage);
+    }
+
+    private static bool TryGetTemperature(IMeasurementEx measurementEx, out double temperatureC)
+    {
+        switch (measurementEx)
+        {
+            case MeasurementMoistureEx moistureEx:
+                temperatureC = moistureEx.SoilTemperatureC;
+                return true;
+            case MeasurementThermometerEx thermometerEx:
+                temperatureC = thermometerEx.TempC;
+                return true;
+            default:
+                temperatureC = default;
+                return false;
+        }
     }
 
     private async Task SendAlert(AccountSensor accountSensor, string message, string shortMessage)

@@ -268,6 +268,12 @@
                                             case Core.Entities.AccountSensorAlarmType.HeightHigh:
                                                 <span>@Loc["Height above"] @alarm.AlarmThreshold @Loc["mm"]</span>
                                                 break;
+                                            case Core.Entities.AccountSensorAlarmType.TemperatureLow:
+                                                <span>@Loc["Temperature below"] @alarm.AlarmThreshold @Loc["°C"]</span>
+                                                break;
+                                            case Core.Entities.AccountSensorAlarmType.TemperatureHigh:
+                                                <span>@Loc["Temperature above"] @alarm.AlarmThreshold @Loc["°C"]</span>
+                                                break;
                                             default:
                                                 <span>@Loc["Unknown alarm type"]</span>
                                                 break;
@@ -320,6 +326,11 @@
                                         <option value="HeightLow">@Loc["Height low"]</option>
                                         <option value="HeightHigh">@Loc["Height high"]</option>
                                     }
+                                    @if (Model.AccountSensor.HasTemperature)
+                                    {
+                                        <option value="TemperatureLow">@Loc["Temperature low"]</option>
+                                        <option value="TemperatureHigh">@Loc["Temperature high"]</option>
+                                    }
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -366,6 +377,11 @@
                                             <option value="HeightLow">@Loc["Height low"]</option>
                                             <option value="HeightHigh">@Loc["Height high"]</option>
                                         }
+                                        @if (Model.AccountSensor.HasTemperature)
+                                        {
+                                            <option value="TemperatureLow">@Loc["Temperature low"]</option>
+                                            <option value="TemperatureHigh">@Loc["Temperature high"]</option>
+                                        }
                                     </select>
                                 </div>
                                 <div class="mb-3">
@@ -411,6 +427,10 @@
                             case 'HeightHigh':
                                 thresholdUnit.textContent = '(@Loc["mm"])';
                                 break;
+                            case 'TemperatureLow':
+                            case 'TemperatureHigh':
+                                thresholdUnit.textContent = '(°C)';
+                                break;
                             default:
                                 thresholdUnit.textContent = '';
                         }
@@ -444,6 +464,10 @@
                             case 'HeightLow':
                             case 'HeightHigh':
                                 thresholdUnit.textContent = '(@Loc["mm"])';
+                                break;
+                            case 'TemperatureLow':
+                            case 'TemperatureHigh':
+                                thresholdUnit.textContent = '(°C)';
                                 break;
                             default:
                                 thresholdUnit.textContent = '';

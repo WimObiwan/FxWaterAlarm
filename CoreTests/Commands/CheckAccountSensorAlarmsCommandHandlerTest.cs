@@ -156,6 +156,40 @@ public class CheckAccountSensorAlarmsCommandHandlerTest
             accountSensor);
     }
 
+    private static MeasurementThermometerEx CreateThermometerMeasurement(AccountSensor accountSensor,
+        DateTime timestamp, double tempC = 10.0, double batV = 3.6, double humPrc = 50.0)
+    {
+        return new MeasurementThermometerEx(
+            new MeasurementThermometer
+            {
+                DevEui = accountSensor.Sensor.DevEui,
+                Timestamp = timestamp,
+                TempC = tempC,
+                HumPrc = humPrc,
+                BatV = batV,
+                RssiDbm = -80.0
+            },
+            accountSensor);
+    }
+
+    private static MeasurementMoistureEx CreateMoistureMeasurement(AccountSensor accountSensor,
+        DateTime timestamp, double tempC = 10.0, double batV = 3.6, double soilMoisturePrc = 50.0,
+        double soilConductivity = 100.0)
+    {
+        return new MeasurementMoistureEx(
+            new MeasurementMoisture
+            {
+                DevEui = accountSensor.Sensor.DevEui,
+                Timestamp = timestamp,
+                SoilTemperature = tempC,
+                SoilMoisturePrc = soilMoisturePrc,
+                SoilConductivity = soilConductivity,
+                BatV = batV,
+                RssiDbm = -80.0
+            },
+            accountSensor);
+    }
+
     /// <summary>
     /// Runs the handler after configuring the mediator to return the given measurement.
     /// </summary>
@@ -1069,6 +1103,50 @@ public class CheckAccountSensorAlarmsCommandHandlerTest
 
         Assert.Single(messenger.SentAlerts);
         Assert.Contains("Geen water gedetecteerd", messenger.SentAlerts[0].ShortMessage);
+    }
+
+    [Fact]
+    public async Task TemperatureHigh_ThermometerSensor_TriggersAndSendsAlert()
+    {
+        var (db, handler, messenger, mediator, account, sensor) =
+            await SetupWithAlarm(AccountSensorAlarmType.TemperatureHigh, 25.0,
+                sensorType: SensorType.Thermometer);
+        await using var _ = db;
+
+        var accountSensor = await db.Context.Set<AccountSensor>()
+            .Include(a => a.Sensor).Include(a => a.Account).SingleAsync();
+        var measurement = CreateThermometerMeasurement(accountSensor, DateTime.UtcNow, tempC: 27.4);
+
+        await RunHandler(handler, mediator, measurement, account, sensor);
+
+        Assert.Single(messenger.SentAlerts);
+        Assert.Contains("temperatuur", messenger.SentAlerts[0].Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("boven", messenger.SentAlerts[0].Message, StringComparison.OrdinalIgnoreCase);
+
+        var alarm = await GetAlarmFromDb(db);
+        Assert.True(alarm.IsCurrentlyTriggered);
+    }
+
+    [Fact]
+    public async Task TemperatureLow_MoistureSensor_TriggersAndSendsAlert()
+    {
+        var (db, handler, messenger, mediator, account, sensor) =
+            await SetupWithAlarm(AccountSensorAlarmType.TemperatureLow, 5.0,
+                sensorType: SensorType.Moisture);
+        await using var _ = db;
+
+        var accountSensor = await db.Context.Set<AccountSensor>()
+            .Include(a => a.Sensor).Include(a => a.Account).SingleAsync();
+        var measurement = CreateMoistureMeasurement(accountSensor, DateTime.UtcNow, tempC: 3.2);
+
+        await RunHandler(handler, mediator, measurement, account, sensor);
+
+        Assert.Single(messenger.SentAlerts);
+        Assert.Contains("temperatuur", messenger.SentAlerts[0].Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("onder", messenger.SentAlerts[0].Message, StringComparison.OrdinalIgnoreCase);
+
+        var alarm = await GetAlarmFromDb(db);
+        Assert.True(alarm.IsCurrentlyTriggered);
     }
 
     #endregion

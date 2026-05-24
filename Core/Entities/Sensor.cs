@@ -35,5 +35,5 @@ public class Sensor
     public bool SupportsMinMaxConstraints => Type == SensorType.Level || Type == SensorType.LevelPressure;
     public bool SupportsTrend => Type == SensorType.Level || Type == SensorType.LevelPressure;
     public bool SupportsDiagram => Type == SensorType.Level || Type == SensorType.LevelPressure;
-    public bool SupportsAlerts => Type == SensorType.Level || Type == SensorType.LevelPressure || Type == SensorType.Detect;
+    public bool SupportsAlerts => Type == SensorType.Level || Type == SensorType.LevelPressure || Type == SensorType.Detect || Type == SensorType.Moisture || Type == SensorType.Thermometer;
 }

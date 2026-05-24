@@ -153,8 +153,8 @@ public class SensorTest
     [InlineData(SensorType.Level, true)]
     [InlineData(SensorType.LevelPressure, true)]
     [InlineData(SensorType.Detect, true)]
-    [InlineData(SensorType.Moisture, false)]
-    [InlineData(SensorType.Thermometer, false)]
+    [InlineData(SensorType.Moisture, true)]
+    [InlineData(SensorType.Thermometer, true)]
     public void SupportsAlerts(SensorType type, bool expected)
     {
         Assert.Equal(expected, Create(type).SupportsAlerts);

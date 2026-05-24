@@ -12,6 +12,8 @@ public enum AccountSensorAlarmType
     // HeightStatus = 8
     DetectOn = 9,
     //DetectStatus = 10,
+    TemperatureLow = 11,
+    TemperatureHigh = 12,
 }
 
 public class AccountSensorAlarm
