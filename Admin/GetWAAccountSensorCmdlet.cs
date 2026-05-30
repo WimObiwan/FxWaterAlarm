@@ -86,6 +86,8 @@ public class GetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
             AlertsEnabled = accountSensor.AlertsEnabled,
             NoMinMaxConstraints = accountSensor.NoMinMaxConstraints,
             ManholeAreaM2 = accountSensor.ManholeAreaM2,
+            DensityKgPerM3 = accountSensor.DensityKgPerM3,
+            Geometry = accountSensor.Geometry,
             RestPath = accountSensor.RestPath,
             //AlarmsCount = accountSensor.Alarms.Count,
             Account = GetWAAccountCmdlet.GetAccount(accountSensor.Account),
@@ -109,6 +111,8 @@ public class AccountSensor
     public bool AlertsEnabled { get; init; }
     public bool NoMinMaxConstraints { get; init; }
     public double? ManholeAreaM2 { get; init; }
+    public double? DensityKgPerM3 { get; init; }
+    public TankGeometry Geometry { get; init; }
     public string? RestPath { get; init; }
     //public int AlarmsCount { get; init; }
     required public Account Account { get; init; }

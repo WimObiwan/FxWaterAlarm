@@ -188,4 +188,70 @@ public class UpdateAccountSensorCommandHandlerTest
         Assert.Equal(0, sensors[0].Order);
         Assert.Equal(1, sensors[1].Order);
     }
+
+    [Fact]
+    public async Task Handle_UpdatesDensityAndHorizontalCylinderGeometry_ForLevelPressure()
+    {
+        await using var db = TestDbContext.Create();
+        var (account, sensor, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+            email: "uasgeom@test.com", accountLink: "uasgeomlink", sensorLink: "uasgeomsensor", sensorType: SensorType.LevelPressure);
+
+        var handler = new UpdateAccountSensorCommandHandler(db.Context,
+            NullLogger<UpdateAccountSensorCommandHandler>.Instance);
+
+        await handler.Handle(new UpdateAccountSensorCommand
+        {
+            AccountUid = account.Uid,
+            SensorUid = sensor.Uid,
+            DistanceMmEmpty = new Optional<int?>(true, 100),
+            DistanceMmFull = new Optional<int?>(true, 1900),
+            CapacityL = new Optional<int?>(true, 10000),
+            DensityKgPerM3 = new Optional<double?>(true, 820.0),
+            Geometry = new Optional<TankGeometry>(true, TankGeometry.HorizontalCylinder),
+        }, CancellationToken.None);
+
+        await using var freshCtx = db.CreateFreshContext();
+        var updated = await freshCtx.Set<AccountSensor>().SingleAsync();
+        Assert.Equal(820.0, updated.DensityKgPerM3);
+        Assert.Equal(TankGeometry.HorizontalCylinder, updated.Geometry);
+        Assert.Equal(10000, updated.CapacityL);
+    }
+
+    [Fact]
+    public async Task Handle_DensityOnNonPressureSensor_ThrowsInvalidOperationException()
+    {
+        await using var db = TestDbContext.Create();
+        var (account, sensor, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+            email: "uasdens@test.com", accountLink: "uasdenslink", sensorLink: "uasdenssensor", sensorType: SensorType.Level);
+
+        var handler = new UpdateAccountSensorCommandHandler(db.Context,
+            NullLogger<UpdateAccountSensorCommandHandler>.Instance);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            handler.Handle(new UpdateAccountSensorCommand
+            {
+                AccountUid = account.Uid,
+                SensorUid = sensor.Uid,
+                DensityKgPerM3 = new Optional<double?>(true, 900.0),
+            }, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Handle_HorizontalCylinderWithoutDimensions_ThrowsInvalidOperationException()
+    {
+        await using var db = TestDbContext.Create();
+        var (account, sensor, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+            email: "uashc@test.com", accountLink: "uashclink", sensorLink: "uashcsensor", sensorType: SensorType.LevelPressure);
+
+        var handler = new UpdateAccountSensorCommandHandler(db.Context,
+            NullLogger<UpdateAccountSensorCommandHandler>.Instance);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            handler.Handle(new UpdateAccountSensorCommand
+            {
+                AccountUid = account.Uid,
+                SensorUid = sensor.Uid,
+                Geometry = new Optional<TankGeometry>(true, TankGeometry.HorizontalCylinder),
+            }, CancellationToken.None));
+    }
 }

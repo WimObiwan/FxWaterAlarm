@@ -135,6 +135,17 @@
                     {
                         <tr>
                             <td>
+                                @Loc["Tank geometry"]
+                            </td>
+                            <td>
+                                <select class="form-select" style="width: 220px;" name="geometry" id="geometry" onchange="toggleHorizontalCylinderFields()">
+                                    <option value="Default" @(Model.AccountSensor.Geometry == Core.Entities.TankGeometry.Default ? "selected" : "")>@Loc["Default"]</option>
+                                    <option value="HorizontalCylinder" @(Model.AccountSensor.Geometry == Core.Entities.TankGeometry.HorizontalCylinder ? "selected" : "")>@Loc["Horizontal cylinder"]</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr class="horizontal-cylinder-field" style="display: none;">
+                            <td>
                                 @Loc["Capacity"]
                             </td>
                             <td>
@@ -144,6 +155,41 @@
                                         value="@Model.AccountSensor.CapacityL"/>
                                     <div class="input-group-append">
                                         <span class="input-group-text" id="basic-addon-CapacityL">@Loc["liter"]</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="default-geometry-field" style="display: none;">
+                            <td>
+                                @Loc["Capacity"]
+                            </td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" style="width: 100px;" 
+                                        aria-describedby="basic-addon-CapacityL" name="capacityL"
+                                        value="@Model.AccountSensor.CapacityL"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="basic-addon-CapacityL">@Loc["liter"]</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (Model.AccountSensor.Sensor.Type == Core.Entities.SensorType.LevelPressure)
+                    {
+                        <tr>
+                            <td>
+                                @Loc["Liquid density"]
+                            </td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" style="width: 100px;" 
+                                           aria-describedby="basic-addon-DensityKgPerM3" name="densityKgPerM3"
+                                           inputmode="decimal"
+                                           pattern="[0-9]*[.,]?[0-9]*"
+                                           value="@Model.AccountSensor.DensityKgPerM3?.ToString(System.Globalization.CultureInfo.CurrentCulture)"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="basic-addon-DensityKgPerM3">kg/m³</span>
                                     </div>
                                 </div>
                             </td>
@@ -198,6 +244,17 @@
                 @Html.AntiForgeryToken()
             </form>
             <script>
+                function toggleHorizontalCylinderFields() {
+                    const geometrySelect = document.getElementById('geometry');
+                    const showHorizontalFields = geometrySelect && geometrySelect.value === 'HorizontalCylinder';
+                    document.querySelectorAll('.horizontal-cylinder-field').forEach(function(row) {
+                        row.style.display = showHorizontalFields ? '' : 'none';
+                    });
+                    document.querySelectorAll('.default-geometry-field').forEach(function(row) {
+                        row.style.display = showHorizontalFields ? 'none' : '';
+                    });
+                }
+
                 // Normalize decimal separator for manholeAreaM2 input (allow both comma and dot)
                 document.querySelector('form[action="?page=Settings"]').addEventListener('submit', function(e) {
                     const manholeInput = document.querySelector('input[name="manholeAreaM2"]');
@@ -205,7 +262,14 @@
                         // Replace comma with dot for server-side parsing
                         manholeInput.value = manholeInput.value.replace(',', '.');
                     }
+
+                    const densityInput = document.querySelector('input[name="densityKgPerM3"]');
+                    if (densityInput && densityInput.value) {
+                        densityInput.value = densityInput.value.replace(',', '.');
+                    }
                 });
+
+                toggleHorizontalCylinderFields();
             </script>
 
 

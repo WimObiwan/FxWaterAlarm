@@ -3,6 +3,7 @@ using System.Management.Automation;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Commands;
+using Core.Entities;
 using Core.Util;
 using MediatR;
 using Svrooij.PowerShell.DependencyInjection;
@@ -76,6 +77,12 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
     [Parameter]
     public double? ManholeAreaM2 { get; set; }
 
+    [Parameter]
+    public double? DensityKgPerM3 { get; set; }
+
+    [Parameter]
+    public TankGeometry? Geometry { get; set; }
+
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
         Guid accountId, sensorId;
@@ -112,6 +119,10 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
             AlertsEnabled = Optional.From(AlertsEnabled),
             NoMinMaxConstraints = Optional.From(NoMinMaxConstraints),
             ManholeAreaM2 = Optional.From(ManholeAreaM2, -1.0),
+            DensityKgPerM3 = Optional.From(DensityKgPerM3, -1.0),
+            Geometry = Geometry.HasValue
+                ? new Optional<TankGeometry>(true, Geometry.Value)
+                : new Optional<TankGeometry>(false, default),
         });
     }
 }

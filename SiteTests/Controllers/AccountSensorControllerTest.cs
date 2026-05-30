@@ -4,6 +4,7 @@ using Core.Util;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using Site.Controllers;
 using Site.Services;
 using Site.Utilities;
@@ -96,5 +97,30 @@ public class AccountSensorControllerTest
         var result = await controller.Index("test-link", "test-sensor-link");
 
         Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task Index_ReturnsLevelPayload_WithDensityAndGeometryFields()
+    {
+        var mediator = new ConfigurableFakeMediator();
+        var sensor = TestEntityFactory.CreateSensor(type: SensorType.LevelPressure);
+        var accountSensor = TestEntityFactory.CreateAccountSensor(sensor: sensor);
+        accountSensor.DensityKgPerM3 = 820.0;
+        accountSensor.Geometry = TankGeometry.HorizontalCylinder;
+
+        mediator.SetResponse<AccountSensorByLinkQuery, Core.Entities.AccountSensor?>(accountSensor);
+        var measurement = TestEntityFactory.CreateMeasurementLevelEx(accountSensor);
+        mediator.SetResponse<LastMeasurementQuery, IMeasurementEx?>(measurement);
+
+        var controller = CreateController(mediator);
+        var result = await controller.Index("test-link", "test-sensor-link");
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var json = JsonSerializer.Serialize(okResult.Value);
+        using var doc = JsonDocument.Parse(json);
+
+        var accountSensorNode = doc.RootElement.GetProperty("AccountSensor");
+        Assert.Equal(820.0, accountSensorNode.GetProperty("DensityKgPerM3").GetDouble());
+        Assert.Equal("HorizontalCylinder", accountSensorNode.GetProperty("Geometry").GetString());
     }
 }

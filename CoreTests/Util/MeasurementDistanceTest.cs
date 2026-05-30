@@ -72,6 +72,39 @@ public class MeasurementDistanceTest
         };
     }
 
+    private static AccountSensor CreateHorizontalCylinderLevelPressureSensor(
+        int diameterMm = 1900,
+        int? capacityL = null,
+        double? densityKgPerM3 = null,
+        int? distanceMmEmpty = 0)
+    {
+        var sensor = new Sensor
+        {
+            Uid = Guid.NewGuid(),
+            DevEui = "devCylinderPressure",
+            CreateTimestamp = DateTime.UtcNow,
+            Type = SensorType.LevelPressure
+        };
+        var account = new Account
+        {
+            Uid = Guid.NewGuid(),
+            Email = "dist-cylinder@example.com",
+            CreationTimestamp = DateTime.UtcNow
+        };
+        return new AccountSensor
+        {
+            Sensor = sensor,
+            Account = account,
+            CreateTimestamp = DateTime.UtcNow,
+            DistanceMmEmpty = distanceMmEmpty,
+            DistanceMmFull = diameterMm - (distanceMmEmpty ?? 0),
+            Geometry = TankGeometry.HorizontalCylinder,
+            DensityKgPerM3 = densityKgPerM3,
+            CapacityL = capacityL ?? (int)Math.Round(Math.PI * Math.Pow(diameterMm / 2.0, 2) * 4500.0 / 1_000_000.0),
+            UnusableHeightMm = 0
+        };
+    }
+
     // --- DistanceMm null tests ---
 
     [Fact]
@@ -125,6 +158,16 @@ public class MeasurementDistanceTest
         var distance = new MeasurementDistance(1700, accountSensor);
 
         Assert.Equal(1700, distance.HeightMm); // 1700 + 0
+    }
+
+    [Fact]
+    public void HeightMm_LevelPressure_UsesDensityCorrection()
+    {
+        var accountSensor = CreateLevelPressureSensor(distanceMmEmpty: 100);
+        accountSensor.DensityKgPerM3 = 800.0;
+        var distance = new MeasurementDistance(800, accountSensor);
+
+        Assert.Equal(1100, distance.HeightMm);
     }
 
     // --- RealLevelFraction tests ---
@@ -355,6 +398,41 @@ public class MeasurementDistanceTest
         var distance = new MeasurementDistance(null, accountSensor);
 
         Assert.Null(distance.WaterL);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_AtHalfHeight_IsHalfVolume()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelPressureSensor();
+        var distance = new MeasurementDistance(950, accountSensor);
+
+        var geometricFullVolumeL = accountSensor.CapacityL!.Value;
+        Assert.NotNull(distance.WaterL);
+        Assert.Equal(geometricFullVolumeL / 2.0, distance.WaterL!.Value, 2);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_AtFullHeight_EqualsCapacity()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelPressureSensor(capacityL: 10000);
+        var distance = new MeasurementDistance(1900, accountSensor);
+
+        Assert.NotNull(distance.WaterL);
+        Assert.Equal(10000.0, distance.WaterL!.Value, 2);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_WithPressureEmptyOffset_IsZeroAtEmpty()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelPressureSensor(
+            diameterMm: 2000,
+            capacityL: 10000,
+            distanceMmEmpty: 100);
+
+        var distance = new MeasurementDistance(0, accountSensor);
+
+        Assert.NotNull(distance.WaterL);
+        Assert.Equal(0.0, distance.WaterL!.Value, 2);
     }
 
     // --- Manhole compensation on LevelFractionIncludingUnusableHeight ---

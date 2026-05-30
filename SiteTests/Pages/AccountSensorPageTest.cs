@@ -259,6 +259,46 @@ public class AccountSensorPageTest
         Assert.Equal(SaveResultEnum.Saved, result);
     }
 
+    [Fact]
+    public async Task UpdateSettings_ReturnsInvalidData_WhenDensityInvalid()
+    {
+        var (model, mediator, _) = CreateModel();
+        var acctSensor = CreateAccountSensorEntity(SensorType.LevelPressure);
+        mediator.SetResponse<AccountSensorByLinkQuery, Core.Entities.AccountSensor?>(acctSensor);
+
+        var result = await model.UpdateSettings(mediator, "a", "s", PageTypeEnum.Settings,
+            "name", 0, 500, 2000, 0, 5000, true, null,
+            densityKgPerM3: "-5");
+        Assert.Equal(SaveResultEnum.InvalidData, result);
+    }
+
+    [Fact]
+    public async Task UpdateSettings_ReturnsSaved_WhenHorizontalCylinderUsesDerivedDiameter()
+    {
+        var (model, mediator, _) = CreateModel();
+        var acctSensor = CreateAccountSensorEntity(SensorType.LevelPressure);
+        mediator.SetResponse<AccountSensorByLinkQuery, Core.Entities.AccountSensor?>(acctSensor);
+
+        var result = await model.UpdateSettings(mediator, "a", "s", PageTypeEnum.Settings,
+            "name", 0, 500, 2000, 0, 5000, true, null,
+            geometry: TankGeometry.HorizontalCylinder);
+        Assert.Equal(SaveResultEnum.Saved, result);
+    }
+
+    [Fact]
+    public async Task UpdateSettings_ReturnsSaved_WithValidHorizontalCylinderAndDensity()
+    {
+        var (model, mediator, _) = CreateModel();
+        var acctSensor = CreateAccountSensorEntity(SensorType.LevelPressure);
+        mediator.SetResponse<AccountSensorByLinkQuery, Core.Entities.AccountSensor?>(acctSensor);
+
+        var result = await model.UpdateSettings(mediator, "a", "s", PageTypeEnum.Settings,
+            "name", 0, 500, 2000, 0, 5000, true, null,
+            densityKgPerM3: "820.5",
+            geometry: TankGeometry.HorizontalCylinder);
+        Assert.Equal(SaveResultEnum.Saved, result);
+    }
+
     // --- OnGet tests ---
 
     [Fact]

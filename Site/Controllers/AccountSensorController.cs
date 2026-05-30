@@ -1,4 +1,5 @@
 using Core.Queries;
+using Core.Entities;
 using Core.Util;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,8 @@ class AccountSensorDto
     public int? UnusableHeightMm { get; init; } = null;
     public double? UnusableCapacity { get; init; } = null;
     public double? UsableCapacity { get; init; } = null;
+    public double? DensityKgPerM3 { get; init; } = null;
+    public string Geometry { get; init; } = TankGeometry.Default.ToString();
     public int? ExpectedIntervalSecs { get; init; }
 
 }
@@ -180,6 +183,8 @@ public class AccountSensorController : Controller
                     UnusableHeightMm = accountSensor.UnusableHeightMm,
                     UnusableCapacity = accountSensor.UnusableCapacityL,
                     UsableCapacity = accountSensor.UsableCapacityL,
+                    DensityKgPerM3 = accountSensor.DensityKgPerM3,
+                    Geometry = accountSensor.Geometry.ToString(),
                     ExpectedIntervalSecs = accountSensor.Sensor.ExpectedIntervalSecs
                 },
                 LastMeasurement = lastMeasurementDto,

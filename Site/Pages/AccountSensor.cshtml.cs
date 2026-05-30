@@ -605,7 +605,9 @@ public class AccountSensor : PageModel
         [FromForm] int? unusableHeightMm,
         [FromForm] int? capacityL,
         [FromForm] bool? alertsEnabled,
-        [FromForm] string? manholeAreaM2)
+        [FromForm] string? manholeAreaM2,
+        [FromForm] string? densityKgPerM3 = null,
+        [FromForm] TankGeometry? geometry = null)
     {
         using var actionScope = _auditService.BeginAction("AccountSensor.UpdateSettings", new AuditTarget
         {
@@ -618,7 +620,7 @@ public class AccountSensor : PageModel
             await UpdateSettings(
                 mediator, accountLink, sensorLink, page, sensorName, order,
                 distanceMmFull, distanceMmEmpty, unusableHeightMm, capacityL,
-                alertsEnabled, manholeAreaM2);
+                alertsEnabled, manholeAreaM2, densityKgPerM3, geometry);
 
         if (result == SaveResultEnum.Saved)
         {
@@ -648,7 +650,9 @@ public class AccountSensor : PageModel
         int? unusableHeightMm,
         int? capacityL,
         bool? alertsEnabled,
-        string? manholeAreaM2)
+        string? manholeAreaM2,
+        string? densityKgPerM3 = null,
+        TankGeometry? geometry = null)
     {
         if (page != PageTypeEnum.Settings)
         {
@@ -720,6 +724,26 @@ public class AccountSensor : PageModel
             manholeAreaM2Parsed = manholeAreaM2Parsed2;
         }
 
+        double? densityKgPerM3Parsed;
+        if (densityKgPerM3 == null || densityKgPerM3.Trim().Length == 0)
+        {
+            densityKgPerM3Parsed = null;
+        }
+        else
+        {
+            if (!double.TryParse(densityKgPerM3, CultureInfo.InvariantCulture.NumberFormat, out double densityKgPerM3Parsed2)
+                || densityKgPerM3Parsed2 <= 0.0)
+            {
+                return SaveResultEnum.InvalidData;
+            }
+            densityKgPerM3Parsed = densityKgPerM3Parsed2;
+        }
+
+        var geometryParsed = geometry ?? TankGeometry.Default;
+
+        if (densityKgPerM3Parsed.HasValue && accountSensor.Sensor.Type != SensorType.LevelPressure)
+            return SaveResultEnum.InvalidData;
+
         try
         {
             await mediator.Send(new UpdateAccountSensorCommand
@@ -733,7 +757,9 @@ public class AccountSensor : PageModel
                 Name = Optional.From(sensorName),
                 Order = new Optional<int>(true, order ?? 0),
                 AlertsEnabled = new Optional<bool>(true, alertsEnabled ?? false),
-                ManholeAreaM2 = new Optional<double?>(true, manholeAreaM2Parsed)
+                ManholeAreaM2 = new Optional<double?>(true, manholeAreaM2Parsed),
+                DensityKgPerM3 = new Optional<double?>(true, densityKgPerM3Parsed),
+                Geometry = new Optional<TankGeometry>(true, geometryParsed),
             });
 
             return SaveResultEnum.Saved;

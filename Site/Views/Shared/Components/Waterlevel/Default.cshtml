@@ -25,7 +25,6 @@
 
     @{
         var levelFraction = measurement.Distance.LevelFraction;
-        var realLevelFraction = measurement.Distance.RealLevelFraction;
         var waterL = measurement.Distance.WaterL;
         var height = measurement.Distance.HeightMm;
         var timestamp = measurement.Timestamp;
@@ -39,9 +38,9 @@
         <div style="font-size: @size">@Math.Round(waterL.Value, 0) @Loc["liter"]</div>
         size = "large";
     }
-    @if (realLevelFraction.HasValue)
+    @if (levelFraction.HasValue)
     {
-        <div style="font-size: @size">@Math.Round(realLevelFraction.Value * 100.0, 1)%</div>
+        <div style="font-size: @size">@Math.Round(levelFraction.Value * 100.0, 1)%</div>
         size = "large";
     }
     @if (height.HasValue)
