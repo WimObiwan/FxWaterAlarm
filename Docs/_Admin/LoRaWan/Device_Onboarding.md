@@ -25,6 +25,8 @@ JoinEUI = AppEui
 
 Both LDDS75 and DDS75-LB
 
+Admin command examples are documented in `TTN_Downlink_Admin.md`.
+
 * Interval 5 minutes  
   `0100012C`
 * Interval 20 minutes:  

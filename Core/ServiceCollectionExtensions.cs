@@ -3,6 +3,7 @@ using System.Reflection;
 using Core.Audit;
 using Core.Commands;
 using Core.Communication;
+using Core.Configuration;
 using Core.Helpers;
 using Core.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions
         services.Configure<MeasurementInfluxOptions>(configuration.GetSection(MeasurementInfluxOptions.Position));
         services.Configure<MessengerOptions>(configuration.GetSection(MessengerOptions.Location));
         services.Configure<AuditLogOptions>(configuration.GetSection(AuditLogOptions.Location));
+        services.Configure<ThingsNetworkOptions>(configuration.GetSection(ThingsNetworkOptions.Location));
 
         services.AddScoped<IMeasurementLevelRepository, MeasurementLevelRepository>();
         services.AddScoped<IMeasurementDetectRepository, MeasurementDetectRepository>();
