@@ -10,6 +10,8 @@ public class FakeMeasurementThermometerRepository : IMeasurementThermometerRepos
 {
     public MeasurementThermometer? LastResult { get; set; }
     public MeasurementThermometer[]? GetResult { get; set; }
+    public DateTime? LastDeleteFrom { get; private set; }
+    public DateTime? LastDeleteTill { get; private set; }
 
     public Task<MeasurementThermometer?> GetLast(string devEui, CancellationToken cancellationToken) =>
         Task.FromResult(LastResult);
@@ -32,6 +34,10 @@ public class FakeMeasurementThermometerRepository : IMeasurementThermometerRepos
     public Task<MeasurementThermometer[]> GetMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken) =>
         Task.FromResult(GetResult ?? Array.Empty<MeasurementThermometer>());
 
-    public Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken) =>
-        Task.CompletedTask;
+    public Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken)
+    {
+        LastDeleteFrom = from;
+        LastDeleteTill = till;
+        return Task.CompletedTask;
+    }
 }

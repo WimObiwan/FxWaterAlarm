@@ -10,6 +10,8 @@ public class FakeMeasurementDetectRepository : IMeasurementDetectRepository
 {
     public MeasurementDetect? LastResult { get; set; }
     public MeasurementDetect[]? GetResult { get; set; }
+    public DateTime? LastDeleteFrom { get; private set; }
+    public DateTime? LastDeleteTill { get; private set; }
 
     public Task<MeasurementDetect?> GetLast(string devEui, CancellationToken cancellationToken) =>
         Task.FromResult(LastResult);
@@ -32,6 +34,10 @@ public class FakeMeasurementDetectRepository : IMeasurementDetectRepository
     public Task<MeasurementDetect[]> GetMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken) =>
         Task.FromResult(GetResult ?? Array.Empty<MeasurementDetect>());
 
-    public Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken) =>
-        Task.CompletedTask;
+    public Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken)
+    {
+        LastDeleteFrom = from;
+        LastDeleteTill = till;
+        return Task.CompletedTask;
+    }
 }

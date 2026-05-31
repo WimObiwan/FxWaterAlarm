@@ -177,4 +177,135 @@ public class RemoveMeasurementCommandHandlerTest
         Assert.Null(levelRepo.LastDeleteFrom);
         Assert.Null(levelRepo.LastDeleteTill);
     }
+
+    [Fact]
+    public async Task Handle_LevelPressureSensor_SingleMeasurement_UsesLevelRepository()
+    {
+        await using var db = TestDbContext.Create();
+        var sensor = TestEntityFactory.CreateSensor(SensorType.LevelPressure, devEui: "RM_LP_01");
+        db.Context.Sensors.Add(sensor);
+        await db.Context.SaveChangesAsync();
+
+        var requestedTimestamp = DateTime.UtcNow;
+        var levelRepo = new FakeMeasurementLevelRepository
+        {
+            GetResult = [new MeasurementLevel { DevEui = "RM_LP_01", Timestamp = requestedTimestamp }]
+        };
+
+        var handler = CreateHandler(db, level: levelRepo);
+
+        await handler.Handle(new RemoveMeasurementCommand
+        {
+            SensorUid = sensor.Uid,
+            Timestamp = requestedTimestamp
+        }, CancellationToken.None);
+
+        Assert.Equal(requestedTimestamp, levelRepo.LastDeleteFrom);
+        Assert.Equal(requestedTimestamp, levelRepo.LastDeleteTill);
+    }
+
+    [Fact]
+    public async Task Handle_DetectSensor_MultipleMeasurements_DeletesClosestMeasurement()
+    {
+        await using var db = TestDbContext.Create();
+        var sensor = TestEntityFactory.CreateSensor(SensorType.Detect, devEui: "RM_DET_MULTI_01");
+        db.Context.Sensors.Add(sensor);
+        await db.Context.SaveChangesAsync();
+
+        var requestedTimestamp = DateTime.UtcNow;
+        var closestTimestamp = requestedTimestamp.AddMilliseconds(150);
+        var fartherTimestamp = requestedTimestamp.AddSeconds(-2);
+
+        var detectRepo = new FakeMeasurementDetectRepository
+        {
+            GetResult =
+            [
+                new MeasurementDetect { DevEui = "RM_DET_MULTI_01", Timestamp = fartherTimestamp },
+                new MeasurementDetect { DevEui = "RM_DET_MULTI_01", Timestamp = closestTimestamp }
+            ]
+        };
+
+        var handler = CreateHandler(db, detect: detectRepo);
+
+        await handler.Handle(new RemoveMeasurementCommand
+        {
+            SensorUid = sensor.Uid,
+            Timestamp = requestedTimestamp
+        }, CancellationToken.None);
+
+        Assert.Equal(closestTimestamp, detectRepo.LastDeleteFrom);
+        Assert.Equal(closestTimestamp, detectRepo.LastDeleteTill);
+    }
+
+    [Fact]
+    public async Task Handle_MoistureSensor_SingleMeasurement_DeletesMeasurement()
+    {
+        await using var db = TestDbContext.Create();
+        var sensor = TestEntityFactory.CreateSensor(SensorType.Moisture, devEui: "RM_MOI_01");
+        db.Context.Sensors.Add(sensor);
+        await db.Context.SaveChangesAsync();
+
+        var requestedTimestamp = DateTime.UtcNow;
+        var moistureRepo = new FakeMeasurementMoistureRepository
+        {
+            GetResult = [new MeasurementMoisture { DevEui = "RM_MOI_01", Timestamp = requestedTimestamp }]
+        };
+
+        var handler = CreateHandler(db, moisture: moistureRepo);
+
+        await handler.Handle(new RemoveMeasurementCommand
+        {
+            SensorUid = sensor.Uid,
+            Timestamp = requestedTimestamp
+        }, CancellationToken.None);
+
+        Assert.Equal(requestedTimestamp, moistureRepo.LastDeleteFrom);
+        Assert.Equal(requestedTimestamp, moistureRepo.LastDeleteTill);
+    }
+
+    [Fact]
+    public async Task Handle_ThermometerSensor_SingleMeasurement_DeletesMeasurement()
+    {
+        await using var db = TestDbContext.Create();
+        var sensor = TestEntityFactory.CreateSensor(SensorType.Thermometer, devEui: "RM_THM_01");
+        db.Context.Sensors.Add(sensor);
+        await db.Context.SaveChangesAsync();
+
+        var requestedTimestamp = DateTime.UtcNow;
+        var thermometerRepo = new FakeMeasurementThermometerRepository
+        {
+            GetResult = [new MeasurementThermometer { DevEui = "RM_THM_01", Timestamp = requestedTimestamp }]
+        };
+
+        var handler = CreateHandler(db, thermometer: thermometerRepo);
+
+        await handler.Handle(new RemoveMeasurementCommand
+        {
+            SensorUid = sensor.Uid,
+            Timestamp = requestedTimestamp
+        }, CancellationToken.None);
+
+        Assert.Equal(requestedTimestamp, thermometerRepo.LastDeleteFrom);
+        Assert.Equal(requestedTimestamp, thermometerRepo.LastDeleteTill);
+    }
+
+    [Fact]
+    public async Task Handle_UnsupportedSensorType_ThrowsInvalidOperationException()
+    {
+        await using var db = TestDbContext.Create();
+        var sensor = TestEntityFactory.CreateSensor((SensorType)999, devEui: "RM_BAD_01");
+        db.Context.Sensors.Add(sensor);
+        await db.Context.SaveChangesAsync();
+
+        var handler = CreateHandler(db);
+
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            handler.Handle(new RemoveMeasurementCommand
+            {
+                SensorUid = sensor.Uid,
+                Timestamp = DateTime.UtcNow
+            }, CancellationToken.None));
+
+        Assert.Contains("Unsupported sensor type", ex.Message);
+    }
 }

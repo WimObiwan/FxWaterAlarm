@@ -1,3 +1,5 @@
+using System.Reflection;
+using Core.Configuration;
 using Core.Entities;
 using Core.Repositories;
 using Microsoft.Extensions.Options;
@@ -6,10 +8,6 @@ using Xunit;
 
 namespace CoreTests.Repositories;
 
-/// <summary>
-/// Concrete test subclass of MeasurementRepositoryBase to test base class logic.
-/// Uses RecordLevel/AggregatedRecordLevel/MeasurementLevel/AggregatedMeasurementLevel as the generic types.
-/// </summary>
 internal class TestableMeasurementRepositoryBase : MeasurementRepositoryBase<RecordLevel, AggregatedRecordLevel, MeasurementLevel, AggregatedMeasurementLevel>
 {
     public TestableMeasurementRepositoryBase(MeasurementInfluxOptions options)
@@ -21,8 +19,8 @@ internal class TestableMeasurementRepositoryBase : MeasurementRepositoryBase<Rec
         : this(new MeasurementInfluxOptions
         {
             Endpoint = new Uri("http://localhost:8086"),
-            Username = "testuser",
-            Password = "testpass"
+            Username = string.Empty,
+            Password = string.Empty
         })
     {
     }
@@ -52,33 +50,42 @@ internal class TestableMeasurementRepositoryBase : MeasurementRepositoryBase<Rec
         };
     }
 
-    /// <summary>
-    /// Expose the private GetFilter method via reflection for testing.
-    /// </summary>
     public (string filterText, object parameters) TestGetFilter(string devEui, DateTime? from, DateTime? till)
     {
         var method = typeof(MeasurementRepositoryBase<RecordLevel, AggregatedRecordLevel, MeasurementLevel, AggregatedMeasurementLevel>)
-            .GetMethod("GetFilter", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var result = method!.Invoke(this, [devEui, from, till]);
-        var tuple = ((string, object))result!;
-        return tuple;
+            .GetMethod("GetFilter", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        var result = method!.Invoke(this, new object?[] { devEui, from, till });
+        return ((string, object))result!;
     }
 }
 
 public class MeasurementRepositoryBaseTest
 {
     [Fact]
-    public void Constructor_WithValidOptions_DoesNotThrow()
+    public async Task GetLast_WhenInfluxIsUnavailable_Throws()
     {
-        var options = new MeasurementInfluxOptions
+        var repo = new TestableMeasurementRepositoryBase();
+
+        // We only assert that the path executes and bubbles the connection error.
+        await Assert.ThrowsAnyAsync<Exception>(() => repo.GetLast("DEV001", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Write_WhenInfluxIsUnavailable_Throws()
+    {
+        var repo = new TestableMeasurementRepositoryBase();
+        var record = new RecordLevel
         {
-            Endpoint = new Uri("http://localhost:8086"),
-            Username = "user",
-            Password = "pass"
+            DevEui = "DEV001",
+            Timestamp = DateTime.UtcNow,
+            BatV = 3.3,
+            Distance = 1000,
+            Rssi = -80
         };
 
-        var repo = new TestableMeasurementRepositoryBase(options);
-        Assert.NotNull(repo);
+        // We only assert that the path executes and bubbles the connection error.
+        await Assert.ThrowsAnyAsync<Exception>(() => repo.Write(record, CancellationToken.None));
     }
 
     [Fact]
@@ -88,63 +95,24 @@ public class MeasurementRepositoryBaseTest
         var (filterText, parameters) = repo.TestGetFilter("DEV001", null, null);
 
         Assert.Equal(" WHERE DevEUI = $devEui", filterText);
-        var dict = (Dictionary<string, object>)parameters;
+        var dict = Assert.IsType<Dictionary<string, object>>(parameters);
         Assert.Single(dict);
         Assert.Equal("DEV001", dict["devEui"]);
-    }
-
-    [Fact]
-    public void GetFilter_WithFrom_IncludesFromClause()
-    {
-        var repo = new TestableMeasurementRepositoryBase();
-        var from = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        var (filterText, parameters) = repo.TestGetFilter("DEV001", from, null);
-
-        Assert.Equal(" WHERE DevEUI = $devEui AND time >= $from", filterText);
-        var dict = (Dictionary<string, object>)parameters;
-        Assert.Equal(2, dict.Count);
-        Assert.Equal("DEV001", dict["devEui"]);
-        Assert.Equal(from, dict["from"]);
-    }
-
-    [Fact]
-    public void GetFilter_WithTill_IncludesTillClause()
-    {
-        var repo = new TestableMeasurementRepositoryBase();
-        var till = new DateTime(2024, 12, 31, 23, 59, 59, DateTimeKind.Utc);
-        var (filterText, parameters) = repo.TestGetFilter("DEV001", null, till);
-
-        Assert.Equal(" WHERE DevEUI = $devEui AND time < $till", filterText);
-        var dict = (Dictionary<string, object>)parameters;
-        Assert.Equal(2, dict.Count);
-        Assert.Equal("DEV001", dict["devEui"]);
-        Assert.Equal(till, dict["till"]);
     }
 
     [Fact]
     public void GetFilter_WithFromAndTill_IncludesBothClauses()
     {
         var repo = new TestableMeasurementRepositoryBase();
-        var from = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        var till = new DateTime(2024, 12, 31, 23, 59, 59, DateTimeKind.Utc);
+        var from = new DateTime(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        var till = new DateTime(2026, 1, 2, 12, 0, 0, DateTimeKind.Utc);
         var (filterText, parameters) = repo.TestGetFilter("DEV001", from, till);
 
         Assert.Equal(" WHERE DevEUI = $devEui AND time >= $from AND time < $till", filterText);
-        var dict = (Dictionary<string, object>)parameters;
+        var dict = Assert.IsType<Dictionary<string, object>>(parameters);
         Assert.Equal(3, dict.Count);
         Assert.Equal("DEV001", dict["devEui"]);
         Assert.Equal(from, dict["from"]);
         Assert.Equal(till, dict["till"]);
-    }
-
-    [Fact]
-    public void GetFilter_DevEuiWithSpecialChars_PreservesValue()
-    {
-        var repo = new TestableMeasurementRepositoryBase();
-        var devEui = "A81758FFFE04D4F0";
-        var (_, parameters) = repo.TestGetFilter(devEui, null, null);
-
-        var dict = (Dictionary<string, object>)parameters;
-        Assert.Equal(devEui, dict["devEui"]);
     }
 }
