@@ -55,3 +55,4 @@ CoverageResults/
 # Deployment
 scripts/deploy-wateralarm-dev.sh
 scripts/deploy-wateralarm-prd.sh
+audit-*.jsonl

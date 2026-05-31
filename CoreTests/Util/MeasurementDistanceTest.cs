@@ -72,6 +72,70 @@ public class MeasurementDistanceTest
         };
     }
 
+    private static AccountSensor CreateHorizontalCylinderLevelPressureSensor(
+        int diameterMm = 1900,
+        int? capacityL = null,
+        double? densityKgPerM3 = null,
+        int? distanceMmEmpty = 0)
+    {
+        var sensor = new Sensor
+        {
+            Uid = Guid.NewGuid(),
+            DevEui = "devCylinderPressure",
+            CreateTimestamp = DateTime.UtcNow,
+            Type = SensorType.LevelPressure
+        };
+        var account = new Account
+        {
+            Uid = Guid.NewGuid(),
+            Email = "dist-cylinder@example.com",
+            CreationTimestamp = DateTime.UtcNow
+        };
+        return new AccountSensor
+        {
+            Sensor = sensor,
+            Account = account,
+            CreateTimestamp = DateTime.UtcNow,
+            DistanceMmEmpty = distanceMmEmpty,
+            DistanceMmFull = diameterMm - (distanceMmEmpty ?? 0),
+            Geometry = TankGeometry.HorizontalCylinder,
+            DensityKgPerM3 = densityKgPerM3,
+            CapacityL = capacityL ?? (int)Math.Round(Math.PI * Math.Pow(diameterMm / 2.0, 2) * 4500.0 / 1_000_000.0),
+            UnusableHeightMm = 0
+        };
+    }
+
+    private static AccountSensor CreateHorizontalCylinderLevelSensor(
+        int distanceMmEmpty = 2000,
+        int distanceMmFull = 200,
+        int? capacityL = 10000)
+    {
+        var sensor = new Sensor
+        {
+            Uid = Guid.NewGuid(),
+            DevEui = "devCylinderLevel",
+            CreateTimestamp = DateTime.UtcNow,
+            Type = SensorType.Level
+        };
+        var account = new Account
+        {
+            Uid = Guid.NewGuid(),
+            Email = "dist-cylinder-level@example.com",
+            CreationTimestamp = DateTime.UtcNow
+        };
+        return new AccountSensor
+        {
+            Sensor = sensor,
+            Account = account,
+            CreateTimestamp = DateTime.UtcNow,
+            DistanceMmEmpty = distanceMmEmpty,
+            DistanceMmFull = distanceMmFull,
+            Geometry = TankGeometry.HorizontalCylinder,
+            CapacityL = capacityL,
+            UnusableHeightMm = 0
+        };
+    }
+
     // --- DistanceMm null tests ---
 
     [Fact]
@@ -125,6 +189,16 @@ public class MeasurementDistanceTest
         var distance = new MeasurementDistance(1700, accountSensor);
 
         Assert.Equal(1700, distance.HeightMm); // 1700 + 0
+    }
+
+    [Fact]
+    public void HeightMm_LevelPressure_UsesDensityCorrection()
+    {
+        var accountSensor = CreateLevelPressureSensor(distanceMmEmpty: 100);
+        accountSensor.DensityKgPerM3 = 800.0;
+        var distance = new MeasurementDistance(800, accountSensor);
+
+        Assert.Equal(1100, distance.HeightMm);
     }
 
     // --- RealLevelFraction tests ---
@@ -354,6 +428,171 @@ public class MeasurementDistanceTest
         var accountSensor = CreateLevelSensor();
         var distance = new MeasurementDistance(null, accountSensor);
 
+        Assert.Null(distance.WaterL);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_AtHalfHeight_IsHalfVolume()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelPressureSensor();
+        var distance = new MeasurementDistance(950, accountSensor);
+
+        var geometricFullVolumeL = accountSensor.CapacityL!.Value;
+        Assert.NotNull(distance.WaterL);
+        Assert.Equal(geometricFullVolumeL / 2.0, distance.WaterL!.Value, 2);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_AtFullHeight_EqualsCapacity()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelPressureSensor(capacityL: 10000);
+        var distance = new MeasurementDistance(1900, accountSensor);
+
+        Assert.NotNull(distance.WaterL);
+        Assert.Equal(10000.0, distance.WaterL!.Value, 2);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_WithPressureEmptyOffset_IsZeroAtEmpty()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelPressureSensor(
+            diameterMm: 2000,
+            capacityL: 10000,
+            distanceMmEmpty: 100);
+
+        var distance = new MeasurementDistance(0, accountSensor);
+
+        Assert.NotNull(distance.WaterL);
+        Assert.Equal(0.0, distance.WaterL!.Value, 2);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_LevelSensor_IsZeroAtEmpty()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelSensor(distanceMmEmpty: 2000, distanceMmFull: 200, capacityL: 10000);
+        var distance = new MeasurementDistance(2000, accountSensor);
+
+        Assert.NotNull(distance.WaterL);
+        Assert.Equal(0.0, distance.WaterL!.Value, 2);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_LevelSensor_IsCapacityAtFull()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelSensor(distanceMmEmpty: 2000, distanceMmFull: 200, capacityL: 10000);
+        var distance = new MeasurementDistance(200, accountSensor);
+
+        Assert.NotNull(distance.WaterL);
+        Assert.Equal(10000.0, distance.WaterL!.Value, 2);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_PressureSensor_UsesDensityAdjustment()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelPressureSensor(
+            diameterMm: 2000,
+            capacityL: 10000,
+            densityKgPerM3: 800.0,
+            distanceMmEmpty: 0);
+
+        // 800 mm pressure reading at 800 kg/m3 equals 1000 mm water column, i.e. half diameter.
+        var distance = new MeasurementDistance(800, accountSensor);
+
+        Assert.NotNull(distance.WaterL);
+        Assert.Equal(5000.0, distance.WaterL!.Value, 2);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_WithNullDistance_ReturnsNull()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelPressureSensor(diameterMm: 2000, capacityL: 10000);
+        var distance = new MeasurementDistance(null, accountSensor);
+
+        Assert.Null(distance.WaterL);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_WithNullCapacity_ReturnsNull()
+    {
+        var sensor = new Sensor
+        {
+            Uid = Guid.NewGuid(),
+            DevEui = "devCylinderPressureNullCap",
+            CreateTimestamp = DateTime.UtcNow,
+            Type = SensorType.LevelPressure
+        };
+        var account = new Account
+        {
+            Uid = Guid.NewGuid(),
+            Email = "dist-cylinder-null-cap@example.com",
+            CreationTimestamp = DateTime.UtcNow
+        };
+        var accountSensor = new AccountSensor
+        {
+            Sensor = sensor,
+            Account = account,
+            CreateTimestamp = DateTime.UtcNow,
+            DistanceMmEmpty = 0,
+            DistanceMmFull = 2000,
+            Geometry = TankGeometry.HorizontalCylinder,
+            CapacityL = null,
+            UnusableHeightMm = 0
+        };
+
+        var distance = new MeasurementDistance(1000, accountSensor);
+
+        Assert.Null(distance.WaterL);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_WithInvalidDerivedDiameter_FallsBackToDefaultCalculation()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelSensor(distanceMmEmpty: 500, distanceMmFull: 700, capacityL: 10000);
+        var distance = new MeasurementDistance(600, accountSensor);
+
+        Assert.NotNull(distance.WaterL);
+        Assert.Equal(5000.0, distance.WaterL!.Value, 2);
+    }
+
+    [Fact]
+    public void LevelFraction_HorizontalCylinder_WithZeroCapacity_FallsBackToDefaultCalculation()
+    {
+        var accountSensor = CreateHorizontalCylinderLevelPressureSensor(diameterMm: 2000, capacityL: 0);
+        var distance = new MeasurementDistance(1000, accountSensor);
+
+        Assert.NotNull(distance.LevelFraction);
+        Assert.Equal(0.5, distance.LevelFraction!.Value, 3);
+    }
+
+    [Fact]
+    public void WaterL_HorizontalCylinder_WithUnsupportedSensorType_ReturnsNull()
+    {
+        var sensor = new Sensor
+        {
+            Uid = Guid.NewGuid(),
+            DevEui = "devCylinderUnsupported",
+            CreateTimestamp = DateTime.UtcNow,
+            Type = SensorType.Moisture
+        };
+        var account = new Account
+        {
+            Uid = Guid.NewGuid(),
+            Email = "dist-cylinder-unsupported@example.com",
+            CreationTimestamp = DateTime.UtcNow
+        };
+        var accountSensor = new AccountSensor
+        {
+            Sensor = sensor,
+            Account = account,
+            CreateTimestamp = DateTime.UtcNow,
+            Geometry = TankGeometry.HorizontalCylinder,
+            DistanceMmEmpty = 2000,
+            DistanceMmFull = 200,
+            CapacityL = 10000,
+            UnusableHeightMm = 0
+        };
+
+        var distance = new MeasurementDistance(1000, accountSensor);
         Assert.Null(distance.WaterL);
     }
 

@@ -70,6 +70,9 @@ namespace Core.Migrations
                     b.Property<DateTime>("CreateTimestamp")
                         .HasColumnType("TEXT");
 
+                    b.Property<double?>("DensityKgPerM3")
+                        .HasColumnType("REAL");
+
                     b.Property<bool>("Disabled")
                         .HasColumnType("INTEGER");
 
@@ -77,6 +80,9 @@ namespace Core.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("DistanceMmFull")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Geometry")
                         .HasColumnType("INTEGER");
 
                     b.Property<double?>("ManholeAreaM2")

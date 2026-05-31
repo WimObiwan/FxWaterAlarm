@@ -1,4 +1,5 @@
 using Core.Exceptions;
+using Core.Entities;
 using Core.Repositories;
 using Core.Util;
 using MediatR;
@@ -21,6 +22,8 @@ public record UpdateAccountSensorCommand : IRequest
     public Optional<bool> AlertsEnabled { get; init; }
     public Optional<bool> NoMinMaxConstraints { get; init; }
     public Optional<double?> ManholeAreaM2 { get; init; }
+    public Optional<double?> DensityKgPerM3 { get; init; }
+    public Optional<TankGeometry> Geometry { get; init; }
 }
 
 public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSensorCommand>
@@ -64,6 +67,50 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
             accountSensor.NoMinMaxConstraints = request.NoMinMaxConstraints.Value;
         if (request.ManholeAreaM2 is { Specified: true})
             accountSensor.ManholeAreaM2 = request.ManholeAreaM2.Value;
+        if (request.DensityKgPerM3 is { Specified: true })
+            accountSensor.DensityKgPerM3 = request.DensityKgPerM3.Value;
+        if (request.Geometry is { Specified: true })
+            accountSensor.Geometry = request.Geometry.Value;
+
+        if (accountSensor.DensityKgPerM3 is { } densityKgPerM3 && densityKgPerM3 <= 0.0)
+            throw new InvalidOperationException("DensityKgPerM3 must be greater than zero.");
+
+        if (accountSensor.DensityKgPerM3.HasValue && accountSensor.Sensor.Type != Entities.SensorType.LevelPressure)
+            throw new InvalidOperationException("DensityKgPerM3 can only be configured for pressure level sensors.");
+
+        if (accountSensor.Geometry == TankGeometry.HorizontalCylinder)
+        {
+            if (accountSensor.Sensor.Type != Entities.SensorType.Level && accountSensor.Sensor.Type != Entities.SensorType.LevelPressure)
+                throw new InvalidOperationException("HorizontalCylinder geometry is only supported for level sensors.");
+
+            int diameterMm;
+            if (accountSensor.Sensor.Type == Entities.SensorType.LevelPressure)
+            {
+                if (accountSensor.DistanceMmFull is not { } distanceMmFull || distanceMmFull <= 0)
+                    throw new InvalidOperationException("HorizontalCylinder geometry requires DistanceMmFull > 0 for pressure sensors.");
+
+                if (accountSensor.DistanceMmEmpty is { } distanceMmEmpty && distanceMmEmpty < 0)
+                    throw new InvalidOperationException("HorizontalCylinder geometry requires DistanceMmEmpty >= 0 for pressure sensors.");
+
+                diameterMm = distanceMmFull + (accountSensor.DistanceMmEmpty ?? 0);
+            }
+            else
+            {
+                if (accountSensor.DistanceMmEmpty is not { } distanceMmEmpty || distanceMmEmpty <= 0)
+                    throw new InvalidOperationException("HorizontalCylinder geometry requires DistanceMmEmpty > 0 for level sensors.");
+
+                if (accountSensor.DistanceMmFull is not { } distanceMmFull || distanceMmFull < 0)
+                    throw new InvalidOperationException("HorizontalCylinder geometry requires DistanceMmFull >= 0 for level sensors.");
+
+                diameterMm = distanceMmEmpty - distanceMmFull;
+            }
+
+            if (diameterMm <= 0)
+                throw new InvalidOperationException("HorizontalCylinder geometry requires valid distance settings to derive a positive diameter.");
+
+            if (accountSensor.CapacityL is not { } capacityL || capacityL <= 0)
+                throw new InvalidOperationException("CapacityL must be greater than zero when using HorizontalCylinder geometry.");
+        }
 
         if (request.Order is { Specified: true})
         {

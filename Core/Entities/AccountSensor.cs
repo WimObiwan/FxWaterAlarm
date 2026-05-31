@@ -16,6 +16,13 @@ public enum GraphType
     Conductivity,
     Status,
 }
+
+public enum TankGeometry
+{
+    Default = 0,
+    HorizontalCylinder = 1,
+}
+
 public class AccountSensor
 {
     private readonly List<AccountSensorAlarm> _alarms = null!;
@@ -33,6 +40,8 @@ public class AccountSensor
     public bool AlertsEnabled { get; set; }
     public bool NoMinMaxConstraints { get; set; }
     public double? ManholeAreaM2 { get; set; }
+    public double? DensityKgPerM3 { get; set; }
+    public TankGeometry Geometry { get; set; } = TankGeometry.Default;
     
     public IReadOnlyCollection<AccountSensorAlarm> Alarms => _alarms?.AsReadOnly()!;
 
@@ -104,9 +113,10 @@ public class AccountSensor
 
     public bool HasVolume => 
         Sensor.SupportsCapacity
-        && HasPercentage
-        && CapacityL.HasValue
-        && CapacityL > 0;
+        && (
+            (HasPercentage && CapacityL.HasValue && CapacityL > 0)
+            || (Geometry == TankGeometry.HorizontalCylinder && CapacityL > 0)
+        );
 
     public bool HasTemperature => 
         Sensor.SupportsTemperature;
