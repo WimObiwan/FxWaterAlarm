@@ -152,3 +152,16 @@ Implemented on 2026-05-31:
     - Pressure sensors: `(distance 100%) + ((distance 0%) ?? 0)`
     - Water level sensors: `(distance 0%) - (distance 100%)`
 - Horizontal cylinder validation now depends on a positive derived diameter and a positive `Capacity`.
+
+---------------------
+
+Visualization update after testing:
+Problem:
+  There is a DiagramViewComponent that shows the tank fill level.
+  This is designed for vertical tanks, so it uses the liquid height percentage to fill the diagram.
+  The diagram is not correct for tanks with `HorizontalCylinder` geometry.
+I suggest to:
+- Show a different diagram for `HorizontalCylinder` geometry.  
+- Most accurate would be to use a circle instead of a rectangle.  If possible, also with some "manhole" on top.
+- Add same info as on the default diagram.
+- use a different component for this, to keep the code cleaner and avoid too many conditionals in the existing diagram component.

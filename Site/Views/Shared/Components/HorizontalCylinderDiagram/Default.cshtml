@@ -1,0 +1,76 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@model Site.ViewComponents.HorizontalCylinderDiagramModel
+@inject IViewLocalizer Loc
+
+@{
+    var measurementLevelEx = Model.MeasurementLevelEx;
+    var accountSensor = measurementLevelEx.AccountSensor;
+    var distance = measurementLevelEx.Distance;
+
+    var levelFraction = distance.LevelFraction;
+    var waterL = distance.WaterL;
+    var heightMm = distance.HeightMm;
+    var capacityL = accountSensor.CapacityL;
+    var timestamp = measurementLevelEx.Timestamp.ToLocalTime().ToString("G");
+    var uniqueId = Guid.NewGuid().ToString("N");
+
+    var fillFraction = Math.Clamp(levelFraction ?? 0.0, 0.0, 1.0);
+    var tankTopY = 40.0;
+    var tankHeight = 180.0;
+    var tankBottomY = tankTopY + tankHeight;
+    var fillTopY = tankBottomY - tankHeight * fillFraction;
+}
+
+@if (!levelFraction.HasValue || !waterL.HasValue || !heightMm.HasValue)
+{
+    <div class="alert alert-warning">
+        @Loc["The diagram cannot be displayed because the required data is missing."]
+    </div>
+}
+else
+{
+    <svg class="diagram-svg" style="max-width: 400px; max-height=70vh; object-fit: scale-down;" viewBox="0 0 260 240" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <clipPath id="tankClip-@uniqueId">
+                <circle cx="120" cy="130" r="90" />
+            </clipPath>
+        </defs>
+
+        @* <rect x="105" y="12" width="30" height="16" rx="3" fill="var(--diagram-stroke, black)" /> *@
+
+        <rect x="30" y="@fillTopY" width="180" height="@(tankBottomY - fillTopY)"
+              clip-path="url(#tankClip-@uniqueId)"
+              fill="var(--diagram-dimmed-blue, rgba(0, 0, 255, 0.2))" />
+
+        <path d="
+            M 30 @fillTopY
+            q 10 -3 20 0
+            q 10  3 20 0
+            q 10 -3 20 0
+            q 10  3 20 0
+            q 10 -3 20 0
+            q 10  3 20 0
+            q 10 -3 20 0
+            q 10  3 20 0
+            q 10 -3 20 0
+        "
+        fill="none"
+        stroke="var(--diagram-blue, blue)"
+        stroke-width="2.5"
+        clip-path="url(#tankClip-@uniqueId)" />
+
+        <circle cx="120" cy="130" r="90" fill="none" stroke="var(--diagram-stroke, black)" stroke-width="3" />
+    </svg>
+
+    <!--div style="margin-top: 8px; font-size: 0.95rem; line-height: 1.4;">
+        <div style="font-weight: 600;">@accountSensor.Name</div>
+        <div style="color: var(--diagram-blue, blue);">@Math.Round(waterL.Value, 0) @Loc["liter"]</div>
+        <div>@Math.Round(levelFraction.Value * 100.0, 1)%</div>
+        <div>@heightMm @Loc["mm"]</div>
+        @if (capacityL.HasValue)
+        {
+            <div style="color: var(--diagram-dimmed, gray);">@Loc["Capacity"]: @capacityL @Loc["liter"]</div>
+        }
+        <div style="color: var(--diagram-dimmed, gray);">@timestamp</div>
+    </div-->
+}

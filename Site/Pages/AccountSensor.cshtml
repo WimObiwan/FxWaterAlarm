@@ -376,12 +376,23 @@
             }
         }
         
-        @if (hasTrend && Model.PageType == AccountSensor.PageTypeEnum.Diagram)
-        {            
-            @await Component.InvokeAsync("Diagram", new
+        @if (hasDiagram && Model.PageType == AccountSensor.PageTypeEnum.Diagram)
+        {
+            @if (Model.LastMeasurement is MeasurementLevelEx measurementLevelEx
+                 && measurementLevelEx.AccountSensor.Geometry == TankGeometry.HorizontalCylinder)
             {
-                measurementEx = Model.LastMeasurement
-            })
+                @await Component.InvokeAsync("HorizontalCylinderDiagram", new
+                {
+                    measurementLevelEx = measurementLevelEx
+                })
+            }
+            else
+            {
+                @await Component.InvokeAsync("Diagram", new
+                {
+                    measurementEx = Model.LastMeasurement
+                })
+            }
         }
 
         @if (hasTrend && Model.PageType == AccountSensor.PageTypeEnum.Trend)

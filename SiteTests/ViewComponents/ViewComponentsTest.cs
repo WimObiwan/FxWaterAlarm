@@ -79,6 +79,20 @@ public class ViewComponentsTest
         Assert.Null(model.MeasurementEx);
     }
 
+    [Fact]
+    public async Task HorizontalCylinderDiagramViewComponent_ReturnsViewWithModel()
+    {
+        var component = new HorizontalCylinderDiagramViewComponent();
+        component.ViewComponentContext = CreateViewComponentContext();
+
+        var measurement = TestEntityFactory.CreateMeasurementLevelEx();
+        var result = await component.InvokeAsync(measurement);
+
+        var viewResult = Assert.IsType<ViewViewComponentResult>(result);
+        var model = Assert.IsType<HorizontalCylinderDiagramModel>(viewResult.ViewData!.Model);
+        Assert.Same(measurement, model.MeasurementLevelEx);
+    }
+
     // --- TrendViewComponent ---
 
     [Fact]
