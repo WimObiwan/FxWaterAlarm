@@ -29,7 +29,7 @@ internal readonly record struct MeasurementAxisBounds(double MinValue, double Ma
 [Route("api/a/{AccountLink}/s/{SensorLink}/m")]
 public class AccountSensorMeasurementController : Controller
 {
-    private const double MinimumLevelAxisSpanMm = 300.0;
+    private const double MinimumLevelAxisSpanMm = 500.0;
 
     private readonly IMediator _mediator;
     private readonly IAuditService _auditService;
