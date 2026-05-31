@@ -144,22 +144,7 @@
                                 </select>
                             </td>
                         </tr>
-                        <tr class="horizontal-cylinder-field" style="display: none;">
-                            <td>
-                                @Loc["Capacity"]
-                            </td>
-                            <td>
-                                <div class="input-group mb-3">
-                                    <input type="number" class="form-control" style="width: 100px;" 
-                                        aria-describedby="basic-addon-CapacityL" name="capacityL"
-                                        value="@Model.AccountSensor.CapacityL"/>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text" id="basic-addon-CapacityL">@Loc["liter"]</span>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="default-geometry-field" style="display: none;">
+                        <tr>
                             <td>
                                 @Loc["Capacity"]
                             </td>
@@ -249,9 +234,6 @@
                     const showHorizontalFields = geometrySelect && geometrySelect.value === 'HorizontalCylinder';
                     document.querySelectorAll('.horizontal-cylinder-field').forEach(function(row) {
                         row.style.display = showHorizontalFields ? '' : 'none';
-                    });
-                    document.querySelectorAll('.default-geometry-field').forEach(function(row) {
-                        row.style.display = showHorizontalFields ? 'none' : '';
                     });
                 }
 
