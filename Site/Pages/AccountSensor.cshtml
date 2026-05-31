@@ -494,7 +494,7 @@
                                 {
                                     <button type="button"
                                             class="btn btn-sm btn-outline-danger"
-                                            data-timestamp-utc="@row.Measurement.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")"
+                                            data-timestamp-utc="@row.Measurement.Timestamp.ToString("O")"
                                             data-timestamp-display="@row.Measurement.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")"
                                             onclick="removeMeasurement(this)"
                                             title="@Loc["Remove measurement"]">

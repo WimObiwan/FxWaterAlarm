@@ -1,11 +1,14 @@
+# Runtime
 *.db
 *.db-shm
 *.db-wal
 healthchecksdb
+appsettings.Local.json
+logs/
+
+# IDE / .net
 .idea
 .vs
-appsettings.Local.json
-
 #Ignore thumbnails created by Windows
 Thumbs.db
 #Ignore files built by Visual Studio
@@ -49,5 +52,6 @@ CoverageResults/
 .lens
 *.lscache
 
+# Deployment
 scripts/deploy-wateralarm-dev.sh
 scripts/deploy-wateralarm-prd.sh

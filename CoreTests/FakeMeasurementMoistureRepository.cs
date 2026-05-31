@@ -10,6 +10,8 @@ public class FakeMeasurementMoistureRepository : IMeasurementMoistureRepository
 {
     public MeasurementMoisture? LastResult { get; set; }
     public MeasurementMoisture[]? GetResult { get; set; }
+    public DateTime? LastDeleteFrom { get; private set; }
+    public DateTime? LastDeleteTill { get; private set; }
 
     public Task<MeasurementMoisture?> GetLast(string devEui, CancellationToken cancellationToken) =>
         Task.FromResult(LastResult);
@@ -32,6 +34,10 @@ public class FakeMeasurementMoistureRepository : IMeasurementMoistureRepository
     public Task<MeasurementMoisture[]> GetMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken) =>
         Task.FromResult(GetResult ?? Array.Empty<MeasurementMoisture>());
 
-    public Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken) =>
-        Task.CompletedTask;
+    public Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken)
+    {
+        LastDeleteFrom = from;
+        LastDeleteTill = till;
+        return Task.CompletedTask;
+    }
 }

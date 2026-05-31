@@ -225,9 +225,9 @@ public abstract class MeasurementRepositoryBase<TRecord, TAggregatedRecord, TMea
         using var httpClient = new HttpClient();
         var endpoint = _options.Endpoint;
         
-        // Format timestamps for InfluxDB (RFC3339 format)
-        var fromTimestamp = from.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
-        var tillTimestamp = till.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+        // Format timestamps for InfluxDB using high precision and explicit UTC.
+        var fromTimestamp = from.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
+        var tillTimestamp = till.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
         
         // Construct the delete query
         var deleteQuery = $"DELETE FROM {GetTableName()} WHERE \"DevEUI\" = '{devEui}' AND time >= '{fromTimestamp}' AND time <= '{tillTimestamp}'";
