@@ -13,6 +13,8 @@ public class FakeMeasurementLevelRepository : IMeasurementLevelRepository
     public AggregatedMeasurement[]? AggregatedResult { get; set; }
     public MeasurementLevel? LastBeforeResult { get; set; }
     public AggregatedMeasurement? LastMedianResult { get; set; }
+    public DateTime? LastDeleteFrom { get; private set; }
+    public DateTime? LastDeleteTill { get; private set; }
 
     public Task<MeasurementLevel?> GetLast(string devEui, CancellationToken cancellationToken) =>
         Task.FromResult(LastResult);
@@ -35,6 +37,10 @@ public class FakeMeasurementLevelRepository : IMeasurementLevelRepository
     public Task<MeasurementLevel[]> GetMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken) =>
         Task.FromResult(GetResult ?? Array.Empty<MeasurementLevel>());
 
-    public Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken) =>
-        Task.CompletedTask;
+    public Task DeleteMeasurementsInTimeRange(string devEui, DateTime from, DateTime till, CancellationToken cancellationToken)
+    {
+        LastDeleteFrom = from;
+        LastDeleteTill = till;
+        return Task.CompletedTask;
+    }
 }

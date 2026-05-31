@@ -58,71 +58,85 @@ public class RemoveMeasurementCommandHandler : IRequestHandler<RemoveMeasurement
         {
             case SensorType.Level:
             case SensorType.LevelPressure:
-                await ProcessLevelMeasurements(sensor.DevEui, fromTime, tillTime, cancellationToken);
+                await ProcessMeasurements(
+                    sensor.DevEui,
+                    request.Timestamp,
+                    fromTime,
+                    tillTime,
+                    cancellationToken,
+                    _measurementLevelRepository.GetMeasurementsInTimeRange,
+                    _measurementLevelRepository.DeleteMeasurementsInTimeRange);
                 break;
             case SensorType.Detect:
-                await ProcessDetectMeasurements(sensor.DevEui, fromTime, tillTime, cancellationToken);
+                await ProcessMeasurements(
+                    sensor.DevEui,
+                    request.Timestamp,
+                    fromTime,
+                    tillTime,
+                    cancellationToken,
+                    _measurementDetectRepository.GetMeasurementsInTimeRange,
+                    _measurementDetectRepository.DeleteMeasurementsInTimeRange);
                 break;
             case SensorType.Moisture:
-                await ProcessMoistureMeasurements(sensor.DevEui, fromTime, tillTime, cancellationToken);
+                await ProcessMeasurements(
+                    sensor.DevEui,
+                    request.Timestamp,
+                    fromTime,
+                    tillTime,
+                    cancellationToken,
+                    _measurementMoistureRepository.GetMeasurementsInTimeRange,
+                    _measurementMoistureRepository.DeleteMeasurementsInTimeRange);
                 break;
             case SensorType.Thermometer:
-                await ProcessThermometerMeasurements(sensor.DevEui, fromTime, tillTime, cancellationToken);
+                await ProcessMeasurements(
+                    sensor.DevEui,
+                    request.Timestamp,
+                    fromTime,
+                    tillTime,
+                    cancellationToken,
+                    _measurementThermometerRepository.GetMeasurementsInTimeRange,
+                    _measurementThermometerRepository.DeleteMeasurementsInTimeRange);
                 break;
             default:
                 throw new InvalidOperationException($"Unsupported sensor type: {sensor.Type}");
         }
     }
 
-    private async Task ProcessLevelMeasurements(string devEui, DateTime fromTime, DateTime tillTime, CancellationToken cancellationToken)
+    private static async Task ProcessMeasurements<TMeasurement>(
+        string devEui,
+        DateTime requestedTimestamp,
+        DateTime fromTime,
+        DateTime tillTime,
+        CancellationToken cancellationToken,
+        Func<string, DateTime, DateTime, CancellationToken, Task<TMeasurement[]>> getMeasurementsInTimeRange,
+        Func<string, DateTime, DateTime, CancellationToken, Task> deleteMeasurementsInTimeRange)
+        where TMeasurement : Measurement
     {
-        var measurements = await _measurementLevelRepository.GetMeasurementsInTimeRange(devEui, fromTime, tillTime, cancellationToken);
-        
+        var measurements = await getMeasurementsInTimeRange(devEui, fromTime, tillTime, cancellationToken);
+
         if (measurements.Length == 0)
             throw new InvalidOperationException("No measurements found within the specified time range");
-        
-        if (measurements.Length > 1)
-            throw new InvalidOperationException($"Multiple measurements ({measurements.Length}) found within the specified time range. Expected exactly 1.");
 
-        await _measurementLevelRepository.DeleteMeasurementsInTimeRange(devEui, fromTime, tillTime, cancellationToken);
-    }
+        var ordered = measurements
+            .Select(m => new
+            {
+                Measurement = m,
+                Distance = Math.Abs((m.Timestamp - requestedTimestamp).Ticks)
+            })
+            .OrderBy(x => x.Distance)
+            .ThenBy(x => x.Measurement.Timestamp)
+            .ToArray();
 
-    private async Task ProcessDetectMeasurements(string devEui, DateTime fromTime, DateTime tillTime, CancellationToken cancellationToken)
-    {
-        var measurements = await _measurementDetectRepository.GetMeasurementsInTimeRange(devEui, fromTime, tillTime, cancellationToken);
-        
-        if (measurements.Length == 0)
-            throw new InvalidOperationException("No measurements found within the specified time range");
-        
-        if (measurements.Length > 1)
-            throw new InvalidOperationException($"Multiple measurements ({measurements.Length}) found within the specified time range. Expected exactly 1.");
+        if (ordered.Length > 1 && ordered[0].Distance == ordered[1].Distance)
+            throw new InvalidOperationException(
+                "Multiple measurements are equally close to the specified timestamp. Specify a more precise timestamp.");
 
-        await _measurementDetectRepository.DeleteMeasurementsInTimeRange(devEui, fromTime, tillTime, cancellationToken);
-    }
+        var measurementToDelete = ordered[0].Measurement;
 
-    private async Task ProcessMoistureMeasurements(string devEui, DateTime fromTime, DateTime tillTime, CancellationToken cancellationToken)
-    {
-        var measurements = await _measurementMoistureRepository.GetMeasurementsInTimeRange(devEui, fromTime, tillTime, cancellationToken);
-        
-        if (measurements.Length == 0)
-            throw new InvalidOperationException("No measurements found within the specified time range");
-        
-        if (measurements.Length > 1)
-            throw new InvalidOperationException($"Multiple measurements ({measurements.Length}) found within the specified time range. Expected exactly 1.");
-
-        await _measurementMoistureRepository.DeleteMeasurementsInTimeRange(devEui, fromTime, tillTime, cancellationToken);
-    }
-
-    private async Task ProcessThermometerMeasurements(string devEui, DateTime fromTime, DateTime tillTime, CancellationToken cancellationToken)
-    {
-        var measurements = await _measurementThermometerRepository.GetMeasurementsInTimeRange(devEui, fromTime, tillTime, cancellationToken);
-        
-        if (measurements.Length == 0)
-            throw new InvalidOperationException("No measurements found within the specified time range");
-        
-        if (measurements.Length > 1)
-            throw new InvalidOperationException($"Multiple measurements ({measurements.Length}) found within the specified time range. Expected exactly 1.");
-
-        await _measurementThermometerRepository.DeleteMeasurementsInTimeRange(devEui, fromTime, tillTime, cancellationToken);
+        await deleteMeasurementsInTimeRange(
+            devEui,
+            measurementToDelete.Timestamp,
+            measurementToDelete.Timestamp,
+            cancellationToken);
     }
 }
