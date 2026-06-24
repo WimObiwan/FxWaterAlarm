@@ -14,7 +14,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Svrooij.PowerShell.DependencyInjection" Version="1.1.4" />
-    <PackageReference Include="System.IO.Packaging" Version="10.0.8" />
+    <PackageReference Include="System.IO.Packaging" Version="10.0.9" />
     <!-- Added manually, to fix security vulnerability, comes in via Svrooij.PowerShell.DependencyInjection -->
     <!-- 8.0.3 is the most recent 8.0.x version available -->
     <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.3" />
