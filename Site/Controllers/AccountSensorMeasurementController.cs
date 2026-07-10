@@ -243,6 +243,13 @@ public class AccountSensorMeasurementController : Controller
         if (measurementResults == null)
             return null;
 
+        var (absoluteMin, absoluteMax) = GetAbsoluteAxisBounds(accountSensor, graphType);
+
+        // When both bounds are known (Percentage: 0-100 %, Volume: 0-capacity),
+        // always show the full range from empty to maximum capacity.
+        if (absoluteMin.HasValue && absoluteMax.HasValue)
+            return new MeasurementAxisBounds(absoluteMin.Value, absoluteMax.Value);
+
         var minimumSpan = GetMinimumAxisSpan(accountSensor, graphType);
         if (!minimumSpan.HasValue || minimumSpan.Value <= 0.0)
             return null;
@@ -265,8 +272,6 @@ public class AccountSensorMeasurementController : Controller
             maxValue = Math.Round(midpoint + span / 2.0, 2);
             minValue = Math.Round(midpoint - span / 2.0, 2);
         }
-
-        var (absoluteMin, absoluteMax) = GetAbsoluteAxisBounds(accountSensor, graphType);
 
         if (absoluteMin.HasValue && minValue < absoluteMin.Value)
         {
@@ -311,11 +316,24 @@ public class AccountSensorMeasurementController : Controller
 
         return graphType switch
         {
-            GraphType.Height => (0.0, null),
+            GraphType.Height => (0.0, GetFullHeightMm(accountSensor)),
             GraphType.Distance when accountSensor.Sensor.Type == SensorType.Level => (0.0, null),
             GraphType.Percentage => (0.0, 100.0),
             GraphType.Volume => (0.0, accountSensor.UsableCapacityL ?? accountSensor.CapacityL),
             _ => (null, null)
+        };
+    }
+
+    // Height when full, matching MeasurementDistance.HeightMm (no UnusableHeightMm deduction)
+    private static double? GetFullHeightMm(AccountSensor accountSensor)
+    {
+        return accountSensor.Sensor.Type switch
+        {
+            SensorType.Level when accountSensor.DistanceMmEmpty.HasValue && accountSensor.DistanceMmFull.HasValue
+                => accountSensor.DistanceMmEmpty.Value - accountSensor.DistanceMmFull.Value,
+            SensorType.LevelPressure when accountSensor.DistanceMmFull.HasValue
+                => (accountSensor.DistanceMmEmpty ?? 0) + accountSensor.DistanceMmFull.Value,
+            _ => null
         };
     }
 

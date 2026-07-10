@@ -183,6 +183,75 @@ public class AccountSensorMeasurementControllerTest
     }
 
     [Fact]
+    public async Task Index_ReturnsFullHeightAxisRange_ForHeightGraph()
+    {
+        var (controller, mediator) = CreateController();
+        var accountSensor = TestEntityFactory.CreateAccountSensor(
+            distanceMmEmpty: 2000,
+            distanceMmFull: 500,
+            capacityL: 5000);
+        mediator.AccountSensor = accountSensor;
+        mediator.Measurements =
+        [
+            TestEntityFactory.CreateMeasurementLevelEx(accountSensor, distanceMm: 1000),
+            TestEntityFactory.CreateMeasurementLevelEx(accountSensor, distanceMm: 1010)
+        ];
+
+        var result = await controller.Index("a", "s", graphType: GraphType.Height);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var measurementResult = Assert.IsType<MeasurementResult>(ok.Value);
+        Assert.Equal(0.0, measurementResult.MinValue);
+        Assert.Equal(1500.0, measurementResult.MaxValue);
+    }
+
+    [Fact]
+    public async Task Index_ReturnsFullCapacityAxisRange_ForVolumeGraph()
+    {
+        var (controller, mediator) = CreateController();
+        var accountSensor = TestEntityFactory.CreateAccountSensor(
+            distanceMmEmpty: 2000,
+            distanceMmFull: 500,
+            capacityL: 5000);
+        mediator.AccountSensor = accountSensor;
+        mediator.Measurements =
+        [
+            TestEntityFactory.CreateMeasurementLevelEx(accountSensor, distanceMm: 1000),
+            TestEntityFactory.CreateMeasurementLevelEx(accountSensor, distanceMm: 1010)
+        ];
+
+        var result = await controller.Index("a", "s", graphType: GraphType.Volume);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var measurementResult = Assert.IsType<MeasurementResult>(ok.Value);
+        Assert.Equal(0.0, measurementResult.MinValue);
+        Assert.Equal(5000.0, measurementResult.MaxValue);
+    }
+
+    [Fact]
+    public async Task Index_ReturnsFullAxisRange_ForPercentageGraph()
+    {
+        var (controller, mediator) = CreateController();
+        var accountSensor = TestEntityFactory.CreateAccountSensor(
+            distanceMmEmpty: 2000,
+            distanceMmFull: 500,
+            capacityL: 5000);
+        mediator.AccountSensor = accountSensor;
+        mediator.Measurements =
+        [
+            TestEntityFactory.CreateMeasurementLevelEx(accountSensor, distanceMm: 1000),
+            TestEntityFactory.CreateMeasurementLevelEx(accountSensor, distanceMm: 1010)
+        ];
+
+        var result = await controller.Index("a", "s", graphType: GraphType.Percentage);
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var measurementResult = Assert.IsType<MeasurementResult>(ok.Value);
+        Assert.Equal(0.0, measurementResult.MinValue);
+        Assert.Equal(100.0, measurementResult.MaxValue);
+    }
+
+    [Fact]
     public async Task Index_EnforcesMinimumAxisSpan_ForLevelPressurePercentageGraph()
     {
         var (controller, mediator) = CreateController();
