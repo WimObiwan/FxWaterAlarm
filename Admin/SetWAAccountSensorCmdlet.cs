@@ -83,6 +83,9 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
     [Parameter]
     public TankGeometry? Geometry { get; set; }
 
+    [Parameter]
+    public GraphType? DefaultGraphType { get; set; }
+
     public override async Task ProcessRecordAsync(CancellationToken cancellationToken)
     {
         Guid accountId, sensorId;
@@ -123,6 +126,10 @@ public class SetWAAccountSensorCmdlet : DependencyCmdlet<Startup>
             Geometry = Geometry.HasValue
                 ? new Optional<TankGeometry>(true, Geometry.Value)
                 : new Optional<TankGeometry>(false, default),
+            // GraphType.None clears the default graph (back to automatic)
+            DefaultGraphType = DefaultGraphType.HasValue
+                ? new Optional<GraphType?>(true, DefaultGraphType.Value == GraphType.None ? null : DefaultGraphType.Value)
+                : new Optional<GraphType?>(false, default),
         });
     }
 }

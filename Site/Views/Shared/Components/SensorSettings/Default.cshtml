@@ -219,8 +219,56 @@
                     }
                     <tr>
                         <td>
+                            @Loc["Default graph"]
                         </td>
                         <td>
+                            <select class="form-select" style="width: 220px;" name="defaultGraphType">
+                                <option value="" @(Model.AccountSensor.DefaultGraphType == null ? "selected" : "")>@Loc["Automatic"]</option>
+                                @if (Model.AccountSensor.HasVolume)
+                                {
+                                    <option value="Volume" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.Volume ? "selected" : "")>@Loc["Volume"]</option>
+                                }
+                                @if (Model.AccountSensor.HasPercentage)
+                                {
+                                    <option value="Percentage" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.Percentage ? "selected" : "")>
+                                        @(Model.AccountSensor.Sensor.Type == Core.Entities.SensorType.Moisture ? Loc["Moisture"] : Loc["Percentage"])</option>
+                                }
+                                @if (Model.AccountSensor.HasHeight)
+                                {
+                                    <option value="Height" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.Height ? "selected" : "")>@Loc["Height"]</option>
+                                }
+                                @if (Model.AccountSensor.HasDistance)
+                                {
+                                    <option value="Distance" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.Distance ? "selected" : "")>@Loc["Distance"]</option>
+                                }
+                                @if (Model.AccountSensor.HasTemperature)
+                                {
+                                    <option value="Temperature" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.Temperature ? "selected" : "")>@Loc["Temperature"]</option>
+                                }
+                                @if (Model.AccountSensor.HasConductivity)
+                                {
+                                    <option value="Conductivity" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.Conductivity ? "selected" : "")>@Loc["Conductivity"]</option>
+                                }
+                                @if (Model.AccountSensor.HasStatus)
+                                {
+                                    <option value="Status" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.Status ? "selected" : "")>@Loc["Status"]</option>
+                                }
+                                <option value="RssiDbm" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.RssiDbm ? "selected" : "")>@Loc["Signal"]</option>
+                                <option value="Reception" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.Reception ? "selected" : "")>@Loc["Reception"]</option>
+                                <option value="BatV" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.BatV ? "selected" : "")>@Loc["Battery"]</option>
+                                @if (Model.AccountSensor.Sensor.SupportsTrend)
+                                {
+                                    <option value="Trend" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.Trend ? "selected" : "")>@Loc["Trend"]</option>
+                                }
+                                @if (Model.AccountSensor.Sensor.SupportsDiagram)
+                                {
+                                    <option value="Diagram" @(Model.AccountSensor.DefaultGraphType == Core.Entities.GraphType.Diagram ? "selected" : "")>@Loc["Diagram"]</option>
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-center">
                             <button type="submit" class="btn btn-primary mb-3">@Loc["Submit changes"]</button>
                         </td>
                     </tr>

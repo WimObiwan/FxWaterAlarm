@@ -246,4 +246,64 @@
         <value>Mangat oppervlakte</value>
         <comment>Mangat oppervlakte (voor overloopberekeningen)</comment>
     </data>
+    <data name="Default graph" xml:space="preserve">
+        <value>Standaard grafiek</value>
+        <comment>Default graph</comment>
+    </data>
+    <data name="Automatic" xml:space="preserve">
+        <value>Automatisch</value>
+        <comment>Automatic</comment>
+    </data>
+    <data name="Volume" xml:space="preserve">
+        <value>Volume</value>
+        <comment>Volume</comment>
+    </data>
+    <data name="Percentage" xml:space="preserve">
+        <value>Percentage</value>
+        <comment>Percentage</comment>
+    </data>
+    <data name="Moisture" xml:space="preserve">
+        <value>Vochtigheid</value>
+        <comment>Moisture</comment>
+    </data>
+    <data name="Height" xml:space="preserve">
+        <value>Hoogte</value>
+        <comment>Height</comment>
+    </data>
+    <data name="Distance" xml:space="preserve">
+        <value>Afstand</value>
+        <comment>Distance</comment>
+    </data>
+    <data name="Temperature" xml:space="preserve">
+        <value>Temperatuur</value>
+        <comment>Temperature</comment>
+    </data>
+    <data name="Conductivity" xml:space="preserve">
+        <value>Geleidbaarheid</value>
+        <comment>Conductivity</comment>
+    </data>
+    <data name="Status" xml:space="preserve">
+        <value>Status</value>
+        <comment>Status</comment>
+    </data>
+    <data name="Signal" xml:space="preserve">
+        <value>Signaal</value>
+        <comment>Signal</comment>
+    </data>
+    <data name="Reception" xml:space="preserve">
+        <value>Ontvangst</value>
+        <comment>Reception</comment>
+    </data>
+    <data name="Battery" xml:space="preserve">
+        <value>Batterij</value>
+        <comment>Battery</comment>
+    </data>
+    <data name="Trend" xml:space="preserve">
+        <value>Trend</value>
+        <comment>Trend</comment>
+    </data>
+    <data name="Diagram" xml:space="preserve">
+        <value>Diagram</value>
+        <comment>Diagram</comment>
+    </data>
 </root>

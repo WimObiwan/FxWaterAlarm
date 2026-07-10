@@ -103,6 +103,75 @@ public class UpdateAccountSensorCommandHandlerTest
     }
 
     [Fact]
+    public async Task Handle_UpdatesDefaultGraphType()
+    {
+        await using var db = TestDbContext.Create();
+        var (account, sensor, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+            email: "uasdgt@test.com", accountLink: "uasdgtlink", sensorLink: "uasdgtsensor");
+
+        var handler = new UpdateAccountSensorCommandHandler(db.Context,
+            NullLogger<UpdateAccountSensorCommandHandler>.Instance);
+
+        await handler.Handle(new UpdateAccountSensorCommand
+        {
+            AccountUid = account.Uid,
+            SensorUid = sensor.Uid,
+            DistanceMmEmpty = new Optional<int?>(true, 2000),
+            DistanceMmFull = new Optional<int?>(true, 300),
+            CapacityL = new Optional<int?>(true, 5000),
+            DefaultGraphType = new Optional<GraphType?>(true, GraphType.Percentage)
+        }, CancellationToken.None);
+
+        await using var freshCtx = db.CreateFreshContext();
+        var updated = await freshCtx.Set<AccountSensor>().SingleAsync();
+        Assert.Equal(GraphType.Percentage, updated.DefaultGraphType);
+    }
+
+    [Fact]
+    public async Task Handle_ClearsDefaultGraphType()
+    {
+        await using var db = TestDbContext.Create();
+        var (account, sensor, accountSensor) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+            email: "uasdgtc@test.com", accountLink: "uasdgtclink", sensorLink: "uasdgtcsensor");
+
+        accountSensor.DefaultGraphType = GraphType.Distance;
+        await db.Context.SaveChangesAsync();
+
+        var handler = new UpdateAccountSensorCommandHandler(db.Context,
+            NullLogger<UpdateAccountSensorCommandHandler>.Instance);
+
+        await handler.Handle(new UpdateAccountSensorCommand
+        {
+            AccountUid = account.Uid,
+            SensorUid = sensor.Uid,
+            DefaultGraphType = new Optional<GraphType?>(true, null)
+        }, CancellationToken.None);
+
+        await using var freshCtx = db.CreateFreshContext();
+        var updated = await freshCtx.Set<AccountSensor>().SingleAsync();
+        Assert.Null(updated.DefaultGraphType);
+    }
+
+    [Fact]
+    public async Task Handle_UnsupportedDefaultGraphType_Throws()
+    {
+        await using var db = TestDbContext.Create();
+        var (account, sensor, _) = await TestEntityFactory.SeedAccountWithSensor(db.Context,
+            email: "uasdgtu@test.com", accountLink: "uasdgtulink", sensorLink: "uasdgtusensor");
+
+        var handler = new UpdateAccountSensorCommandHandler(db.Context,
+            NullLogger<UpdateAccountSensorCommandHandler>.Instance);
+
+        // No capacity configured, so Volume graph is not supported
+        await Assert.ThrowsAsync<InvalidOperationException>(() => handler.Handle(new UpdateAccountSensorCommand
+        {
+            AccountUid = account.Uid,
+            SensorUid = sensor.Uid,
+            DefaultGraphType = new Optional<GraphType?>(true, GraphType.Volume)
+        }, CancellationToken.None));
+    }
+
+    [Fact]
     public async Task Handle_UnspecifiedFieldsUnchanged()
     {
         await using var db = TestDbContext.Create();

@@ -15,6 +15,8 @@ public enum GraphType
     Temperature,
     Conductivity,
     Status,
+    Trend,
+    Diagram,
 }
 
 public enum TankGeometry
@@ -42,6 +44,7 @@ public class AccountSensor
     public double? ManholeAreaM2 { get; set; }
     public double? DensityKgPerM3 { get; set; }
     public TankGeometry Geometry { get; set; } = TankGeometry.Default;
+    public GraphType? DefaultGraphType { get; set; }
     
     public IReadOnlyCollection<AccountSensorAlarm> Alarms => _alarms?.AsReadOnly()!;
 
@@ -144,6 +147,12 @@ public class AccountSensor
     {
         get
         {
+            // Trend and Diagram are pages, not measurement graphs
+            if (DefaultGraphType is { } defaultGraphType
+                && defaultGraphType != GraphType.Trend && defaultGraphType != GraphType.Diagram
+                && SupportsGraphType(defaultGraphType))
+                return defaultGraphType;
+
             if (HasVolume)
                 return GraphType.Volume;
             else if (HasPercentage)
@@ -153,6 +162,24 @@ public class AccountSensor
             else
                 return GraphType.None;
         }
+    }
+
+    public bool SupportsGraphType(GraphType graphType)
+    {
+        return graphType switch
+        {
+            GraphType.Volume => HasVolume,
+            GraphType.Percentage => HasPercentage,
+            GraphType.Height => HasHeight,
+            GraphType.Distance => HasDistance,
+            GraphType.Temperature => HasTemperature,
+            GraphType.Conductivity => HasConductivity,
+            GraphType.Status => HasStatus,
+            GraphType.RssiDbm or GraphType.Reception or GraphType.BatV => true,
+            GraphType.Trend => Sensor.SupportsTrend,
+            GraphType.Diagram => Sensor.SupportsDiagram,
+            _ => false
+        };
     }
 
     public void EnsureEnabled()

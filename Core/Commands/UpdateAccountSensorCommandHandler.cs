@@ -24,6 +24,7 @@ public record UpdateAccountSensorCommand : IRequest
     public Optional<double?> ManholeAreaM2 { get; init; }
     public Optional<double?> DensityKgPerM3 { get; init; }
     public Optional<TankGeometry> Geometry { get; init; }
+    public Optional<GraphType?> DefaultGraphType { get; init; }
 }
 
 public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSensorCommand>
@@ -71,6 +72,12 @@ public class UpdateAccountSensorCommandHandler : IRequestHandler<UpdateAccountSe
             accountSensor.DensityKgPerM3 = request.DensityKgPerM3.Value;
         if (request.Geometry is { Specified: true })
             accountSensor.Geometry = request.Geometry.Value;
+        if (request.DefaultGraphType is { Specified: true })
+            accountSensor.DefaultGraphType = request.DefaultGraphType.Value;
+
+        if (request.DefaultGraphType is { Specified: true, Value: { } defaultGraphType }
+            && !accountSensor.SupportsGraphType(defaultGraphType))
+            throw new InvalidOperationException($"DefaultGraphType {defaultGraphType} is not supported by this sensor.");
 
         if (accountSensor.DensityKgPerM3 is { } densityKgPerM3 && densityKgPerM3 <= 0.0)
             throw new InvalidOperationException("DensityKgPerM3 must be greater than zero.");

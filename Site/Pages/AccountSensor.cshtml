@@ -167,6 +167,7 @@
                     }
                     return @"class=""dropdown-item""";
                 }
+
             }
             @if (hasGraph)
             {
@@ -176,7 +177,7 @@
                     @if (accountSensor.HasVolume == true)
                     {
                     <li>
-                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphVolume, AccountSensor.PageTypeEnum.GraphDefault))
+                        <a @Html.Raw(PageTypeSubMenu(AccountSensor.PageTypeEnum.GraphVolume))
                             href="@ConstructUrlFilter(pageType: AccountSensor.PageTypeEnum.GraphVolume)">@Loc["Volume"]</a>
                     </li>
                     }
@@ -289,22 +290,6 @@
             GraphType graphType;
 
             var pageType = Model.PageType;
-
-            if (pageType == AccountSensor.PageTypeEnum.GraphDefault)
-            {
-                if (accountSensor.HasVolume)
-                    pageType = AccountSensor.PageTypeEnum.GraphVolume;
-                else if (accountSensor.HasPercentage)
-                    pageType = AccountSensor.PageTypeEnum.GraphPercentage;
-                else if (accountSensor.HasHeight)
-                    pageType = AccountSensor.PageTypeEnum.GraphHeight;
-                else if (accountSensor.HasDistance)
-                    pageType = AccountSensor.PageTypeEnum.GraphDistance;
-                else if (accountSensor.HasTemperature)
-                    pageType = AccountSensor.PageTypeEnum.GraphTemperature;
-                else if (accountSensor.HasStatus)
-                    pageType = AccountSensor.PageTypeEnum.GraphStatus;
-            }
 
             switch (pageType)
             {

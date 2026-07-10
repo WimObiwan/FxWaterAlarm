@@ -85,6 +85,42 @@ public class AccountSensor : PageModel
 
     public string? QrBaseUrl { get; private set; }
 
+    public static PageTypeEnum ResolveDefaultGraphPageType(Core.Entities.AccountSensor accountSensor)
+    {
+        if (accountSensor.DefaultGraphType is { } defaultGraphType && accountSensor.SupportsGraphType(defaultGraphType))
+        {
+            switch (defaultGraphType)
+            {
+                case GraphType.Volume: return PageTypeEnum.GraphVolume;
+                case GraphType.Percentage: return PageTypeEnum.GraphPercentage;
+                case GraphType.Height: return PageTypeEnum.GraphHeight;
+                case GraphType.Distance: return PageTypeEnum.GraphDistance;
+                case GraphType.Temperature: return PageTypeEnum.GraphTemperature;
+                case GraphType.Conductivity: return PageTypeEnum.GraphConductivity;
+                case GraphType.Status: return PageTypeEnum.GraphStatus;
+                case GraphType.RssiDbm: return PageTypeEnum.GraphSignal;
+                case GraphType.Reception: return PageTypeEnum.GraphReception;
+                case GraphType.BatV: return PageTypeEnum.GraphBattery;
+                case GraphType.Trend: return PageTypeEnum.Trend;
+                case GraphType.Diagram: return PageTypeEnum.Diagram;
+            }
+        }
+
+        if (accountSensor.HasVolume)
+            return PageTypeEnum.GraphVolume;
+        if (accountSensor.HasPercentage)
+            return PageTypeEnum.GraphPercentage;
+        if (accountSensor.HasHeight)
+            return PageTypeEnum.GraphHeight;
+        if (accountSensor.HasDistance)
+            return PageTypeEnum.GraphDistance;
+        if (accountSensor.HasTemperature)
+            return PageTypeEnum.GraphTemperature;
+        if (accountSensor.HasStatus)
+            return PageTypeEnum.GraphStatus;
+        return PageTypeEnum.GraphDefault;
+    }
+
     public async Task OnGet(string accountLink, string sensorLink,
         [FromQuery] PageTypeEnum page = PageTypeEnum.GraphDefault,
         [FromQuery] bool preview = false,
@@ -106,6 +142,9 @@ public class AccountSensor : PageModel
 
         if (AccountSensorEntity != null)
         {
+            if (PageType == PageTypeEnum.GraphDefault)
+                PageType = ResolveDefaultGraphPageType(AccountSensorEntity);
+
             QrBaseUrl = _urlBuilder.BuildUrl(AccountSensorEntity.RestPath);
 
             LastMeasurement = await _mediator.Send(new LastMeasurementQuery
@@ -607,7 +646,8 @@ public class AccountSensor : PageModel
         [FromForm] bool? alertsEnabled,
         [FromForm] string? manholeAreaM2,
         [FromForm] string? densityKgPerM3 = null,
-        [FromForm] TankGeometry? geometry = null)
+        [FromForm] TankGeometry? geometry = null,
+        [FromForm] GraphType? defaultGraphType = null)
     {
         using var actionScope = _auditService.BeginAction("AccountSensor.UpdateSettings", new AuditTarget
         {
@@ -620,7 +660,7 @@ public class AccountSensor : PageModel
             await UpdateSettings(
                 mediator, accountLink, sensorLink, page, sensorName, order,
                 distanceMmFull, distanceMmEmpty, unusableHeightMm, capacityL,
-                alertsEnabled, manholeAreaM2, densityKgPerM3, geometry);
+                alertsEnabled, manholeAreaM2, densityKgPerM3, geometry, defaultGraphType);
 
         if (result == SaveResultEnum.Saved)
         {
@@ -652,7 +692,8 @@ public class AccountSensor : PageModel
         bool? alertsEnabled,
         string? manholeAreaM2,
         string? densityKgPerM3 = null,
-        TankGeometry? geometry = null)
+        TankGeometry? geometry = null,
+        GraphType? defaultGraphType = null)
     {
         if (page != PageTypeEnum.Settings)
         {
@@ -760,6 +801,7 @@ public class AccountSensor : PageModel
                 ManholeAreaM2 = new Optional<double?>(true, manholeAreaM2Parsed),
                 DensityKgPerM3 = new Optional<double?>(true, densityKgPerM3Parsed),
                 Geometry = new Optional<TankGeometry>(true, geometryParsed),
+                DefaultGraphType = new Optional<GraphType?>(true, defaultGraphType),
             });
 
             return SaveResultEnum.Saved;

@@ -18,6 +18,14 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+        <data name="Default graph" xml:space="preserve">
+            <value>Default graph</value>
+            <comment>Default graph</comment>
+        </data>
+        <data name="Automatic" xml:space="preserve">
+            <value>Automatic</value>
+            <comment>Automatic</comment>
+        </data>
         <data name="No alarms configured" xml:space="preserve">
             <value>No alarms configured</value>
             <comment>No alarms configured</comment>

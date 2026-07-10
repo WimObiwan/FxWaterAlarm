@@ -274,6 +274,64 @@ public class AccountSensorComputedTest
         Assert.Equal(GraphType.None, as1.GraphType);
     }
 
+    [Fact]
+    public void GraphType_SupportedDefaultGraphType_ReturnsDefault()
+    {
+        var as1 = CreateAccountSensor(SensorType.Level);
+        as1.DefaultGraphType = GraphType.Percentage;
+        Assert.Equal(GraphType.Percentage, as1.GraphType);
+    }
+
+    [Fact]
+    public void GraphType_UnsupportedDefaultGraphType_FallsBack()
+    {
+        // Level doesn't support conductivity
+        var as1 = CreateAccountSensor(SensorType.Level);
+        as1.DefaultGraphType = GraphType.Conductivity;
+        Assert.Equal(GraphType.Volume, as1.GraphType);
+    }
+
+    [Theory]
+    [InlineData(GraphType.Trend)]
+    [InlineData(GraphType.Diagram)]
+    public void GraphType_PageDefaultGraphType_FallsBack(GraphType defaultGraphType)
+    {
+        // Trend and Diagram are pages, not measurement graphs
+        var as1 = CreateAccountSensor(SensorType.Level);
+        as1.DefaultGraphType = defaultGraphType;
+        Assert.Equal(GraphType.Volume, as1.GraphType);
+    }
+
+    // --- SupportsGraphType ---
+
+    [Theory]
+    [InlineData(GraphType.Volume, true)]
+    [InlineData(GraphType.Percentage, true)]
+    [InlineData(GraphType.Height, true)]
+    [InlineData(GraphType.Distance, true)]
+    [InlineData(GraphType.RssiDbm, true)]
+    [InlineData(GraphType.Reception, true)]
+    [InlineData(GraphType.BatV, true)]
+    [InlineData(GraphType.Temperature, false)]
+    [InlineData(GraphType.Conductivity, false)]
+    [InlineData(GraphType.Status, false)]
+    [InlineData(GraphType.Trend, true)]
+    [InlineData(GraphType.Diagram, true)]
+    [InlineData(GraphType.None, false)]
+    public void SupportsGraphType_Level_FullyConfigured(GraphType graphType, bool expected)
+    {
+        var as1 = CreateAccountSensor(SensorType.Level);
+        Assert.Equal(expected, as1.SupportsGraphType(graphType));
+    }
+
+    [Fact]
+    public void SupportsGraphType_Level_WithoutCapacity_NoVolume()
+    {
+        var as1 = CreateAccountSensor(SensorType.Level, capacityL: null);
+        Assert.False(as1.SupportsGraphType(GraphType.Volume));
+        Assert.True(as1.SupportsGraphType(GraphType.Percentage));
+    }
+
     // --- EnsureEnabled ---
 
     [Fact]
