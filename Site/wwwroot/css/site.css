@@ -95,6 +95,19 @@ body {
     display: none;
 }
 
+/* QR codes are SVG, so they scale to the container without losing sharpness.
+   The width/height attributes on the img supply the aspect ratio, which keeps
+   the space reserved before the image paints. */
+.qr-code {
+    width: 100%;
+    height: auto;
+    max-width: 200px;
+}
+
+.qr-code-sm {
+    max-width: 165px;
+}
+
 /* Dark mode enhancements */
 [data-bs-theme="dark"] .bg-warning-inline {
     background-color: #664d03 !important;

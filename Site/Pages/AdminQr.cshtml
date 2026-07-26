@@ -1,15 +1,11 @@
 @page
-@using QRCoder
-@using SixLabors.ImageSharp
+@using System.Text
+@using Net.Codecrete.QrCodeGenerator
 @model AdminQr
 
 @{
-    QRCodeGenerator qrGenerator = new QRCodeGenerator();
-    QRCodeData qrCodeInfo = qrGenerator.CreateQrCode(Model.QrUrl, QRCodeGenerator.ECCLevel.Q);
-    QRCode qrCode = new QRCode(qrCodeInfo);
-    using Image qrCodeImage = qrCode.GetGraphic(5, Color.Black, Color.Transparent, false);
-    using var memoryStream = new MemoryStream();
-    await qrCodeImage.SaveAsPngAsync(memoryStream);
-    string img = "data:image/png;base64," + Convert.ToBase64String(memoryStream.ToArray());
+    QrCode qrCode = QrCode.EncodeText(Model.QrUrl, QrCode.Ecc.Quartile);
+    string svg = qrCode.ToSvgString(0, "black", "transparent");
+    string img = "data:image/svg+xml;base64," + Convert.ToBase64String(Encoding.UTF8.GetBytes(svg));
 }
-<img alt="qrcode" src="@img"/>
+<img alt="qrcode" src="@img" class="qr-code qr-code-sm" width="165" height="165"/>

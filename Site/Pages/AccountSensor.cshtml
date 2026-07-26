@@ -2,9 +2,9 @@
 @using Core.Entities
 @using Core.Util
 @using Microsoft.AspNetCore.Mvc.Localization
-@using QRCoder
+@using Net.Codecrete.QrCodeGenerator
 @using Site.Utilities
-@using SixLabors.ImageSharp
+@using System.Text
 @using Microsoft.AspNetCore.Http.Extensions
 @model AccountSensor
 @inject IUserInfo UserInfo
@@ -563,14 +563,10 @@
         {
             if (Model.QrBaseUrl is { } qrBaseUrl)
             {
-                QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeInfo = qrGenerator.CreateQrCode(qrBaseUrl, QRCodeGenerator.ECCLevel.Q);
-                QRCode qrCode = new QRCode(qrCodeInfo);
-                using Image qrCodeImage = qrCode.GetGraphic(5);
-                using var memoryStream = new MemoryStream();
-                await qrCodeImage.SaveAsPngAsync(memoryStream);
-                string img = "data:image/png;base64," + Convert.ToBase64String(memoryStream.ToArray());
-                <img alt="qrcode" src="@img"/>
+                QrCode qrCode = QrCode.EncodeText(qrBaseUrl, QrCode.Ecc.Quartile);
+                string svg = qrCode.ToSvgString(4);
+                string img = "data:image/svg+xml;base64," + Convert.ToBase64String(Encoding.UTF8.GetBytes(svg));
+                <img alt="qrcode" src="@img" class="qr-code" width="200" height="200"/>
                 <div>
                     <a id="qrBaseUrl" href="@qrBaseUrl">@qrBaseUrl</a>&nbsp;
                     <button type="button" class="btn btn-clipboard" title="Copy to clipboard" data-clipboard data-clipboard-target="#qrBaseUrl">
