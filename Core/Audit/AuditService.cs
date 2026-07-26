@@ -92,6 +92,7 @@ public sealed class AuditService : IAuditService
 
         return new AuditTarget
         {
+            Email = right?.Email ?? left?.Email,
             AccountUid = right?.AccountUid ?? left?.AccountUid,
             AccountLink = right?.AccountLink ?? left?.AccountLink,
             SensorUid = right?.SensorUid ?? left?.SensorUid,

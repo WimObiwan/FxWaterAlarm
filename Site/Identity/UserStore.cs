@@ -1,9 +1,17 @@
 using Microsoft.AspNetCore.Identity;
+using Site.Security;
 
 namespace Site.Identity;
 
 public class UserStore : IUserStore<IdentityUser>, IUserEmailStore<IdentityUser>
 {
+    private readonly IKnownLoginEmailService _knownLoginEmailService;
+
+    public UserStore(IKnownLoginEmailService knownLoginEmailService)
+    {
+        _knownLoginEmailService = knownLoginEmailService;
+    }
+
     public void Dispose()
     {
     }
@@ -79,13 +87,17 @@ public class UserStore : IUserStore<IdentityUser>, IUserEmailStore<IdentityUser>
         throw new NotImplementedException();
     }
 
-    public Task<IdentityUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+    public async Task<IdentityUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
     {
-        var user =  new IdentityUser()
+        // Only email addresses linked to an account (or an admin address) are known users.
+        // Returning null for anything else stops login tokens from being minted for strangers.
+        if (!await _knownLoginEmailService.IsKnownLoginEmail(normalizedEmail, cancellationToken))
+            return null;
+
+        return new IdentityUser()
         {
             Email = normalizedEmail
         };
-        return Task.FromResult<IdentityUser?>(user);
     }
 
     public Task<string?> GetNormalizedEmailAsync(IdentityUser user, CancellationToken cancellationToken)

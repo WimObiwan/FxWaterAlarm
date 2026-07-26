@@ -1,12 +1,20 @@
 using Microsoft.AspNetCore.Identity;
 using Site.Identity;
+using SiteTests.Helpers;
 using Xunit;
 
 namespace SiteTests.Identity;
 
 public class UserStoreTest
 {
-    private readonly UserStore _store = new();
+    private readonly FakeKnownLoginEmailService _knownEmails = new();
+    private readonly UserStore _store;
+
+    public UserStoreTest()
+    {
+        _knownEmails.KnownEmails.Add("user@test.com");
+        _store = new UserStore(_knownEmails);
+    }
 
     [Fact]
     public async Task GetUserIdAsync_ReturnsEmail()
@@ -25,7 +33,7 @@ public class UserStoreTest
     }
 
     [Fact]
-    public async Task FindByEmailAsync_ReturnsUserWithEmail()
+    public async Task FindByEmailAsync_KnownEmail_ReturnsUserWithEmail()
     {
         var result = await _store.FindByEmailAsync("user@test.com", CancellationToken.None);
         Assert.NotNull(result);
@@ -33,9 +41,34 @@ public class UserStoreTest
     }
 
     [Fact]
+    public async Task FindByEmailAsync_UnknownEmail_ReturnsNull()
+    {
+        var result = await _store.FindByEmailAsync("stranger@example.com", CancellationToken.None);
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task FindByEmailAsync_AdminEmail_ReturnsUser()
+    {
+        _knownEmails.AdminEmails.Add("admin@test.com");
+
+        var result = await _store.FindByEmailAsync("admin@test.com", CancellationToken.None);
+
+        Assert.NotNull(result);
+        Assert.Equal("admin@test.com", result!.Email);
+    }
+
+    [Fact]
+    public async Task FindByEmailAsync_EmptyEmail_ReturnsNull()
+    {
+        var result = await _store.FindByEmailAsync("", CancellationToken.None);
+        Assert.Null(result);
+    }
+
+    [Fact]
     public void Dispose_DoesNotThrow()
     {
-        var store = new UserStore();
+        var store = new UserStore(_knownEmails);
         store.Dispose(); // Should not throw
     }
 

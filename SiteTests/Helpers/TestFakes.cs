@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
+using Site.Security;
 using Site.Services;
 using Site.Utilities;
 
@@ -124,6 +125,19 @@ public class FakeTrendService : ITrendService
 
     public Task<TrendMeasurementEx?[]> GetTrendMeasurements(MeasurementLevelEx lastMeasurementLevelEx, params TimeSpan[] fromHours)
         => Task.FromResult(fromHours.Select(_ => TrendResult).ToArray());
+}
+
+public class FakeKnownLoginEmailService : IKnownLoginEmailService
+{
+    public HashSet<string> KnownEmails { get; } = new(StringComparer.OrdinalIgnoreCase);
+    public HashSet<string> AdminEmails { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public Task<bool> IsKnownLoginEmail(string? emailAddress, CancellationToken cancellationToken = default)
+        => Task.FromResult(!string.IsNullOrWhiteSpace(emailAddress)
+            && (KnownEmails.Contains(emailAddress) || AdminEmails.Contains(emailAddress)));
+
+    public bool IsAdminEmail(string? emailAddress)
+        => !string.IsNullOrWhiteSpace(emailAddress) && AdminEmails.Contains(emailAddress);
 }
 
 public class FakeAuditService : IAuditService

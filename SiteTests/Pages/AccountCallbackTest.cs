@@ -1,3 +1,4 @@
+using Core.Audit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -17,11 +18,13 @@ namespace SiteTests.Pages;
 /// </summary>
 public class AccountCallbackTest
 {
-    private static (AccountCallback model, FakeUserManager userManager, DefaultHttpContext httpContext)
+    private readonly FakeAuditService _auditService = new();
+
+    private (AccountCallback model, FakeUserManager userManager, DefaultHttpContext httpContext)
         CreateModel()
     {
         var userManager = new FakeUserManager();
-        var model = new AccountCallback(userManager, NullLogger<AccountCallback>.Instance);
+        var model = new AccountCallback(userManager, _auditService, NullLogger<AccountCallback>.Instance);
 
         var httpContext = new DefaultHttpContext();
 
@@ -149,17 +152,76 @@ public class AccountCallbackTest
         Assert.Equal("Error", redirect.Url);
     }
 
-    // ---- User not found: throws ----
+    // ---- Unknown user: rejected without signing in ----
 
     [Fact]
-    public async Task OnGet_UserNotFound_Throws()
+    public async Task OnGet_UserNotFound_RedirectsToLoginWithUnknownEmailError()
     {
         var (model, _, _) = CreateModel();
         // Don't add user
 
-        await Assert.ThrowsAsync<Exception>(
-            () => model.OnGet(token: "some-token", email: "unknown@test.com", url: null,
-                configuration: CreateConfiguration()));
+        var result = await model.OnGet(token: "some-token", email: "unknown@test.com", url: null,
+            configuration: CreateConfiguration());
+
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal("/Login", redirect.PageName);
+        Assert.Equal(AccountLoginMessage.UnknownEmailError, redirect.RouteValues!["error"]);
+    }
+
+    [Fact]
+    public async Task OnGet_UserNotFound_IsAudited()
+    {
+        var (model, _, _) = CreateModel();
+
+        await model.OnGet(token: "some-token", email: "unknown@test.com", url: null,
+            configuration: CreateConfiguration());
+
+        Assert.Contains(_auditService.Events, e => e.Action == AccountCallback.AuditActionLogin);
+        var denied = Assert.Single(_auditService.Events, e => e.Outcome == AuditOutcome.Denied);
+        Assert.Equal("Unknown email address", denied.Details?.Reason);
+    }
+
+    // ---- Audit trail for the regular outcomes ----
+
+    [Fact]
+    public async Task OnGet_ValidToken_IsAudited()
+    {
+        var (model, userManager, _) = CreateModel();
+        userManager.AddUser("user@test.com");
+        userManager.VerifyTokenResult = true;
+
+        await model.OnGet(token: "valid-token", email: "user@test.com", url: null,
+            configuration: CreateConfiguration());
+
+        var beginAction = Assert.Single(_auditService.Events, e => e.Action == AccountCallback.AuditActionLogin);
+        Assert.Equal("user@test.com", beginAction.Target?.Email);
+        Assert.Contains(_auditService.Events, e => e.Outcome == AuditOutcome.Succeeded);
+    }
+
+    [Fact]
+    public async Task OnGet_InvalidToken_IsAudited()
+    {
+        var (model, userManager, _) = CreateModel();
+        userManager.AddUser("user@test.com");
+        userManager.VerifyTokenResult = false;
+
+        await model.OnGet(token: "bad-token", email: "user@test.com", url: null,
+            configuration: CreateConfiguration());
+
+        var failed = Assert.Single(_auditService.Events, e => e.Outcome == AuditOutcome.Failed);
+        Assert.Equal("Invalid token", failed.Details?.Reason);
+    }
+
+    [Fact]
+    public async Task OnGet_EmptyToken_SignOutIsAudited()
+    {
+        var (model, _, _) = CreateModel();
+
+        await model.OnGet(token: "", email: "user@test.com", url: null,
+            configuration: CreateConfiguration());
+
+        Assert.Contains(_auditService.Events, e => e.Action == AccountCallback.AuditActionSignOut);
+        Assert.Contains(_auditService.Events, e => e.Outcome == AuditOutcome.Succeeded);
     }
 
     // ---- Token lifespan from configuration ----

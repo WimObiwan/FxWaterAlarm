@@ -24,6 +24,8 @@ public sealed class AuditClient
 
 public sealed class AuditTarget
 {
+    /// <summary>Email address the action applies to, e.g. the login address of an authentication event.</summary>
+    public string? Email { get; init; }
     public Guid? AccountUid { get; init; }
     public string? AccountLink { get; init; }
     public Guid? SensorUid { get; init; }

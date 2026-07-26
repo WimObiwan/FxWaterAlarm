@@ -1,3 +1,4 @@
+using Core.Audit;
 using Core.Queries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,13 +34,28 @@ public class AccountLoginMessageTest
         };
     }
 
-    private static (AccountLoginMessage model, FakeUserManager userManager, ConfigurableFakeMediator mediator, FakeMessenger messenger)
+    /// <summary>Known-email service of the model created by <see cref="CreateModel"/>.</summary>
+    private readonly FakeKnownLoginEmailService _knownEmails = new();
+
+    /// <summary>Audit service of the model created by <see cref="CreateModel"/>.</summary>
+    private readonly FakeAuditService _auditService = new();
+
+    /// <summary>Registers an email address as both an identity user and a known login address.</summary>
+    private void AddKnownUser(FakeUserManager userManager, string email)
+    {
+        userManager.AddUser(email);
+        _knownEmails.KnownEmails.Add(email);
+    }
+
+    private (AccountLoginMessage model, FakeUserManager userManager, ConfigurableFakeMediator mediator, FakeMessenger messenger)
         CreateModel(AccountLoginMessageOptions? options = null)
     {
         var userManager = new FakeUserManager();
         var mediator = new ConfigurableFakeMediator();
         var messenger = new FakeMessenger();
         options ??= CreateOptions();
+        foreach (var adminEmail in options.AdminEmails ?? Array.Empty<string>())
+            _knownEmails.AdminEmails.Add(adminEmail);
         var loginSecurityService = new AllowAllLoginSecurityService();
         var model = new AccountLoginMessage(
             userManager,
@@ -47,6 +63,8 @@ public class AccountLoginMessageTest
             messenger,
             Options.Create(options),
             loginSecurityService,
+            _knownEmails,
+            _auditService,
             NullLogger<AccountLoginMessage>.Instance);
 
         // Set up PageContext with routing so Url.PageLink works for relative page paths
@@ -149,7 +167,7 @@ public class AccountLoginMessageTest
 
         var account = TestEntityFactory.CreateAccount(link: "my-link", email: "owner@example.com");
         mediator.SetResponse<AccountByLinkQuery, Core.Entities.Account?>(account);
-        userManager.AddUser("owner@example.com");
+        AddKnownUser(userManager, "owner@example.com");
 
         var result = await model.OnGet(mode: 1, accountLink: "my-link");
 
@@ -174,8 +192,8 @@ public class AccountLoginMessageTest
     public async Task OnGet_Mode3_WithEmail_SendsMailToProvidedEmail()
     {
         var (model, userManager, _, messenger) = CreateModel(
-            CreateOptions(adminEmails: new[] { "admin@test.com" }));
-        userManager.AddUser("custom-admin@test.com");
+            CreateOptions(adminEmails: new[] { "admin@test.com", "custom-admin@test.com" }));
+        AddKnownUser(userManager, "custom-admin@test.com");
 
         var result = await model.OnGet(mode: 3, emailAddress: "custom-admin@test.com");
 
@@ -186,11 +204,29 @@ public class AccountLoginMessageTest
     }
 
     [Fact]
+    public async Task OnGet_Mode3_NonAdminEmail_SendsNoMailAndRedirectsToLogin()
+    {
+        var (model, userManager, _, messenger) = CreateModel(
+            CreateOptions(adminEmails: new[] { "admin@test.com" }));
+        // A regular account holder is a known login address, but not an admin address.
+        AddKnownUser(userManager, "victim@example.com");
+
+        var result = await model.OnGet(mode: 3, emailAddress: "victim@example.com");
+
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal("/Login", redirect.PageName);
+        Assert.Equal(AccountLoginMessage.UnknownEmailError, redirect.RouteValues!["error"]);
+        Assert.Empty(messenger.AuthMails);
+        Assert.Contains(_auditService.Events, e =>
+            e.Outcome == AuditOutcome.Denied && e.Details?.Reason == "Not an admin email address");
+    }
+
+    [Fact]
     public async Task OnGet_Mode3_WithoutEmail_UsesConfiguredAdminEmail()
     {
         var (model, userManager, _, messenger) = CreateModel(
             CreateOptions(adminEmails: new[] { "admin@test.com" }));
-        userManager.AddUser("admin@test.com");
+        AddKnownUser(userManager, "admin@test.com");
 
         var result = await model.OnGet(mode: 3, emailAddress: null);
 
@@ -224,7 +260,7 @@ public class AccountLoginMessageTest
         var (model, userManager, mediator, messenger) = CreateModel();
         var account = TestEntityFactory.CreateAccount(link: "my-link", email: "owner@example.com");
         mediator.SetResponse<AccountByLinkQuery, Core.Entities.Account?>(account);
-        userManager.AddUser("owner@example.com");
+        AddKnownUser(userManager, "owner@example.com");
 
         var result = await model.OnGet(mode: 1, accountLink: "my-link");
 
@@ -243,7 +279,7 @@ public class AccountLoginMessageTest
         var (model, userManager, mediator, messenger) = CreateModel();
         var account = TestEntityFactory.CreateAccount(link: "demo-link", email: "demo@wateralarm.be", isDemo: true);
         mediator.SetResponse<AccountByLinkQuery, Core.Entities.Account?>(account);
-        userManager.AddUser("demo@wateralarm.be");
+        AddKnownUser(userManager, "demo@wateralarm.be");
 
         var result = await model.OnGet(mode: 1, accountLink: "demo-link");
 
@@ -272,7 +308,7 @@ public class AccountLoginMessageTest
     public async Task OnPost_Mode21_SendsMailToEmail()
     {
         var (model, userManager, _, messenger) = CreateModel();
-        userManager.AddUser("user@example.com");
+        AddKnownUser(userManager, "user@example.com");
 
         var result = await model.OnPost(mode: 21, accountLink: null,
             emailAddress: "user@example.com", cookie: null, returnUrl: null, code: null);
@@ -280,6 +316,79 @@ public class AccountLoginMessageTest
         var redirect = Assert.IsType<RedirectResult>(result);
         Assert.Contains("m=11", redirect.Url);
         Assert.Single(messenger.AuthMails);
+    }
+
+    // ---- OnPost mode 21: unknown email addresses are rejected ----
+
+    [Fact]
+    public async Task OnPost_Mode21_UnknownEmail_SendsNoMailAndRedirectsToLogin()
+    {
+        var (model, _, _, messenger) = CreateModel();
+        // No user registered: "stranger@example.com" is not linked to any account.
+
+        var result = await model.OnPost(mode: 21, accountLink: null,
+            emailAddress: "stranger@example.com", cookie: null, returnUrl: null, code: null);
+
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal("/Login", redirect.PageName);
+        Assert.Equal(AccountLoginMessage.UnknownEmailError, redirect.RouteValues!["error"]);
+        Assert.Empty(messenger.AuthMails);
+    }
+
+    [Fact]
+    public async Task OnPost_Mode21_UnknownEmail_KeepsReturnUrl()
+    {
+        var (model, _, _, _) = CreateModel();
+
+        var result = await model.OnPost(mode: 21, accountLink: null,
+            emailAddress: "stranger@example.com", cookie: null, returnUrl: "/a/my-link", code: null);
+
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal("/a/my-link", redirect.RouteValues!["r"]);
+    }
+
+    [Fact]
+    public async Task OnPost_Mode21_UnknownEmail_IsAudited()
+    {
+        var (model, _, _, _) = CreateModel();
+
+        await model.OnPost(mode: 21, accountLink: null,
+            emailAddress: "stranger@example.com", cookie: null, returnUrl: null, code: null);
+
+        Assert.Contains(_auditService.Events, e =>
+            e.Action == AccountLoginMessage.AuditActionCodeRequested);
+        var denied = Assert.Single(_auditService.Events, e => e.Outcome == AuditOutcome.Denied);
+        Assert.Equal("Unknown email address", denied.Details?.Reason);
+        Assert.Equal("stranger@example.com", denied.Target?.Email);
+    }
+
+    [Fact]
+    public async Task OnPost_Mode21_KnownEmail_IsAudited()
+    {
+        var (model, userManager, _, _) = CreateModel();
+        AddKnownUser(userManager, "user@example.com");
+
+        await model.OnPost(mode: 21, accountLink: null,
+            emailAddress: "user@example.com", cookie: null, returnUrl: null, code: null);
+
+        var succeeded = Assert.Single(_auditService.Events, e => e.Outcome == AuditOutcome.Succeeded);
+        Assert.Equal("user@example.com", succeeded.Target?.Email);
+        Assert.Contains(_auditService.Events, e =>
+            e.Action == AccountLoginMessage.AuditActionCodeRequested && e.Outcome == AuditOutcome.Attempted);
+    }
+
+    [Fact]
+    public async Task OnPost_Mode22_InvalidCode_IsAudited()
+    {
+        var (model, _, _, _) = CreateModel();
+
+        await model.OnPost(mode: 22, accountLink: "link",
+            emailAddress: "user@example.com", cookie: "bad-cookie", returnUrl: null, code: "000000");
+
+        Assert.Contains(_auditService.Events, e =>
+            e.Action == AccountLoginMessage.AuditActionCodeVerified);
+        var failed = Assert.Single(_auditService.Events, e => e.Outcome == AuditOutcome.Failed);
+        Assert.Equal("Invalid code", failed.Details?.Reason);
     }
 
     [Fact]

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Core.Audit;
 using Core.Commands;
 using Core.Entities;
 
@@ -18,12 +19,15 @@ public class GoogleCallback : PageModel
     internal const string PickerProtectionPurpose = "AccountPicker.GoogleToken";
 
     private readonly IMediator _mediator;
+    private readonly IAuditService _auditService;
     private readonly ILogger<GoogleCallback> _logger;
     private readonly IDataProtectionProvider _dataProtectionProvider;
 
-    public GoogleCallback(IMediator mediator, ILogger<GoogleCallback> logger, IDataProtectionProvider dataProtectionProvider)
+    public GoogleCallback(IMediator mediator, IAuditService auditService, ILogger<GoogleCallback> logger,
+        IDataProtectionProvider dataProtectionProvider)
     {
         _mediator = mediator;
+        _auditService = auditService;
         _logger = logger;
         _dataProtectionProvider = dataProtectionProvider;
     }
@@ -34,11 +38,15 @@ public class GoogleCallback : PageModel
         [FromQuery(Name = "a")] string? accountLink,
         [FromServices] IConfiguration configuration)
     {
+        using var auditScope = _auditService.BeginAction(AccountCallback.AuditActionLogin);
+        await _auditService.LogAsync(AuditOutcome.Attempted);
+
         var result = await HttpContext.AuthenticateAsync("ExternalCookie");
         if (!result.Succeeded)
         {
             _logger.LogWarning("Google callback: external authentication result missing or invalid from IP {IpAddress}",
                 HttpContext.Connection.RemoteIpAddress);
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Google authentication failed" });
             return RedirectToPage("/Login", new { error = "google_failed" });
         }
 
@@ -60,6 +68,9 @@ public class GoogleCallback : PageModel
             _logger.LogWarning(
                 "Google login rejected: email not present or not verified (email={Email}, email_verified={EmailVerified})",
                 email, emailVerified);
+            await _auditService.LogAsync(AuditOutcome.Denied,
+                new AuditDetails { Reason = "Email address not present or not verified" },
+                target: new AuditTarget { Email = email });
             return RedirectToPage("/Login", new { error = "email_not_verified" });
         }
 
@@ -67,6 +78,9 @@ public class GoogleCallback : PageModel
         {
             _logger.LogWarning("Google callback: missing sub claim from IP {IpAddress}",
                 HttpContext.Connection.RemoteIpAddress);
+            await _auditService.LogAsync(AuditOutcome.Failed,
+                new AuditDetails { Reason = "Missing sub claim" },
+                target: new AuditTarget { Email = email });
             return RedirectToPage("/Login", new { error = "google_failed" });
         }
 
@@ -95,6 +109,9 @@ public class GoogleCallback : PageModel
             if (linkedAccount == null)
             {
                 _logger.LogWarning("Google login: linked account not found for sub {Sub}", googleSub);
+                await _auditService.LogAsync(AuditOutcome.Failed,
+                    new AuditDetails { Reason = "Linked account not found" },
+                    target: new AuditTarget { Email = email });
                 return RedirectToPage("/Login", new { error = "no_account" });
             }
             return await SignInAccount(linkedAccount, googleSub, returnUrl, configuration);
@@ -106,6 +123,9 @@ public class GoogleCallback : PageModel
         if (accounts.Count == 0)
         {
             _logger.LogWarning("Google login: no WaterAlarm account found for email {Email} / sub {Sub}", email, googleSub);
+            await _auditService.LogAsync(AuditOutcome.Denied,
+                new AuditDetails { Reason = "Unknown email address" },
+                target: new AuditTarget { Email = email });
             return RedirectToPage("/Login", new { error = "no_account" });
         }
 
@@ -239,6 +259,8 @@ public class GoogleCallback : PageModel
         _logger.LogInformation(
             "Google login succeeded for email {Email} (account {AccountId}) from IP {IpAddress}",
             account.Email, account.Id, HttpContext.Connection.RemoteIpAddress);
+        await _auditService.LogAsync(AuditOutcome.Succeeded,
+            target: new AuditTarget { Email = account.Email, AccountUid = account.Uid });
 
         return Redirect(returnUrl ?? "/auto");
     }

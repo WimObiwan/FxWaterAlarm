@@ -55,4 +55,7 @@
     <data name="Error_google_not_configured" xml:space="preserve">
         <value>Google login is not available at this time.</value>
     </data>
+    <data name="Error_unknown_email" xml:space="preserve">
+        <value>This e-mail address is not known. Please use the e-mail address linked to your WaterAlarm account.</value>
+    </data>
 </root>

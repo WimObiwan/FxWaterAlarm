@@ -55,4 +55,7 @@
     <data name="Error_google_not_configured" xml:space="preserve">
         <value>Google-aanmelding is momenteel niet beschikbaar.</value>
     </data>
+    <data name="Error_unknown_email" xml:space="preserve">
+        <value>Dit e-mailadres is niet gekend. Gebruik het e-mailadres dat aan uw WaterAlarm-account gekoppeld is.</value>
+    </data>
 </root>

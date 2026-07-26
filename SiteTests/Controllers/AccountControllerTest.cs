@@ -44,11 +44,13 @@ public class AccountControllerTest
         public void SaveTempData(HttpContext context, IDictionary<string, object?> values) { }
     }
 
-    private static (AccountController controller, FakeUserManager userManager, FakeAuthenticationService authService) CreateController()
+    private readonly FakeAuditService _auditService = new();
+
+    private (AccountController controller, FakeUserManager userManager, FakeAuthenticationService authService) CreateController()
     {
         var userManager = new FakeUserManager();
         var authService = new FakeAuthenticationService();
-        var controller = new AccountController(userManager);
+        var controller = new AccountController(userManager, _auditService);
 
         var services = new ServiceCollection();
         services.AddSingleton<IAuthenticationService>(authService);
@@ -108,13 +110,19 @@ public class AccountControllerTest
     }
 
     [Fact]
-    public async Task LoginCallback_UserNotFound_ThrowsException()
+    public async Task LoginCallback_UserNotFound_RedirectsToLoginWithUnknownEmailError()
     {
-        var (controller, _, _) = CreateController();
+        var (controller, _, authService) = CreateController();
         var config = CreateConfiguration();
 
-        await Assert.ThrowsAsync<Exception>(() =>
-            controller.LoginCallback("token", "nonexistent@test.com", config));
+        var result = await controller.LoginCallback("token", "nonexistent@test.com", config);
+
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal("/Login", redirect.PageName);
+        Assert.Equal(Site.Pages.AccountLoginMessage.UnknownEmailError, redirect.RouteValues!["error"]);
+        Assert.False(authService.SignedIn);
+        Assert.Contains(_auditService.Events, e =>
+            e.Outcome == Core.Audit.AuditOutcome.Denied && e.Details?.Reason == "Unknown email address");
     }
 
     [Fact]

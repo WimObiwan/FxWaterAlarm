@@ -142,6 +142,7 @@ builder.Services.AddTransient<ITrendService, TrendService>();
 builder.Services.AddSingleton<IMcpDocumentationService, McpDocumentationService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<ILoginSecurityService, LoginSecurityService>();
+builder.Services.AddTransient<IKnownLoginEmailService, KnownLoginEmailService>();
 
 builder.Services.Configure<GoogleAuthOptions>(builder.Configuration.GetSection(GoogleAuthOptions.Location));
 var googleAuthOptions = builder.Configuration.GetSection(GoogleAuthOptions.Location).Get<GoogleAuthOptions>() ?? new GoogleAuthOptions();
