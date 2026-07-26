@@ -14,10 +14,11 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Svrooij.PowerShell.DependencyInjection" Version="1.1.4" />
-    <PackageReference Include="System.IO.Packaging" Version="10.0.9" />
+    <PackageReference Include="System.IO.Packaging" Version="10.0.10" />
     <!-- Added manually, to fix security vulnerability, comes in via Svrooij.PowerShell.DependencyInjection -->
-    <!-- 8.0.3 is the most recent 8.0.x version available -->
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.3" />
+    <!-- 10.0.10 is the most recent 10.0.x version available -->
+    <!-- Best wait to upgrade to any future .net version, before that .net version is supported by pwsh! -->
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
   </ItemGroup>
 
   <ItemGroup>

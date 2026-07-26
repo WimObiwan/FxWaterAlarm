@@ -12,20 +12,27 @@
 
     <ItemGroup>
         <PackageReference Include="CommandLineParser" Version="2.9.1" />
-        <PackageReference Include="GitInfo" Version="3.6.0">
+        <PackageReference Include="GitInfo" Version="3.6.1">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="MediatR" Version="14.1.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+        <PackageReference Include="MediatR" Version="14.2.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.9" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.10" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.10" />
         <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+        <!-- Added manually, to fix security vulnerability (CVE-2025-6965, GHSA-2m69-gcr7-jv3q) in the -->
+        <!-- SQLitePCLRaw.lib.e_sqlite3 <= 2.1.11 native SQLite build, which comes in via -->
+        <!-- Microsoft.EntityFrameworkCore.Sqlite. Remove once we're on EF Core 10.0.11+, which pins -->
+        <!-- bundle_e_sqlite3 2.1.12 itself. See https://github.com/dotnet/efcore/issues/38257 -->
+        <!-- Also remove before moving to EF Core 11: it switches to SQLite3MC.PCLRaw.bundle, which -->
+        <!-- conflicts with a direct bundle_e_sqlite3 reference. -->
+        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
         <PackageReference Include="Vibrant.InfluxDB.Client" Version="4.0.4" />
     </ItemGroup>
 
