@@ -16,20 +16,30 @@ Onboarding procedure
 ## 2. Register in TTN
 
 * Go to TTN --> Application
-	* https://eu1.cloud.thethings.network/console/applications/fx-dragino-ldds75 
-	* "Select the end device in the LoRaWAN Device Repository"
-	* "Dragino"
-	* "LDDS75"
-	* "Unknown"
-	* "1.2" (=last)
-	* "EU 863 870"
-	* "Europe 863-870 MHz (SF9 for RX2)"
-	* JoinEUI (=AppEui)
-	* Id: fx-waterlevel2-<number>
+	* LDDS75
+		* https://eu1.cloud.thethings.network/console/applications/fx-dragino-ldds75 
+		* "Select the end device in the LoRaWAN Device Repository"
+		* "Dragino"
+		* "LDDS75"
+		* "Unknown"
+		* "1.2" (=last)
+		* "EU 863 870"
+		* "Europe 863-870 MHz (SF9 for RX2)"
+		* JoinEUI (=AppEui)
+		* Id: fx-waterlevel2-<number>
+	* DDS75-LB
+		* https://eu1.cloud.thethings.network/console/applications/fx-dragino-dds75-lb
+		* Manual
+		* 86x
+		* 1.0.3
+		* JoinEUI = AppEUI
+		* DevEUI
+		* AppKey
+		* Id: fx-waterlevel3-<number>
 * Set name fx-ttn-...
 * Set location
 	* https://whatismyelevation.com/
-* Set payload formatter!
+* ~~Set payload formatter!~~
 
 ## 3. Turn on device
 
