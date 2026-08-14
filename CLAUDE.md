@@ -60,7 +60,31 @@ Alarm checking is a Core command (`CheckAccountSensorAlarmsCommandHandler` / `Ch
 
 `appsettings.json` + optional git-ignored `appsettings.Local.json` (both Site and Admin) for secrets/local overrides: connection string `WaterAlarmDb`, `Influx` section, SMTP credentials, Google auth, API keys.
 
+## Documentation
+
+Two trees, two audiences. Full conventions in `.claude/rules/documentation.md` — read it
+before adding or renaming any documentation file.
+
+| Tree | Audience | Language | Published? |
+| ---- | -------- | -------- | ---------- |
+| `Docs/` | customers and installers | **Dutch** | yes — live on https://wateralarm.be/Docs/ |
+| `InternalDocs/` | developer/ops notes | **English** | no — repo only |
+
+**`Docs/`** is markdown, served live: `Site/wwwroot/Docs` is a symlink to `../../Docs` and
+`Site/Program.cs` registers it via `AddMarkdownProcessingFolder`. No build step or route to
+add — dropping a file in `Docs/` publishes it. Filenames are CamelCase with underscores for
+spaces (`Sensor_Nodes/Home_Assistant.md`), because the filename becomes the URL and the
+breadcrumb title (`_` → space). Every folder has an `index.md` listing its children; link
+new pages from it. Renaming breaks public URLs. Everything under `Docs/` is public,
+including `_Admin/` (unlisted, not authenticated) — no secrets, no customer data.
+
+**`InternalDocs/`** is the project's lab notebook (same spirit as the `homelab-ops`
+workspace): `state/YYYY-MM-DD-<topic>.md` for dated findings, `decisions/` for durable
+decisions, `runbooks/` for procedures, `backlog.md` for loose ends. Lowercase-kebab
+filenames. Write findings down as you go (problem → checked → findings → open questions),
+mark how each was established, and promote what lasts into `decisions/`/`runbooks/`. See
+`InternalDocs/README.md`.
+
 ## Notes
 
-- `Docs/` contains user/ops documentation, largely in Dutch.
 - Site project has a known CS1998 warning in TrendService.cs; it is expected.

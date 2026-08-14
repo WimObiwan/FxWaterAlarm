@@ -9,6 +9,7 @@ logs/
 # IDE / .net
 .idea
 .vs
+.claude/settings.local.json
 #Ignore thumbnails created by Windows
 Thumbs.db
 #Ignore files built by Visual Studio
