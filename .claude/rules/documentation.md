@@ -47,6 +47,10 @@ rendered live from disk — no build step, no page registration, no route to add
 `.md` file in `Docs/` publishes it at the matching URL on the next request. Edit `Docs/`,
 never the symlink path.
 
+**Tables: no column alignment.** The Markdig pipeline has the emoji extension enabled, which
+rewrites `:|` into 😐 — so a right-aligned delimiter row (`|---:|---:|`) is mangled and the
+whole table renders as a paragraph.  Use plain `|---|---|` delimiters.
+
 `Site/Services/McpDocumentationService.cs` also indexes this tree for the `/mcp`
 documentation endpoint, so anything here is machine-readable for third parties too.
 
