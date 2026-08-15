@@ -292,7 +292,7 @@ De gateway moet de sensor kunnen horen én zelf op het internet geraken.
 
 ### LoRa of 5G?
 
-<img src="_Tekeningen/Keuze_Verbinding.svg" alt="Beslissingsboom: geen WiFi of ethernet bij de meetplaats betekent 5G; met internet ter plaatse is LoRa de betere keuze bij een diepe betonnen put of een metalen deksel en vanaf zeven sensoren, in de overige gevallen gaan beide" class="img-fluid" style="max-width: 660px;">
+<img src="_Tekeningen/Keuze_Verbinding.svg" alt="Beslissingsboom: geen WiFi of ethernet bij de meetplaats betekent 5G; met internet ter plaatse is LoRa de betere keuze bij een diepe betonnen put of een metalen deksel en bij meerdere sensoren op dezelfde locatie, in de overige gevallen gaan beide" class="img-fluid" style="max-width: 660px;">
 
 **Kort:** geen internet ter plaatse → 5G.  Diep in beton of onder een metalen deksel → LoRa.
 In alle andere gevallen gaan beide, en is 5G het eenvoudigst te installeren.

@@ -316,8 +316,8 @@ def keuze_verbinding():
     rows = [
         (196, "Diep in een betonnen put,\nof onder een metalen deksel?", "LoRa",
          "komt beter door beton, verbruikt minder"),
-        (272, "Zeven sensoren of meer\nop dezelfde locatie?", "LoRa",
-         "de gateway betaalt zichzelf terug"),
+        (272, "Meerdere sensoren op dezelfde\nlocatie (of gedeeld met buren)?",
+         "LoRa", "één gateway bedient ze allemaal"),
         (344, "Anders?", "beide gaan",
          "5G is het eenvoudigst te installeren"),
     ]
