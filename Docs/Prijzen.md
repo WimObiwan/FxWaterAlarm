@@ -104,9 +104,8 @@ Twee regenputten en een lekdetectie in de kelder:
 | Abonnement vanaf het tweede jaar (3 sensoren) | 90 € / jaar |
 
 > **Waarom is 5G hier goedkoper?**  De gateway kost 130 €, terwijl je per sensor slechts 20 €
-> bespaart met LoRa.  Op aankoopprijs alleen wordt LoRa pas voordeliger vanaf ongeveer zeven
-> sensoren.  Kies LoRa dus in de eerste plaats omwille van de betrouwbaarheid — zeker bij diepe
-> betonnen putten of metalen deksels, waar 5G-ontvangst een probleem kan zijn.
+> bespaart met LoRa.  Kies LoRa dus in de eerste plaats omwille van de betrouwbaarheid — zeker bij
+> diepe betonnen putten of metalen deksels, waar 5G-ontvangst een probleem kan zijn.
 
 ## Wat als een sensor toch niet past?
 
