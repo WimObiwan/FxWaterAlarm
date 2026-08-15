@@ -145,9 +145,12 @@ class Sketch:
     def ellipse(self, cx, cy, rx, ry, stroke: str | None = None,
                 width: float = 1.6, passes: int = 2, fill: str | None = None,
                 fill_opacity: float = 1.0, dash: str | None = None,
-                opacity: float = 1.0, steps: int = 16, start: float = 0.0,
-                end: float = 2 * math.pi, close: bool = True,
-                bow: float = 0.7) -> None:
+                opacity: float = 1.0, steps: int | None = None,
+                start: float = 0.0, end: float = 2 * math.pi,
+                close: bool = True, bow: float = 0.7) -> None:
+        if steps is None:
+            # enough segments that a big circle does not read as a polygon
+            steps = max(16, int(math.pi * (rx + ry) / 11))
         pts = []
         for i in range(steps + 1):
             a = start + (end - start) * i / steps
@@ -230,6 +233,87 @@ class Sketch:
             self.arc(cx, cy, start_r + i * step, direction - spread / 2,
                      direction + spread / 2, stroke=stroke or self.BRAND,
                      width=width, passes=1, opacity=0.9 - i * 0.15)
+
+    def cloud(self, cx: float, cy: float, w: float, h: float,
+              stroke: str | None = None, width: float = 1.6,
+              fill: str | None = None, fill_opacity: float = 0.10) -> float:
+        """A lumpy cloud - the internet, a network, anything 'out there'.
+
+        Fits the box (cx, cy) +- (w/2, h/2).  Returns the y at which a caption
+        sits optically centred inside it.
+        """
+        stroke = stroke or self.INK
+        bottom = cy + h / 2
+        left, right = cx - w / 2, cx + w / 2
+        # (position along the bottom, radius as a fraction of the largest bump)
+        bumps = [(0.15, 0.62), (0.42, 1.0), (0.69, 0.80), (0.90, 0.55)]
+        big = h / 1.55                      # so the tallest bump fills h
+        top = bottom
+        for t, rf in bumps:
+            r = big * rf
+            top = min(top, bottom - r * 0.55 - r)
+        if fill:
+            ry = (bottom - top) / 2
+            self.parts.append(
+                f'<ellipse cx="{self._f(cx)}" cy="{self._f(bottom - ry * 0.92)}" '
+                f'rx="{self._f(w * 0.46)}" ry="{self._f(ry * 0.96)}" '
+                f'fill="{fill}" fill-opacity="{self._f(fill_opacity)}" '
+                f'stroke="none" />')
+        for t, rf in bumps:
+            r = big * rf
+            bx = left + (right - left) * t
+            self.arc(bx, bottom - r * 0.55, r, 185, 355, stroke=stroke,
+                     width=width, passes=1)
+        self._rough_segments([P(left + w * 0.06, bottom), P(right - w * 0.06, bottom)],
+                             stroke, width, passes=1)
+        return bottom - (bottom - top) * 0.42
+
+    # --- blocks ------------------------------------------------------------
+    def box(self, x, y, w, h, lines: str | Sequence[str] = (), size: float = 14,
+            stroke: str | None = None, color: str | None = None,
+            fill: str | None = None, fill_opacity: float = 0.10,
+            width: float = 1.8, weight: str = "600", dash: str | None = None,
+            leading: float = 1.35, hatch: float | None = None,
+            hatch_color: str | None = None) -> tuple[float, float]:
+        """A labelled box.  Returns its centre, handy for drawing arrows."""
+        stroke = stroke or self.INK
+        self.rect(x, y, w, h, stroke=stroke, width=width, fill=fill,
+                  fill_opacity=fill_opacity, dash=dash, hatch=hatch,
+                  hatch_color=hatch_color, hatch_spacing=8, hatch_opacity=0.5)
+        if isinstance(lines, str):
+            lines = [lines]
+        cx, cy = x + w / 2, y + h / 2
+        step = size * leading
+        top = cy - step * (len(lines) - 1) / 2
+        for i, line in enumerate(lines):
+            self.text(cx, top + i * step, line, size=size,
+                      color=color or self.INK, anchor="middle", weight=weight,
+                      baseline="middle")
+        return cx, cy
+
+    def connect(self, x1, y1, x2, y2, label: str = "", sub: str = "",
+                stroke: str | None = None, dash: str | None = None,
+                size: float = 12.5, color: str | None = None,
+                width: float = 1.6) -> None:
+        """An arrow between two boxes, with an optional label above it."""
+        stroke = stroke or self.INK
+        self.arrow(x1, y1, x2, y2, stroke=stroke, width=width, dash=dash)
+        mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+        color = color or self.INK_SOFT
+        if abs(y2 - y1) > abs(x2 - x1):
+            # vertical arrow: labels go beside it, not on top of it
+            if label:
+                self.text(mx + 10, my, label, size=size, color=color,
+                          weight="600", baseline="middle")
+            if sub:
+                self.text(mx + 10, my + 17, sub, size=size - 0.5, color=color)
+            return
+        if label:
+            self.text(mx, my - 9, label, size=size, anchor="middle",
+                      color=color, weight="600")
+        if sub:
+            self.text(mx, my + 19, sub, size=size - 0.5, anchor="middle",
+                      color=color)
 
     # --- annotation --------------------------------------------------------
     def arrow_head(self, x: float, y: float, angle_deg: float,

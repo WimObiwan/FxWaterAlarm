@@ -14,7 +14,8 @@ tag (Bootstrap has no global `img { max-width }`, so keep the `img-fluid` class)
 ## Regenerate
 
 ```bash
-python3 scripts/sketch/draw_regenput_sensor.py     # writes Docs/_Tekeningen/Regenput_Sensor.svg
+scripts/sketch/regenerate.sh                       # all drawings
+python3 scripts/sketch/draw_sensor_overzicht.py    # just one page's drawings
 ```
 
 No dependencies beyond the standard library. The wobble comes from a seeded
@@ -28,11 +29,23 @@ google-chrome --headless --disable-gpu --screenshot=/tmp/x.png --window-size=830
   file://$PWD/Docs/_Tekeningen/Regenput_Sensor.svg
 ```
 
-## Adding a drawing
+## Layout of the scripts
 
-Copy `draw_regenput_sensor.py`, keep the same shape: geometry constants at the top, then
-background → structure → content → annotation → labels. Give each drawing its **own seed**
-so two drawings do not wobble identically.
+One script per documentation page, one function per drawing inside it:
+
+| Script | Page |
+|---|---|
+| `draw_regenput_sensor.py` | the opening illustration of `Docs/Sensor_Overzicht.md` |
+| `draw_sensor_overzicht.py` | the rest of `Docs/Sensor_Overzicht.md` |
+| `draw_mangat.py` | `Docs/Aanpassingen/mangat-volume-compensatie.md` |
+
+Keep the same shape inside a function: geometry constants first, then background →
+structure → content → annotation → labels. Give each drawing its **own seed** so two
+drawings do not wobble identically, and factor a shape that several drawings share into a
+private helper (see `_put()` and `_tank()`).
+
+After adding a drawing: embed it in the page, and add a row to
+`Docs/_Tekeningen/index.md`.
 
 ## Style rules
 
@@ -66,10 +79,15 @@ These keep the set looking like one family:
 
 `sketchlib.py`, one class:
 
-* shapes — `line`, `polyline`, `rect`, `circle`, `ellipse`, `arc`
+* shapes — `line`, `polyline`, `rect`, `circle`, `ellipse`, `arc`, `cloud`
 * texture — `hatch`, `wave`, `grass`, `radio`
+* blocks — `box` (labelled rectangle), `connect` (arrow between two boxes, with label)
 * annotation — `arrow`, `dimension`, `text`, `label`, `title_text`, `caption`
 * output — `save(path)`, `to_svg()`
+
+A drawing is text plus lines, so leave room: a label that does not fit beside its arrow
+belongs above the whole row. Always look at the rendered PNG before committing — overlaps
+are invisible in the source.
 
 `polyline`/`rect` take `fill`, `fill_opacity`, `hatch`, `hatch_spacing`, `hatch_color`,
 `dash`, `passes` and `bow` (0 = straight, 1 = default wobble). Draw order is painter's

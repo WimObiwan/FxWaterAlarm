@@ -25,19 +25,7 @@ en WaterAlarm berekent het correcte volume — ook boven de 100%.
 Wanneer het water onder het "vol"-niveau zit, verandert er niets.  Het volume wordt berekend op
 basis van de inhoud en afmetingen van de put, zoals altijd.
 
-```
-          ┌──────┐
-          │mangat│  ← smal (bv. 0,5 m²)
-          │      │
-     ┌────┘      └─────┐
-     │    hoofdput     │  ← breed (bv. 4,5 m²)
-     │                 │
-     │~~~~~~~~~~~~~~~~~│  ← waterniveau (bv. 80%)
-     │/////////////////│
-     │/////////////////│
-     │/////////////////│
-     └─────────────────┘
-```
+<img src="/Docs/_Tekeningen/Mangat_Onder_100.svg" alt="Het water staat in de brede hoofdput, onder de overgang naar het smalle mangat" class="img-fluid" style="max-width: 600px;">
 
 > In dit geval is de berekening gewoon:
 > **Volume = niveau × inhoud van de put**
@@ -47,18 +35,7 @@ basis van de inhoud en afmetingen van de put, zoals altijd.
 Wanneer het water boven de 100%-markering stijgt, komt het in het mangat terecht.  Omdat het mangat
 smaller is, komt er **minder volume per mm stijging** bij.
 
-```
-          ┌──────┐
-          │//////│  ← water in het mangat
-          │//////│
-     ┌────┘══════└─────┐  ← 100% niveau (overgang put → mangat)
-     │/////////////////│
-     │/////////////////│
-     │/////////////////│
-     │/////////////////│
-     │/////////////////│
-     └─────────────────┘
-```
+<img src="/Docs/_Tekeningen/Mangat_Boven_100.svg" alt="De put is vol en het water staat in het smalle mangat; per millimeter stijging komt er minder volume bij" class="img-fluid" style="max-width: 600px;">
 
 > De berekening wordt nu:
 > **Totaal volume = inhoud van de put + (overflow hoogte × mangat oppervlakte)**
@@ -89,16 +66,7 @@ Meet de binnenmaat van je mangat (de opening bovenaan de put).
 - **Vierkant mangat:** oppervlakte = zijde × zijde (in meter)
   - Voorbeeld: 70 cm × 70 cm → 0,7 × 0,7 = **0,49 m²**
 
-```
-     Rond mangat              Vierkant mangat
-    ┌───────────┐            ┌───────────┐
-    │  ╭─────╮  │            │ ┌───────┐ │
-    │  │ ⌀80 │  │            │ │ 70×70 │ │
-    │  │ cm  │  │            │ │  cm   │ │
-    │  ╰─────╯  │            │ └───────┘ │
-    │   0,50 m² │            │   0,49 m² │
-    └───────────┘            └───────────┘
-```
+<img src="/Docs/_Tekeningen/Mangat_Vorm.svg" alt="Een rond mangat van 80 cm doorsnede is 0,50 m², een vierkant mangat van 70 bij 70 cm is 0,49 m²" class="img-fluid" style="max-width: 640px;">
 
 ### Stap 2: Instelling invoeren in WaterAlarm
 
@@ -108,18 +76,7 @@ Meet de binnenmaat van je mangat (de opening bovenaan de put).
 4. Vul de oppervlakte in **m²** in (gebruik een punt of komma als decimaalteken).
 5. Klik op **Opslaan**.
 
-```
-     ┌──────────────────────────────────────────────┐
-     │          Sensor Instellingen                 │
-     │                                              │
-     │  Afstand leeg (mm):     [ 3000       ]       │
-     │  Afstand vol (mm):      [ 800        ]       │
-     │  Inhoud (L):            [ 10000      ]       │
-     │  Mangat oppervlakte:    [ 0,50       ] m²    │
-     │                                              │
-     │              [ Opslaan ]                     │
-     └──────────────────────────────────────────────┘
-```
+<img src="/Docs/_Tekeningen/Mangat_Instellingen.svg" alt="Het veld Mangat oppervlakte in de sensorinstellingen, in te vullen in vierkante meter" class="img-fluid" style="max-width: 620px;">
 
 > **Tip:** Als je de oppervlakte van je mangat niet kent of je put geen mangat heeft, laat het veld
 > dan gewoon leeg.  WaterAlarm werkt dan zoals voorheen (niveau wordt afgekapt op 100%).
@@ -133,24 +90,7 @@ Meet de binnenmaat van je mangat (de opening bovenaan de put).
 
 ### Dwarsdoorsnede van een typische put
 
-```
-                    deksel
-              ┌───────────────┐
-              │    mangat     │         oppervlakte: 0,50 m²
-              │    (smal)     │       ← hier wordt het volume
-              │               │         apart berekend
-              │               │
-         ┌────┘- - - - - - - -└────┐  ← sensor "vol" niveau
-         │                         │
-         │      hoofdput           │    oppervlakte: 4,55 m²
-         │      (breed)            │  ← hier geldt de
-         │                         │    normale berekening
-         │                         │
-         │                         │
-         │                         │
-         │▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│  ← onbruikbare bodem
-         └─────────────────────────┘
-```
+<img src="/Docs/_Tekeningen/Mangat_Doorsnede.svg" alt="Dwarsdoorsnede: smal mangat bovenaan dat apart gerekend wordt, brede hoofdput met de gewone berekening, en een onbruikbare bodem onderaan" class="img-fluid" style="max-width: 620px;">
 
 ## Veelgestelde vragen
 
