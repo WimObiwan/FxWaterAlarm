@@ -314,8 +314,8 @@ def keuze_verbinding():
     # ja -> three cases underneath
     s.connect(qx + 90, qy + qh, qx + 90, qy + qh + 40, "ja")
     rows = [
-        (196, "Diep in een betonnen put,\nof onder een metalen deksel?", "LoRa",
-         "komt beter door beton, verbruikt minder"),
+        (196, "In of onder een gebouw, diep in beton,\nof onder een metalen deksel?",
+         "LoRa", "5G raakt daar meestal niet buiten"),
         (272, "Meerdere sensoren op dezelfde\nlocatie (of gedeeld met buren)?",
          "LoRa", "één gateway bedient ze allemaal"),
         (344, "Anders?", "beide gaan",

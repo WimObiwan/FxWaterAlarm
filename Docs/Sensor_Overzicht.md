@@ -60,6 +60,9 @@ nodig.
   woning, een plaats zonder internetverbinding.
 * Werkt alleen als er ter plaatse **voldoende ontvangst** is — zie
   [Wat kan er misgaan?](#wat-kan-er-misgaan)
+* **Zit de sensor in of onder een gebouw** — een kelder, een garage, een technische ruimte, een
+  put onder de woning of onder een oprit — dan is de 5G-ontvangst er meestal te zwak.  Kies daar
+  in de regel voor LoRa.
 
 ### LoRa of 5G?
 
@@ -71,14 +74,16 @@ nodig.
 | Meerdere sensoren | Delen dezelfde gateway | Elke sensor werkt op zichzelf |
 | Verwachte batterijduur | **± 5 jaar** | ± 3 jaar, afhankelijk van de ontvangst |
 | Bereik door beton en gesloten deksels | Goed | Wisselend, afhankelijk van de locatie |
+| Sensor in of onder een gebouw (kelder, garage, technische ruimte) | **Ja**, de aangewezen keuze | Meestal te weinig ontvangst |
 | Simkaart en dataverbinding | Niet van toepassing | Inbegrepen in het abonnement |
 | Afhankelijk van een mobiele operator | Nee | Ja |
-| Beste bij | Meetplaats met WiFi in de buurt, en zeker bij twijfelachtige 5G-ontvangst | Losstaande locatie zonder internetverbinding |
+| Beste bij | Meetplaats met WiFi in de buurt, in of onder een gebouw, en zeker bij twijfelachtige 5G-ontvangst | Losstaande locatie in open lucht, zonder internetverbinding |
 
 > **Kies niet op prijs alleen.**  Een LoRa-sensor is 20 € goedkoper dan zijn 5G-tegenhanger, maar
 > de gateway kost eenmalig 130 € (zie [Prijzen](Prijzen.md)).  De keuze maak je dus vooral op de
 > omstandigheden: **is er internet ter plaatse** (dan kan LoRa) en **is er voldoende 5G-ontvangst
-> in de put** (anders moet het LoRa zijn).
+> op de meetplaats** (anders moet het LoRa zijn).  In of onder een gebouw is dat laatste zelden het
+> geval.
 
 ## Waterniveau meten: ultrasoon of druk
 
@@ -263,8 +268,10 @@ van die van het wateroppervlak.
 
 ### 2. 5G: slechte ontvangst en een lege batterij
 
-Een 5G-sensor onderin een betonnen put, onder een metalen deksel of ver van een zendmast heeft
-soms te weinig signaal.  De sensor blijft dan opnieuw proberen om zijn meting door te sturen, en
+Een 5G-sensor onderin een betonnen put, onder een metalen deksel, **in of onder een gebouw** of
+ver van een zendmast heeft soms te weinig signaal.  Een kelder, een garage, een technische ruimte
+of een put onder de woning zijn de lastigste plaatsen: het signaal moet dan door een vloerplaat of
+door meerdere muren.  De sensor blijft dan opnieuw proberen om zijn meting door te sturen, en
 **dat verbruikt veel batterij**.  Het gevolg is niet meteen zichtbaar: de metingen komen wel
 binnen, maar in plaats van de verwachte ± 3 jaar is de batterij veel sneller leeg — en soms vallen
 metingen weg.  De grafiek **Batterij** op de sensorpagina laat dit als eerste zien: het niveau
@@ -276,7 +283,8 @@ zakt dan zichtbaar sneller dan normaal.
    kunststof exemplaar.
 2. **Een zonnepaneel toevoegen**, zodat het hogere verbruik gecompenseerd wordt.
 3. **Overstappen naar een LoRa-sensor met gateway.**  LoRa komt veel beter door beton en door een
-   gesloten deksel, en verbruikt minder.
+   gesloten deksel, en verbruikt minder.  Voor een sensor in of onder een gebouw is dat meestal
+   meteen de juiste keuze — daar valt met plaatsing weinig te winnen.
 
 ### 3. LoRa: gateway te ver, of geen internet
 
@@ -292,10 +300,11 @@ De gateway moet de sensor kunnen horen én zelf op het internet geraken.
 
 ### LoRa of 5G?
 
-<img src="_Tekeningen/Keuze_Verbinding.svg" alt="Beslissingsboom: geen WiFi of ethernet bij de meetplaats betekent 5G; met internet ter plaatse is LoRa de betere keuze bij een diepe betonnen put of een metalen deksel en bij meerdere sensoren op dezelfde locatie, in de overige gevallen gaan beide" class="img-fluid" style="max-width: 660px;">
+<img src="_Tekeningen/Keuze_Verbinding.svg" alt="Beslissingsboom: geen WiFi of ethernet bij de meetplaats betekent 5G; met internet ter plaatse is LoRa de betere keuze voor een sensor in of onder een gebouw, in een diepe betonnen put of onder een metalen deksel, en bij meerdere sensoren op dezelfde locatie; in de overige gevallen gaan beide" class="img-fluid" style="max-width: 660px;">
 
-**Kort:** geen internet ter plaatse → 5G.  Diep in beton of onder een metalen deksel → LoRa.
-In alle andere gevallen gaan beide, en is 5G het eenvoudigst te installeren.
+**Kort:** geen internet ter plaatse → 5G.  In of onder een gebouw, diep in beton of onder een
+metalen deksel → LoRa.  In alle andere gevallen gaan beide, en is 5G het eenvoudigst te
+installeren.
 
 ### Wat wil je meten?
 

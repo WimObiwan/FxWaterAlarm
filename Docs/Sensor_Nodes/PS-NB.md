@@ -24,6 +24,14 @@ Dit toestel heeft een knopje om:
 * Doorgestuurde metingen zijn de hoogte van het wateroppervlak tot de onderkant van de druksensor (waar de gaatjes zitten).
 * Wanneer de sensor een stukje boven de bodem hangt, kan dit ingesteld worden in de configuratie op het WaterAlarm-platform.
 
+## 5G-ontvangst
+
+Zit de put **in of onder een gebouw** — een kelder, een garage, of een put onder de woning of de
+oprit — dan is de 5G-ontvangst er meestal te zwak.  De sensor blijft dan opnieuw proberen te
+verzenden en de batterij gaat een stuk minder lang mee.  Kies in dat geval de LoRa-uitvoering
+[PS-LB](PS-LB.md) met een gateway; zie
+[Sensor Overzicht](/Docs/Sensor_Overzicht.md#2-5g-slechte-ontvangst-en-een-lege-batterij).
+
 ## Metingen die je moet doen (terwijl de put open is)
 
 <img src="/Docs/_Tekeningen/Inmeten_Druk.svg" alt="Doorsnede van een put: meet vanaf de onderkant van de druksensor tot de bovenkant van de put en tot de bodem; samen geven ze de hoogte van de put" class="img-fluid" style="max-width: 660px;">

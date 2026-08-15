@@ -42,6 +42,8 @@ Dit toestel heeft een knopje om:
 * Let op de **5G-ontvangst**: kelders en technische ruimtes in beton zijn net de plaatsen waar de
   ontvangst tegenvalt.  Bij zwakke ontvangst gaat de batterij sneller leeg — zie
   [Sensor Overzicht](/Docs/Sensor_Overzicht.md#2-5g-slechte-ontvangst-en-een-lege-batterij).
+  Staat de sensor **in of onder een gebouw**, dan is de LoRa-uitvoering
+  [WL03A-LB](WL03A-LB.md) meestal de betere keuze.
 
 ## Testen na de installatie
 
