@@ -15,7 +15,7 @@ Eenmalige aankoopprijs per sensor.  Elke sensor bestaat in een LoRa- en een 5G-u
 | Sensor | Wat meet hij? | **LoRa** | **5G (NB-IoT)** |
 |--------|---------------|---|---|
 | Ultrasoon | Waterniveau, gemeten van bovenaf | **140 €** | 160 € |
-| Druk | Waterniveau, drukcel in het water | 220 € | 240 € |
+| Druk | Water- of stookolieniveau, drukcel in de vloeistof | 220 € | 240 € |
 | Bodemvochtigheid | Vochtigheid, temperatuur en geleidbaarheid van de bodem | 180 € | 200 € |
 | Lekdetectie | Water aanwezig of niet, via detectiekabel | 140 € | 160 € |
 
@@ -50,10 +50,15 @@ Het abonnement dekt het gebruik van het WaterAlarm-platform: het dashboard met d
 de historiek en grafieken, de alarmen per e-mail, en de integraties
 ([API](Integraties/API.md), [Home Assistant](Integraties/Home_Assistant.md)).
 
-> **Zonnepaneel gratis bij abonnement.**  De meeste sensoren zijn leverbaar met een ingebouwd
-> zonnepaneel.  Bij een installatie met abonnement rekenen we daarvoor **geen meerprijs** aan.
-> Het is vooral interessant waar de sensor voldoende daglicht krijgt — zie
-> [Sensor Overzicht](Sensor_Overzicht.md#zonnepaneel).
+**Ook inbegrepen, zonder meerprijs:**
+
+* **De simkaart van een 5G-sensor.**  De dataverbinding zit mee in het abonnement — je hoeft zelf
+  geen simkaart te kopen en geen contract bij een mobiele operator af te sluiten.  Er zijn dus
+  geen bijkomende kosten voor de verbinding, ook niet bij 5G.
+* **Het zonnepaneel.**  De meeste sensoren zijn leverbaar met een ingebouwd zonnepaneel; bij een
+  installatie met abonnement rekenen we daarvoor geen meerprijs aan.  Het is vooral interessant
+  waar de sensor voldoende daglicht krijgt — zie
+  [Sensor Overzicht](Sensor_Overzicht.md#zonnepaneel).
 
 ## Rekenvoorbeelden
 

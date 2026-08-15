@@ -1,5 +1,9 @@
 # DDS75-LB
 
+<img src="DDS75-LB.jpg" alt="DDS75-LB" class="img-fluid" style="max-width: 360px;">
+
+*Foto: Dragino*
+
 Dit toestel heeft een knopje om:
 
 * Aan/af-gezet worden zonder het te openen:

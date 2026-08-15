@@ -1,5 +1,9 @@
 # PS-LB - Niveau-sensor met druk via LoRa (LoRaWAN)
 
+<img src="PS-LB.jpg" alt="PS-LB" class="img-fluid" style="max-width: 360px;">
+
+*Foto: Dragino*
+
 ## Bediening
 
 Dit toestel heeft een knopje om:

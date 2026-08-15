@@ -1,5 +1,9 @@
 # PS-NB - Niveau-sensor met druk via 5G (NB-IoT)
 
+<img src="PS-NB.jpg" alt="PS-NB" class="img-fluid" style="max-width: 360px;">
+
+*Foto: Dragino*
+
 ## Bediening
 
 Dit toestel heeft een knopje om:

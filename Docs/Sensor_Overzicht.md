@@ -24,8 +24,9 @@ Elke sensor bestaat in beide uitvoeringen (LoRa en 5G).
 |-------------|--------------|------|-------------|
 | Waterniveau in put, tank of regenwaterreservoir | Ultrasoon (meet van bovenaf) | [DDS75-LB](Sensor_Nodes/DDS75-LB.md) | [DDS75-NB](Sensor_Nodes/DDS75-NB.md) |
 | Waterniveau in put, tank of regenwaterreservoir | Druk (sensor hangt in het water) | [PS-LB](Sensor_Nodes/PS-LB.md) | [PS-NB](Sensor_Nodes/PS-NB.md) |
-| Bodemvochtigheid in tuin, veld of serre | Bodemvochtsensor | ✔ | ✔ |
-| Waterlek of overstroming | Detectiekabel | ✔ | ✔ |
+| Stookolie in een tank | Druk (sensor hangt in de stookolie) | [PS-LB](Sensor_Nodes/PS-LB.md) | [PS-NB](Sensor_Nodes/PS-NB.md) |
+| Bodemvochtigheid in tuin, veld of serre | Bodemvochtsensor | [SE01-LB](Sensor_Nodes/SE01-LB.md) | [SE01-NB](Sensor_Nodes/SE01-NB.md) |
+| Waterlek of overstroming | Detectiekabel | [WL03A-LB](Sensor_Nodes/WL03A-LB.md) | [WL03A-NB](Sensor_Nodes/WL03A-NB.md) |
 
 ## Hoe komen de metingen bij WaterAlarm?
 
@@ -45,7 +46,8 @@ internet.
 
 * **Eén gateway bedient meerdere sensoren.**  Heb je meerdere putten of meetpunten op dezelfde
   locatie, dan koop je de gateway maar één keer.
-* Er is **geen abonnement bij een operator** nodig voor de verbinding zelf.
+* Er komt **geen simkaart en geen mobiele operator** aan te pas: de metingen lopen over je eigen
+  internetaansluiting.
 * De gateway is een **eenmalige aankoop**, maar wel een extra kost bij de eerste sensor.
 
 ### 5G — rechtstreeks via het mobiele netwerk
@@ -61,6 +63,8 @@ nodig.
    └────────────┘                 └──────────────────┘    └────────────┘
 ```
 
+* **De simkaart is inbegrepen in het abonnement.**  Je hoeft zelf geen simkaart te kopen en geen
+  contract bij een mobiele operator af te sluiten; de dataverbinding zit mee in de prijs.
 * Ideaal voor een **losstaande locatie**: een weide, een tweede verblijf, een put ver van de
   woning, een plaats zonder internetverbinding.
 * Werkt alleen als er ter plaatse **voldoende ontvangst** is — zie
@@ -76,12 +80,12 @@ nodig.
 | Meerdere sensoren | Delen dezelfde gateway | Elke sensor werkt op zichzelf |
 | Verwachte batterijduur | **± 5 jaar** | ± 3 jaar, afhankelijk van de ontvangst |
 | Bereik door beton en gesloten deksels | Goed | Wisselend, afhankelijk van de locatie |
+| Simkaart en dataverbinding | Niet van toepassing | Inbegrepen in het abonnement |
 | Afhankelijk van een mobiele operator | Nee | Ja |
 | Beste bij | Meetplaats met WiFi in de buurt, en zeker bij twijfelachtige 5G-ontvangst | Losstaande locatie zonder internetverbinding |
 
 > **Kies niet op prijs alleen.**  Een LoRa-sensor is 20 € goedkoper dan zijn 5G-tegenhanger, maar
-> de gateway kost eenmalig 130 €.  Puur op aankoopprijs is die gateway pas terugverdiend vanaf een
-> stuk of zeven sensoren (zie [Prijzen](Prijzen.md)).  De keuze maak je dus vooral op de
+> de gateway kost eenmalig 130 € (zie [Prijzen](Prijzen.md)).  De keuze maak je dus vooral op de
 > omstandigheden: **is er internet ter plaatse** (dan kan LoRa) en **is er voldoende 5G-ontvangst
 > in de put** (anders moet het LoRa zijn).
 
@@ -117,6 +121,7 @@ het volume in liter — maar ze meten op een heel andere manier.
 | Gevoelig voor een smalle of onregelmatige schacht | **Ja** | Nee |
 | Gevoelig voor schuim of sterke golfslag | Ja | Beperkt |
 | Werkt in een smalle buis of peilbuis | Moeilijk | **Ja** |
+| Geschikt voor stookolie | Nee | **Ja** |
 | Beste bij | Een normale, open put of tank met een vrije doorgang naar het water | Moeilijke putten, smalle schachten, of waar ultrasoon niet betrouwbaar meet |
 
 > **Kort:** begin bij ultrasoon — dat is het goedkoopste en volstaat voor de meeste regenputten.
@@ -125,6 +130,63 @@ het volume in liter — maar ze meten op een heel andere manier.
 
 Wat je precies moet opmeten bij de installatie, staat per toestel beschreven bij de
 [Sensor Nodes](Sensor_Nodes/).
+
+## Stookolietanks
+
+Naast water volgt WaterAlarm ook het niveau van een **stookolietank** op — met dezelfde
+**druksensor** ([PS-LB](Sensor_Nodes/PS-LB.md) of [PS-NB](Sensor_Nodes/PS-NB.md)).  Je ziet
+hoeveel liter er nog in de tank zit en welk percentage dat is, en je kan een alarm instellen dat
+je verwittigt wanneer het tijd is om bij te bestellen.
+
+Een stookolietank verschilt op twee punten van een regenput.  Met beide houdt WaterAlarm
+automatisch rekening — je moet zelf niets omrekenen.
+
+### Stookolie is lichter dan water
+
+Een druksensor meet het gewicht van de vloeistofkolom boven zich.  Stookolie weegt ongeveer
+840 kg/m³, tegenover 1.000 kg/m³ voor water: dezelfde hoogte stookolie duwt dus minder hard op de
+sensor.  Zou je daar geen rekening mee houden, dan lijkt de tank leger dan hij is.
+
+In de instellingen van de sensor geef je daarom de **massadichtheid van de vloeistof** op.
+WaterAlarm rekent het gemeten drukverschil dan om naar de juiste vloeistofhoogte.  Vul je niets
+in, dan gaat het systeem uit van water (1.000 kg/m³).
+
+### Een liggende cilindertank loopt niet gelijkmatig vol
+
+In een rechthoekige put komt er bij elke centimeter stijging evenveel liter bij.  In een liggende
+cilindertank niet: onderaan en bovenaan is de tank smal, in het midden breed.  De vulhoogte zegt
+dus niet rechtstreeks hoeveel liter er nog in zit.
+
+```
+    25% hoogte        50% hoogte        75% hoogte
+     ╭───────╮         ╭───────╮         ╭───────╮
+    ╭╯       ╰╮       ╭╯       ╰╮       ╭╯       ╰╮
+   │           │     │           │     │~~~~~~~~~~~│
+   │           │     │~~~~~~~~~~~│     │///////////│
+   │~~~~~~~~~~~│     │///////////│     │///////////│
+    ╰╮///////╭╯       ╰╮///////╭╯       ╰╮///////╭╯
+     ╰───────╯         ╰───────╯         ╰───────╯
+   ± 20% inhoud       50% inhoud       ± 80% inhoud
+```
+
+WaterAlarm rekent daarom met de werkelijke vorm van een liggende cilinder in plaats van met de
+hoogte alleen:
+
+| Vulhoogte | Werkelijke inhoud |
+|---|---|
+| 25 % | ± 20 % |
+| 50 % | 50 % |
+| 75 % | ± 80 % |
+
+* Je stelt de tank in als **liggende cilinder**, samen met de inhoud in liter.  De diameter hoef
+  je niet apart op te meten: die leidt WaterAlarm af uit de ingestelde afstanden.
+* De berekening wordt geschaald naar de **opgegeven inhoud**, zodat ook tanks met bolle uiteinden
+  het juiste aantal liter tonen.
+* Op de sensorpagina krijg je een **aangepast diagram**: een ronde dwarsdoorsnede in plaats van
+  een rechthoekige tank.
+
+> Laat bij je bestelling weten dat het om een stookolietank gaat, en of het een liggende
+> cilindertank is.  Dan zetten we de massadichtheid en de geometrie meteen goed.
 
 ## Andere sensoren
 
@@ -138,6 +200,8 @@ Een sensor met een sonde die je in de grond steekt.  Hij meet:
 
 Typisch gebruik: tuin, moestuin, serre of veld — een alarm wanneer de grond te droog wordt, of
 opvolging van het effect van de beregening.
+
+Toestellen: [SE01-LB](Sensor_Nodes/SE01-LB.md) (LoRa) en [SE01-NB](Sensor_Nodes/SE01-NB.md) (5G).
 
 ### Waterlekdetectie met detectiekabel
 
@@ -158,6 +222,13 @@ plek.
 Typisch gebruik: kelder, stookruimte, technische ruimte, onder een boiler of wasmachine, of naast
 een pomp.  De sensor geeft een **status** door (droog / nat) en stuurt een alarm zodra er water
 gedetecteerd wordt.
+
+> **De detectiekabel kan verlengd worden**, ook tot meer dan 10 meter.  Zo bewaak je met één
+> sensor een volledige kelder, een lange leiding of verschillende risicoplekken tegelijk.  Geef bij
+> je bestelling door welke lengte je nodig hebt.
+
+Toestellen: [WL03A-LB](Sensor_Nodes/WL03A-LB.md) (LoRa) en [WL03A-NB](Sensor_Nodes/WL03A-NB.md)
+(5G).
 
 ## Batterijduur
 
@@ -290,6 +361,7 @@ De gateway moet de sensor kunnen horen én zelf op het internet geraken.
      ├── Waterniveau, normale open put ───► ultrasoon (goedkoopst)
      ├── Waterniveau, put met buizen,
      │   kabels of smalle schacht ────────► druk
+     ├── Stookolie in een tank ───────────► druk
      ├── Bodemvochtigheid ────────────────► bodemvochtsensor
      └── Lek of overstroming ─────────────► detectiekabel
 ```
