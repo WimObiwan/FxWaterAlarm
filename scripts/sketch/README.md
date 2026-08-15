@@ -38,6 +38,7 @@ One script per documentation page, one function per drawing inside it:
 | `draw_regenput_sensor.py` | the opening illustration of `Docs/Sensor_Overzicht.md` |
 | `draw_sensor_overzicht.py` | the rest of `Docs/Sensor_Overzicht.md` |
 | `draw_mangat.py` | `Docs/Aanpassingen/mangat-volume-compensatie.md` |
+| `draw_sensor_nodes.py` | the device pages in `Docs/Sensor_Nodes/` |
 
 Keep the same shape inside a function: geometry constants first, then background →
 structure → content → annotation → labels. Give each drawing its **own seed** so two

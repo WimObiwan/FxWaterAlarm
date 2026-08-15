@@ -136,21 +136,25 @@ def instellingen():
     s.line(x, y + 44, x + w, y + 44, width=1.4, passes=1)
     s.text(x + 20, y + 30, "Instellingen", size=15, weight="700")
 
+    # the field names are the ones the platform actually shows
     velden = [
-        ("Afstand leeg (mm)", "3000", False),
-        ("Afstand vol (mm)", "800", False),
-        ("Inhoud (L)", "10000", False),
-        ("Mangat oppervlakte (m²)", "0,50", True),
+        (["Afstand sensor tot water", "wanneer leeg (0%)"], "3000", "mm", False),
+        (["Afstand sensor tot water", "wanneer vol (100%)"], "800", "mm", False),
+        (["Capaciteit"], "10000", "liter", False),
+        (["Mangat oppervlakte"], "0,50", "m²", True),
     ]
-    ry = y + 76
-    for naam, waarde, highlight in velden:
+    ry = y + 72
+    for namen, waarde, eenheid, highlight in velden:
         kleur = s.ACCENT if highlight else s.INK
-        s.text(x + 20, ry + 5, naam, size=13,
-               color=kleur, weight="600" if highlight else "500")
-        s.rect(x + 250, ry - 14, 140, 28, stroke=kleur,
+        top = ry + 5 - 9 * (len(namen) - 1)
+        for i, naam in enumerate(namen):
+            s.text(x + 20, top + i * 18, naam, size=12.5, color=kleur,
+                   weight="600" if highlight else "500")
+        s.rect(x + 250, ry - 14, 120, 28, stroke=kleur,
                width=1.8 if highlight else 1.3, fill=kleur if highlight else None,
                fill_opacity=0.12)
         s.text(x + 262, ry + 5, waarde, size=13, color=kleur)
+        s.text(x + 378, ry + 5, eenheid, size=12, color=s.INK_SOFT)
         if highlight:
             s.arrow(x + w + 106, ry, x + w + 14, ry, stroke=s.ACCENT, width=1.6)
             s.text(x + w + 114, ry - 6, "in m²,", size=12.5, color=s.ACCENT,

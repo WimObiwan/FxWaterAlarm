@@ -28,6 +28,8 @@ Dit toestel heeft een knopje om:
 
 ## Montage
 
+<img src="/Docs/_Tekeningen/Montage_Bodemvocht.svg" alt="De behuizing blijft boven de grond, de drie pinnen van de sonde gaan volledig en verticaal in de grond op de diepte van de wortels" class="img-fluid" style="max-width: 640px;">
+
 * Kies een plaats die representatief is voor het perceel: niet vlak naast een druppelaar of een
   sproeier, en niet op een plek waar water blijft staan.
 * Steek de drie pinnen van de sonde volledig en verticaal in de grond, op de diepte waar de wortels

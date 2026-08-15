@@ -29,6 +29,8 @@ Dit toestel heeft een knopje om:
 
 ## Montage
 
+<img src="/Docs/_Tekeningen/Detectiekabel.svg" alt="De sensor hangt hoog tegen de muur, de detectiekabel ligt op de vloer; water op eender welk punt van de kabel geeft alarm" class="img-fluid" style="max-width: 660px;">
+
 * Hang de sensor tegen de muur, **hoger dan het punt waar water kan komen**.  De behuizing zelf
   mag niet onder water komen te staan.
 * Leg de detectiekabel plat op de vloer, op het **laagste punt** van de ruimte of vlak naast wat
