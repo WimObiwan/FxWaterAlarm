@@ -247,3 +247,112 @@ body {
     --diagram-magenta: #f76bf7;
     --diagram-dimmed-magenta: #7c327c;
 }
+
+/* ---------------------------------------------------------------------------
+   Rendered markdown from Docs/ (Site/Pages/__MarkdownPageTemplate.cshtml).
+   Scoped to .markdown-body so the app's own pages keep their Bootstrap look.
+   Bootstrap 5.1 has no theme tokens yet, so the colours are declared per theme.
+   --------------------------------------------------------------------------- */
+.markdown-body {
+    --md-border: #e2e5e9;
+    --md-border-strong: #c9cfd6;
+    --md-head-bg: #f1f3f5;
+    --md-stripe: #f8f9fa;
+    --md-hover: #eaf1fb;
+    --md-quote-bg: #f6f8fa;
+    --md-quote-accent: #2257bf;
+}
+
+[data-bs-theme="dark"] .markdown-body {
+    --md-border: #363b3e;
+    --md-border-strong: #4a5054;
+    --md-head-bg: #23272a;
+    --md-stripe: #1e2123;
+    --md-hover: #263039;
+    --md-quote-bg: #1e2123;
+    --md-quote-accent: #90caf9;
+}
+
+/* Headings: room above, so a section is not glued to the block before it */
+.markdown-body h2 {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+}
+
+.markdown-body h3 {
+    margin-top: 2.25rem;
+    margin-bottom: .75rem;
+}
+
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    margin-top: 1.75rem;
+    margin-bottom: .5rem;
+}
+
+.markdown-body h1 {
+    margin-bottom: 1.25rem;
+}
+
+.markdown-body > :first-child {
+    margin-top: 0;
+}
+
+/* Tables: shrink to their content, scroll instead of overflowing when wide */
+.markdown-body table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 1.75rem 0;
+    border: 1px solid var(--md-border);
+    border-radius: .5rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: .95rem;
+}
+
+.markdown-body th,
+.markdown-body td {
+    padding: .7rem 1.15rem;
+    border-bottom: 1px solid var(--md-border);
+    vertical-align: top;
+    text-align: left;
+}
+
+.markdown-body thead th {
+    background-color: var(--md-head-bg);
+    border-bottom: 2px solid var(--md-border-strong);
+    font-weight: 600;
+    letter-spacing: .01em;
+}
+
+.markdown-body tbody tr:nth-child(even) {
+    background-color: var(--md-stripe);
+}
+
+.markdown-body tbody tr:hover {
+    background-color: var(--md-hover);
+}
+
+.markdown-body tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* Blockquotes are used as callouts throughout Docs/ */
+.markdown-body blockquote {
+    margin: 1.5rem 0;
+    padding: .85rem 1.15rem;
+    border-left: 4px solid var(--md-quote-accent);
+    border-radius: 0 .375rem .375rem 0;
+    background-color: var(--md-quote-bg);
+}
+
+.markdown-body blockquote > :last-child {
+    margin-bottom: 0;
+}
+
+.markdown-body img {
+    margin: .5rem 0 1rem;
+}
