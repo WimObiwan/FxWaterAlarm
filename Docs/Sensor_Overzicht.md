@@ -94,6 +94,8 @@ nodig.
 Beide sensoren geven hetzelfde resultaat op je dashboard — het niveau in mm, het percentage en
 het volume in liter — maar ze meten op een heel andere manier.
 
+<img src="_Tekeningen/Regenput_Sensor.svg" alt="Doorsnede van een regenput met een ultrasone niveausensor onder het deksel" class="img-fluid" style="max-width: 620px;">
+
 ```
         ULTRASOON (DDS75)                       DRUK (PS)
    ┌───────[sensor]────────┐             ┌───────[sensor]────────┐

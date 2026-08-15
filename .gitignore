@@ -58,3 +58,6 @@ scripts/fetch-db-prd.sh
 scripts/deploy-wateralarm-dev.sh
 scripts/deploy-wateralarm-prd.sh
 audit-*.jsonl
+# Python (scripts/sketch)
+__pycache__/
+*.pyc
