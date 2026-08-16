@@ -55,6 +55,9 @@ de historiek en grafieken, de alarmen per e-mail, en de integraties
 * **De simkaart van een 5G-sensor.**  De dataverbinding zit mee in het abonnement — je hoeft zelf
   geen simkaart te kopen en geen contract bij een mobiele operator af te sluiten.  Er zijn dus
   geen bijkomende kosten voor de verbinding, ook niet bij 5G.
+* **Het bevestigingshoudertje.**  Bij een niveausensor zit het bijhorende houdertje mee: dat voor
+  de kabel bij een druksensor, dat voor de kegel bij een ultrasone sensor — zie de
+  [Sensor Nodes](Sensor_Nodes/) voor de montage.
 * **Het zonnepaneel.**  De meeste sensoren zijn leverbaar met een ingebouwd zonnepaneel; bij een
   installatie met abonnement rekenen we daarvoor geen meerprijs aan.  Het is vooral interessant
   waar de sensor voldoende daglicht krijgt — zie

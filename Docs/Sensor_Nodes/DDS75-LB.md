@@ -17,6 +17,15 @@ Dit toestel heeft een knopje om:
 * Er kan een extra meting gedaan worden, nuttig voor testen:
     * Druk 1 à 2 seconden op de knop
 
+## Montage
+
+* De **sensormodule** zet je vast met **2 schroefjes**.  Draai ze zeker niet hard aan.
+* Het **houdertje voor de kegelvormige ultrasone sensor wordt meegeleverd**.  Daar volstaat
+  **1 schroefje** om het vast te zetten.
+* Hang de sensor bovenaan in de put, met een **vrije baan naar het water**: buizen, kabels of een
+  uitstekende rand in de meetkegel geven valse echo's — zie
+  [Sensor Overzicht](/Docs/Sensor_Overzicht.md#1-ultrasoon-valse-echos-door-buizen-en-kabels).
+
 ## Metingen die je moet doen (terwijl de put open is)
 
 <img src="/Docs/_Tekeningen/Inmeten_Ultrasoon.svg" alt="Doorsnede van een put: beide afstanden meet je vanaf de sensor, tot het niveau dat 0 % moet zijn en tot het niveau dat 100 % moet zijn" class="img-fluid sketch">

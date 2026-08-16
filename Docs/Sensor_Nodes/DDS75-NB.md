@@ -17,6 +17,15 @@ Dit toestel heeft een knopje om:
 * Er kan een extra meting gedaan worden, nuttig voor testen:
     * Druk 1 à 2 seconden op de knop
 
+## Montage
+
+* De **sensormodule** zet je vast met **2 schroefjes**.  Draai ze zeker niet hard aan.
+* Het **houdertje voor de kegelvormige ultrasone sensor wordt meegeleverd**.  Daar volstaat
+  **1 schroefje** om het vast te zetten.
+* Hang de sensor bovenaan in de put, met een **vrije baan naar het water**: buizen, kabels of een
+  uitstekende rand in de meetkegel geven valse echo's — zie
+  [Sensor Overzicht](/Docs/Sensor_Overzicht.md#1-ultrasoon-valse-echos-door-buizen-en-kabels).
+
 ## 5G-ontvangst
 
 Zit de put **in of onder een gebouw** — een kelder, een garage, of een put onder de woning of de

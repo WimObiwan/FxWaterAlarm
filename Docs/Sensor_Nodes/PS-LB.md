@@ -19,6 +19,8 @@ Dit toestel heeft een knopje om:
 
 ## Montage
 
+* De **sensormodule** zet je vast met **2 schroefjes**.  Draai ze zeker niet hard aan.
+* Het **houdertje voor de kabel wordt meegeleverd**.  Ook dat zet je vast met 2 schroefjes.
 * Monteer de houder tegen de muur en plaats de kabel in de houder.  Best met een tie-wrap.
 * Zorg ervoor dat de druksensor in het water hangt, en zweeft vlak boven de bodem.
 * Doorgestuurde metingen zijn de hoogte van het wateroppervlak tot de onderkant van de druksensor (waar de gaatjes zitten).
