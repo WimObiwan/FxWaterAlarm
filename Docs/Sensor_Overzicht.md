@@ -214,6 +214,9 @@ Je hoeft dit niet zelf op te volgen: op de sensorpagina staat een grafiek **Batt
 verloop van het batterijniveau, en je kan een **alarm op de batterij** instellen, zodat je een
 e-mail krijgt voor de batterij leeg is.
 
+Een **vervangbatterij zit in het abonnement**, tot één batterij per jaar; enkel de eventuele
+verzendingskosten komen daar nog bij (zie [Prijzen](Prijzen.md)).
+
 Wil je de batterij helemaal niet of veel minder vaak vervangen, dan is een zonnepaneel de
 oplossing.
 
