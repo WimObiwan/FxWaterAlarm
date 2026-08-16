@@ -55,7 +55,7 @@ de historiek en grafieken, de alarmen per e-mail, en de integraties
   geen simkaart te kopen en geen contract bij een mobiele operator af te sluiten.  Er zijn dus
   geen bijkomende kosten voor de verbinding, ook niet bij 5G.
 * **De batterij.**  Is de batterij van je sensor leeg, dan krijg je een nieuwe, tot één batterij
-  per jaar.  Enkel de eventuele **verzendingskosten** komen daar nog bij.
+  per sensor per jaar.  Enkel de eventuele **verzendingskosten** komen daar nog bij.
 * **Het bevestigingshoudertje.**  Bij een niveausensor zit het bijhorende houdertje mee: dat voor
   de kabel bij een druksensor, dat voor de kegel bij een ultrasone sensor — zie de
   [Sensor Nodes](Sensor_Nodes/) voor de montage.
