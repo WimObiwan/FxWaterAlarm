@@ -64,6 +64,37 @@ de historiek en grafieken, de alarmen per e-mail, en de integraties
   waar de sensor voldoende daglicht krijgt — zie
   [Sensor Overzicht](Sensor_Overzicht.md#zonnepaneel).
 
+## Installatie
+
+Je installeert de sensor normaal gezien zelf.  Dat is eenvoudig: twee schroeven voor de
+sensormodule en twee voor het bijgeleverde houdertje — zie de [Sensor Nodes](Sensor_Nodes/) voor
+de montage.
+
+Liever een installatie ter plaatse?  Dat kan, aan een vaste prijs volgens de afstand tot Torhout:
+
+| Afstand | Prijs |
+|---|---|
+| Minder dan 30 km | **50 €** |
+| Minder dan 100 km | **100 €** |
+| Verder | Op aanvraag |
+
+* Eenmalig, per verplaatsing: meerdere sensoren op dezelfde locatie kosten niet meer.
+* Bij een installatie ter plaatse vervalt de verzending.
+
+## Verzending
+
+Verzending gebeurt met bpost, aan de tarieven van bpost:
+
+| Bestemming | Prijs |
+|---|---|
+| Naar een postpunt of pakjesautomaat | ± 5,40 € |
+| Naar een adres | ± 7,10 € |
+
+* Dit zijn de tarieven van bpost op het moment van schrijven; ze kunnen wijzigen.  Op de
+  bestelbon staat het bedrag dat effectief geldt.
+* De verzending van een **vervangbatterij** (inbegrepen in het abonnement, zie hierboven) komt
+  apart.
+
 ## Rekenvoorbeelden
 
 Alle bedragen exclusief btw.
@@ -118,3 +149,24 @@ kiezen we samen het juiste toestel.  Loopt het toch mis — bijvoorbeeld een ult
 valse echo's meet, of een 5G-sensor met te weinig ontvangst — dan is de oplossing meestal een
 upgrade naar een druksensor of een overstap naar LoRa.  Wat er kan mislopen en hoe je het oplost,
 staat bij [Wat kan er misgaan?](Sensor_Overzicht.md#wat-kan-er-misgaan).
+
+### Omruilen
+
+**Bij een omruiling betaal je enkel het prijsverschil.**  Blijkt de 5G-ontvangst ter plaatse
+onvoldoende, of meet een ultrasone sensor niet betrouwbaar in jouw put, dan ruilen we om naar de
+oplossing die wél werkt — je betaalt het verschil in aankoopprijs, plus de verzending.  Je blijft
+dus niet met een onbruikbare sensor zitten.
+
+Dat is in de praktijk bijna altijd de betere afloop: je houdt een werkende installatie.
+
+### Terugname
+
+Lukt de installatie om een andere reden niet, dan neem ik alles terug **tot zes maanden na
+levering**, zolang het toestel onbeschadigd is:
+
+* Je krijgt de **aankoopprijs volledig terugbetaald**.
+* De **verzendingskosten** (heen en terug) blijven ten laste van de koper.
+* Vanaf **één maand** na levering wordt **5 € per maand** afgehouden voor het gebruik van batterij
+  en simkaart.
+
+Een terugname is tot nu toe nog nooit nodig geweest; een omruiling wel.
