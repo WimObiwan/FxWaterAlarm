@@ -369,3 +369,38 @@ body {
 [data-bs-theme="dark"] .markdown-body a:focus {
     color: #bbdefb;
 }
+
+/* Images in Docs/ never exceed the column: the drawings are wide, and a phone
+   is not.  Inline max-width on the tag would beat .img-fluid, so the widths
+   live here instead - see .claude/rules/documentation.md. */
+.markdown-body img {
+    max-width: 100%;
+    height: auto;
+}
+
+.markdown-body .sketch,
+.markdown-body .photo {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.markdown-body .sketch {
+    max-width: 700px;
+}
+
+.markdown-body .photo {
+    max-width: 360px;
+}
+
+/* Wrapped in a link by site.js, so a drawing that is too small to read on a
+   phone opens on its own where it can be pinched and zoomed. */
+.markdown-body .media-zoom {
+    display: block;
+    cursor: zoom-in;
+}
+
+.markdown-body .media-zoom:focus-visible {
+    outline: 2px solid var(--md-quote-accent);
+    outline-offset: 3px;
+}

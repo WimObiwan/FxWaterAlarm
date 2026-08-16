@@ -154,3 +154,20 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
         setTheme(getPreferredTheme());
     }
 });
+// Docs images: a drawing that is scaled down to fit a phone screen is often too
+// small to read, so make every image in the rendered markdown open on its own.
+// The drawings are SVG, so they stay sharp at any zoom level, and the browser's
+// own pinch-to-zoom does the work - no lightbox library needed.
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.markdown-body img').forEach(img => {
+        if (img.closest('a')) return;
+        const link = document.createElement('a');
+        link.href = img.getAttribute('src');
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.className = 'media-zoom';
+        link.title = 'Klik om te vergroten';
+        img.parentNode.insertBefore(link, img);
+        link.appendChild(img);
+    });
+});

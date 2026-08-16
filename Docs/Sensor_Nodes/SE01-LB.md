@@ -1,6 +1,6 @@
 # SE01-LB - Bodemvochtsensor via LoRa (LoRaWAN)
 
-<img src="SE01-LB.jpg" alt="SE01-LB" class="img-fluid" style="max-width: 360px;">
+<img src="SE01-LB.jpg" alt="SE01-LB" class="img-fluid photo">
 
 *Foto: Dragino*
 
@@ -28,7 +28,7 @@ Dit toestel heeft een knopje om:
 
 ## Montage
 
-<img src="/Docs/_Tekeningen/Montage_Bodemvocht.svg" alt="De behuizing blijft boven de grond, de drie pinnen van de sonde gaan volledig en verticaal in de grond op de diepte van de wortels" class="img-fluid" style="max-width: 640px;">
+<img src="/Docs/_Tekeningen/Montage_Bodemvocht.svg" alt="De behuizing blijft boven de grond, de drie pinnen van de sonde gaan volledig en verticaal in de grond op de diepte van de wortels" class="img-fluid sketch">
 
 * Kies een plaats die representatief is voor het perceel: niet vlak naast een druppelaar of een
   sproeier, en niet op een plek waar water blijft staan.

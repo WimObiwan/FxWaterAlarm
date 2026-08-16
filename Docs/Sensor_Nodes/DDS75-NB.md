@@ -1,6 +1,6 @@
 # DDS75-NB
 
-<img src="DDS75-NB.jpg" alt="DDS75-NB" class="img-fluid" style="max-width: 360px;">
+<img src="DDS75-NB.jpg" alt="DDS75-NB" class="img-fluid photo">
 
 *Foto: Dragino*
 
@@ -27,7 +27,7 @@ verzenden en de batterij gaat een stuk minder lang mee.  Kies in dat geval de Lo
 
 ## Metingen die je moet doen (terwijl de put open is)
 
-<img src="/Docs/_Tekeningen/Inmeten_Ultrasoon.svg" alt="Doorsnede van een put: beide afstanden meet je vanaf de sensor, tot het niveau dat 0 % moet zijn en tot het niveau dat 100 % moet zijn" class="img-fluid" style="max-width: 660px;">
+<img src="/Docs/_Tekeningen/Inmeten_Ultrasoon.svg" alt="Doorsnede van een put: beide afstanden meet je vanaf de sensor, tot het niveau dat 0 % moet zijn en tot het niveau dat 100 % moet zijn" class="img-fluid sketch">
 
 * Totale capaciteit van de put (in liter)
   (bvb 10000 liter)

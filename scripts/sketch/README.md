@@ -5,11 +5,18 @@ wobbly bezier drawn twice, the way a pen doubles back over a line. The look is d
 informal — these drawings explain a product to a customer, they are not construction plans.
 
 Output goes to `Docs/_Tekeningen/*.svg` and is committed. Pages embed it with a raw `<img>`
-tag (Bootstrap has no global `img { max-width }`, so keep the `img-fluid` class):
+tag carrying the `sketch` class — and **no inline width**, because an inline `max-width`
+beats `.img-fluid` and makes the drawing overflow a phone screen:
 
 ```html
-<img src="_Tekeningen/Regenput_Sensor.svg" alt="..." class="img-fluid" style="max-width: 620px;">
+<img src="_Tekeningen/Regenput_Sensor.svg" alt="..." class="img-fluid sketch">
 ```
+
+The width lives in `Site/wwwroot/css/site.css` (`.markdown-body .sketch`: full column
+width, capped at 700px). `site.js` wraps every image in the rendered markdown in a link to
+itself, so a drawing that is too small to read on a phone opens on its own and can be
+pinched and zoomed — that is why the drawings must stay SVG, and why they must be readable
+standalone (hence the title on each one). Photos use `class="img-fluid photo"` instead.
 
 ## Regenerate
 

@@ -1,6 +1,6 @@
 # PS-LB - Niveau-sensor met druk via LoRa (LoRaWAN)
 
-<img src="PS-LB.jpg" alt="PS-LB" class="img-fluid" style="max-width: 360px;">
+<img src="PS-LB.jpg" alt="PS-LB" class="img-fluid photo">
 
 *Foto: Dragino*
 
@@ -26,7 +26,7 @@ Dit toestel heeft een knopje om:
 
 ## Metingen die je moet doen (terwijl de put open is)
 
-<img src="/Docs/_Tekeningen/Inmeten_Druk.svg" alt="Doorsnede van een put: meet vanaf de onderkant van de druksensor tot de bovenkant van de put en tot de bodem; samen geven ze de hoogte van de put" class="img-fluid" style="max-width: 660px;">
+<img src="/Docs/_Tekeningen/Inmeten_Druk.svg" alt="Doorsnede van een put: meet vanaf de onderkant van de druksensor tot de bovenkant van de put en tot de bodem; samen geven ze de hoogte van de put" class="img-fluid sketch">
 
 * Totale capaciteit van de put (in liter)
   (bvb 10000 liter))

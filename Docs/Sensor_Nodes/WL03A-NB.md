@@ -1,6 +1,6 @@
 # WL03A-NB - Waterdetectie met detectiekabel via 5G (NB-IoT)
 
-<img src="WL03A-NB.jpg" alt="WL03A-NB" class="img-fluid" style="max-width: 360px;">
+<img src="WL03A-NB.jpg" alt="WL03A-NB" class="img-fluid photo">
 
 *Foto: Dragino*
 
@@ -29,7 +29,7 @@ Dit toestel heeft een knopje om:
 
 ## Montage
 
-<img src="/Docs/_Tekeningen/Detectiekabel.svg" alt="De sensor hangt hoog tegen de muur, de detectiekabel ligt op de vloer; water op eender welk punt van de kabel geeft alarm" class="img-fluid" style="max-width: 660px;">
+<img src="/Docs/_Tekeningen/Detectiekabel.svg" alt="De sensor hangt hoog tegen de muur, de detectiekabel ligt op de vloer; water op eender welk punt van de kabel geeft alarm" class="img-fluid sketch">
 
 * Hang de sensor tegen de muur, **hoger dan het punt waar water kan komen**.  De behuizing zelf
   mag niet onder water komen te staan.

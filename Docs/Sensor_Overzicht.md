@@ -11,7 +11,7 @@ historiek, en krijg je een e-mail wanneer een alarmgrens overschreden wordt.
 Deze pagina helpt je kiezen welke sensor bij jouw situatie past.  De prijzen staan op een aparte
 pagina: [Prijzen](Prijzen.md).
 
-<img src="_Tekeningen/Regenput_Sensor.svg" alt="Doorsnede van een regenput met een ultrasone niveausensor onder het deksel" class="img-fluid" style="max-width: 620px;">
+<img src="_Tekeningen/Regenput_Sensor.svg" alt="Doorsnede van een regenput met een ultrasone niveausensor onder het deksel" class="img-fluid sketch">
 
 ## Twee keuzes
 
@@ -38,7 +38,7 @@ De sensor stuurt zijn meting via LoRa naar een **gateway** die jij zelf op de lo
 Die gateway staat binnen, heeft stroom nodig en een **WiFi- of ethernetverbinding** naar het
 internet.
 
-<img src="_Tekeningen/Verbinding_LoRa.svg" alt="De sensor stuurt via LoRa naar een gateway binnenshuis; die gaat via WiFi of ethernet naar het internet en naar het WaterAlarm-platform" class="img-fluid" style="max-width: 680px;">
+<img src="_Tekeningen/Verbinding_LoRa.svg" alt="De sensor stuurt via LoRa naar een gateway binnenshuis; die gaat via WiFi of ethernet naar het internet en naar het WaterAlarm-platform" class="img-fluid sketch">
 
 * **Eén gateway bedient meerdere sensoren.**  Heb je meerdere putten of meetpunten op dezelfde
   locatie, dan koop je de gateway maar één keer.
@@ -52,7 +52,7 @@ De sensor heeft een simkaart aan boord en stuurt zijn meting rechtstreeks door o
 van een mobiele operator (NB-IoT).  Er is geen gateway, geen WiFi en geen apparatuur binnenshuis
 nodig.
 
-<img src="_Tekeningen/Verbinding_5G.svg" alt="De sensor met simkaart stuurt rechtstreeks over het mobiele netwerk van de operator naar het WaterAlarm-platform" class="img-fluid" style="max-width: 640px;">
+<img src="_Tekeningen/Verbinding_5G.svg" alt="De sensor met simkaart stuurt rechtstreeks over het mobiele netwerk van de operator naar het WaterAlarm-platform" class="img-fluid sketch">
 
 * **De simkaart is inbegrepen in het abonnement.**  Je hoeft zelf geen simkaart te kopen en geen
   contract bij een mobiele operator af te sluiten; de dataverbinding zit mee in de prijs.
@@ -90,7 +90,7 @@ nodig.
 Beide sensoren geven hetzelfde resultaat op je dashboard — het niveau in mm, het percentage en
 het volume in liter — maar ze meten op een heel andere manier.
 
-<img src="_Tekeningen/Ultrasoon_Druk.svg" alt="Links meet een ultrasone sensor de afstand tot het wateroppervlak, rechts meet een druksensor de waterkolom boven een drukcel vlak boven de bodem" class="img-fluid" style="max-width: 680px;">
+<img src="_Tekeningen/Ultrasoon_Druk.svg" alt="Links meet een ultrasone sensor de afstand tot het wateroppervlak, rechts meet een druksensor de waterkolom boven een drukcel vlak boven de bodem" class="img-fluid sketch">
 
 | | **Ultrasoon** | **Druk** |
 |---|---|---|
@@ -137,7 +137,7 @@ In een rechthoekige put komt er bij elke centimeter stijging evenveel liter bij.
 cilindertank niet: onderaan en bovenaan is de tank smal, in het midden breed.  De vulhoogte zegt
 dus niet rechtstreeks hoeveel liter er nog in zit.
 
-<img src="_Tekeningen/Liggende_Cilinder.svg" alt="Bij 25 % vulhoogte zit er ongeveer 20 % inhoud in, bij 50 % de helft, bij 75 % ongeveer 80 %" class="img-fluid" style="max-width: 660px;">
+<img src="_Tekeningen/Liggende_Cilinder.svg" alt="Bij 25 % vulhoogte zit er ongeveer 20 % inhoud in, bij 50 % de helft, bij 75 % ongeveer 80 %" class="img-fluid sketch">
 
 WaterAlarm rekent daarom met de werkelijke vorm van een liggende cilinder in plaats van met de
 hoogte alleen:
@@ -179,7 +179,7 @@ Een sensor met een **detectiekabel** die je op de vloer legt, langs een leiding 
 lekbak.  De kabel detecteert water op eender welk punt over zijn hele lengte, niet enkel op één
 plek.
 
-<img src="_Tekeningen/Detectiekabel.svg" alt="De sensor hangt hoog tegen de muur, de detectiekabel ligt op de vloer; water op eender welk punt van de kabel geeft alarm" class="img-fluid" style="max-width: 660px;">
+<img src="_Tekeningen/Detectiekabel.svg" alt="De sensor hangt hoog tegen de muur, de detectiekabel ligt op de vloer; water op eender welk punt van de kabel geeft alarm" class="img-fluid sketch">
 
 Typisch gebruik: kelder, stookruimte, technische ruimte, onder een boiler of wasmachine, of naast
 een pomp.  De sensor geeft een **status** door (droog / nat) en stuurt een alarm zodra er water
@@ -250,7 +250,7 @@ terugkomt.  Hangt er iets in de weg — een aanvoerbuis, een overloop, een pompk
 een uitstekende rand van het mangat — dan kan de sensor de echo van dát obstakel meten in plaats
 van die van het wateroppervlak.
 
-<img src="_Tekeningen/Valse_Echo.svg" alt="Een losse buis in de put vangt de geluidspuls op, waardoor de sensor de afstand tot de buis meet in plaats van tot het water" class="img-fluid" style="max-width: 620px;">
+<img src="_Tekeningen/Valse_Echo.svg" alt="Een losse buis in de put vangt de geluidspuls op, waardoor de sensor de afstand tot de buis meet in plaats van tot het water" class="img-fluid sketch">
 
 **Symptomen:**
 
@@ -300,7 +300,7 @@ De gateway moet de sensor kunnen horen én zelf op het internet geraken.
 
 ### LoRa of 5G?
 
-<img src="_Tekeningen/Keuze_Verbinding.svg" alt="Beslissingsboom: geen WiFi of ethernet bij de meetplaats betekent 5G; met internet ter plaatse is LoRa de betere keuze voor een sensor in of onder een gebouw, in een diepe betonnen put of onder een metalen deksel, en bij meerdere sensoren op dezelfde locatie; in de overige gevallen gaan beide" class="img-fluid" style="max-width: 660px;">
+<img src="_Tekeningen/Keuze_Verbinding.svg" alt="Beslissingsboom: geen WiFi of ethernet bij de meetplaats betekent 5G; met internet ter plaatse is LoRa de betere keuze voor een sensor in of onder een gebouw, in een diepe betonnen put of onder een metalen deksel, en bij meerdere sensoren op dezelfde locatie; in de overige gevallen gaan beide" class="img-fluid sketch">
 
 **Kort:** geen internet ter plaatse → 5G.  In of onder een gebouw, diep in beton of onder een
 metalen deksel → LoRa.  In alle andere gevallen gaan beide, en is 5G het eenvoudigst te
@@ -308,7 +308,7 @@ installeren.
 
 ### Wat wil je meten?
 
-<img src="_Tekeningen/Keuze_Meetgrootheid.svg" alt="Waterniveau in een gewone open put met ultrasoon, een put met buizen of een smalle schacht en stookolie met druk, verder de bodemvochtsensor en de detectiekabel" class="img-fluid" style="max-width: 620px;">
+<img src="_Tekeningen/Keuze_Meetgrootheid.svg" alt="Waterniveau in een gewone open put met ultrasoon, een put met buizen of een smalle schacht en stookolie met druk, verder de bodemvochtsensor en de detectiekabel" class="img-fluid sketch">
 
 **Kort:** waterniveau in een gewone open put → ultrasoon.  Put met buizen, kabels of een smalle
 schacht, en stookolietanks → druk.  Bodemvochtigheid → bodemvochtsensor.  Lek of overstroming →

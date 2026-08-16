@@ -1,6 +1,6 @@
 # PS-NB - Niveau-sensor met druk via 5G (NB-IoT)
 
-<img src="PS-NB.jpg" alt="PS-NB" class="img-fluid" style="max-width: 360px;">
+<img src="PS-NB.jpg" alt="PS-NB" class="img-fluid photo">
 
 *Foto: Dragino*
 
@@ -34,7 +34,7 @@ verzenden en de batterij gaat een stuk minder lang mee.  Kies in dat geval de Lo
 
 ## Metingen die je moet doen (terwijl de put open is)
 
-<img src="/Docs/_Tekeningen/Inmeten_Druk.svg" alt="Doorsnede van een put: meet vanaf de onderkant van de druksensor tot de bovenkant van de put en tot de bodem; samen geven ze de hoogte van de put" class="img-fluid" style="max-width: 660px;">
+<img src="/Docs/_Tekeningen/Inmeten_Druk.svg" alt="Doorsnede van een put: meet vanaf de onderkant van de druksensor tot de bovenkant van de put en tot de bodem; samen geven ze de hoogte van de put" class="img-fluid sketch">
 
 * Totale capaciteit van de put (in liter)
   (bvb 10000 liter))
