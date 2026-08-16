@@ -51,9 +51,9 @@ never the symlink path.
 `.img-fluid` and the image then overflows a phone screen. Write
 `<img src="…" alt="…" class="img-fluid sketch">` for a drawing from `_Tekeningen/` and
 `class="img-fluid photo"` for a product photo; the widths live in
-`Site/wwwroot/css/site.css` under `.markdown-body`. `site.js` wraps every image in the
-rendered markdown in a link to itself, so it opens standalone and can be pinched and zoomed
-on a phone — that only works well for images that are readable on their own.
+`Site/wwwroot/css/site.css` under `.markdown-body`. Tapping an image opens the viewer in
+`site.js`: a full-screen overlay with zoom buttons, pinch and drag — so only add images
+that are worth enlarging and readable on their own.
 
 **Tables: no column alignment.** The Markdig pipeline has the emoji extension enabled, which
 rewrites `:|` into 😐 — so a right-aligned delimiter row (`|---:|---:|`) is mangled and the

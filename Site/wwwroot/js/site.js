@@ -154,20 +154,193 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
         setTheme(getPreferredTheme());
     }
 });
-// Docs images: a drawing that is scaled down to fit a phone screen is often too
-// small to read, so make every image in the rendered markdown open on its own.
-// The drawings are SVG, so they stay sharp at any zoom level, and the browser's
-// own pinch-to-zoom does the work - no lightbox library needed.
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.markdown-body img').forEach(img => {
-        if (img.closest('a')) return;
-        const link = document.createElement('a');
-        link.href = img.getAttribute('src');
-        link.target = '_blank';
-        link.rel = 'noopener';
-        link.className = 'media-zoom';
-        link.title = 'Klik om te vergroten';
-        img.parentNode.insertBefore(link, img);
-        link.appendChild(img);
+
+// ---------------------------------------------------------------------------
+// Docs images: a drawing scaled down to fit a phone is too small to read, so
+// tapping one opens it in an overlay with zoom buttons.  Pinch, drag and
+// double-tap work there too; the drawings are SVG, so they stay sharp at any
+// zoom level.  Every image also stays wrapped in a plain link to itself, so
+// "open in new tab" and a JS-less browser keep working.
+// ---------------------------------------------------------------------------
+(function () {
+    const MIN_SCALE = 1;
+    const MAX_SCALE = 10;
+
+    let viewer, stage, image, level, openLink, lastFocus;
+    let scale = 1, tx = 0, ty = 0;
+    const pointers = new Map();
+    let pinchDistance = 0, pinchX = 0, pinchY = 0;
+
+    function build() {
+        viewer = document.createElement('div');
+        viewer.className = 'media-viewer';
+        viewer.setAttribute('role', 'dialog');
+        viewer.setAttribute('aria-modal', 'true');
+        viewer.setAttribute('aria-label', 'Afbeelding bekijken');
+        viewer.tabIndex = -1;
+        viewer.innerHTML =
+            '<div class="media-viewer-bar">' +
+            '<button type="button" data-act="out" title="Uitzoomen" aria-label="Uitzoomen"><i class="bi bi-zoom-out"></i></button>' +
+            '<span class="media-viewer-level" aria-live="polite">100%</span>' +
+            '<button type="button" data-act="in" title="Inzoomen" aria-label="Inzoomen"><i class="bi bi-zoom-in"></i></button>' +
+            '<button type="button" data-act="fit" title="Passend maken" aria-label="Passend maken"><i class="bi bi-aspect-ratio"></i></button>' +
+            '<a class="media-viewer-open" target="_blank" rel="noopener" title="In een nieuw tabblad openen" aria-label="In een nieuw tabblad openen"><i class="bi bi-box-arrow-up-right"></i></a>' +
+            '<button type="button" data-act="close" title="Sluiten (Esc)" aria-label="Sluiten"><i class="bi bi-x-lg"></i></button>' +
+            '</div>' +
+            '<div class="media-viewer-stage"><img alt=""></div>';
+        document.body.appendChild(viewer);
+
+        stage = viewer.querySelector('.media-viewer-stage');
+        image = viewer.querySelector('.media-viewer-stage img');
+        level = viewer.querySelector('.media-viewer-level');
+        openLink = viewer.querySelector('.media-viewer-open');
+
+        viewer.querySelectorAll('[data-act]').forEach(button => {
+            button.addEventListener('click', () => {
+                const act = button.getAttribute('data-act');
+                if (act === 'close') close();
+                else if (act === 'fit') fit();
+                else zoomAt(act === 'in' ? 1.4 : 1 / 1.4, centreX(), centreY());
+            });
+        });
+
+        // clicking the backdrop, but not the image itself, closes
+        stage.addEventListener('click', event => {
+            if (event.target === stage) close();
+        });
+
+        stage.addEventListener('wheel', event => {
+            event.preventDefault();
+            zoomAt(event.deltaY < 0 ? 1.15 : 1 / 1.15, event.clientX, event.clientY);
+        }, { passive: false });
+
+        stage.addEventListener('dblclick', event => {
+            if (scale > 1.05) fit();
+            else zoomAt(2.5, event.clientX, event.clientY);
+        });
+
+        stage.addEventListener('pointerdown', event => {
+            stage.setPointerCapture(event.pointerId);
+            pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+            if (pointers.size === 2) startPinch();
+        });
+
+        stage.addEventListener('pointermove', event => {
+            const previous = pointers.get(event.pointerId);
+            if (!previous) return;
+            const dx = event.clientX - previous.x;
+            const dy = event.clientY - previous.y;
+            pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+            if (pointers.size === 1) {
+                if (scale > 1.001) { tx += dx; ty += dy; apply(); }
+            } else if (pointers.size === 2) {
+                const [a, b] = [...pointers.values()];
+                const distance = Math.hypot(a.x - b.x, a.y - b.y);
+                const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2;
+                if (pinchDistance > 0) {
+                    tx += midX - pinchX;
+                    ty += midY - pinchY;
+                    zoomAt(distance / pinchDistance, midX, midY);
+                }
+                pinchDistance = distance;
+                pinchX = midX;
+                pinchY = midY;
+            }
+        });
+
+        ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => {
+            stage.addEventListener(type, event => {
+                pointers.delete(event.pointerId);
+                if (pointers.size < 2) pinchDistance = 0;
+            });
+        });
+
+        document.addEventListener('keydown', event => {
+            if (!viewer.classList.contains('is-open')) return;
+            if (event.key === 'Escape') close();
+            else if (event.key === '+' || event.key === '=') zoomAt(1.4, centreX(), centreY());
+            else if (event.key === '-') zoomAt(1 / 1.4, centreX(), centreY());
+            else if (event.key === '0') fit();
+        });
+
+        window.addEventListener('popstate', () => {
+            if (viewer.classList.contains('is-open')) close(true);
+        });
+    }
+
+    function startPinch() {
+        const [a, b] = [...pointers.values()];
+        pinchDistance = Math.hypot(a.x - b.x, a.y - b.y);
+        pinchX = (a.x + b.x) / 2;
+        pinchY = (a.y + b.y) / 2;
+    }
+
+    function centreX() { const r = stage.getBoundingClientRect(); return r.left + r.width / 2; }
+    function centreY() { const r = stage.getBoundingClientRect(); return r.top + r.height / 2; }
+
+    function apply() {
+        image.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + scale + ')';
+        level.textContent = Math.round(scale * 100) + '%';
+        stage.classList.toggle('is-zoomed', scale > 1.001);
+    }
+
+    // zoom by `factor`, keeping whatever sits under (px, py) in place
+    function zoomAt(factor, px, py) {
+        const next = Math.min(Math.max(scale * factor, MIN_SCALE), MAX_SCALE);
+        const applied = next / scale;
+        if (applied === 1) return;
+        const rect = image.getBoundingClientRect();
+        tx += (px - (rect.left + rect.width / 2)) * (1 - applied);
+        ty += (py - (rect.top + rect.height / 2)) * (1 - applied);
+        scale = next;
+        apply();
+    }
+
+    function fit() { scale = 1; tx = 0; ty = 0; apply(); }
+
+    function open(src, alt) {
+        if (!viewer) build();
+        image.src = src;
+        image.alt = alt || '';
+        openLink.href = src;
+        fit();
+        viewer.classList.add('is-open');
+        document.body.classList.add('media-viewer-open');
+        lastFocus = document.activeElement;
+        viewer.focus();   // move focus into the dialog without ringing a button
+        // so the back button/gesture closes the overlay instead of leaving the page
+        history.pushState({ mediaViewer: true }, '');
+    }
+
+    function close(fromPopState) {
+        if (!viewer || !viewer.classList.contains('is-open')) return;
+        viewer.classList.remove('is-open');
+        document.body.classList.remove('media-viewer-open');
+        image.removeAttribute('src');
+        pointers.clear();
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+        if (!fromPopState && history.state && history.state.mediaViewer) history.back();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.markdown-body img').forEach(img => {
+            let link = img.closest('a');
+            if (!link) {
+                link = document.createElement('a');
+                link.href = img.getAttribute('src');
+                link.target = '_blank';
+                link.rel = 'noopener';
+                link.className = 'media-zoom';
+                link.title = 'Klik om te vergroten';
+                img.parentNode.insertBefore(link, img);
+                link.appendChild(img);
+            }
+            link.addEventListener('click', event => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+                event.preventDefault();
+                open(link.href, img.alt);
+            });
+        });
     });
-});
+})();

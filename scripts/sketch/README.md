@@ -13,10 +13,11 @@ beats `.img-fluid` and makes the drawing overflow a phone screen:
 ```
 
 The width lives in `Site/wwwroot/css/site.css` (`.markdown-body .sketch`: full column
-width, capped at 700px). `site.js` wraps every image in the rendered markdown in a link to
-itself, so a drawing that is too small to read on a phone opens on its own and can be
-pinched and zoomed — that is why the drawings must stay SVG, and why they must be readable
-standalone (hence the title on each one). Photos use `class="img-fluid photo"` instead.
+width, capped at 700px). Tapping an image opens the viewer in `site.js` — a full-screen
+overlay with zoom buttons, pinch, drag and double-tap — so a drawing that is too small to
+read on a phone can be enlarged there. That is why the drawings must stay SVG (they stay
+sharp at any zoom) and why each one must be readable on its own, hence the title on every
+drawing. Photos use `class="img-fluid photo"` instead.
 
 ## Regenerate
 
