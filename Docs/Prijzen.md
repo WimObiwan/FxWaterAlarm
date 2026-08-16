@@ -1,6 +1,6 @@
 ---
 title: Prijzen
-date: 2026-08-14
+date: 2026-08-16
 ---
 
 # Prijzen
@@ -39,12 +39,11 @@ Eenmalige aankoopprijs per sensor.  Elke sensor bestaat in een LoRa- en een 5G-u
 | Formule | Prijs per sensor |
 |---|---|
 | Jaarlijks | **30 € / jaar** |
-| Maandelijks | 4 € / maand |
+| Maandelijks | 5 € / maand |
 
 * **Het eerste jaar is inbegrepen** in de aankoopprijs van de sensor.  Het abonnement start pas
   daarna.
 * De prijs geldt **per sensor**, niet per account of per gateway.
-* Jaarlijks betalen is voordeliger: 12 × 4 € = 48 € tegenover 30 € per jaar.
 
 Het abonnement dekt het gebruik van het WaterAlarm-platform: het dashboard met de actuele waarden,
 de historiek en grafieken, de alarmen per e-mail, en de integraties
