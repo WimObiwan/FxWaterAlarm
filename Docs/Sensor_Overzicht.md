@@ -102,6 +102,7 @@ het volume in liter — maar ze meten op een heel andere manier.
 | Gevoelig voor schuim of sterke golfslag | Ja | Beperkt |
 | Werkt in een smalle buis of peilbuis | Moeilijk | **Ja** |
 | Geschikt voor stookolie | Nee | **Ja** |
+| Sensormodule bovengronds mogelijk? | Nee — het toestel meet zelf van bovenaf in de put | **Ja** — enkel de drukcel hangt in het water, de module mag verder weg |
 | Beste bij | Een normale, open put of tank met een vrije doorgang naar het water | Moeilijke putten, smalle schachten, of waar ultrasoon niet betrouwbaar meet |
 
 > **Kort:** begin bij ultrasoon — dat is het goedkoopste en volstaat voor de meeste regenputten.
@@ -109,7 +110,9 @@ het volume in liter — maar ze meten op een heel andere manier.
 > een ultrasone sensor ter plaatse geen stabiele meting geeft.
 
 Wat je precies moet opmeten bij de installatie, staat per toestel beschreven bij de
-[Sensor Nodes](Sensor_Nodes/).
+[Sensor Nodes](Sensor_Nodes/).  Hoe je een druksensor opstelt — kabellengtes, de antenne
+verlengen en waar de sensormodule best hangt — staat op
+[Druksensor Opstelling](Sensor_Nodes/Druksensor_Opstelling.md).
 
 ## Stookolietanks
 
@@ -226,6 +229,8 @@ De meeste sensoren zijn ook leverbaar met een **ingebouwd zonnepaneel**.  Het pa
 batterij bij, waardoor de sensor veel langer meegaat en je de batterij niet of veel minder vaak
 moet vervangen.
 
+* Het paneel is **ingebouwd in de sensormodule**: het zit vast op het kastje en kan niet apart,
+  een eind verderop, geplaatst worden.  Waar de module hangt, hangt ook het paneel.
 * Interessant overal waar de sensor (of zijn paneel) **voldoende daglicht** krijgt: buiten, op een
   paal, tegen een muur, of onder een lichtdoorlatend deksel.
 * Weinig zinvol wanneer de sensor volledig in een gesloten, donkere put zit — daar blijft de
@@ -283,7 +288,10 @@ zakt dan zichtbaar sneller dan normaal.
 **Oplossingen:**
 
 1. **De sensor of de antenne hoger plaatsen**, of het metalen deksel vervangen door een
-   kunststof exemplaar.
+   kunststof exemplaar.  Bij een **druksensor** kan dat het verschil maken: daar hangt enkel de
+   drukcel in het water, en de sensormodule mag bovengronds staan — met een langere kabel naar de
+   drukcel, of met een verlengkabel voor de antenne.  Zie
+   [Druksensor Opstelling](Sensor_Nodes/Druksensor_Opstelling.md).
 2. **Een zonnepaneel toevoegen**, zodat het hogere verbruik gecompenseerd wordt.
 3. **Overstappen naar een LoRa-sensor met gateway.**  LoRa komt veel beter door beton en door een
    gesloten deksel, en verbruikt minder.  Voor een sensor in of onder een gebouw is dat meestal

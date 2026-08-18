@@ -22,6 +22,9 @@ Dit toestel heeft een knopje om:
 * De **sensormodule** zet je vast met **2 schroefjes**.  Draai ze zeker niet hard aan.
 * Het **houdertje voor de kabel wordt meegeleverd**.  Ook dat zet je vast met 2 schroefjes.
 * Monteer de houder tegen de muur en plaats de kabel in de houder.  Best met een tie-wrap.
+* De **kabel tussen de drukcel en de sensormodule mag je niet inkorten**; een teveel aan kabel rol
+  je op.  De standaardlengte is 5 m, langere kabels zijn mogelijk — zie
+  [Druksensor Opstelling](Druksensor_Opstelling.md).
 * Zorg ervoor dat de druksensor in het water hangt, en zweeft vlak boven de bodem.
 * Doorgestuurde metingen zijn de hoogte van het wateroppervlak tot de onderkant van de druksensor (waar de gaatjes zitten).
 * Wanneer de sensor een stukje boven de bodem hangt, kan dit ingesteld worden in de configuratie op het WaterAlarm-platform.
@@ -33,6 +36,11 @@ oprit — dan is de 5G-ontvangst er meestal te zwak.  De sensor blijft dan opnie
 verzenden en de batterij gaat een stuk minder lang mee.  Kies in dat geval de LoRa-uitvoering
 [PS-LB](PS-LB.md) met een gateway; zie
 [Sensor Overzicht](/Docs/Sensor_Overzicht.md#2-5g-slechte-ontvangst-en-een-lege-batterij).
+
+Bij een druksensor heb je wel een mogelijkheid die de ultrasone sensor niet heeft: de
+**sensormodule hangt niet noodzakelijk in de put**.  Met een langere kabel naar de drukcel, of met
+een verlengkabel voor de antenne, krijg je de module of de antenne bovengronds — en dan is de
+ontvangst meestal probleemloos.  Zie [Druksensor Opstelling](Druksensor_Opstelling.md).
 
 ## Metingen die je moet doen (terwijl de put open is)
 

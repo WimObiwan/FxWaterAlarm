@@ -7,6 +7,11 @@ title: Sensor Nodes
 Weet je nog niet welke sensor je nodig hebt?  Begin bij het
 [Sensor Overzicht](/Docs/Sensor_Overzicht.md) en de [Prijzen](/Docs/Prijzen.md).
 
+## Opstelling
+
+* [Druksensor Opstelling](Druksensor_Opstelling.md) — kabellengtes, antenne verlengen en waar je
+  de sensormodule plaatst
+
 ## LoRa
 
 * [DDS75-LB - Niveau-sensor ultrasoon via LoRa (LoRaWAN)](DDS75-LB.md)

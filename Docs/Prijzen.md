@@ -1,6 +1,6 @@
 ---
 title: Prijzen
-date: 2026-08-16
+date: 2026-08-18
 ---
 
 # Prijzen
@@ -23,6 +23,24 @@ Eenmalige aankoopprijs per sensor.  Elke sensor bestaat in een LoRa- en een 5G-u
   wel een gateway (zie hieronder).
 * De **ultrasone niveausensor is het voordeligst**; een druksensor kost 80 € meer, maar is
   ongevoelig voor buizen, kabels en smalle schachten.
+
+## Opties bij een druksensor
+
+De druksensor bestaat uit een drukcel in het water, een kabel en de sensormodule met de antenne.
+Wil je de module (of enkel de antenne) verder van de put plaatsen — bijvoorbeeld bovengronds, voor
+een betere 5G-ontvangst — dan kan dat met een langere kabel.  De meerprijs van de leverancier
+wordt gewoon doorgerekend.
+
+| Optie | Meerprijs |
+|---|---|
+| Kabel drukcel 10 m in plaats van 5 m | + 20 € |
+| Kabel drukcel 15 m in plaats van 5 m | + 30 € (niet leverbaar met zonnepaneel) |
+| Verlengkabel voor de antenne, 10 m | + 15 € |
+
+* De standaardlengte van de kabel naar de drukcel is **5 meter**; die kabel kan je **niet
+  inkorten** (oprollen mag).
+* Welke opstelling in jouw put zinvol is, staat op
+  [Druksensor Opstelling](Sensor_Nodes/Druksensor_Opstelling.md).
 
 ## Gateway (enkel bij LoRa)
 
@@ -60,9 +78,9 @@ de historiek en grafieken, de alarmen per e-mail, en de integraties
   de kabel bij een druksensor, dat voor de kegel bij een ultrasone sensor — zie de
   [Sensor Nodes](Sensor_Nodes/) voor de montage.
 * **Het zonnepaneel.**  De meeste sensoren zijn leverbaar met een ingebouwd zonnepaneel; bij een
-  installatie met abonnement rekenen we daarvoor geen meerprijs aan.  Het is vooral interessant
-  waar de sensor voldoende daglicht krijgt — zie
-  [Sensor Overzicht](Sensor_Overzicht.md#zonnepaneel).
+  installatie met abonnement rekenen we daarvoor geen meerprijs aan.  Het paneel zit **vast op de
+  sensormodule**, dus het is vooral interessant waar die module zelf voldoende daglicht krijgt —
+  zie [Sensor Overzicht](Sensor_Overzicht.md#zonnepaneel).
 
 ## Installatie
 
