@@ -29,18 +29,43 @@ Onboarding procedure
 * Set location
 	* https://whatismyelevation.com/
 
-## 3. Initial network setup
+## 3. Connect to the gateway
 
-* Plug in power
-* Press the gateway button for **~5 seconds** until blue LED flashes slowly (AP/config mode)
-* On laptop, connect to WIFI SSID `SenseCAP_XXXXXX` (XXXXXX = last 6 of EUI)
-	* Default password: `12345678`
-* Surf to http://192.168.168.1 in browser
+* Using Wifi
+	* Plug in power
+	* Press the gateway button for **~5 seconds** until blue LED flashes slowly (AP/config mode)
+	* On laptop, connect to WIFI SSID `SenseCAP_XXXXXX` (XXXXXX = last 6 of EUI)
+		* Default password: `12345678`
+	* Surf to http://192.168.168.1 in browser
+* Using Ethernet
+	* Temporarily change IP-address and run DHCP server on ethernet port:
+		```
+		sudo ifconfig enp3s0 192.168.9.1 netmask 255.255.255.0
+		sudo dnsmasq -d -C /dev/null --port=0 --domain=localdomain --interface=enp3s0 --dhcp-range=192.168.9.2,192.168.9.10,99h
+		```
+	* Connect gateway using ethernet cable to laptop, and power up
+	* This gives this output:
+		```
+		dnsmasq: started, version 2.90 DNS disabled
+		dnsmasq: compile time options: IPv6 GNU-getopt DBus no-UBus i18n IDN2 DHCP DHCPv6 no-Lua TFTP conntrack ipset no-nftset auth cryptohash DNSSEC loop-detect inotify dumpfile
+		dnsmasq-dhcp: DHCP, IP range 192.168.9.2 -- 192.168.9.10, lease time 4d3h
+		dnsmasq-dhcp: DHCPDISCOVER(enp3s0) a8:40:41:...
+		dnsmasq-dhcp: DHCPOFFER(enp3s0) 192.168.9.9 a8:40:41:... 
+		dnsmasq-dhcp: DHCPDISCOVER(enp3s0) a8:40:41:... 
+		dnsmasq-dhcp: DHCPOFFER(enp3s0) 192.168.9.9 a8:40:41:... 
+		dnsmasq-dhcp: DHCPREQUEST(enp3s0) 192.168.9.9 a8:40:41:1d:15:e6 
+		dnsmasq-dhcp: DHCPACK(enp3s0) 192.168.9.9 a8:40:41:... dragino-1d15e4
+		```
+	* So IP address is `192.168.9.9`
+	* Surf to http://192.168.9.9 in browser
 * Log in with username/password from label (Local Console = LuCI)
+
+## 4. Initial network setup
+
 * (Optional) Network --> Wireless: add home WIFI SSID + password, Save & Apply
 	* Or stay on ethernet — both work
 
-## 4. Configure LoRaWAN --> TTN (Basics Station, preferred)
+## 5. Configure LoRaWAN --> TTN (Basics Station, preferred)
 
 In Local Console:
 
@@ -60,7 +85,7 @@ In Local Console:
 	* token: `Authorization: Bearer <API_KEY_FROM_STEP_2>`
 * Save & Apply
 
-## 5. Verify
+## 6. Verify
 
 * TTN --> Gateways --> `<your-gateway>` --> Live data
 	* Status should flip to **Connected** within ~1 minute
@@ -69,7 +94,7 @@ In Local Console:
 	* https://eu1.cloud.thethings.network/console/gateways
 	* https://whatismyelevation.com/
 
-## 6. Change WIFI / reconfigure
+## 7. Change WIFI / reconfigure
 
 * Press button ~5 seconds until blue LED flashes slowly
 * Connect to WIFI SSID `SenseCAP_XXXXXX`, password `12345678`
