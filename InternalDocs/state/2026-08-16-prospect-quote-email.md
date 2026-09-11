@@ -120,5 +120,8 @@ Open questions 2, 3 and 4 below are answered by this addendum.
    at 5 €/month from month one — see the addendum above.
 4. ~~Does the subscription cover battery *shipping* or not?~~ Answered: it does **not** —
    shipping of a replacement battery is charged separately, now stated on the price page.
-5. VAT: quotes are stated excl. VAT, which is the wrong frame for a private customer.
-   Should quotes to consumers show incl. VAT?
+5. ~~VAT: quotes are stated excl. VAT, which is the wrong frame for a private customer.
+   Should quotes to consumers show incl. VAT?~~ Answered on 2026-09-08: **yes** — quotes to
+   private customers are stated incl. 21 % VAT. Instructed by Wim while a later quote was
+   being drafted; see [`2026-09-09-quote-email-edits.md`](2026-09-09-quote-email-edits.md).
+   Whether business customers still get excl. VAT is untested.

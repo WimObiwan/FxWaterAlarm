@@ -1,6 +1,6 @@
 ---
 title: Prijzen
-date: 2026-08-18
+date: 2026-09-09
 ---
 
 # Prijzen
@@ -60,7 +60,7 @@ wordt gewoon doorgerekend.
 | Maandelijks | 5 € / maand |
 
 * **Het eerste jaar is inbegrepen** in de aankoopprijs van de sensor.  Het abonnement start pas
-  daarna.
+  daarna, dus na 12 maanden.
 * De prijs geldt **per sensor**, niet per account of per gateway.
 
 Het abonnement dekt het gebruik van het WaterAlarm-platform: het dashboard met de actuele waarden,
@@ -93,6 +93,7 @@ Liever een installatie ter plaatse?  Dat kan, aan een vaste prijs volgens de afs
 | Afstand | Prijs |
 |---|---|
 | Minder dan 30 km | **50 €** |
+| Minder dan 60 km | **75 €** |
 | Minder dan 100 km | **100 €** |
 | Verder | Op aanvraag |
 
@@ -101,15 +102,17 @@ Liever een installatie ter plaatse?  Dat kan, aan een vaste prijs volgens de afs
 
 ## Verzending
 
-Verzending gebeurt met bpost, aan de tarieven van bpost:
+Verzending gebeurt met bpost.  Het bedrag dekt de verzending zelf én de verpakking:
 
 | Bestemming | Prijs |
 |---|---|
-| Naar een postpunt of pakjesautomaat | ± 5,40 € |
-| Naar een adres | ± 7,10 € |
+| Naar een postpunt of pakjesautomaat | **7,44 €** |
+| Naar een adres | 9,92 € |
 
-* Dit zijn de tarieven van bpost op het moment van schrijven; ze kunnen wijzigen.  Op de
-  bestelbon staat het bedrag dat effectief geldt.
+* Inclusief btw komt dat neer op **9,00 €** naar een postpunt en **12,00 €** naar een adres.
+* Dit zijn de tarieven op het moment van schrijven; ze kunnen wijzigen.  Op de bestelbon staat
+  het bedrag dat effectief geldt.
+* Bij een **installatie ter plaatse** vervalt de verzending (zie hierboven).
 * De verzending van een **vervangbatterij** (inbegrepen in het abonnement, zie hierboven) komt
   apart.
 
