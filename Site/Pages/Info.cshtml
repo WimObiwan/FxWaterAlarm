@@ -6,6 +6,8 @@
     Layout = "Shared/_Layout";
 }
 
+<h2 class="h4">Server-side</h2>
+
 <table style="display: block">
     <tr>
         <td><strong>RequestHost</strong></td><td>@Model.RequestHost</td>
@@ -127,6 +129,38 @@
     </tr>
 </table>
 
+<h2 class="h4 mt-3">Client-side</h2>
+
+<table id="infoClient" style="display: block">
+    <tr>
+        <td><strong>BrowserOnLine</strong></td><td data-client="onLine">-</td>
+    </tr>
+    <tr>
+        <td><strong>ServerReachable</strong></td><td data-client="reachable">-</td>
+    </tr>
+    <tr>
+        <td><strong>ServerRoundTrip</strong></td><td data-client="roundTrip">-</td>
+    </tr>
+    <tr>
+        <td><strong>LastProbe</strong></td><td data-client="lastProbe">-</td>
+    </tr>
+    <tr>
+        <td><strong>ConnectionEffectiveType</strong></td><td data-client="effectiveType">-</td>
+    </tr>
+    <tr>
+        <td><strong>ConnectionDownlink</strong></td><td data-client="downlink">-</td>
+    </tr>
+    <tr>
+        <td><strong>ConnectionRtt</strong></td><td data-client="rtt">-</td>
+    </tr>
+    <tr>
+        <td><strong>ConnectionSaveData</strong></td><td data-client="saveData">-</td>
+    </tr>
+    <tr>
+        <td><strong>LastChange</strong></td><td data-client="lastChange">-</td>
+    </tr>
+</table>
+
 <div class="d-none" aria-hidden="true">
     <textarea id="infoTroubleshootingCopy"
               class="form-control"
@@ -144,3 +178,86 @@
         Copy this information
     </button>
 </div>
+
+@section Scripts {
+<script>
+    (function () {
+        const copy = document.getElementById('infoTroubleshootingCopy');
+        const serverInfo = copy.value;
+        const cells = {};
+        document.querySelectorAll('#infoClient [data-client]').forEach(td => cells[td.dataset.client] = td);
+
+        // navigator.connection (Network Information API) is Chromium-only; show "unsupported" elsewhere.
+        const c = navigator.connection;
+        const fmt = v => v === undefined || v === null ? (c ? '-' : 'unsupported') : String(v);
+
+        // navigator.onLine only says whether the device has *a* network (LAN, Wi-Fi), not whether
+        // it reaches the internet: false is reliable, true is not. So actually ask the server.
+        // HEAD on a small static file, cache-busted; the service worker does not intercept fetches.
+        const probeIntervalMs = 15000;
+        const probeTimeoutMs = 5000;
+        let probe = { reachable: 'probing…', roundTrip: '-', lastProbe: '-' };
+
+        async function runProbe() {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), probeTimeoutMs);
+            const started = performance.now();
+            let reachable;
+            try {
+                const response = await fetch('/favicon.ico?probe=' + Date.now(),
+                    { method: 'HEAD', cache: 'no-store', signal: controller.signal });
+                reachable = response.ok ? 'yes' : 'no (HTTP ' + response.status + ')';
+            } catch (e) {
+                reachable = e.name === 'AbortError' ? 'no (timeout after ' + probeTimeoutMs + ' ms)' : 'no (network error)';
+            } finally {
+                clearTimeout(timer);
+            }
+            const elapsed = Math.round(performance.now() - started);
+            probe = {
+                reachable: reachable,
+                roundTrip: reachable === 'yes' ? elapsed + ' ms' : '-',
+                lastProbe: new Date().toLocaleString()
+            };
+            update();
+        }
+
+        function update() {
+            const values = {
+                onLine: String(navigator.onLine),
+                reachable: probe.reachable,
+                roundTrip: probe.roundTrip,
+                lastProbe: probe.lastProbe,
+                effectiveType: fmt(c?.effectiveType),
+                downlink: c?.downlink !== undefined ? c.downlink + ' Mbps' : fmt(undefined),
+                rtt: c?.rtt !== undefined ? c.rtt + ' ms' : fmt(undefined),
+                saveData: fmt(c?.saveData),
+                lastChange: new Date().toLocaleString()
+            };
+            for (const [key, value] of Object.entries(values))
+                cells[key].textContent = value;
+
+            // Keep "Copy this information" complete: server text plus the current client values.
+            copy.value = serverInfo + '\n'
+                + 'BrowserOnLine: ' + values.onLine + '\n'
+                + 'ServerReachable: ' + values.reachable + '\n'
+                + 'ServerRoundTrip: ' + values.roundTrip + '\n'
+                + 'ConnectionEffectiveType: ' + values.effectiveType + '\n'
+                + 'ConnectionDownlink: ' + values.downlink + '\n'
+                + 'ConnectionRtt: ' + values.rtt + '\n'
+                + 'ConnectionSaveData: ' + values.saveData;
+        }
+
+        // A network change is exactly when reachability may have changed: re-probe right away.
+        const onNetworkChange = () => { update(); runProbe(); };
+        c?.addEventListener('change', onNetworkChange);
+        window.addEventListener('online', onNetworkChange);
+        window.addEventListener('offline', onNetworkChange);
+        // Background tabs throttle timers; probe again as soon as the page is visible.
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) runProbe(); });
+        setInterval(() => { if (!document.hidden) runProbe(); }, probeIntervalMs);
+
+        update();
+        runProbe();
+    })();
+</script>
+}
