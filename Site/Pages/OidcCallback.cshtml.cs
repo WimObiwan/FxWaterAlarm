@@ -63,10 +63,12 @@ public class OidcCallback : PageModel
         var email = result.Principal?.FindFirstValue(ClaimTypes.Email)
                     ?? result.Principal?.FindFirstValue("email");
         var emailVerified = result.Principal?.FindFirst("email_verified")?.Value;
+        // Keycloak client roles, lifted into role claims in Program.cs (OnTokenValidated).
+        var roles = result.Principal?.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList() ?? [];
 
         _logger.LogInformation(
-            "OIDC callback: email={Email}, email_verified={EmailVerified} from IP {IpAddress}",
-            email, emailVerified, HttpContext.Connection.RemoteIpAddress);
+            "OIDC callback: email={Email}, email_verified={EmailVerified}, roles={Roles} from IP {IpAddress}",
+            email, emailVerified, roles, HttpContext.Connection.RemoteIpAddress);
 
         // Keycloak emits email_verified as a JSON boolean, which surfaces as "true"/"false"
         // with provider-dependent casing. Treat a missing claim as unverified: unlike Google,
@@ -96,13 +98,14 @@ public class OidcCallback : PageModel
         if (mode == "link" && !string.IsNullOrEmpty(accountLink))
             return await HandleLinkMode(accountLink, subject, email!);
 
-        return await HandleLoginMode(returnUrl, subject, email!, configuration);
+        return await HandleLoginMode(returnUrl, subject, email!, roles, configuration);
     }
 
     private async Task<IActionResult> HandleLoginMode(
         string? returnUrl,
         string subject,
         string email,
+        IReadOnlyList<string> roles,
         IConfiguration configuration)
     {
         // Check the direct provider link first
@@ -123,7 +126,7 @@ public class OidcCallback : PageModel
                     target: new AuditTarget { Email = email });
                 return RedirectToPage("/Login", new { error = "no_account" });
             }
-            return await SignInAccount(linkedAccount, subject, returnUrl, configuration);
+            return await SignInAccount(linkedAccount, subject, roles, returnUrl, configuration);
         }
 
         // Fall back: look for all mail AccountUsers matching the asserted email.
@@ -152,7 +155,7 @@ public class OidcCallback : PageModel
                 Provider = ProviderName,
                 ProviderSubjectId = subject
             });
-            return await SignInAccount(account, subject, returnUrl, configuration);
+            return await SignInAccount(account, subject, roles, returnUrl, configuration);
         }
 
         // Multiple accounts match — redirect to picker
@@ -160,7 +163,7 @@ public class OidcCallback : PageModel
             "OIDC login: multiple accounts ({Count}) found for email {Email}, redirecting to picker",
             accounts.Count, email);
 
-        var token = new AccountPickerToken { ProviderSub = subject, Email = email, ReturnUrl = returnUrl };
+        var token = new AccountPickerToken { ProviderSub = subject, Email = email, Roles = roles, ReturnUrl = returnUrl };
         var protector = _dataProtectionProvider.CreateProtector(PickerProtectionPurpose);
         var protectedToken = protector.Protect(JsonSerializer.Serialize(token));
 
@@ -241,6 +244,7 @@ public class OidcCallback : PageModel
     private async Task<IActionResult> SignInAccount(
         Core.Entities.Account account,
         string subject,
+        IReadOnlyList<string> roles,
         string? returnUrl,
         IConfiguration configuration)
     {
@@ -252,6 +256,7 @@ public class OidcCallback : PageModel
             new("provider", ProviderName),
             new("provider_sub", subject)
         };
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var configOptions = configuration
             .GetSection(AccountLoginMessageOptions.Location)
@@ -284,5 +289,6 @@ internal record AccountPickerToken
 {
     public required string ProviderSub { get; init; }
     public required string Email { get; init; }
+    public IReadOnlyList<string> Roles { get; init; } = [];
     public string? ReturnUrl { get; init; }
 }

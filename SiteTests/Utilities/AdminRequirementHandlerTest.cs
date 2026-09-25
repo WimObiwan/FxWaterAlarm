@@ -30,11 +30,12 @@ public class AdminRequirementHandlerTest
             null);
     }
 
-    private static ClaimsPrincipal CreateUser(string? email = null)
+    private static ClaimsPrincipal CreateUser(string? email = null, params Claim[] extraClaims)
     {
         var claims = new List<Claim>();
         if (email != null)
             claims.Add(new Claim("email", email));
+        claims.AddRange(extraClaims);
         var identity = new ClaimsIdentity(claims, "test");
         return new ClaimsPrincipal(identity);
     }
@@ -186,5 +187,49 @@ public class AdminRequirementHandlerTest
         var context = await RunHandler(options, CreateUser("admin@example.com"), httpContext);
 
         Assert.True(context.HasSucceeded);
+    }
+
+    [Fact]
+    public async Task Succeeds_WhenAdminRoleAndEmailNotListed()
+    {
+        var options = CreateOptions(adminEmails: ["admin@example.com"]);
+        var user = CreateUser("other@example.com", new Claim(ClaimTypes.Role, "admin"));
+
+        var context = await RunHandler(options, user, CreateHttpContext());
+
+        Assert.True(context.HasSucceeded);
+    }
+
+    [Fact]
+    public async Task Succeeds_WhenAdminRoleAndAdminEmailsIsNull()
+    {
+        var options = CreateOptions(adminEmails: null);
+        var user = CreateUser("other@example.com", new Claim(ClaimTypes.Role, "admin"));
+
+        var context = await RunHandler(options, user, CreateHttpContext());
+
+        Assert.True(context.HasSucceeded);
+    }
+
+    [Fact]
+    public async Task Fails_WhenAdminRoleButIpNotInAllowedRange()
+    {
+        var options = CreateOptions(adminIPs: ["10.0.0.0/8"]);
+        var user = CreateUser("other@example.com", new Claim(ClaimTypes.Role, "admin"));
+
+        var context = await RunHandler(options, user, CreateHttpContext("192.168.1.1"));
+
+        Assert.True(context.HasFailed);
+    }
+
+    [Fact]
+    public async Task Fails_WhenAdminValueOnNonRoleClaim()
+    {
+        var options = CreateOptions();
+        var user = CreateUser("other@example.com", new Claim("given_name", "admin"));
+
+        var context = await RunHandler(options, user, CreateHttpContext());
+
+        Assert.True(context.HasFailed);
     }
 }

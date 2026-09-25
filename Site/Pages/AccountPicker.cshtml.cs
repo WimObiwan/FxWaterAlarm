@@ -93,7 +93,7 @@ public class AccountPicker : PageModel
 
         DeletePickerCookie();
 
-        return await SignInAccount(account, pickerToken.ProviderSub, pickerToken.ReturnUrl, configuration);
+        return await SignInAccount(account, pickerToken.ProviderSub, pickerToken.Roles, pickerToken.ReturnUrl, configuration);
     }
 
     // POST handler: already-authenticated user switching to a different account
@@ -115,7 +115,9 @@ public class AccountPicker : PageModel
         }
 
         var providerSub = User.FindFirstValue("provider_sub");
-        return await SignInAccount(account, providerSub, null, configuration);
+        // Roles belong to the person, not the account: keep them across the switch.
+        var roles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+        return await SignInAccount(account, providerSub, roles, null, configuration);
     }
 
     private async Task<IReadOnlyList<CoreEntities.Account>> GetAccessibleAccounts()
@@ -184,6 +186,7 @@ public class AccountPicker : PageModel
     private async Task<IActionResult> SignInAccount(
         CoreEntities.Account account,
         string? providerSub,
+        IReadOnlyList<string> roles,
         string? returnUrl,
         IConfiguration configuration)
     {
@@ -196,6 +199,7 @@ public class AccountPicker : PageModel
         };
         if (!string.IsNullOrEmpty(providerSub))
             claims.Add(new Claim("provider_sub", providerSub));
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var configOptions = configuration
             .GetSection(AccountLoginMessageOptions.Location)

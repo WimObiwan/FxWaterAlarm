@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using Site.Authentication;
 using Site.Pages;
 
 public class AdminRequirement : IAuthorizationRequirement
@@ -34,11 +36,14 @@ public class AdminRequirementHandler : AuthorizationHandler<AdminRequirement>
 
         _logger.LogDebug("Admin authorization, using IpAddress: {IPAddress}", remoteIpAddress);
 
-        if (
-            string.IsNullOrEmpty(loginEmail)
-            || adminEmails == null
-            || !adminEmails.Contains(loginEmail, StringComparer.InvariantCultureIgnoreCase)
-        )
+        // Admin is either the Keycloak client role (see KeycloakRoles) or a listed email.
+        // Only a role-typed claim counts; the AdminIPs restriction below applies to both.
+        var hasAdminRole = context.User.HasClaim(ClaimTypes.Role, KeycloakRoles.Admin);
+        var hasAdminEmail = !string.IsNullOrEmpty(loginEmail)
+            && adminEmails != null
+            && adminEmails.Contains(loginEmail, StringComparer.InvariantCultureIgnoreCase);
+
+        if (!hasAdminRole && !hasAdminEmail)
         {
             context.Fail();
         }

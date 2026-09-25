@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net;
+using System.Security.Claims;
 using Core;
 using Core.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -221,6 +222,21 @@ if (oidcOptions.IsConfigured)
         options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         options.NonceCookie.SameSite = SameSiteMode.None;
         options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
+
+        // Lift the Keycloak client roles into role claims on the external principal, so
+        // OidcCallback can carry them into the WaterAlarm.Auth cookie. Read here rather than
+        // later because SaveTokens is off: this is the only point the access token is at hand.
+        options.Events.OnTokenValidated = context =>
+        {
+            if (context.Principal?.Identity is ClaimsIdentity identity)
+            {
+                var roles = KeycloakRoles.ReadClientRoles(
+                    context.TokenEndpointResponse?.AccessToken, oidcOptions.ClientId!);
+                foreach (var role in roles)
+                    identity.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
+            return Task.CompletedTask;
+        };
 
         options.Events.OnRemoteFailure = context =>
         {

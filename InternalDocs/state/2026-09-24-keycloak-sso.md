@@ -126,3 +126,29 @@ Deploy #2 works. `AccountUser` row 36 was created automatically:
 The email-fallback re-link described above is confirmed end to end — no data migration was
 needed. Production is ready to deploy; its config is already on server3.
 
+
+## 2026-09-26 — admin via Keycloak client role
+
+Admin was only `AccountLoginMessage:AdminEmails` (+ `AdminIPs`). Added the FilmOpTV pattern
+(Keycloak roles lifted from the access token into `ClaimTypes.Role`), adapted:
+
+- **Client roles only.** `Site/Authentication/KeycloakRoles.cs` reads
+  `resource_access.{ClientId}.roles` and deliberately ignores `realm_access`: a realm role
+  called `admin` meant for another app must not grant WaterAlarm admin. Because dev and prd
+  are separate clients, admin is granted per environment.
+- **Read in `OnTokenValidated`** (`Site/Program.cs`), from `TokenEndpointResponse.AccessToken`.
+  `SaveTokens` stays `false` — FilmOpTV reads it later from the saved tokens, we don't keep them.
+- **Carried into the app cookie.** WaterAlarm builds the `WaterAlarm.Auth` principal by hand,
+  so `OidcCallback.SignInAccount` copies the role claims; `AccountPickerToken` carries them
+  through the multi-account picker, and an account switch keeps the session's roles.
+- `AdminRequirementHandler`: admin = role `admin` **or** listed email; `AdminIPs` still applies
+  to both. Only a role-typed claim counts (same lesson as the FilmOpTV `ClaimChecker` fix).
+- A revoked role stays effective until the cookie expires (`TokenLifespan`); there is no
+  refresh against Keycloak.
+
+*Established by unit tests only* (`KeycloakRolesTest`, `AdminRequirementHandlerTest`) —
+not yet exercised against Keycloak.
+
+Still to do: create client role `admin` on `wateralarm-dev` / `wateralarm-prd`, assign it,
+check the `roles` client scope is a default scope on both, deploy, and verify on dev
+(the callback log line now includes `roles=`). Then decide whether `AdminEmails` can shrink.
