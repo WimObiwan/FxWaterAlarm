@@ -22,7 +22,7 @@
     <data name="Login type" xml:space="preserve"><value>Login type</value></data>
     <data name="Email address" xml:space="preserve"><value>Email address</value></data>
     <data name="Add user" xml:space="preserve"><value>Add user</value></data>
-    <data name="Link Google account" xml:space="preserve"><value>Link Google account</value></data>
+    <data name="Link SSO account" xml:space="preserve"><value>Link SSO account</value></data>
     <data name="Mail" xml:space="preserve"><value>Mail</value></data>
     <data name="Google" xml:space="preserve"><value>Google</value></data>
     <data name="Back to account" xml:space="preserve"><value>Back to account</value></data>
@@ -31,14 +31,20 @@
     <data name="Message_user_already_exists" xml:space="preserve"><value>User already exists.</value></data>
     <data name="Message_user_removed" xml:space="preserve"><value>User removed.</value></data>
     <data name="Message_user_cannot_remove_current" xml:space="preserve"><value>You cannot remove the currently logged in user.</value></data>
-    <data name="Message_google_linked" xml:space="preserve"><value>Google account linked.</value></data>
-    <data name="Message_google_already_linked" xml:space="preserve"><value>This Google account is already linked to this account.</value></data>
-    <data name="Message_google_conflict" xml:space="preserve"><value>This Google account is linked to another account.</value></data>
-    <data name="Message_google_not_configured" xml:space="preserve"><value>Google login is not configured.</value></data>
+    <data name="Message_oidc_linked" xml:space="preserve"><value>SSO account linked.</value></data>
+    <data name="Message_oidc_already_linked" xml:space="preserve"><value>This SSO account is already linked to this account.</value></data>
+    <data name="Message_oidc_conflict" xml:space="preserve"><value>This SSO account is linked to another account.</value></data>
+    <data name="Message_oidc_not_configured" xml:space="preserve"><value>Single sign-on is not configured.</value></data>
     <data name="Message_email_changed" xml:space="preserve"><value>Email address changed.</value></data>
     <data name="Message_email_invalid" xml:space="preserve"><value>Please enter a valid email address.</value></data>
     <data name="Remove user" xml:space="preserve"><value>Remove user</value></data>
     <data name="Change email" xml:space="preserve"><value>Change email</value></data>
     <data name="Edit email" xml:space="preserve"><value>Edit email</value></data>
     <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+    <data name="SSO" xml:space="preserve">
+        <value>SSO</value>
+    </data>
+    <data name="Single sign-on" xml:space="preserve">
+        <value>Single sign-on</value>
+    </data>
 </root>

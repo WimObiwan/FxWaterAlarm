@@ -70,8 +70,9 @@ public class UserInfo : IUserInfo
                 && email != null
                 && string.Equals(u.Email, email, StringComparison.OrdinalIgnoreCase))
             ||
-            (u.LoginType == AccountUserLoginType.Google
-                && provider == "google"
+            (u.LoginType is AccountUserLoginType.Oidc or AccountUserLoginType.Google
+                && provider != null
+                && u.Provider == provider
                 && providerSub != null
                 && u.ProviderSubjectId == providerSub));
     }
@@ -101,6 +102,8 @@ public class UserInfo : IUserInfo
 
         var email = user.FindFirstValue("email");
         var providerSub = user.FindFirstValue("provider_sub");
+        // Use the session's own provider so legacy "google" sessions keep resolving.
+        var provider = user.FindFirstValue("provider") ?? "oidc";
 
         var accountsById = new Dictionary<int, Account>();
 
@@ -113,16 +116,16 @@ public class UserInfo : IUserInfo
 
         if (!string.IsNullOrEmpty(providerSub))
         {
-            var googleUser = await _mediator.Send(new AccountUserByProviderQuery
+            var providerUser = await _mediator.Send(new AccountUserByProviderQuery
             {
-                Provider = "google",
+                Provider = provider,
                 ProviderSubjectId = providerSub
             });
-            if (googleUser != null)
+            if (providerUser != null)
             {
-                var googleAccount = await _mediator.Send(new AccountByIdQuery { Id = googleUser.AccountId });
-                if (googleAccount != null)
-                    accountsById[googleAccount.Id] = googleAccount;
+                var providerAccount = await _mediator.Send(new AccountByIdQuery { Id = providerUser.AccountId });
+                if (providerAccount != null)
+                    accountsById[providerAccount.Id] = providerAccount;
             }
         }
 

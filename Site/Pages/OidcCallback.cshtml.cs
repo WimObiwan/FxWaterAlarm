@@ -13,17 +13,20 @@ using Core.Entities;
 
 namespace Site.Pages;
 
-public class GoogleCallback : PageModel
+public class OidcCallback : PageModel
 {
+    /// <summary>Provider name stored in AccountUser.Provider for Keycloak-brokered logins.</summary>
+    internal const string ProviderName = "oidc";
+
     internal const string PickerCookieName = "WaterAlarm.Picker";
-    internal const string PickerProtectionPurpose = "AccountPicker.GoogleToken";
+    internal const string PickerProtectionPurpose = "AccountPicker.OidcToken";
 
     private readonly IMediator _mediator;
     private readonly IAuditService _auditService;
-    private readonly ILogger<GoogleCallback> _logger;
+    private readonly ILogger<OidcCallback> _logger;
     private readonly IDataProtectionProvider _dataProtectionProvider;
 
-    public GoogleCallback(IMediator mediator, IAuditService auditService, ILogger<GoogleCallback> logger,
+    public OidcCallback(IMediator mediator, IAuditService auditService, ILogger<OidcCallback> logger,
         IDataProtectionProvider dataProtectionProvider)
     {
         _mediator = mediator;
@@ -44,29 +47,35 @@ public class GoogleCallback : PageModel
         var result = await HttpContext.AuthenticateAsync("ExternalCookie");
         if (!result.Succeeded)
         {
-            _logger.LogWarning("Google callback: external authentication result missing or invalid from IP {IpAddress}",
+            _logger.LogWarning("OIDC callback: external authentication result missing or invalid from IP {IpAddress}",
                 HttpContext.Connection.RemoteIpAddress);
-            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "Google authentication failed" });
-            return RedirectToPage("/Login", new { error = "google_failed" });
+            await _auditService.LogAsync(AuditOutcome.Failed, new AuditDetails { Reason = "OIDC authentication failed" });
+            return RedirectToPage("/Login", new { error = "oidc_failed" });
         }
 
         // Consume the external cookie immediately
         await HttpContext.SignOutAsync("ExternalCookie");
 
-        var googleSub = result.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
-        var email = result.Principal?.FindFirstValue(ClaimTypes.Email);
+        // MapInboundClaims (on by default) rewrites sub/email to the long ClaimTypes URIs.
+        // Read the raw names too, so this keeps working if that is ever turned off.
+        var subject = result.Principal?.FindFirstValue(ClaimTypes.NameIdentifier)
+                      ?? result.Principal?.FindFirstValue("sub");
+        var email = result.Principal?.FindFirstValue(ClaimTypes.Email)
+                    ?? result.Principal?.FindFirstValue("email");
         var emailVerified = result.Principal?.FindFirst("email_verified")?.Value;
 
         _logger.LogInformation(
-            "Google callback: email={Email}, email_verified={EmailVerified} from IP {IpAddress}",
+            "OIDC callback: email={Email}, email_verified={EmailVerified} from IP {IpAddress}",
             email, emailVerified, HttpContext.Connection.RemoteIpAddress);
 
-        // If email_verified claim is missing, assume verified since Google's OAuth requires it
-        // If present, it should be "true" (as string)
-        if (string.IsNullOrEmpty(email) || (emailVerified != null && emailVerified != "true"))
+        // Keycloak emits email_verified as a JSON boolean, which surfaces as "true"/"false"
+        // with provider-dependent casing. Treat a missing claim as unverified: unlike Google,
+        // a brokered identity provider gives no guarantee that the address was checked.
+        if (string.IsNullOrEmpty(email)
+            || !string.Equals(emailVerified, "true", StringComparison.OrdinalIgnoreCase))
         {
             _logger.LogWarning(
-                "Google login rejected: email not present or not verified (email={Email}, email_verified={EmailVerified})",
+                "OIDC login rejected: email not present or not verified (email={Email}, email_verified={EmailVerified})",
                 email, emailVerified);
             await _auditService.LogAsync(AuditOutcome.Denied,
                 new AuditDetails { Reason = "Email address not present or not verified" },
@@ -74,33 +83,33 @@ public class GoogleCallback : PageModel
             return RedirectToPage("/Login", new { error = "email_not_verified" });
         }
 
-        if (string.IsNullOrWhiteSpace(googleSub))
+        if (string.IsNullOrWhiteSpace(subject))
         {
-            _logger.LogWarning("Google callback: missing sub claim from IP {IpAddress}",
+            _logger.LogWarning("OIDC callback: missing sub claim from IP {IpAddress}",
                 HttpContext.Connection.RemoteIpAddress);
             await _auditService.LogAsync(AuditOutcome.Failed,
                 new AuditDetails { Reason = "Missing sub claim" },
                 target: new AuditTarget { Email = email });
-            return RedirectToPage("/Login", new { error = "google_failed" });
+            return RedirectToPage("/Login", new { error = "oidc_failed" });
         }
 
         if (mode == "link" && !string.IsNullOrEmpty(accountLink))
-            return await HandleLinkMode(accountLink, googleSub, email!);
+            return await HandleLinkMode(accountLink, subject, email!);
 
-        return await HandleLoginMode(returnUrl, googleSub, email!, configuration);
+        return await HandleLoginMode(returnUrl, subject, email!, configuration);
     }
 
     private async Task<IActionResult> HandleLoginMode(
         string? returnUrl,
-        string googleSub,
+        string subject,
         string email,
         IConfiguration configuration)
     {
-        // Check direct Google link first
+        // Check the direct provider link first
         var linkedUser = await _mediator.Send(new AccountUserByProviderQuery
         {
-            Provider = "google",
-            ProviderSubjectId = googleSub
+            Provider = ProviderName,
+            ProviderSubjectId = subject
         });
 
         if (linkedUser != null)
@@ -108,21 +117,23 @@ public class GoogleCallback : PageModel
             var linkedAccount = await _mediator.Send(new AccountByIdQuery { Id = linkedUser.AccountId });
             if (linkedAccount == null)
             {
-                _logger.LogWarning("Google login: linked account not found for sub {Sub}", googleSub);
+                _logger.LogWarning("OIDC login: linked account not found for sub {Sub}", subject);
                 await _auditService.LogAsync(AuditOutcome.Failed,
                     new AuditDetails { Reason = "Linked account not found" },
                     target: new AuditTarget { Email = email });
                 return RedirectToPage("/Login", new { error = "no_account" });
             }
-            return await SignInAccount(linkedAccount, googleSub, returnUrl, configuration);
+            return await SignInAccount(linkedAccount, subject, returnUrl, configuration);
         }
 
-        // Fall back: look for all mail AccountUsers matching the Google email
+        // Fall back: look for all mail AccountUsers matching the asserted email.
+        // This is what lets a user whose old direct-Google link is no longer matched
+        // (the subject is now Keycloak's, not Google's) re-link themselves on first login.
         var accounts = await _mediator.Send(new AccountsByEmailQuery { Email = email });
 
         if (accounts.Count == 0)
         {
-            _logger.LogWarning("Google login: no WaterAlarm account found for email {Email} / sub {Sub}", email, googleSub);
+            _logger.LogWarning("OIDC login: no WaterAlarm account found for email {Email} / sub {Sub}", email, subject);
             await _auditService.LogAsync(AuditOutcome.Denied,
                 new AuditDetails { Reason = "Unknown email address" },
                 target: new AuditTarget { Email = email });
@@ -132,24 +143,24 @@ public class GoogleCallback : PageModel
         if (accounts.Count == 1)
         {
             var account = accounts[0];
-            // Auto-link this Google identity to the matched account for next logins
+            // Auto-link this identity to the matched account for next logins
             await _mediator.Send(new AddAccountUserCommand
             {
                 AccountId = account.Id,
-                LoginType = AccountUserLoginType.Google,
+                LoginType = AccountUserLoginType.Oidc,
                 Email = email,
-                Provider = "google",
-                ProviderSubjectId = googleSub
+                Provider = ProviderName,
+                ProviderSubjectId = subject
             });
-            return await SignInAccount(account, googleSub, returnUrl, configuration);
+            return await SignInAccount(account, subject, returnUrl, configuration);
         }
 
         // Multiple accounts match — redirect to picker
         _logger.LogInformation(
-            "Google login: multiple accounts ({Count}) found for email {Email}, redirecting to picker",
+            "OIDC login: multiple accounts ({Count}) found for email {Email}, redirecting to picker",
             accounts.Count, email);
 
-        var token = new AccountPickerToken { GoogleSub = googleSub, Email = email, ReturnUrl = returnUrl };
+        var token = new AccountPickerToken { ProviderSub = subject, Email = email, ReturnUrl = returnUrl };
         var protector = _dataProtectionProvider.CreateProtector(PickerProtectionPurpose);
         var protectedToken = protector.Protect(JsonSerializer.Serialize(token));
 
@@ -167,8 +178,8 @@ public class GoogleCallback : PageModel
 
     private async Task<IActionResult> HandleLinkMode(
         string accountLink,
-        string googleSub,
-        string googleEmail)
+        string subject,
+        string providerEmail)
     {
         // Must already be signed in
         var session = await HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
@@ -189,46 +200,47 @@ public class GoogleCallback : PageModel
             (u.LoginType == AccountUserLoginType.Mail
                 && sessionEmail != null
                 && string.Equals(u.Email, sessionEmail, StringComparison.OrdinalIgnoreCase))
-            || (u.LoginType == AccountUserLoginType.Google
-                && sessionProvider == "google"
+            || (u.LoginType is AccountUserLoginType.Oidc or AccountUserLoginType.Google
+                && sessionProvider != null
+                && u.Provider == sessionProvider
                 && sessionProviderSub != null
                 && u.ProviderSubjectId == sessionProviderSub));
 
         if (!isAuthorized)
             return Forbid();
 
-        // Check if this Google sub is already linked anywhere
+        // Check if this subject is already linked anywhere
         var existingLink = await _mediator.Send(new AccountUserByProviderQuery
         {
-            Provider = "google",
-            ProviderSubjectId = googleSub
+            Provider = ProviderName,
+            ProviderSubjectId = subject
         });
 
         if (existingLink != null)
         {
-            var msg = existingLink.AccountId == account.Id ? "google_already_linked" : "google_conflict";
+            var msg = existingLink.AccountId == account.Id ? "oidc_already_linked" : "oidc_conflict";
             return Redirect($"/a/{accountLink}/users?message={msg}");
         }
 
         await _mediator.Send(new AddAccountUserCommand
         {
             AccountId = account.Id,
-            LoginType = AccountUserLoginType.Google,
-            Email = googleEmail,
-            Provider = "google",
-            ProviderSubjectId = googleSub
+            LoginType = AccountUserLoginType.Oidc,
+            Email = providerEmail,
+            Provider = ProviderName,
+            ProviderSubjectId = subject
         });
 
         _logger.LogInformation(
-            "Google account linked for sub {Sub} to account {AccountId} from IP {IpAddress}",
-            googleSub, account.Id, HttpContext.Connection.RemoteIpAddress);
+            "OIDC account linked for sub {Sub} to account {AccountId} from IP {IpAddress}",
+            subject, account.Id, HttpContext.Connection.RemoteIpAddress);
 
-        return Redirect($"/a/{accountLink}/users?message=google_linked");
+        return Redirect($"/a/{accountLink}/users?message=oidc_linked");
     }
 
     private async Task<IActionResult> SignInAccount(
         Core.Entities.Account account,
-        string googleSub,
+        string subject,
         string? returnUrl,
         IConfiguration configuration)
     {
@@ -236,9 +248,9 @@ public class GoogleCallback : PageModel
         {
             new("sub", account.Uid.ToString()),
             new("email", account.Email),
-            new("auth_method", "google"),
-            new("provider", "google"),
-            new("provider_sub", googleSub)
+            new("auth_method", ProviderName),
+            new("provider", ProviderName),
+            new("provider_sub", subject)
         };
 
         var configOptions = configuration
@@ -257,18 +269,20 @@ public class GoogleCallback : PageModel
         );
 
         _logger.LogInformation(
-            "Google login succeeded for email {Email} (account {AccountId}) from IP {IpAddress}",
+            "OIDC login succeeded for email {Email} (account {AccountId}) from IP {IpAddress}",
             account.Email, account.Id, HttpContext.Connection.RemoteIpAddress);
         await _auditService.LogAsync(AuditOutcome.Succeeded,
             target: new AuditTarget { Email = account.Email, AccountUid = account.Uid });
 
-        return Redirect(returnUrl ?? "/auto");
+        // returnUrl arrives from the "r" query parameter and round-trips through the
+        // provider, so it is attacker-controllable: never redirect off-site with it.
+        return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/auto");
     }
 }
 
 internal record AccountPickerToken
 {
-    public required string GoogleSub { get; init; }
+    public required string ProviderSub { get; init; }
     public required string Email { get; init; }
     public string? ReturnUrl { get; init; }
 }

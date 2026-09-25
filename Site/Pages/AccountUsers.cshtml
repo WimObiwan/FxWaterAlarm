@@ -36,21 +36,21 @@
         {
             @Loc["Message_user_cannot_remove_current"]
         }
-        else if (Model.Message == "google_linked")
+        else if (Model.Message == "oidc_linked")
         {
-            @Loc["Message_google_linked"]
+            @Loc["Message_oidc_linked"]
         }
-        else if (Model.Message == "google_already_linked")
+        else if (Model.Message == "oidc_already_linked")
         {
-            @Loc["Message_google_already_linked"]
+            @Loc["Message_oidc_already_linked"]
         }
-        else if (Model.Message == "google_conflict")
+        else if (Model.Message == "oidc_conflict")
         {
-            @Loc["Message_google_conflict"]
+            @Loc["Message_oidc_conflict"]
         }
-        else if (Model.Message == "google_not_configured")
+        else if (Model.Message == "oidc_not_configured")
         {
-            @Loc["Message_google_not_configured"]
+            @Loc["Message_oidc_not_configured"]
         }
         else if (Model.Message == "email_changed")
         {
@@ -88,7 +88,7 @@
                         {
                             <tr>
                                 <td>
-                                    @(user.LoginType == AccountUserLoginType.Mail ? Loc["Mail"] : Loc["Google"])
+                                    @(user.LoginType == AccountUserLoginType.Mail ? Loc["Mail"] : user.LoginType == AccountUserLoginType.Google ? Loc["Google"] : Loc["SSO"])
                                 </td>
                                 <td>
                                     @if (Model.EditEmailUserId == user.Id && Model.CanEditDefaultEmail(user))
@@ -152,14 +152,14 @@
 
 <div class="card">
     <div class="card-body">
-        <h2 class="h5">Google</h2>
-        @if (Model.GoogleEnabled)
+        <h2 class="h5">@Loc["Single sign-on"]</h2>
+        @if (Model.OidcEnabled)
         {
-            <a class="btn btn-outline-secondary" asp-page-handler="LinkGoogle" asp-route-accountLink="@Model.AccountEntity?.Link">@Loc["Link Google account"]</a>
+            <a class="btn btn-outline-secondary" asp-page-handler="LinkOidc" asp-route-accountLink="@Model.AccountEntity?.Link">@Loc["Link SSO account"]</a>
         }
         else
         {
-            <div class="text-muted">@Loc["Message_google_not_configured"]</div>
+            <div class="text-muted">@Loc["Message_oidc_not_configured"]</div>
         }
     </div>
 </div>

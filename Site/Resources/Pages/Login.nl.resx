@@ -23,7 +23,7 @@
         <value>Aanmelden via e-mailcode</value>
     </data>
     <data name="Enter your e-mail address. We will send you a one-time code to verify your identity." xml:space="preserve">
-        <value>Geef uw e-mailadres in. We sturen u een eenmalige code om uw identiteit te verifiëren.</value>
+        <value>Geef uw e-mailadres in. We sturen u een eenmalige code om uw identiteit te verifiëren. Deze mogelijkheid voorzien we nog tijdelijk tot iedereen succesvol kan inloggen met de nieuwe inlogmethode hierboven.</value>
     </data>
     <data name="your@email.com" xml:space="preserve">
         <value>uw@email.com</value>
@@ -31,29 +31,29 @@
     <data name="Send code" xml:space="preserve">
         <value>Code verzenden</value>
     </data>
-    <data name="Login with Google" xml:space="preserve">
-        <value>Aanmelden met Google</value>
+    <data name="Login with single sign-on" xml:space="preserve">
+        <value>Aanmelden</value>
     </data>
-    <data name="Google login is not yet available. It will be introduced in a future update." xml:space="preserve">
-        <value>Google-aanmelding is nog niet beschikbaar. Dit wordt toegevoegd in een toekomstige update.</value>
+    <data name="Single sign-on is not yet available. It will be introduced in a future update." xml:space="preserve">
+        <value>Single sign-on is nog niet beschikbaar. Dit wordt in een volgende update toegevoegd.</value>
     </data>
     <data name="Coming soon" xml:space="preserve">
         <value>Binnenkort beschikbaar</value>
     </data>
-    <data name="Continue with Google" xml:space="preserve">
-        <value>Doorgaan met Google</value>
+    <data name="Continue with single sign-on" xml:space="preserve">
+        <value>Aanmelden</value>
     </data>
-    <data name="Error_google_failed" xml:space="preserve">
-        <value>Google-aanmelding mislukt. Probeer het opnieuw.</value>
+    <data name="Error_oidc_failed" xml:space="preserve">
+        <value>Aanmelden met single sign-on is mislukt. Probeer het opnieuw.</value>
     </data>
     <data name="Error_email_not_verified" xml:space="preserve">
-        <value>Het e-mailadres van uw Google-account is niet geverifieerd. Verifieer het in Google en probeer opnieuw.</value>
+        <value>Uw e-mailadres is niet geverifieerd. Verifieer het bij uw identiteitsprovider en probeer opnieuw.</value>
     </data>
     <data name="Error_no_account" xml:space="preserve">
-        <value>Er is geen WaterAlarm-account gekoppeld aan uw Google-account. Meld u aan via uw e-mailcode.</value>
+        <value>Er is geen WaterAlarm-account gekoppeld aan dat e-mailadres. Meld u aan via uw e-mailcode.</value>
     </data>
-    <data name="Error_google_not_configured" xml:space="preserve">
-        <value>Google-aanmelding is momenteel niet beschikbaar.</value>
+    <data name="Error_oidc_not_configured" xml:space="preserve">
+        <value>Single sign-on is momenteel niet beschikbaar.</value>
     </data>
     <data name="Error_unknown_email" xml:space="preserve">
         <value>Dit e-mailadres is niet gekend. Gebruik het e-mailadres dat aan uw WaterAlarm-account gekoppeld is.</value>

@@ -5,7 +5,7 @@
 @inject IViewLocalizer Loc
 
 @{
-    ViewData["Title"] = Model.Mode == "google" ? Loc["Choose account"].Value : Loc["Switch account"].Value;
+    ViewData["Title"] = Model.Mode == "oidc" ? Loc["Choose account"].Value : Loc["Switch account"].Value;
 }
 
 <div class="row justify-content-center">
@@ -19,7 +19,7 @@
         }
         else
         {
-            var handler = Model.Mode == "google" ? "Google" : "Switch";
+            var handler = Model.Mode == "oidc" ? "Oidc" : "Switch";
             @foreach (var account in Model.Accounts)
             {
                 <form method="post" asp-page-handler="@handler" class="mb-3">

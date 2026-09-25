@@ -24,7 +24,7 @@ public class AccountUsers : PageModel
 
     public Core.Entities.Account? AccountEntity { get; private set; }
     public IReadOnlyList<AccountUser> Users { get; private set; } = [];
-    public bool GoogleEnabled { get; private set; }
+    public bool OidcEnabled { get; private set; }
     public bool IsAdmin { get; private set; }
     public int? EditEmailUserId { get; private set; }
     public string? Message { get; private set; }
@@ -40,10 +40,10 @@ public class AccountUsers : PageModel
         [FromRoute] string accountLink,
         [FromQuery] string? message,
         [FromQuery] int? editEmailUserId,
-        [FromServices] IOptionsSnapshot<GoogleAuthOptions>? googleOptions = null)
+        [FromServices] IOptionsSnapshot<OidcOptions>? oidcOptions = null)
     {
         Message = message;
-        GoogleEnabled = googleOptions?.Value.IsConfigured ?? false;
+        OidcEnabled = oidcOptions?.Value.IsConfigured ?? false;
 
         AccountEntity = await _mediator.Send(new AccountByLinkQuery { Link = accountLink });
         if (AccountEntity == null)
@@ -69,12 +69,12 @@ public class AccountUsers : PageModel
     public async Task<IActionResult> OnPostAddMailUserAsync(
         [FromRoute] string accountLink,
         [FromForm] string email,
-        [FromServices] IOptionsSnapshot<GoogleAuthOptions>? googleOptions = null)
+        [FromServices] IOptionsSnapshot<OidcOptions>? oidcOptions = null)
     {
         using var actionScope = _auditService.BeginAction("AccountUser.AddMailUser", new AuditTarget { AccountLink = accountLink });
         await _auditService.LogAsync(AuditOutcome.Attempted);
 
-        GoogleEnabled = googleOptions?.Value.IsConfigured ?? false;
+        OidcEnabled = oidcOptions?.Value.IsConfigured ?? false;
 
         var account = await _mediator.Send(new AccountByLinkQuery { Link = accountLink });
         if (account == null)
@@ -124,16 +124,16 @@ public class AccountUsers : PageModel
         return Redirect($"/a/{accountLink}/users?message=user_added");
     }
 
-    public IActionResult OnGetLinkGoogle(
+    public IActionResult OnGetLinkOidc(
         [FromRoute] string accountLink,
-        [FromServices] IOptionsSnapshot<GoogleAuthOptions>? googleOptions = null)
+        [FromServices] IOptionsSnapshot<OidcOptions>? oidcOptions = null)
     {
-        if (!(googleOptions?.Value.IsConfigured ?? false))
-            return Redirect($"/a/{accountLink}/users?message=google_not_configured");
+        if (!(oidcOptions?.Value.IsConfigured ?? false))
+            return Redirect($"/a/{accountLink}/users?message=oidc_not_configured");
 
-        var callbackUrl = Url.Page("/GoogleCallback", values: new { mode = "link", a = accountLink });
+        var callbackUrl = Url.Page("/OidcCallback", values: new { mode = "link", a = accountLink });
         var properties = new AuthenticationProperties { RedirectUri = callbackUrl };
-        return Challenge(properties, "Google");
+        return Challenge(properties, "oidc");
     }
 
     public async Task<IActionResult> OnPostRemoveUserAsync(
@@ -285,8 +285,9 @@ public class AccountUsers : PageModel
                 && email != null
                 && user.Email != null
                 && string.Equals(user.Email, email, StringComparison.OrdinalIgnoreCase))
-            || (user.LoginType == AccountUserLoginType.Google
-                && provider == "google"
+            || (user.LoginType is AccountUserLoginType.Oidc or AccountUserLoginType.Google
+                && provider != null
+                && user.Provider == provider
                 && providerSub != null
                 && user.ProviderSubjectId == providerSub);
     }

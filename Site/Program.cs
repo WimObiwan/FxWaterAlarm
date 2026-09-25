@@ -144,8 +144,8 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<ILoginSecurityService, LoginSecurityService>();
 builder.Services.AddTransient<IKnownLoginEmailService, KnownLoginEmailService>();
 
-builder.Services.Configure<GoogleAuthOptions>(builder.Configuration.GetSection(GoogleAuthOptions.Location));
-var googleAuthOptions = builder.Configuration.GetSection(GoogleAuthOptions.Location).Get<GoogleAuthOptions>() ?? new GoogleAuthOptions();
+builder.Services.Configure<OidcOptions>(builder.Configuration.GetSection(OidcOptions.Location));
+var oidcOptions = builder.Configuration.GetSection(OidcOptions.Location).Get<OidcOptions>() ?? new OidcOptions();
 
 {
     AccountLoginMessageOptions accountLoginMessageOptions =
@@ -182,21 +182,50 @@ var authBuilder = builder.Services.AddAuthentication()
     })
     .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 
-if (googleAuthOptions.IsConfigured)
+if (oidcOptions.IsConfigured)
 {
-    authBuilder.AddGoogle(options =>
+    authBuilder.AddOpenIdConnect("oidc", options =>
     {
-        options.ClientId = googleAuthOptions.ClientId!;
-        options.ClientSecret = googleAuthOptions.ClientSecret!;
+        options.Authority = oidcOptions.Authority!;
+        options.ClientId = oidcOptions.ClientId!;
+        options.ClientSecret = oidcOptions.ClientSecret!;
         options.SignInScheme = "ExternalCookie";
-        // Let the Google middleware handle this path internally, then redirect to /GoogleCallback.
-        options.CallbackPath = "/signin-google";
-        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+
+        // Confidential client, authorization code flow with PKCE.
+        options.ResponseType = "code";
+        options.UsePkce = true;
+
+        // Let the OIDC middleware handle this path internally, then redirect to /OidcCallback.
+        options.CallbackPath = "/signin-oidc";
+
+        // "email" is not in the default scope set, and the callback requires it.
+        options.Scope.Clear();
+        options.Scope.Add("openid");
+        options.Scope.Add("profile");
+        options.Scope.Add("email");
+
+        // email_verified is not guaranteed in the id_token; userinfo is authoritative.
+        options.GetClaimsFromUserInfoEndpoint = true;
+
+        // Nothing downstream calls the provider on the user's behalf, so don't
+        // carry access/refresh tokens around in the external cookie.
+        options.SaveTokens = false;
+
+        // ResponseMode defaults to form_post, so the provider POSTs the code back
+        // cross-site. A Lax cookie is NOT sent on a cross-site POST (Lax covers only
+        // top-level GET navigation), which loses the correlation and nonce cookies and
+        // fails the callback with "cookie not found". None+Secure is required here, and
+        // is what ASP.NET Core defaults these two to for exactly this reason.
+        // (The old AddGoogle block could use Lax because OAuth2 returns via a GET.)
+        options.CorrelationCookie.SameSite = SameSiteMode.None;
         options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.NonceCookie.SameSite = SameSiteMode.None;
+        options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
+
         options.Events.OnRemoteFailure = context =>
         {
             context.HandleResponse();
-            context.Response.Redirect("/login?error=google_failed");
+            context.Response.Redirect("/login?error=oidc_failed");
             return Task.CompletedTask;
         };
     });

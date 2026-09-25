@@ -257,6 +257,50 @@ public class UserInfoTest
     }
 
     [Fact]
+    public async Task CanUpdateAccount_ReturnsTrue_WhenOidcProviderMatches()
+    {
+        var httpContext = CreateHttpContext(provider: "oidc", providerSub: "kc-sub-abc");
+        var mediator = new ConfigurableFakeMediator();
+        mediator.SetResponse<AccountUsersByAccountQuery, IReadOnlyList<AccountUser>>(
+        [
+            new AccountUser
+            {
+                AccountId = 1,
+                LoginType = AccountUserLoginType.Oidc,
+                Provider = "oidc",
+                ProviderSubjectId = "kc-sub-abc",
+                CreationTimestamp = DateTime.UtcNow
+            }
+        ]);
+        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false, mediator: mediator);
+        var account = CreateAccount("owner@example.com");
+        Assert.True(await userInfo.CanUpdateAccount(account));
+    }
+
+    [Fact]
+    public async Task CanUpdateAccount_ReturnsFalse_WhenSubjectMatchesButProviderDiffers()
+    {
+        // A legacy google row must not authorize an oidc session that happens to
+        // carry the same subject string, and vice versa.
+        var httpContext = CreateHttpContext(provider: "oidc", providerSub: "shared-sub");
+        var mediator = new ConfigurableFakeMediator();
+        mediator.SetResponse<AccountUsersByAccountQuery, IReadOnlyList<AccountUser>>(
+        [
+            new AccountUser
+            {
+                AccountId = 1,
+                LoginType = AccountUserLoginType.Google,
+                Provider = "google",
+                ProviderSubjectId = "shared-sub",
+                CreationTimestamp = DateTime.UtcNow
+            }
+        ]);
+        var userInfo = CreateUserInfo(httpContext, authorizationSucceeds: false, mediator: mediator);
+        var account = CreateAccount("owner@example.com");
+        Assert.False(await userInfo.CanUpdateAccount(account));
+    }
+
+    [Fact]
     public async Task CanUpdateAccount_ReturnsTrue_WhenGoogleProviderMatches()
     {
         var httpContext = CreateHttpContext(provider: "google", providerSub: "google-sub-123");

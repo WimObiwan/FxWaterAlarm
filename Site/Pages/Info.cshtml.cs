@@ -42,7 +42,7 @@ public class Info : PageModel
     public string? UserAgent { get; set; }
     public bool IsAuthenticated { get; set; }
     public string? UserEmail { get; set; }
-    public string? GoogleId { get; set; }
+    public string? ProviderSub { get; set; }
     public string? LoginMethod { get; set; }
     public DateTimeOffset? LoginTimestamp { get; set; }
     public DateTimeOffset? SessionExpiresAt { get; set; }
@@ -99,12 +99,12 @@ public class Info : PageModel
 
         IsAuthenticated = HttpContext.User.Identity?.IsAuthenticated ?? false;
         UserEmail = HttpContext.User.FindFirstValue("email");
-        GoogleId = HttpContext.User.FindFirstValue("provider_sub");
+        ProviderSub = HttpContext.User.FindFirstValue("provider_sub");
 
         var provider = HttpContext.User.FindFirstValue("provider");
-        LoginMethod = provider == "google" || !string.IsNullOrEmpty(GoogleId)
-            ? "google"
-            : (IsAuthenticated ? "email" : null);
+        LoginMethod = !string.IsNullOrEmpty(provider)
+            ? provider
+            : (!string.IsNullOrEmpty(ProviderSub) ? "oidc" : (IsAuthenticated ? "email" : null));
 
         var services = HttpContext.RequestServices;
 
@@ -183,7 +183,7 @@ public class Info : PageModel
             $"AuthTicketFailure: {Safe(AuthTicketFailure)}",
             $"LoginMethod: {Safe(LoginMethod)}",
             $"UserEmail: {Safe(UserEmail)}",
-            $"GoogleId: {Safe(GoogleId)}",
+            $"ProviderSub: {Safe(ProviderSub)}",
             $"LoginTimestamp: {FormatTimestamp(LoginTimestamp)}",
             $"SessionExpiresAt: {FormatTimestamp(SessionExpiresAt)}",
             $"SessionAge: {Safe(SessionAge)}",

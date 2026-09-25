@@ -10,31 +10,35 @@ public class Login : PageModel
 {
     public string? ReturnUrl { get; set; }
     public string? Error { get; set; }
-    public bool GoogleEnabled { get; private set; }
+    public bool OidcEnabled { get; private set; }
 
     public IActionResult OnGet(
         [FromQuery(Name = "r")] string? returnUrl = null,
         [FromQuery] string? error = null,
-        [FromServices] IOptionsSnapshot<GoogleAuthOptions>? googleOptions = null)
+        [FromServices] IOptionsSnapshot<OidcOptions>? oidcOptions = null)
     {
         if (User.Identity?.IsAuthenticated == true)
-            return Redirect(returnUrl ?? "/auto");
+            return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/auto");
 
         ReturnUrl = returnUrl;
         Error = error;
-        GoogleEnabled = googleOptions?.Value.IsConfigured ?? false;
+        OidcEnabled = oidcOptions?.Value.IsConfigured ?? false;
         return Page();
     }
 
-    public IActionResult OnGetGoogle(
+    public IActionResult OnGetOidc(
         [FromQuery(Name = "r")] string? returnUrl = null,
-        [FromServices] IOptionsSnapshot<GoogleAuthOptions>? googleOptions = null)
+        [FromServices] IOptionsSnapshot<OidcOptions>? oidcOptions = null)
     {
-        if (!(googleOptions?.Value.IsConfigured ?? false))
-            return RedirectToPage("/Login", new { r = returnUrl, error = "google_not_configured" });
+        if (!(oidcOptions?.Value.IsConfigured ?? false))
+            return RedirectToPage("/Login", new { r = returnUrl, error = "oidc_not_configured" });
 
-        var callbackUrl = Url.Page("/GoogleCallback", values: new { r = returnUrl });
+        // Drop a non-local returnUrl here rather than at the callback: it round-trips
+        // through the provider in the auth properties and must not be attacker-chosen.
+        var safeReturnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : null;
+
+        var callbackUrl = Url.Page("/OidcCallback", values: new { r = safeReturnUrl });
         var properties = new AuthenticationProperties { RedirectUri = callbackUrl };
-        return Challenge(properties, "Google");
+        return Challenge(properties, "oidc");
     }
 }

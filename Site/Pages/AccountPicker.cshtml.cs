@@ -21,7 +21,7 @@ public class AccountPicker : PageModel
     public IReadOnlyList<CoreEntities.Account> Accounts { get; private set; } = [];
 
     /// <summary>
-    /// "google" = first-time Google login needing account selection.
+    /// "oidc"   = first-time external login needing account selection.
     /// "switch" = already authenticated, switching active account.
     /// </summary>
     public string Mode { get; private set; } = "switch";
@@ -39,7 +39,7 @@ public class AccountPicker : PageModel
         var pickerToken = ReadPickerToken();
         if (pickerToken != null)
         {
-            Mode = "google";
+            Mode = "oidc";
             Accounts = await _mediator.Send(new AccountsByEmailQuery { Email = pickerToken.Email });
             return Page();
         }
@@ -53,8 +53,8 @@ public class AccountPicker : PageModel
         return Page();
     }
 
-    // POST handler: user selected an account during Google first-login
-    public async Task<IActionResult> OnPostGoogleAsync(
+    // POST handler: user selected an account during external first-login
+    public async Task<IActionResult> OnPostOidcAsync(
         int accountId,
         [FromServices] IConfiguration configuration)
     {
@@ -72,11 +72,11 @@ public class AccountPicker : PageModel
             return Forbid();
         }
 
-        // Auto-link Google sub to the selected account (unless already linked)
+        // Auto-link the subject to the selected account (unless already linked)
         var existingLink = await _mediator.Send(new AccountUserByProviderQuery
         {
-            Provider = "google",
-            ProviderSubjectId = pickerToken.GoogleSub
+            Provider = OidcCallback.ProviderName,
+            ProviderSubjectId = pickerToken.ProviderSub
         });
 
         if (existingLink == null)
@@ -84,16 +84,16 @@ public class AccountPicker : PageModel
             await _mediator.Send(new AddAccountUserCommand
             {
                 AccountId = account.Id,
-                LoginType = CoreEntities.AccountUserLoginType.Google,
+                LoginType = CoreEntities.AccountUserLoginType.Oidc,
                 Email = pickerToken.Email,
-                Provider = "google",
-                ProviderSubjectId = pickerToken.GoogleSub
+                Provider = OidcCallback.ProviderName,
+                ProviderSubjectId = pickerToken.ProviderSub
             });
         }
 
         DeletePickerCookie();
 
-        return await SignInAccount(account, pickerToken.GoogleSub, pickerToken.ReturnUrl, configuration);
+        return await SignInAccount(account, pickerToken.ProviderSub, pickerToken.ReturnUrl, configuration);
     }
 
     // POST handler: already-authenticated user switching to a different account
@@ -114,14 +114,16 @@ public class AccountPicker : PageModel
             return Forbid();
         }
 
-        var googleSub = User.FindFirstValue("provider_sub");
-        return await SignInAccount(account, googleSub, null, configuration);
+        var providerSub = User.FindFirstValue("provider_sub");
+        return await SignInAccount(account, providerSub, null, configuration);
     }
 
     private async Task<IReadOnlyList<CoreEntities.Account>> GetAccessibleAccounts()
     {
         var email = User.FindFirstValue("email");
-        var googleSub = User.FindFirstValue("provider_sub");
+        var providerSub = User.FindFirstValue("provider_sub");
+        // Use the session's own provider so legacy "google" sessions keep resolving.
+        var provider = User.FindFirstValue("provider") ?? OidcCallback.ProviderName;
 
         var accountsById = new Dictionary<int, CoreEntities.Account>();
 
@@ -132,18 +134,18 @@ public class AccountPicker : PageModel
                 accountsById[a.Id] = a;
         }
 
-        if (!string.IsNullOrEmpty(googleSub))
+        if (!string.IsNullOrEmpty(providerSub))
         {
-            var googleUser = await _mediator.Send(new AccountUserByProviderQuery
+            var providerUser = await _mediator.Send(new AccountUserByProviderQuery
             {
-                Provider = "google",
-                ProviderSubjectId = googleSub
+                Provider = provider,
+                ProviderSubjectId = providerSub
             });
-            if (googleUser != null)
+            if (providerUser != null)
             {
-                var googleAccount = await _mediator.Send(new AccountByIdQuery { Id = googleUser.AccountId });
-                if (googleAccount != null)
-                    accountsById[googleAccount.Id] = googleAccount;
+                var providerAccount = await _mediator.Send(new AccountByIdQuery { Id = providerUser.AccountId });
+                if (providerAccount != null)
+                    accountsById[providerAccount.Id] = providerAccount;
             }
         }
 
@@ -152,12 +154,12 @@ public class AccountPicker : PageModel
 
     private AccountPickerToken? ReadPickerToken()
     {
-        if (!Request.Cookies.TryGetValue(GoogleCallback.PickerCookieName, out var cookieValue))
+        if (!Request.Cookies.TryGetValue(OidcCallback.PickerCookieName, out var cookieValue))
             return null;
 
         try
         {
-            var protector = _dataProtectionProvider.CreateProtector(GoogleCallback.PickerProtectionPurpose);
+            var protector = _dataProtectionProvider.CreateProtector(OidcCallback.PickerProtectionPurpose);
             var json = protector.Unprotect(cookieValue);
             return JsonSerializer.Deserialize<AccountPickerToken>(json);
         }
@@ -170,7 +172,7 @@ public class AccountPicker : PageModel
 
     private void DeletePickerCookie()
     {
-        Response.Cookies.Delete(GoogleCallback.PickerCookieName, new CookieOptions
+        Response.Cookies.Delete(OidcCallback.PickerCookieName, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
@@ -181,7 +183,7 @@ public class AccountPicker : PageModel
 
     private async Task<IActionResult> SignInAccount(
         CoreEntities.Account account,
-        string? googleSub,
+        string? providerSub,
         string? returnUrl,
         IConfiguration configuration)
     {
@@ -189,11 +191,11 @@ public class AccountPicker : PageModel
         {
             new("sub", account.Uid.ToString()),
             new("email", account.Email),
-            new("auth_method", "google"),
-            new("provider", "google")
+            new("auth_method", OidcCallback.ProviderName),
+            new("provider", OidcCallback.ProviderName)
         };
-        if (!string.IsNullOrEmpty(googleSub))
-            claims.Add(new Claim("provider_sub", googleSub));
+        if (!string.IsNullOrEmpty(providerSub))
+            claims.Add(new Claim("provider_sub", providerSub));
 
         var configOptions = configuration
             .GetSection(AccountLoginMessageOptions.Location)
@@ -213,6 +215,7 @@ public class AccountPicker : PageModel
             "AccountPicker: signed in to account {AccountId} from IP {IpAddress}",
             account.Id, HttpContext.Connection.RemoteIpAddress);
 
-        return Redirect(returnUrl ?? "/auto");
+        // returnUrl originated from a query parameter: never redirect off-site with it.
+        return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/auto");
     }
 }

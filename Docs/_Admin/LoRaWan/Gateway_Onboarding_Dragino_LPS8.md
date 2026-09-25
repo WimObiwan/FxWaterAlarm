@@ -10,7 +10,7 @@
   sudo ifconfig enp3s0 192.168.9.1 netmask 255.255.255.0
   sudo dnsmasq -d -C /dev/null --port=0 --domain=localdomain --interface=enp3s0 --dhcp-range=192.168.9.2,192.168.9.10,99h
   ```
-* Connect LPS8 using ethernet cable to laptop, and power up
+* Connect gateway using ethernet cable to laptop, and power up
 * This gives this output:
   ```
   dnsmasq: started, version 2.90 DNS disabled
