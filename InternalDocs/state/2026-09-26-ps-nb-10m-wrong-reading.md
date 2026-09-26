@@ -71,3 +71,22 @@ WaterAlarm shows −1250 mm. The PS-NB-I5 (5 m) units read fine.
   The layout changed somewhere in between, and the exact version is unknown. A unit on v3.8.1–v3.8.5
   would be misparsed.
 - The −1250 point already in InfluxDB for `F860915082514413` probably needs removing.
+
+## Addendum 2026-09-26 evening — deployed
+
+- IotRouter deployed to server3 at 19:18:10 (Brussels) via `IotRouter/scripts/deploy-iotrouter-prd.sh`
+  (gitignored wrapper around `deploy.sh`). Snapshot for rollback: `/opt/IotRouter-20260926`.
+  `ProbeRangeMm` for `F860915082514413` added to `/opt/IotRouter/appsettings.json`. `[verified]`
+- Other nodes after deploy: `F860631074843179` (5 m, old layout) read 9.245 mA / 1639 mm at 20:54, the same
+  as before the deploy. DDS75 NB nodes and LoRaWAN sensors arrived and parsed normally. `F867787054436393`
+  missed its 20:18 slot, but it had already missed several slots earlier that day. `[verified]`
+- 10 m unit: silent between 18:59 and 22:18 (Brussels) although the device reported successful sends;
+  nothing reached the bridge. The 22:18:47 uplink parsed as 4.002 mA → 1.25 mm (10 m range) and was written
+  to InfluxDB. `[verified]` Cause of the gap unknown. It fits a 1NCE ESM back-off
+  (see `2026-09-12-nbiot-backoff-timers.md`), but that is unconfirmed because there was no `AT+QESMC?` capture. `[hypothesis]`
+- The four −1250 points (16:01:54, 16:31:08, 16:32:06, 16:59:07 UTC) were deleted with `Remove-WAMeasurement`
+  from `/opt/wateralarm-admin` (`pwsh-preview`). `Get-WAMeasurements` afterwards shows only
+  20:18:40 UTC, 1 mm. `[verified]`
+- Correction: the sensor *is* registered (Sensor 55, LevelPressure, created 2026-09-26 15:34 UTC). Earlier
+  "not in the Sensor table" came from querying the stale pre-rename DB at
+  `/var/www/wateralarm.foxinnovations.be/`. Prod runs from `/var/www/www.wateralarm.be/`. `[verified]`
