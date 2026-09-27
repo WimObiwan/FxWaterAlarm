@@ -22,6 +22,11 @@ title: Versie Informatie
 > *
 -->
 
+### v1.9
+> 2026-09-27
+> * De melding "Je kunt WaterAlarm.be nu ook installeren als app" kan weggeklikt worden.  Ze
+>   komt dan 30 dagen niet meer terug op dat toestel.
+
 ### v1.8
 > 2026-05-17
 > * Ondersteuning voor stookolietanks.  Stookolie heeft een andere massadichtheid dan water, waardoor het volume van de tank gecorrigeerd wordt.  Bijkomend is de geometrie van de tank ook anders, aangezien een stookolietank een platte cilinder is.
