@@ -15,16 +15,20 @@ is geen gateway en geen internetverbinding ter plaatse nodig; de simkaart zit in
 
 ## Bediening
 
-Dit toestel heeft een knopje om:
+De sensormodule heeft een knopje en een lichtje.
 
-* Aan/af-gezet worden zonder het te openen:
-    * Aanzetten
-        * Druk 1 à 2 seconden op de knop
-    * Afzetten
-        * Druk 5x kort op de knop
-          (Het lichtje kleurt even rood, en het toestel wordt uitgezet)
-* Er kan een extra meting gedaan worden, nuttig voor testen:
-    * Druk 1 à 2 seconden op de knop
+* Aanzetten
+    * Druk **3 à 4 seconden** op de knop.
+    * Het lichtje kleurt groen en begint te knipperen: het toestel start op.
+    * Zodra er verbinding is met het 5G-netwerk, kleurt het lichtje enkele seconden **blauw**.
+      De eerste keer kan dat lang duren.
+* Extra meting versturen (nuttig voor testen)
+    * Druk **1 à 3 seconden** op de knop.
+    * Het lichtje kleurt even blauw wanneer de meting verstuurd is.  Het kan nog even duren
+      voor ze op het platform zichtbaar is.
+* Afzetten
+    * Druk **5x kort** op de knop.
+    * Het lichtje kleurt even rood, en het toestel wordt uitgezet.
 
 ## Montage
 
