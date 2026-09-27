@@ -129,11 +129,15 @@
     </tr>
 </table>
 
-<h2 class="h4 mt-3">
-    Client-side
-    <button type="button" id="infoClientRefresh" class="btn btn-link p-0 align-baseline" title="Refresh client-side information">
+<h2 class="h4 mt-3 d-flex align-items-center gap-3">
+    Connection
+    <button type="button" id="infoClientRefresh" class="btn btn-link p-0" style="font-size: 1.5em" title="Refresh connection information">
         <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
     </button>
+    <span class="form-check form-switch fs-6 fw-normal mb-0">
+        <input class="form-check-input" type="checkbox" role="switch" id="infoClientAutoRefresh" autocomplete="off">
+        <label class="form-check-label" for="infoClientAutoRefresh">auto-refresh</label>
+    </span>
 </h2>
 
 <table id="infoClient" style="display: block">
@@ -203,7 +207,12 @@
         const probeTimeoutMs = 5000;
         let probe = { reachable: 'probing…', roundTrip: '-', lastProbe: '-' };
 
+        let probing = false;
+
         async function runProbe() {
+            // Auto-refresh fires every second but a probe may take up to probeTimeoutMs: never overlap.
+            if (probing) return;
+            probing = true;
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), probeTimeoutMs);
             const started = performance.now();
@@ -216,6 +225,7 @@
                 reachable = e.name === 'AbortError' ? 'no (timeout after ' + probeTimeoutMs + ' ms)' : 'no (network error)';
             } finally {
                 clearTimeout(timer);
+                probing = false;
             }
             const elapsed = Math.round(performance.now() - started);
             probe = {
@@ -261,6 +271,18 @@
         document.addEventListener('visibilitychange', () => { if (!document.hidden) runProbe(); });
         setInterval(() => { if (!document.hidden) runProbe(); }, probeIntervalMs);
         document.getElementById('infoClientRefresh').addEventListener('click', onNetworkChange);
+
+        // Auto-refresh: off after every page load (autocomplete="off" stops the browser restoring it).
+        let autoRefreshTimer = null;
+        const autoRefresh = document.getElementById('infoClientAutoRefresh');
+        autoRefresh.checked = false;
+        autoRefresh.addEventListener('change', () => {
+            clearInterval(autoRefreshTimer);
+            autoRefreshTimer = autoRefresh.checked
+                ? setInterval(() => { if (!document.hidden) onNetworkChange(); }, 1000)
+                : null;
+            if (autoRefresh.checked) onNetworkChange();
+        });
 
         update();
         runProbe();
