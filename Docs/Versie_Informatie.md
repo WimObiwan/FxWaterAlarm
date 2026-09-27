@@ -24,8 +24,33 @@ title: Versie Informatie
 
 ### v1.9
 > 2026-09-27
+>
+> ##### Nieuw
+> * Tabelweergave: op de sensorpagina kan je de metingen ook als tabel bekijken, met de kolommen
+>   die bij het type sensor horen.
+> * Ondersteuning voor temperatuursensoren, met een eigen weergave en alarmen bij een te hoge of
+>   te lage temperatuur.
+> * Per sensor kan ingesteld worden welke grafiek standaard getoond wordt.
+> * Het e-mailadres waarmee een gebruiker inlogt, kan gewijzigd worden.
+>
+> ##### Verbeteringen
 > * De melding "Je kunt WaterAlarm.be nu ook installeren als app" kan weggeklikt worden.  Ze
 >   komt dan 30 dagen niet meer terug op dat toestel.
+> * Vernieuwen-knop in de menubalk, handig in de geïnstalleerde app waar geen knop van de browser
+>   is.
+> * Ben je ingelogd, dan opent "Mijn sensoren" de sensoren van je account, in plaats van de
+>   laatst onthouden link.
+> * Mooiere documentatiepagina's: afbeeldingen passen op een smartphone en openen in een
+>   zoombare weergave, en links zijn beter leesbaar in donkere modus.
+> * QR-codes blijven scherp, ook bij afdrukken of inzoomen.
+> * Betere schaal (minimum en maximum) op de grafieken van volume, percentage en hoogte.
+>
+> ##### Andere
+> * Inloggen met Google verloopt nu via de centrale login-server van Fox Innovations.
+> * Het veld "Capaciteit" in de sensorinstellingen werkt weer correct.
+> * Een foutieve meting verwijderen gaf soms de fout "Multiple measurements found"; dat is
+>   opgelost.
+> * Een witte balk bovenaan het scherm op de iPad mini is verdwenen.
 
 ### v1.8
 > 2026-05-17

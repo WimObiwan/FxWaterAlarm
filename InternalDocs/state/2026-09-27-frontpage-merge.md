@@ -1,6 +1,7 @@
 # Frontpage: merge blog.wateralarm.be into the Site
 
-Status: **code done and verified locally.** The nginx change on server3 is still to do; see
+Status: **live in production since 2026-09-27** (release `44c4e88`, nginx switched the same evening).
+Procedure used:
 [`../runbooks/retire-blog-subdomain.md`](../runbooks/retire-blog-subdomain.md).
 Decision: [`../decisions/single-site.md`](../decisions/single-site.md).
 
@@ -90,3 +91,17 @@ text in the browser:
 
 Verified by driving Chrome over CDP: both modes on the frontpage and on /Docs/Prijzen, the
 choice remembered across pages, 7,44 € → 9,00 €, and 140 € → 169,40 €.
+
+## Addendum 2026-09-27: switched in production
+
+- Site `44c4e88` deployed to dev and prd.
+- nginx on server3, done by hand (*verified with curl afterwards*):
+  - `/etc/nginx/conf.d/wateralarm.be.conf`: removed `location ~ ^/$ { return 301 https://blog.wateralarm.be/; }`
+    from the `www.wateralarm.be` 443 block.
+  - `/etc/nginx/conf.d/blog.wateralarm.be.conf`: the 443 block now only does
+    `return 301 https://www.wateralarm.be$request_uri;`. The port-80 block is unchanged, so
+    certificate renewal keeps working.
+- Result: `www/` → 200 (new frontpage). `blog/?utm_source=x` → 301 `www/?utm_source=x`.
+  `blog/some/path` → 301 `www/some/path`. Apex → 301 www. `/Short?c=...` → 302 `/?utm_...`.
+- Still open: archive and remove the Mobirise webroot; stop GA `G-HEJ2ZM9CYB`; optional
+  `error_page` fallback (runbook steps 3 and 5).

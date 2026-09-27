@@ -4,8 +4,9 @@ One-off procedure for server3, to run **after** the Site release that contains t
 `Site/Pages/Index.cshtml` is deployed. Background:
 [`../decisions/single-site.md`](../decisions/single-site.md).
 
-The server block names and file paths below are **not verified**. The nginx config was not
-read when this runbook was written. Look first, then edit.
+Steps 0–2 and 4 were done on 2026-09-27. The files are `/etc/nginx/conf.d/wateralarm.be.conf`
+(`www.wateralarm.be` 443 block) and `/etc/nginx/conf.d/blog.wateralarm.be.conf`. Only steps 3
+(optional) and 5 are left.
 
 ## 0. Look
 
