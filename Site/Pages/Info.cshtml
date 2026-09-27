@@ -129,7 +129,12 @@
     </tr>
 </table>
 
-<h2 class="h4 mt-3">Client-side</h2>
+<h2 class="h4 mt-3">
+    Client-side
+    <button type="button" id="infoClientRefresh" class="btn btn-link p-0 align-baseline" title="Refresh client-side information">
+        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+    </button>
+</h2>
 
 <table id="infoClient" style="display: block">
     <tr>
@@ -255,6 +260,7 @@
         // Background tabs throttle timers; probe again as soon as the page is visible.
         document.addEventListener('visibilitychange', () => { if (!document.hidden) runProbe(); });
         setInterval(() => { if (!document.hidden) runProbe(); }, probeIntervalMs);
+        document.getElementById('infoClientRefresh').addEventListener('click', onNetworkChange);
 
         update();
         runProbe();
