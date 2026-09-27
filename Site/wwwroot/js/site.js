@@ -43,6 +43,33 @@ clipboardDemos.on('success',function(e)
     }, 2000);
 });
 
+// The "install as app" banner can be dismissed; remember that for 30 days.
+// localStorage rather than a cookie: only the browser needs it, the server never does.
+const INSTALL_DISMISSED_KEY = 'installBannerDismissedUntil';
+const INSTALL_DISMISS_DAYS = 30;
+
+function isInstallBannerDismissed() {
+    try {
+        const until = Number(localStorage.getItem(INSTALL_DISMISSED_KEY));
+        return until > Date.now();
+    } catch {
+        return false;
+    }
+}
+
+function dismissInstallBanner() {
+    try {
+        localStorage.setItem(INSTALL_DISMISSED_KEY, String(Date.now() + INSTALL_DISMISS_DAYS * 24 * 60 * 60 * 1000));
+    } catch {
+        // storage blocked: the banner just comes back on the next visit
+    }
+    installContainer.classList.toggle('hidden', true);
+}
+
+if (typeof butInstallDismiss !== 'undefined') {
+    butInstallDismiss.addEventListener('click', dismissInstallBanner);
+}
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
@@ -79,7 +106,9 @@ if ('serviceWorker' in navigator) {
         // Stash the event so it can be triggered later.
         window.deferredPrompt = event;
         // Remove the 'hidden' class from the install button container
-        installContainer.classList.toggle('hidden', false);
+        if (!isInstallBannerDismissed()) {
+            installContainer.classList.toggle('hidden', false);
+        }
     });
 }
 

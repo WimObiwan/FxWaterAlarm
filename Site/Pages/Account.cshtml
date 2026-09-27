@@ -43,11 +43,12 @@
 </div>
 }
 
-<p class=""><div id="installContainer" class="alert alert-success small-alert hidden">
+<p class=""><div id="installContainer" class="alert alert-success alert-dismissible small-alert hidden">
     Je kunt WaterAlarm.be nu ook installeren als <i>app</i>.  Druk hiervoor op de knop
     <button id="butInstall" type="button">
         installeren
     </button>.
+    <button id="butInstallDismiss" type="button" class="btn-close" aria-label="Sluiten" title="Niet meer tonen (30 dagen)"></button>
 </div></p>
 
 @if (@Model.Message is {} message)
