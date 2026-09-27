@@ -373,3 +373,109 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
         });
     });
 })();
+
+// ---------------------------------------------------------------------------
+// Prices: the source text (Docs/*.md, the frontpage) is written exclusive of
+// btw, but consumers must see prices inclusive of btw.  A Particulier /
+// Professioneel switch rewrites every "123 €" amount and every "exclusief btw"
+// in scope; Particulier (incl. 21% btw) is the default.  The choice is shared
+// by all pages.  Scope: elements with data-vat-scope, and any Docs page that
+// mentions an amount (the switch is then placed under its title).
+// ---------------------------------------------------------------------------
+(function () {
+    const VAT = 1.21;
+    const STORAGE_KEY = 'vatMode';
+    const PRICE = /(\d+(?:,\d+)?)(\s*)€/g;
+    const EXCL = /\b([Ee])xclusief btw\b/g;
+
+    const texts = new Map(); // text node -> original (exclusive) text
+    let mode = 'particulier';
+
+    try {
+        if (localStorage.getItem(STORAGE_KEY) === 'professioneel')
+            mode = 'professioneel';
+    } catch (e) { }
+
+    // "140" -> "169,40", "240" -> "290,40", "200" -> "242"; "7,44" -> "9,00" (cents stay when the source has them).
+    function formatIncl(amount) {
+        const incl = Math.round(parseFloat(amount.replace(',', '.')) * VAT * 100) / 100;
+        return Number.isInteger(incl) && !amount.includes(',') ? String(incl) : incl.toFixed(2).replace('.', ',');
+    }
+
+    // A non-breaking space keeps "169,40 €" together in a narrow table column.
+    function convert(text, incl) {
+        text = text.replace(PRICE, (m, amount, space) =>
+            (incl ? formatIncl(amount) : amount) + (space ? '\u00a0' : '') + '€');
+        return incl ? text.replace(EXCL, (m, e) => (e === 'E' ? 'I' : 'i') + 'nclusief btw') : text;
+    }
+
+    function collect(scope) {
+        const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, {
+            acceptNode: node => node.parentElement.closest('.vat-toggle, code, pre, script, style')
+                ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+        });
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            PRICE.lastIndex = 0;
+            EXCL.lastIndex = 0;
+            if (PRICE.test(node.nodeValue) || EXCL.test(node.nodeValue))
+                texts.set(node, node.nodeValue);
+        }
+    }
+
+    function render() {
+        texts.forEach((original, node) => {
+            node.nodeValue = convert(original, mode === 'particulier');
+        });
+        document.querySelectorAll('.vat-toggle').forEach(toggle => {
+            toggle.querySelector('input').checked = mode === 'professioneel';
+            toggle.querySelectorAll('[data-vat-mode]').forEach(label =>
+                label.classList.toggle('active', label.getAttribute('data-vat-mode') === mode));
+        });
+    }
+
+    function setMode(newMode) {
+        mode = newMode;
+        try { localStorage.setItem(STORAGE_KEY, mode); } catch (e) { }
+        render();
+    }
+
+    let toggleCount = 0;
+    function buildToggle(container) {
+        const id = 'vat-switch-' + (++toggleCount);
+        container.classList.add('vat-toggle');
+        container.innerHTML =
+            '<button type="button" class="vat-toggle-label" data-vat-mode="particulier">Particulier <span class="vat-toggle-hint">incl. btw</span></button>' +
+            '<div class="form-check form-switch m-0">' +
+            '<input class="form-check-input" type="checkbox" role="switch" id="' + id + '" aria-label="Prijzen voor professionelen, exclusief btw">' +
+            '</div>' +
+            '<button type="button" class="vat-toggle-label" data-vat-mode="professioneel">Professioneel <span class="vat-toggle-hint">excl. btw</span></button>';
+        container.querySelector('input').addEventListener('change', event =>
+            setMode(event.target.checked ? 'professioneel' : 'particulier'));
+        container.querySelectorAll('[data-vat-mode]').forEach(label =>
+            label.addEventListener('click', () => setMode(label.getAttribute('data-vat-mode'))));
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-vat-scope]').forEach(collect);
+
+        document.querySelectorAll('.markdown-body').forEach(body => {
+            PRICE.lastIndex = 0;
+            if (!PRICE.test(body.textContent))
+                return;
+            collect(body);
+            if (!body.querySelector('[data-vat-toggle]')) {
+                const toggle = document.createElement('div');
+                toggle.setAttribute('data-vat-toggle', '');
+                const title = body.querySelector('h1');
+                if (title)
+                    title.after(toggle);
+                else
+                    body.prepend(toggle);
+            }
+        });
+
+        document.querySelectorAll('[data-vat-toggle]').forEach(buildToggle);
+        if (texts.size > 0)
+            render();
+    });
+})();

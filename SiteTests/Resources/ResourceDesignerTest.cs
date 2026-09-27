@@ -9,43 +9,6 @@ namespace SiteTests.Resources;
 /// </summary>
 public class ResourceDesignerTest
 {
-    // --- Pages/Index ---
-
-    [Fact]
-    public void Index_ResourceManager_IsNotNull()
-    {
-        Assert.NotNull(Site.Resources.Pages.Index.ResourceManager);
-    }
-
-    [Fact]
-    public void Index_Intro_ReturnsValue()
-    {
-        var value = Site.Resources.Pages.Index.Intro;
-        Assert.NotNull(value);
-        Assert.NotEmpty(value);
-    }
-
-    [Fact]
-    public void Index_LiveDemo_ReturnsValue()
-    {
-        Assert.NotNull(Site.Resources.Pages.Index.LiveDemo);
-    }
-
-    [Fact]
-    public void Index_Schema_ReturnsValue()
-    {
-        Assert.NotNull(Site.Resources.Pages.Index.Schema);
-    }
-
-    [Fact]
-    public void Index_Culture_CanBeSetAndGet()
-    {
-        var original = Site.Resources.Pages.Index.Culture;
-        Site.Resources.Pages.Index.Culture = System.Globalization.CultureInfo.InvariantCulture;
-        Assert.Equal(System.Globalization.CultureInfo.InvariantCulture, Site.Resources.Pages.Index.Culture);
-        Site.Resources.Pages.Index.Culture = original;
-    }
-
     // --- Pages/Account ---
 
     [Fact]
@@ -156,11 +119,5 @@ public class ResourceDesignerTest
     public void Layout_SetLink_ReturnsValue()
     {
         Assert.NotNull(Site.Resources.Views.Shared._Layout.Set_link);
-    }
-
-    [Fact]
-    public void Layout_NewsBlog_ReturnsValue()
-    {
-        Assert.NotNull(Site.Resources.Views.Shared._Layout.News_blog);
     }
 }

@@ -1,107 +1,303 @@
 ﻿@page
-@using Microsoft.AspNetCore.Mvc.Localization
 @model IndexModel
-@inject IViewLocalizer Loc
 @{
-    ViewData["Title"] = null;
+    ViewData["Title"] = "Regenput, waterniveau en lekdetectie opvolgen";
+    ViewData["RobotsAllowIndex"] = true;
+    const string description = "WaterAlarm volgt het niveau van je regenput, put of stookolietank op, en detecteert waterlekken. Draadloze sensor op batterij, via LoRa of 5G, met dashboard en alarm per e-mail.";
 }
 
-<h1>WaterAlarm</h1>
+@section Head {
+    <meta name="description" content="@description"/>
+    <link rel="canonical" href="https://www.wateralarm.be/"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:site_name" content="WaterAlarm"/>
+    <meta property="og:title" content="WaterAlarm — weet altijd hoe vol je regenput is"/>
+    <meta property="og:description" content="@description"/>
+    <meta property="og:url" content="https://www.wateralarm.be/"/>
+    <meta property="og:image" content="https://www.wateralarm.be/img/front/ultrasoon-put.webp"/>
+    <meta property="og:locale" content="nl_BE"/>
+}
 
-@Loc["Intro"]
+<div class="front" lang="nl">
 
-<hr/>
+    @* ---- Hero ---- *@
+    <section class="front-hero row align-items-center g-4 mb-5">
+        <div class="col-md-7">
+            <h1 class="display-5 fw-bold mb-3">Weet altijd hoe vol je regenput is</h1>
+            <p class="lead mb-4">
+                WaterAlarm volgt het waterniveau in je regenput, put of tank op — en ook stookolie,
+                bodemvochtigheid en waterlekken.  Een draadloze sensor op batterij meet op regelmatige
+                tijdstippen; jij ziet het resultaat op je smartphone of computer, en krijgt een e-mail
+                zodra een alarmgrens overschreden wordt.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                @if (Model.HasAutoLink)
+                {
+                    <a class="btn btn-primary btn-lg" href="/auto"><i class="bi bi-speedometer2 me-1"></i> Mijn sensoren</a>
+                    <a class="btn btn-outline-secondary btn-lg" href="/Docs/"><i class="bi bi-book me-1"></i> Documentatie</a>
+                }
+                else
+                {
+                    <a class="btn btn-primary btn-lg" href="/demo"><i class="bi bi-play-circle me-1"></i> Live demo</a>
+                    <a class="btn btn-outline-primary btn-lg" href="/Docs/Sensor_Overzicht"><i class="bi bi-list-check me-1"></i> Welke sensor?</a>
+                    <a class="btn btn-outline-secondary btn-lg" href="/login?r=%2Fauto"><i class="bi bi-person me-1"></i> Inloggen</a>
+                }
+            </div>
+            @if (!Model.HasAutoLink)
+            {
+                <p class="small text-muted mt-3 mb-0">
+                    De live demo toont echte metingen van een regenput.  Al klant?  Log in, of open de
+                    link die je bij je installatie kreeg.
+                </p>
+            }
+        </div>
+        <div class="col-md-5">
+            <img class="front-photo" src="/img/front/ultrasoon-put.webp" alt="Ultrasone WaterAlarm-sensor, gemonteerd bovenaan in een regenput" width="709" height="551"/>
+        </div>
+    </section>
 
-<h2>@Loc["LiveDemo"]</h2>
-<p>
-    @Loc["LiveDemoText"]
-</p>
-
-<hr/>
-
-<h2>@Loc["Schema"]</h2>
-
-<img src="/img/Wateralarm schema.drawio.svg" width="100%" alt="Schema"/>
-
-<hr/>
-
-<h2>Release notes &amp; roadmap</h2>
-
-<div class="accordion" id="accordionExample">
-    <div class="accordion-item">
-        <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                Release notes
-            </button>
-        </h2>
-        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th>Version</th>
-                        <th>Major changes</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>v0.14</td><td>Trends page, navbar improvements</td>
-                    </tr>
-                    <tr>
-                        <td>v0.13</td><td>Removed some sensor animations, Library upgrades</td>
-                    </tr>
-                    <tr>
-                        <td>v0.12</td><td>Localization &amp;amp; Dutch translation</td>
-                    </tr>
-                    <tr>
-                        <td>v0.11</td><td>Add main page</td>
-                    </tr>
-                    <tr>
-                        <td>v0.10</td><td>Update titles</td>
-                    </tr>
-                    <tr>
-                        <td>v0.9</td><td>Add additional graphs</td>
-                    </tr>
-                    @* <tr><td>v0.7-v0.8</td><td>Major refactorings</td></tr> *@
-                    <tr>
-                        <td>v0.6</td><td>Simplified graph</td>
-                    </tr>
-                    <tr>
-                        <td>v0.5</td><td>Add initial graph</td>
-                    </tr>
-                    <tr>
-                        <td>v0.4</td><td>Add battery & RSSI percentages</td>
-                    </tr>
-                    <tr>
-                        <td>v0.3</td><td>Add battery on details page, tabs</td>
-                    </tr>
-                    <tr>
-                        <td>v0.2</td><td>Add RSSI on details page</td>
-                    </tr>
-                    <tr>
-                        <td>v0.1</td><td>Add details page</td>
-                    </tr>
-                    </tbody>
-                </table>
+    @* ---- Hoe werkt het ---- *@
+    <section class="mb-5" id="hoe-werkt-het">
+        <h2 class="mb-4">Hoe werkt het?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="front-step"><span class="front-step-nr">1</span></div>
+                <h3 class="h5">De sensor meet</h3>
+                <p>
+                    Een draadloze sensor op batterij, zonder stroomaansluiting, meet het niveau (of de
+                    vochtigheid, of de aanwezigheid van water) op regelmatige tijdstippen.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <div class="front-step"><span class="front-step-nr">2</span></div>
+                <h3 class="h5">Via LoRa of 5G</h3>
+                <p>
+                    De meting gaat naar het WaterAlarm-platform: via je eigen LoRa-gateway en je
+                    internetaansluiting, of rechtstreeks over het 5G-netwerk (NB-IoT).
+                </p>
+            </div>
+            <div class="col-md-4">
+                <div class="front-step"><span class="front-step-nr">3</span></div>
+                <h3 class="h5">Jij ziet het, overal</h3>
+                <p>
+                    Het actuele niveau in mm, % en liter, de historiek in grafieken, en een alarm per
+                    e-mail — bij een te laag of te hoog niveau, of een bijna lege batterij.
+                </p>
             </div>
         </div>
-    </div>
-    <div class="accordion-item">
-        <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                Roadmap
-            </button>
-        </h2>
-        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <ul>
-                    <li>Account page</li>
-                    <li>Privacy page</li>
-                    <li>Self-care configuration of tank dimension</li>
-                    <li>Thresholds</li>
-                    <li>MQTT</li>
+        <img class="front-sketch mt-2" src="/Docs/_Tekeningen/Regenput_Sensor.svg" alt="Doorsnede van een regenput met een ultrasone niveausensor onder het deksel" loading="lazy"/>
+    </section>
+
+    @* ---- Wat meet je ---- *@
+    <section class="mb-5" id="sensoren">
+        <h2 class="mb-2">Wat wil je meten?</h2>
+        <p class="mb-4">Elke sensor bestaat in een LoRa- en een 5G-uitvoering.</p>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+            <div class="col">
+                <a class="card h-100 front-card" href="/Docs/Sensor_Overzicht#waterniveau-meten-ultrasoon-of-druk">
+                    <img class="card-img-top" src="/img/front/ultrasoon-put-2.webp" alt="Ultrasone sensor tegen de bovenrand van een put" loading="lazy"/>
+                    <div class="card-body">
+                        <h3 class="h5 card-title">Waterniveau — ultrasoon</h3>
+                        <p class="card-text">Meet van bovenaf, zonder contact met het water.  De voordeligste keuze, en volstaat voor de meeste regenputten.</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col">
+                <a class="card h-100 front-card" href="/Docs/Sensor_Nodes/Druksensor_Opstelling">
+                    <img class="card-img-top front-card-sketch" src="/Docs/_Tekeningen/Ultrasoon_Druk.svg" alt="Ultrasone sensor en druksensor naast elkaar in een put" loading="lazy"/>
+                    <div class="card-body">
+                        <h3 class="h5 card-title mb-1">Waterniveau — druk</h3>
+                        <p class="mb-2">(of stookolie)</p>
+                        <p class="card-text">Een drukcel hangt vlak boven de bodem.  Voor moeilijke of smalle putten, peilbuizen en stookolietanks.</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col">
+                <a class="card h-100 front-card" href="/Docs/Sensor_Overzicht#bodemvochtigheid">
+                    <img class="card-img-top" src="/img/front/bodemvocht.webp" alt="Bodemvochtsensor in een bloempot" loading="lazy"/>
+                    <div class="card-body">
+                        <h3 class="h5 card-title">Bodemvochtigheid</h3>
+                        <p class="card-text">Vochtigheid, temperatuur en geleidbaarheid van de bodem — voor tuin, serre of veld.</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col">
+                <a class="card h-100 front-card" href="/Docs/Sensor_Overzicht#waterlekdetectie-met-detectiekabel">
+                    <img class="card-img-top" src="/img/front/lekdetectie-kabel.webp" alt="Detectiekabel voor waterlekken op de bodem van een bak met water" loading="lazy"/>
+                    <div class="card-body">
+                        <h3 class="h5 card-title">Waterlekdetectie</h3>
+                        <p class="card-text">Een detectiekabel op de vloer geeft alarm zodra er ergens over zijn lengte water komt — in de kelder, naast de boiler of de pomp.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <p class="mt-3 mb-0">
+            <a href="/Docs/Sensor_Overzicht">Sensor Overzicht</a> helpt je kiezen, met de verschillen,
+            de batterijduur, het zonnepaneel en wat er kan misgaan.
+        </p>
+    </section>
+
+    @* ---- LoRa of 5G ---- *@
+    <section class="mb-5" id="lora-of-5g">
+        <h2 class="mb-4">LoRa of 5G?</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="h5 card-title"><i class="bi bi-router me-1"></i> LoRa — via een eigen gateway</h3>
+                        <ul class="mb-0">
+                            <li>Een gateway binnenshuis, op stroom en WiFi of ethernet</li>
+                            <li>Eén gateway bedient al je sensoren op dezelfde locatie</li>
+                            <li>Batterij gaat ± 5 jaar mee</li>
+                            <li>De aangewezen keuze in of onder een gebouw, of bij diepe betonnen putten</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="h5 card-title"><i class="bi bi-broadcast me-1"></i> 5G — rechtstreeks via het mobiele netwerk</h3>
+                        <ul class="mb-0">
+                            <li>Geen gateway, geen WiFi, niets binnenshuis nodig</li>
+                            <li>Simkaart en dataverbinding zitten in het abonnement</li>
+                            <li>Batterij gaat 2 à 3 jaar mee, afhankelijk van de ontvangst</li>
+                            <li>Ideaal op een losstaande locatie in open lucht</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="mt-3 mb-0">
+            Kies niet op prijs alleen — zie <a href="/Docs/Sensor_Overzicht#lora-of-5g">LoRa of 5G?</a>
+        </p>
+    </section>
+
+    @* ---- Prijzen ---- *@
+    <section class="mb-5" id="prijzen" data-vat-scope>
+        <h2 class="mb-2">Prijzen</h2>
+        <p class="mb-4">
+            De prijzen hieronder gaan uit van het slechtste geval.  Bel me gerust en leg je situatie
+            uit — vaak kan het eenvoudiger of goedkoper: <a href="tel:+32484248424">0484 24 84 24</a>.
+        </p>
+        @* Deliberately only the headline figures: Docs/Prijzen.md is the price list. *@
+        <div class="row g-4 align-items-stretch">
+            <div class="col-md-4">
+                <div class="front-price">
+                    <div class="front-price-label">Sensor, eenmalig</div>
+                    <div class="front-price-value">vanaf 140 €</div>
+                    <div class="small text-muted">LoRa; 5G vanaf 160 €</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="front-price">
+                    <div class="front-price-label">Abonnement</div>
+                    <div class="front-price-value">30 € / jaar</div>
+                    <div class="small text-muted">per sensor — het eerste jaar is inbegrepen</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="front-price">
+                    <div class="front-price-label">Inbegrepen</div>
+                    <div class="front-price-value front-price-value-sm">simkaart, batterij, zonnepaneel</div>
+                    <div class="small text-muted">een vervangbatterij per jaar; zonnepaneel waar leverbaar</div>
+                </div>
+            </div>
+        </div>
+        @* Filled by site.js: switches every amount in data-vat-scope between incl. and excl. btw. *@
+        <div class="mt-3" data-vat-toggle></div>
+        <p class="mt-2 mb-0">
+            Alle prijzen exclusief btw.  De volledige prijslijst, de opties en rekenvoorbeelden staan op
+            <a href="/Docs/Prijzen">Prijzen</a>.
+        </p>
+    </section>
+
+    @* ---- App & integraties ---- *@
+    <section class="mb-5" id="integraties">
+        <h2 class="mb-4">App en integraties</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+                <a class="card h-100 front-card" href="/demo">
+                    <img class="card-img-top front-card-contain" src="/img/front/app.webp" alt="Schermafdruk van de WaterAlarm-app met het volume van een regenput" loading="lazy"/>
+                    <div class="card-body">
+                        <h3 class="h5 card-title">Web-app</h3>
+                        <p class="card-text">Werkt in elke browser, en installeer je als app op Android of iPhone — geen app store nodig.</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col">
+                <a class="card h-100 front-card" href="/Docs/Integraties/Home_Assistant">
+                    <img class="card-img-top front-card-contain" src="/img/front/home-assistant.webp" alt="WaterAlarm-meters in een Home Assistant-dashboard" loading="lazy"/>
+                    <div class="card-body">
+                        <h3 class="h5 card-title">Home Assistant</h3>
+                        <p class="card-text">Toon je niveaus in je eigen domotica, en gebruik ze in automatisaties.</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col">
+                <a class="card h-100 front-card" href="/Docs/Integraties/API">
+                    <img class="card-img-top front-card-contain" src="/img/front/api.webp" alt="JSON-antwoord van de WaterAlarm-API" loading="lazy"/>
+                    <div class="card-body">
+                        <h3 class="h5 card-title">API</h3>
+                        <p class="card-text">Je metingen in JSON, om zelf verder mee te bouwen.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    @* ---- Zonder risico ---- *@
+    <section class="mb-5" id="zonder-risico">
+        <h2 class="mb-3">Zonder risico</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <p class="mb-2">
+                    <i class="bi bi-arrow-left-right me-1"></i>
+                    <strong>Omruilen:</strong> meet een sensor in jouw put toch niet betrouwbaar, of is de
+                    5G-ontvangst te zwak, dan ruilen we om naar een oplossing die wél werkt.  Je betaalt
+                    enkel het prijsverschil.
+                </p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-2">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>
+                    <strong>Terugname:</strong> lukt de installatie om een andere reden niet, dan neem ik
+                    alles terug tot zes maanden na levering.
+                </p>
+            </div>
+        </div>
+        <p class="mb-0">
+            De voorwaarden staan bij <a href="/Docs/Prijzen#wat-als-een-sensor-toch-niet-past">Wat als een sensor toch niet past?</a>
+            Wat er kan mislopen en hoe je het oplost: <a href="/Docs/Sensor_Overzicht#wat-kan-er-misgaan">Wat kan er misgaan?</a>
+        </p>
+    </section>
+
+    @* ---- Contact ---- *@
+    <section class="mb-4 front-contact" id="contact">
+        <h2 class="mb-3">Contact</h2>
+        <p>
+            Beschrijf je situatie — wat wil je meten, hoe ziet de put eruit, is er WiFi in de buurt? — dan
+            kiezen we samen het juiste toestel.
+        </p>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="bi bi-envelope me-2"></i><a href="mailto:info@wateralarm.be">info@wateralarm.be</a></li>
+                    <li class="mb-2"><i class="bi bi-telephone me-2"></i><a href="tel:+32484248424">0484 24 84 24</a></li>
                 </ul>
             </div>
+            <div class="col-md-6">
+                <address class="mb-0">
+                    <strong>Fox Innovations</strong> — Wim Devos<br/>
+                    Keibergstraat 95, 8820 Torhout<br/>
+                    <span class="text-muted">Ondernemingsnummer BE 1000.596.372</span>
+                </address>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <p class="small text-muted mb-0">
+        Nieuw in de app: zie <a href="/Docs/Versie_Informatie">Versie Informatie</a>.
+        Installatiefoto's: <a href="/photos">enkele voorbeelden</a>.
+    </p>
 </div>

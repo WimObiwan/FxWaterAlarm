@@ -496,3 +496,50 @@ body.media-viewer-open {
 .media-viewer-stage.is-zoomed img:active {
     cursor: grabbing;
 }
+
+/* Particulier / Professioneel price switch - built by site.js. */
+.vat-toggle {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5rem;
+    padding: .375rem .75rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius-pill);
+    background-color: var(--bs-tertiary-bg);
+}
+
+.vat-toggle .form-switch {
+    padding-left: 2.5em;
+}
+
+.vat-toggle .form-check-input {
+    cursor: pointer;
+}
+
+/* The switch is a choice between two options, not on/off: both ends stay blue. */
+.vat-toggle .form-check-input,
+.vat-toggle .form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+.vat-toggle-label {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--bs-secondary-color);
+}
+
+.vat-toggle-label.active {
+    color: var(--bs-body-color);
+    font-weight: 600;
+}
+
+.vat-toggle-hint {
+    font-size: .8em;
+    font-weight: 400;
+    color: var(--bs-secondary-color);
+}

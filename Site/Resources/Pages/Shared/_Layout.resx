@@ -22,10 +22,6 @@
         <value>Language</value>
         <comment>Language</comment>
     </data>
-    <data name="News blog" xml:space="preserve">
-        <value>News blog</value>
-        <comment>News blog</comment>
-    </data>
     <data name="My sensors" xml:space="preserve">
         <value>My sensors</value>
         <comment>My sensors</comment>

@@ -1,17 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Site.Utilities;
 
 namespace Site.Pages;
 
 public class IndexModel : PageModel
 {
-    private readonly ILogger<IndexModel> _logger;
+    private readonly IUserInfo _userInfo;
 
-    public IndexModel(ILogger<IndexModel> logger)
+    public IndexModel(IUserInfo userInfo)
     {
-        _logger = logger;
+        _userInfo = userInfo;
     }
+
+    // A returning customer: logged in, or /auto has remembered their account/sensor link.
+    public bool HasAutoLink { get; private set; }
 
     public void OnGet()
     {
+        HasAutoLink = _userInfo.IsAuthenticated()
+                      || !string.IsNullOrEmpty(Request.Cookies["auto"]);
     }
 }

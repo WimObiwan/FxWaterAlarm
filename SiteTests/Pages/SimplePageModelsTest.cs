@@ -9,11 +9,32 @@ namespace SiteTests.Pages;
 public class SimplePageModelsTest
 {
     [Fact]
-    public void IndexModel_OnGet_DoesNotThrow()
+    public void IndexModel_OnGet_NewVisitor_HasNoAutoLink()
     {
-        var model = new IndexModel(NullLogger<IndexModel>.Instance);
+        var model = new IndexModel(new FakeUserInfo());
         TestEntityFactory.SetupPageContext(model);
         model.OnGet();
+        Assert.False(model.HasAutoLink);
+    }
+
+    [Fact]
+    public void IndexModel_OnGet_AutoCookie_HasAutoLink()
+    {
+        var model = new IndexModel(new FakeUserInfo());
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Headers.Cookie = "auto=/a/demo/s/abc";
+        TestEntityFactory.SetupPageContext(model, httpContext);
+        model.OnGet();
+        Assert.True(model.HasAutoLink);
+    }
+
+    [Fact]
+    public void IndexModel_OnGet_Authenticated_HasAutoLink()
+    {
+        var model = new IndexModel(new FakeUserInfo { Authenticated = true });
+        TestEntityFactory.SetupPageContext(model);
+        model.OnGet();
+        Assert.True(model.HasAutoLink);
     }
 
     [Fact]

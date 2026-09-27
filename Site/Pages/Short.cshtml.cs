@@ -38,16 +38,16 @@ public class Short : PageModel
             }
         }
 
-        const string blogUrl = "https://blog.wateralarm.be";
+        const string frontpageUrl = "/";
 
         if (queryString != null)
         {
-            // e.g. https://blog.wateralarm.be?utm_source=qr&utm_medium=pst&utm_campaign=th25&utm_id=111
-            return Redirect($"{blogUrl}?{queryString}");
+            // e.g. /?utm_source=qr&utm_medium=pst&utm_campaign=th25&utm_id=111
+            return Redirect($"{frontpageUrl}?{queryString}");
         }
         else
         {
-            return Redirect(blogUrl);
+            return Redirect(frontpageUrl);
         }
     }
 }

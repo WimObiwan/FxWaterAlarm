@@ -7,7 +7,7 @@ namespace SiteTests.Pages;
 public class ShortTest
 {
     [Fact]
-    public void OnGet_RedirectsToBlog_WhenNoContext()
+    public void OnGet_RedirectsToFrontpage_WhenNoContext()
     {
         var model = new Short();
         TestEntityFactory.SetupPageContext(model);
@@ -15,11 +15,11 @@ public class ShortTest
         var result = model.OnGet(null);
 
         var redirect = Assert.IsType<RedirectResult>(result);
-        Assert.Equal("https://blog.wateralarm.be", redirect.Url);
+        Assert.Equal("/", redirect.Url);
     }
 
     [Fact]
-    public void OnGet_RedirectsToBlog_WhenContextHasFewerThan3Parts()
+    public void OnGet_RedirectsToFrontpage_WhenContextHasFewerThan3Parts()
     {
         var model = new Short();
         TestEntityFactory.SetupPageContext(model);
@@ -27,7 +27,7 @@ public class ShortTest
         var result = model.OnGet("source|medium");
 
         var redirect = Assert.IsType<RedirectResult>(result);
-        Assert.Equal("https://blog.wateralarm.be", redirect.Url);
+        Assert.Equal("/", redirect.Url);
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class ShortTest
         var result = model.OnGet("qr|scan|campaign1");
 
         var redirect = Assert.IsType<RedirectResult>(result);
-        Assert.StartsWith("https://blog.wateralarm.be?", redirect.Url);
+        Assert.StartsWith("/?", redirect.Url);
         Assert.Contains("utm_source=qr", redirect.Url);
         Assert.Contains("utm_medium=scan", redirect.Url);
         Assert.Contains("utm_campaign=campaign1", redirect.Url);
@@ -62,7 +62,7 @@ public class ShortTest
     }
 
     [Fact]
-    public void OnGet_RedirectsToBlog_WhenContextIs1Part()
+    public void OnGet_RedirectsToFrontpage_WhenContextIs1Part()
     {
         var model = new Short();
         TestEntityFactory.SetupPageContext(model);
@@ -70,7 +70,7 @@ public class ShortTest
         var result = model.OnGet("onlyonepart");
 
         var redirect = Assert.IsType<RedirectResult>(result);
-        Assert.Equal("https://blog.wateralarm.be", redirect.Url);
+        Assert.Equal("/", redirect.Url);
     }
 
     [Fact]
@@ -82,6 +82,6 @@ public class ShortTest
         var result = model.OnGet("");
 
         var redirect = Assert.IsType<RedirectResult>(result);
-        Assert.Equal("https://blog.wateralarm.be", redirect.Url);
+        Assert.Equal("/", redirect.Url);
     }
 }

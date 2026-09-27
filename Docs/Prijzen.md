@@ -1,6 +1,6 @@
 ---
 title: Prijzen
-date: 2026-09-09
+date: 2026-09-27
 ---
 
 # Prijzen
@@ -109,7 +109,6 @@ Verzending gebeurt met bpost.  Het bedrag dekt de verzending zelf én de verpakk
 | Naar een postpunt of pakjesautomaat | **7,44 €** |
 | Naar een adres | 9,92 € |
 
-* Inclusief btw komt dat neer op **9,00 €** naar een postpunt en **12,00 €** naar een adres.
 * Dit zijn de tarieven op het moment van schrijven; ze kunnen wijzigen.  Op de bestelbon staat
   het bedrag dat effectief geldt.
 * Bij een **installatie ter plaatse** vervalt de verzending (zie hierboven).
