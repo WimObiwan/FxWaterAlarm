@@ -13,7 +13,7 @@
 Welcome to **WaterAlarm** – a project that started as a hobby and has grown into a mature, reliable solution with many installations in the field. The system helps monitor water usage and detect leaks, providing peace of mind for users and valuable insights for people involved in home automation.
 
 <p align="center">
-	<img src="https://blog.wateralarm.be/assets/images/watersensor-709x551.webp" alt="WaterAlarm Sensor" width="350" />
+	<img src="Site/wwwroot/img/front/ultrasoon-put.webp" alt="WaterAlarm Sensor" width="350" />
 </p>
 
 ## Production Site

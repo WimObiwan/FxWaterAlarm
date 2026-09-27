@@ -72,7 +72,7 @@ nodig.
 | Gateway nodig? | **Ja**, eenmalige aankoop | Nee |
 | Internetverbinding ter plaatse? | **Ja**, WiFi of ethernet voor de gateway | Nee |
 | Meerdere sensoren | Delen dezelfde gateway | Elke sensor werkt op zichzelf |
-| Verwachte batterijduur | **± 5 jaar** | ± 3 jaar, afhankelijk van de ontvangst |
+| Verwachte batterijduur | **± 5 jaar** | 2 à 3 jaar, afhankelijk van de ontvangst |
 | Bereik door beton en gesloten deksels | Goed | Wisselend, afhankelijk van de locatie |
 | Sensor in of onder een gebouw (kelder, garage, technische ruimte) | **Ja**, de aangewezen keuze | Meestal te weinig ontvangst |
 | Simkaart en dataverbinding | Niet van toepassing | Inbegrepen in het abonnement |
@@ -203,11 +203,11 @@ die batterij meegaat, hangt vooral af van de gekozen verbinding:
 | Verbinding | Verwachte batterijduur |
 |---|---|
 | **LoRa** | ± 5 jaar |
-| **5G (NB-IoT)** | ± 3 jaar, afhankelijk van de 5G-ontvangst |
+| **5G (NB-IoT)** | 2 à 3 jaar, afhankelijk van de 5G-ontvangst |
 
 * Een **LoRa-sensor** verbruikt weinig per meting, en haalt daardoor de langste levensduur.
 * Een **5G-sensor** verbruikt meer, en de ontvangst ter plaatse maakt een groot verschil.  Bij
-  goede ontvangst haal je de verwachte drie jaar; bij zwakke ontvangst blijft de sensor opnieuw
+  goede ontvangst haal je de verwachte 2 à 3 jaar; bij zwakke ontvangst blijft de sensor opnieuw
   proberen om zijn meting door te sturen, en gaat de batterij een stuk minder lang mee — zie
   [5G: slechte ontvangst en een lege batterij](#2-5g-slechte-ontvangst-en-een-lege-batterij).
 * Het zijn **richtcijfers**.  Ook de meetfrequentie speelt mee: een sensor die vaker meet, gaat
@@ -281,7 +281,7 @@ ver van een zendmast heeft soms te weinig signaal.  Een kelder, een garage, een 
 of een put onder de woning zijn de lastigste plaatsen: het signaal moet dan door een vloerplaat of
 door meerdere muren.  De sensor blijft dan opnieuw proberen om zijn meting door te sturen, en
 **dat verbruikt veel batterij**.  Het gevolg is niet meteen zichtbaar: de metingen komen wel
-binnen, maar in plaats van de verwachte ± 3 jaar is de batterij veel sneller leeg — en soms vallen
+binnen, maar in plaats van de verwachte 2 à 3 jaar is de batterij veel sneller leeg — en soms vallen
 metingen weg.  De grafiek **Batterij** op de sensorpagina laat dit als eerste zien: het niveau
 zakt dan zichtbaar sneller dan normaal.
 
