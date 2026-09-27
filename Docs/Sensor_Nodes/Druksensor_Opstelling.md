@@ -23,12 +23,20 @@ module ergens anders plaatsen: waar de module hangt, daar hangen ook de antenne 
 
 ## De kabel mag je niet inkorten
 
-De kabel tussen de drukcel en de sensormodule heeft een vaste lengte.
+De kabel tussen de drukcel en de sensormodule heeft een vaste lengte.  Er loopt een **dun
+luchtbuisje** door, dat de drukcel nodig heeft voor de meting.
 
-* **Niet inkorten.**  De kabel is op lengte afgewerkt; afknippen maakt de sensor onbruikbaar.
+* **Niet inkorten.**  Afknippen maakt de sensor onbruikbaar.
 * **Oprollen mag wel.**  Een teveel aan kabel rol je gewoon op en hang je weg — dat is de normale
   manier van werken.
-* Vermijd **scherpe plooien**.
+* **Niet plooien**: vermijd scherpe bochten en knikken, die kunnen het luchtbuisje dichtdrukken.
+
+## De kabel beschermen
+
+De kabel is zeer degelijk, maar loopt hij buiten de put, bescherm hem dan:
+
+* **Bovengronds**: in een kabelgoot, tegen UV en ongedierte.
+* **Ondergronds**: in een buis of mantel, zodat een spade of graafwerk hem niet raakt.
 
 ## Hoe lang is de kabel?
 

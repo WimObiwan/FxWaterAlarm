@@ -6,28 +6,44 @@
 
 ## Bediening
 
-Dit toestel heeft een knopje om:
+De sensormodule heeft een knopje en een lichtje.  Ze lijken op elkaar: het **knopje zit aan de
+kant van de antenne** (de bovenkant).
 
-* Aan/af-gezet worden zonder het te openen:
-    * Aanzetten
-        * Druk 1 à 2 seconden op de knop
-    * Afzetten
-        * Druk 5x kort op de knop
-          (Het lichtje kleurt even rood, en het toestel wordt uitgezet) 
-* Er kan een extra meting gedaan worden, nuttig voor testen:
-    * Druk 1 à 2 seconden op de knop
+* Aanzetten
+    * Druk **3 à 4 seconden** op de knop.
+    * Het lichtje kleurt groen en begint te knipperen: het toestel start op.
+    * Zodra er verbinding is met het 5G-netwerk, kleurt het lichtje enkele seconden **blauw**.
+      De eerste keer kan dat lang duren.
+* Extra meting versturen (nuttig voor testen)
+    * Druk **1 à 3 seconden** op de knop.
+    * Het lichtje kleurt even blauw wanneer de meting verstuurd is.  Het kan nog even duren
+      voor ze op het platform zichtbaar is.
+* Afzetten
+    * Druk **5x kort** op de knop.
+    * Het lichtje kleurt even rood, en het toestel wordt uitgezet.
 
 ## Montage
 
 * De **sensormodule** zet je vast met **2 schroefjes**.  Draai ze zeker niet hard aan.
-* Het **houdertje voor de kabel wordt meegeleverd**.  Ook dat zet je vast met 2 schroefjes.
-* Monteer de houder tegen de muur en plaats de kabel in de houder.  Best met een tie-wrap.
-* De **kabel tussen de drukcel en de sensormodule mag je niet inkorten**; een teveel aan kabel rol
-  je op.  De standaardlengte is 5 m, langere kabels zijn mogelijk — zie
-  [Druksensor Opstelling](Druksensor_Opstelling.md).
-* Zorg ervoor dat de druksensor in het water hangt, en zweeft vlak boven de bodem.
+* De **antenne** schroef je op de sensormodule.
+* Het **houdertje voor de kabel wordt meegeleverd**, met spanbandjes.  Monteer het aan de
+  zijkant van het mangat en klem de kabel erin: zo hangt de drukcel op de juiste hoogte, en hoef
+  je zelf **niet in de put** te komen.
+* Schuif de **plastic verpakking** van de drukcel voor je ze in het water laat zakken.
+* De drukcel (het metalen uiteinde van de kabel) hangt **rechtop in het water, vlak boven de
+  bodem**.
+* De **kabel tussen de drukcel en de sensormodule mag je niet inkorten of plooien**; een teveel
+  aan kabel rol je op.  De standaardlengte is 5 m, langere kabels zijn mogelijk.  Waarom niet
+  inkorten, en hoe je de kabel beschermt: zie [Druksensor Opstelling](Druksensor_Opstelling.md).
 * Doorgestuurde metingen zijn de hoogte van het wateroppervlak tot de onderkant van de druksensor (waar de gaatjes zitten).
 * Wanneer de sensor een stukje boven de bodem hangt, kan dit ingesteld worden in de configuratie op het WaterAlarm-platform.
+
+## Testen voor de installatie
+
+Je kan de sensor perfect eerst testen in een **emmer water**.  Zet het toestel aan, hang de
+drukcel in de emmer en verstuur een extra meting.  Voeg daarna water toe (of til de drukcel een
+stuk op) en verstuur opnieuw een meting.  Het verschil zie je in de app onder **Grafiek** →
+**Hoogte**.
 
 ## 5G-ontvangst
 
@@ -47,7 +63,7 @@ ontvangst meestal probleemloos.  Zie [Druksensor Opstelling](Druksensor_Opstelli
 <img src="/Docs/_Tekeningen/Inmeten_Druk.svg" alt="Doorsnede van een put: meet vanaf de onderkant van de druksensor tot de bovenkant van de put en tot de bodem; samen geven ze de hoogte van de put" class="img-fluid sketch">
 
 * Totale capaciteit van de put (in liter)
-  (bvb 10000 liter))
+  (bvb 10000 liter)
 * Afstand van de onderkant van de druksensor tot de bovenkant van de put (in mm)
   (bvb 1990 mm)
 * Optioneel: Afstand van de onderkant van de druksensor tot de bodem van de put (in mm)
@@ -58,3 +74,18 @@ ontvangst meestal probleemloos.  Zie [Druksensor Opstelling](Druksensor_Opstelli
   (bvb 200 mm)
   (als je dit niveau niet instelt, wordt 0% gelijkgesteld met de bodem van de put)
 * Optioneel: de huidige waterhoogte in de put, ter controle of de metingen kloppen (in mm)
+
+De hoogte van de put meet je het makkelijkst **van bovenaf met een rolmeter**: duw de rolmeter
+tegen de bodem en kijk waar de onderkant van het mangat komt.  Meestal is dat een rond getal
+(bvb 1800 mm bij een put van 10000 liter).  Je kan ook wachten tot de put net vol is en de
+meting in de app aflezen.
+
+Deze waarden vul je in bij de sensor op het WaterAlarm-platform, onder **Details** →
+**Instellingen** (enkel wanneer je ingelogd bent).
+
+## Hoe vaak komt er een meting?
+
+De sensor stuurt **elke 2 uur** een meting door.  Bij IoT-toestellen is het normaal dat er af en
+toe een meting verloren gaat.  Uitzonderlijk wordt een toestel door een overbelaste zendmast ook
+enkele uren tot dagen niet toegelaten op het netwerk; daarna komen de metingen vanzelf weer
+door.

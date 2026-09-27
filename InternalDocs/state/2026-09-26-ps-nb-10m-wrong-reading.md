@@ -90,3 +90,10 @@ WaterAlarm shows −1250 mm. The PS-NB-I5 (5 m) units read fine.
 - Correction: the sensor *is* registered (Sensor 55, LevelPressure, created 2026-09-26 15:34 UTC). Earlier
   "not in the Sensor table" came from querying the stale pre-rename DB at
   `/var/www/wateralarm.foxinnovations.be/`. Prod runs from `/var/www/www.wateralarm.be/`. `[verified]`
+
+## Addendum 2026-09-27
+
+Procedure promoted to [`../runbooks/onboard-ps-nb-long-cable.md`](../runbooks/onboard-ps-nb-long-cable.md).
+The button/LED behaviour of this unit (on: 3–4 s, green blinking while starting, blue on network
+attach; 1–3 s extra uplink, blue; 5× short off, red) is confirmed by the owner at the device and
+now documented in `Docs/Sensor_Nodes/PS-NB.md`. `[verified]` (owner)
