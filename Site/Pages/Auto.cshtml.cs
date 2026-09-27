@@ -25,22 +25,8 @@ public class Auto : PageModel
     {
         string? url = HttpContext.Request.Cookies["auto"];
 
-        if (!update && !string.IsNullOrEmpty(url))
-        {
-            var testedUrl = await TestAutoLink(url);
-
-            if (testedUrl != null)
-            {
-                if (testedUrl != url)
-                {
-                    Response.Cookies.Append("auto", testedUrl, new CookieOptions { MaxAge = TimeSpan.FromDays(365 * 10) });
-                }
-                
-                return Redirect(testedUrl);
-            }
-        }
-
-        // No valid link cookie — if authenticated, resolve account from claims
+        // Authenticated: the logged-in account wins over the cookie. The cookie is
+        // refreshed so the app still opens the right sensor(s) after logout.
         if (!update && User.Identity?.IsAuthenticated == true)
         {
             var subClaim = User.FindFirstValue("sub");
@@ -49,7 +35,7 @@ public class Auto : PageModel
                 var account = await _mediator.Send(new AccountByUidQuery { Uid = uid });
                 var appPath = await GetAppPath(account);
                 if (appPath != null)
-                    return Redirect(appPath);
+                    return RedirectAndRemember(appPath, url);
             }
 
             var email = User.FindFirstValue("email");
@@ -64,17 +50,33 @@ public class Auto : PageModel
                 {
                     var appPath = await GetAppPath(accounts[0]);
                     if (appPath != null)
-                        return Redirect(appPath);
+                        return RedirectAndRemember(appPath, url);
                 }
             }
-
-            // Authenticated admin without account context should land on admin dashboard.
-            if (await _userInfo.IsAdmin())
-                return Redirect("/adm");
         }
+
+        if (!update && !string.IsNullOrEmpty(url))
+        {
+            var testedUrl = await TestAutoLink(url);
+
+            if (testedUrl != null)
+                return RedirectAndRemember(testedUrl, url);
+        }
+
+        // Authenticated admin without account context should land on admin dashboard.
+        if (!update && User.Identity?.IsAuthenticated == true && await _userInfo.IsAdmin())
+            return Redirect("/adm");
 
         Link = url;
         return Page();
+    }
+
+    private IActionResult RedirectAndRemember(string path, string? cookieValue)
+    {
+        if (path != cookieValue)
+            Response.Cookies.Append("auto", path, new CookieOptions { MaxAge = TimeSpan.FromDays(365 * 10) });
+
+        return Redirect(path);
     }
 
     public IActionResult OnPost(string link)
