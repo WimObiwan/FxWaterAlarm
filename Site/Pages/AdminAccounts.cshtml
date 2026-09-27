@@ -72,9 +72,13 @@
 
 
 
+<div class="account-container">
+  <input type="search" id="accountFilter" placeholder="Filter on name or e-mail" class="form-control" autocomplete="off" autofocus />
+</div>
+
 @foreach (var account in Model.Accounts.OrderBy(a => a.Name ?? a.Email))
 {
-<div class="account-container">
+<div class="account-container account-item" data-filter="@($"{account.Name} {account.Email}".ToLowerInvariant())">
   <div class="account-header">
     <h2>
       <i class="fas fa-user-shield"></i>
@@ -184,5 +188,13 @@
   function confirmDelete() {
     return confirm("Are you sure you want to delete this sensor?");
   }
+
+  document.getElementById('accountFilter').addEventListener('input', function () {
+    const terms = this.value.toLowerCase().split(/\s+/).filter(t => t);
+    document.querySelectorAll('.account-item').forEach(function (el) {
+      const text = el.dataset.filter;
+      el.style.display = terms.every(t => text.includes(t)) ? '' : 'none';
+    });
+  });
 </script>
 }
