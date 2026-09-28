@@ -1,6 +1,6 @@
 # Rejected or logged-out OIDC login leaves the Keycloak session alive
 
-Status: **code done, unit-tested, deployed to dev 2026-09-28 (incl. the email-claim fix below). Post-logout URIs configured; Google `select_account` and the dev test still to do.**
+Status: **commit `6e43f6f`, deployed to dev and prd 2026-09-28 (incl. the email-claim fix below). Post-logout URIs configured; Google `select_account` and the dev test still to do.**
 Follows [2026-09-24-keycloak-sso](2026-09-24-keycloak-sso.md).
 
 ## Problem
