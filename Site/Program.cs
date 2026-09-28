@@ -185,7 +185,7 @@ var authBuilder = builder.Services.AddAuthentication()
 
 if (oidcOptions.IsConfigured)
 {
-    authBuilder.AddOpenIdConnect("oidc", options =>
+    authBuilder.AddOpenIdConnect(OidcSession.Scheme, options =>
     {
         options.Authority = oidcOptions.Authority!;
         options.ClientId = oidcOptions.ClientId!;
@@ -235,6 +235,23 @@ if (oidcOptions.IsConfigured)
                 foreach (var role in roles)
                     identity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
+
+            // Keep the id_token (only that one) so a rejected login or a logout can end the
+            // Keycloak session with an id_token_hint. See OidcSession.
+            if (context.Properties != null)
+                OidcSession.StoreIdToken(context.Properties,
+                    context.TokenEndpointResponse?.IdToken ?? context.ProtocolMessage.IdToken);
+            return Task.CompletedTask;
+        };
+
+        // The handler looks the id_token up in the ExternalCookie, which OidcCallback has
+        // already consumed, so hand it over explicitly. Remove it from the items afterwards:
+        // the properties are serialized into the logout request's state parameter.
+        options.Events.OnRedirectToIdentityProviderForSignOut = context =>
+        {
+            if (context.Properties.Items.Remove(OidcSession.IdTokenHintItem, out var idTokenHint)
+                && !string.IsNullOrEmpty(idTokenHint))
+                context.ProtocolMessage.IdTokenHint = idTokenHint;
             return Task.CompletedTask;
         };
 

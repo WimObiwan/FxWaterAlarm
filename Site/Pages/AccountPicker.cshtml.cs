@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Site.Authentication;
 using CoreEntities = Core.Entities;
 
 namespace Site.Pages;
@@ -93,7 +94,8 @@ public class AccountPicker : PageModel
 
         DeletePickerCookie();
 
-        return await SignInAccount(account, pickerToken.ProviderSub, pickerToken.Roles, pickerToken.ReturnUrl, configuration);
+        return await SignInAccount(account, pickerToken.ProviderSub, pickerToken.Email, pickerToken.Roles, pickerToken.IdToken,
+            pickerToken.ReturnUrl, configuration);
     }
 
     // POST handler: already-authenticated user switching to a different account
@@ -117,7 +119,12 @@ public class AccountPicker : PageModel
         var providerSub = User.FindFirstValue("provider_sub");
         // Roles belong to the person, not the account: keep them across the switch.
         var roles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
-        return await SignInAccount(account, providerSub, roles, null, configuration);
+        // Likewise the id_token, so logout still ends the Keycloak session after a switch.
+        var session = await HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
+        var idToken = OidcSession.GetIdToken(session.Properties);
+        // The person stays the same, only the account changes.
+        var loginEmail = User.FindFirstValue("email");
+        return await SignInAccount(account, providerSub, loginEmail, roles, idToken, null, configuration);
     }
 
     private async Task<IReadOnlyList<CoreEntities.Account>> GetAccessibleAccounts()
@@ -186,17 +193,21 @@ public class AccountPicker : PageModel
     private async Task<IActionResult> SignInAccount(
         CoreEntities.Account account,
         string? providerSub,
+        string? loginEmail,
         IReadOnlyList<string> roles,
+        string? idToken,
         string? returnUrl,
         IConfiguration configuration)
     {
         var claims = new List<Claim>
         {
             new("sub", account.Uid.ToString()),
-            new("email", account.Email),
             new("auth_method", OidcCallback.ProviderName),
             new("provider", OidcCallback.ProviderName)
         };
+        // The login identity, not the account's main address (see OidcCallback.SignInAccount).
+        if (!string.IsNullOrEmpty(loginEmail))
+            claims.Add(new Claim("email", loginEmail));
         if (!string.IsNullOrEmpty(providerSub))
             claims.Add(new Claim("provider_sub", providerSub));
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
@@ -206,14 +217,17 @@ public class AccountPicker : PageModel
             .Get<AccountLoginMessageOptions>()
             ?? throw new InvalidOperationException("AccountLoginMessageOptions not configured");
 
+        var properties = new AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.Add(configOptions.TokenLifespan)
+        };
+        OidcSession.StoreIdToken(properties, idToken);
+
         await HttpContext.SignInAsync(
             IdentityConstants.ApplicationScheme,
             new ClaimsPrincipal(new ClaimsIdentity(claims, IdentityConstants.ApplicationScheme)),
-            new AuthenticationProperties
-            {
-                IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.Add(configOptions.TokenLifespan)
-            });
+            properties);
 
         _logger.LogInformation(
             "AccountPicker: signed in to account {AccountId} from IP {IpAddress}",

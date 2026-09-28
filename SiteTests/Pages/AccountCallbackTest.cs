@@ -19,6 +19,7 @@ namespace SiteTests.Pages;
 public class AccountCallbackTest
 {
     private readonly FakeAuditService _auditService = new();
+    private readonly FakeAuthenticationService _authenticationService = new();
 
     private (AccountCallback model, FakeUserManager userManager, DefaultHttpContext httpContext)
         CreateModel()
@@ -30,7 +31,7 @@ public class AccountCallbackTest
 
         // Register a fake IAuthenticationService so SignInAsync/SignOutAsync don't throw
         var services = new ServiceCollection();
-        services.AddSingleton<IAuthenticationService>(new FakeAuthenticationService());
+        services.AddSingleton<IAuthenticationService>(_authenticationService);
         httpContext.RequestServices = services.BuildServiceProvider();
 
         var actionContext = new ActionContext(
@@ -104,6 +105,24 @@ public class AccountCallbackTest
 
         var redirect = Assert.IsType<RedirectResult>(result);
         Assert.Equal("/", redirect.Url);
+    }
+
+    [Fact]
+    public async Task OnGet_EmptyToken_OidcSession_AlsoSignsOutOfKeycloak()
+    {
+        var (model, _, _) = CreateModel();
+        var properties = new AuthenticationProperties();
+        Site.Authentication.OidcSession.StoreIdToken(properties, "the-id-token");
+        _authenticationService.AuthenticateResult = AuthenticateResult.Success(
+            new AuthenticationTicket(new System.Security.Claims.ClaimsPrincipal(), properties, "Identity.Application"));
+
+        var result = await model.OnGet(token: "", email: "", url: "%2Fdashboard",
+            configuration: CreateConfiguration());
+
+        var signOut = Assert.IsType<SignOutResult>(result);
+        Assert.Equal([Site.Authentication.OidcSession.Scheme], signOut.AuthenticationSchemes);
+        Assert.Equal("/dashboard", signOut.Properties!.RedirectUri);
+        Assert.Contains("Identity.Application", _authenticationService.SignOutSchemes);
     }
 
     // ---- Valid token: sign in and redirect ----
@@ -251,8 +270,10 @@ public class AccountCallbackTest
         public List<string> SignInSchemes { get; } = new();
         public List<string> SignOutSchemes { get; } = new();
 
+        public AuthenticateResult AuthenticateResult { get; set; } = AuthenticateResult.NoResult();
+
         public Task<AuthenticateResult> AuthenticateAsync(HttpContext context, string? scheme)
-            => Task.FromResult(AuthenticateResult.NoResult());
+            => Task.FromResult(AuthenticateResult);
 
         public Task ChallengeAsync(HttpContext context, string? scheme, AuthenticationProperties? properties)
             => Task.CompletedTask;

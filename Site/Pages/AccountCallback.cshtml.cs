@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Site.Authentication;
 
 namespace Site.Pages;
 
@@ -33,14 +34,16 @@ public class AccountCallback : PageModel
             using var signOutScope = _auditService.BeginAction(AuditActionSignOut,
                 new AuditTarget { Email = string.IsNullOrEmpty(email) ? null : email });
 
+            // Read the id_token before the cookie goes: an OIDC session also logs out at Keycloak,
+            // otherwise the next login silently signs the same identity back in.
+            var session = await HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
+            var idToken = OidcSession.GetIdToken(session.Properties);
+
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
             _logger.LogInformation("User signed out from IP {IpAddress}", HttpContext.Connection.RemoteIpAddress);
             await _auditService.LogAsync(AuditOutcome.Succeeded);
 
-            if (url == null)
-                return Redirect("/");
-
-            return Redirect(Uri.UnescapeDataString(url));
+            return OidcSession.SignOutOfProvider(idToken, url == null ? "/" : Uri.UnescapeDataString(url));
         }
 
         using var auditScope = _auditService.BeginAction(AuditActionLogin, new AuditTarget { Email = email });

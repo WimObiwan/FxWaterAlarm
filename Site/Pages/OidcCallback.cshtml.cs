@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Core.Audit;
 using Core.Commands;
 using Core.Entities;
+using Site.Authentication;
 
 namespace Site.Pages;
 
@@ -56,6 +57,10 @@ public class OidcCallback : PageModel
         // Consume the external cookie immediately
         await HttpContext.SignOutAsync("ExternalCookie");
 
+        // From here on the user has a Keycloak session. Every rejection below must end it
+        // (Reject), or the next login attempt silently returns this same identity again.
+        var idToken = OidcSession.GetIdToken(result.Properties);
+
         // MapInboundClaims (on by default) rewrites sub/email to the long ClaimTypes URIs.
         // Read the raw names too, so this keeps working if that is ever turned off.
         var subject = result.Principal?.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -82,7 +87,7 @@ public class OidcCallback : PageModel
             await _auditService.LogAsync(AuditOutcome.Denied,
                 new AuditDetails { Reason = "Email address not present or not verified" },
                 target: new AuditTarget { Email = email });
-            return RedirectToPage("/Login", new { error = "email_not_verified" });
+            return Reject(idToken, "email_not_verified");
         }
 
         if (string.IsNullOrWhiteSpace(subject))
@@ -92,13 +97,13 @@ public class OidcCallback : PageModel
             await _auditService.LogAsync(AuditOutcome.Failed,
                 new AuditDetails { Reason = "Missing sub claim" },
                 target: new AuditTarget { Email = email });
-            return RedirectToPage("/Login", new { error = "oidc_failed" });
+            return Reject(idToken, "oidc_failed");
         }
 
         if (mode == "link" && !string.IsNullOrEmpty(accountLink))
-            return await HandleLinkMode(accountLink, subject, email!);
+            return await HandleLinkMode(accountLink, subject, email!, idToken);
 
-        return await HandleLoginMode(returnUrl, subject, email!, roles, configuration);
+        return await HandleLoginMode(returnUrl, subject, email!, roles, idToken, configuration);
     }
 
     private async Task<IActionResult> HandleLoginMode(
@@ -106,6 +111,7 @@ public class OidcCallback : PageModel
         string subject,
         string email,
         IReadOnlyList<string> roles,
+        string? idToken,
         IConfiguration configuration)
     {
         // Check the direct provider link first
@@ -124,9 +130,9 @@ public class OidcCallback : PageModel
                 await _auditService.LogAsync(AuditOutcome.Failed,
                     new AuditDetails { Reason = "Linked account not found" },
                     target: new AuditTarget { Email = email });
-                return RedirectToPage("/Login", new { error = "no_account" });
+                return Reject(idToken, "no_account");
             }
-            return await SignInAccount(linkedAccount, subject, roles, returnUrl, configuration);
+            return await SignInAccount(linkedAccount, subject, email, roles, idToken, returnUrl, configuration);
         }
 
         // Fall back: look for all mail AccountUsers matching the asserted email.
@@ -140,7 +146,7 @@ public class OidcCallback : PageModel
             await _auditService.LogAsync(AuditOutcome.Denied,
                 new AuditDetails { Reason = "Unknown email address" },
                 target: new AuditTarget { Email = email });
-            return RedirectToPage("/Login", new { error = "no_account" });
+            return Reject(idToken, "no_account");
         }
 
         if (accounts.Count == 1)
@@ -155,7 +161,7 @@ public class OidcCallback : PageModel
                 Provider = ProviderName,
                 ProviderSubjectId = subject
             });
-            return await SignInAccount(account, subject, roles, returnUrl, configuration);
+            return await SignInAccount(account, subject, email, roles, idToken, returnUrl, configuration);
         }
 
         // Multiple accounts match — redirect to picker
@@ -163,7 +169,10 @@ public class OidcCallback : PageModel
             "OIDC login: multiple accounts ({Count}) found for email {Email}, redirecting to picker",
             accounts.Count, email);
 
-        var token = new AccountPickerToken { ProviderSub = subject, Email = email, Roles = roles, ReturnUrl = returnUrl };
+        var token = new AccountPickerToken
+        {
+            ProviderSub = subject, Email = email, Roles = roles, IdToken = idToken, ReturnUrl = returnUrl
+        };
         var protector = _dataProtectionProvider.CreateProtector(PickerProtectionPurpose);
         var protectedToken = protector.Protect(JsonSerializer.Serialize(token));
 
@@ -182,16 +191,17 @@ public class OidcCallback : PageModel
     private async Task<IActionResult> HandleLinkMode(
         string accountLink,
         string subject,
-        string providerEmail)
+        string providerEmail,
+        string? idToken)
     {
         // Must already be signed in
         var session = await HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
         if (!session.Succeeded)
-            return RedirectToPage("/Login", new { error = "not_authenticated" });
+            return Reject(idToken, "not_authenticated");
 
         var account = await _mediator.Send(new AccountByLinkQuery { Link = accountLink });
         if (account == null)
-            return RedirectToPage("/Login", new { error = "no_account" });
+            return Reject(idToken, "no_account");
 
         // Verify current session user is authorized on this account
         var sessionEmail = session.Principal?.FindFirstValue("email");
@@ -221,8 +231,11 @@ public class OidcCallback : PageModel
 
         if (existingLink != null)
         {
-            var msg = existingLink.AccountId == account.Id ? "oidc_already_linked" : "oidc_conflict";
-            return Redirect($"/a/{accountLink}/users?message={msg}");
+            if (existingLink.AccountId == account.Id)
+                return Redirect($"/a/{accountLink}/users?message=oidc_already_linked");
+
+            // Wrong identity picked: end the Keycloak session so a retry can pick another one.
+            return OidcSession.SignOutOfProvider(idToken, $"/a/{accountLink}/users?message=oidc_conflict");
         }
 
         await _mediator.Send(new AddAccountUserCommand
@@ -244,14 +257,19 @@ public class OidcCallback : PageModel
     private async Task<IActionResult> SignInAccount(
         Core.Entities.Account account,
         string subject,
+        string loginEmail,
         IReadOnlyList<string> roles,
+        string? idToken,
         string? returnUrl,
         IConfiguration configuration)
     {
         var claims = new List<Claim>
         {
             new("sub", account.Uid.ToString()),
-            new("email", account.Email),
+            // The person who logged in, not the account's main address: the rest of the app
+            // (UserInfo, AdminRequirement, account picker, audit) reads "email" as the login
+            // identity, exactly as for an email-code login (AccountCallback).
+            new("email", loginEmail),
             new("auth_method", ProviderName),
             new("provider", ProviderName),
             new("provider_sub", subject)
@@ -263,19 +281,22 @@ public class OidcCallback : PageModel
             .Get<AccountLoginMessageOptions>()
             ?? throw new Exception("AccountLoginMessageOptions not configured");
 
+        var properties = new AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.Add(configOptions.TokenLifespan)
+        };
+        // Kept for logout, so it can end the Keycloak session too (AccountCallback).
+        OidcSession.StoreIdToken(properties, idToken);
+
         await HttpContext.SignInAsync(
             IdentityConstants.ApplicationScheme,
             new ClaimsPrincipal(new ClaimsIdentity(claims, IdentityConstants.ApplicationScheme)),
-            new AuthenticationProperties
-            {
-                IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.Add(configOptions.TokenLifespan)
-            }
-        );
+            properties);
 
         _logger.LogInformation(
-            "OIDC login succeeded for email {Email} (account {AccountId}) from IP {IpAddress}",
-            account.Email, account.Id, HttpContext.Connection.RemoteIpAddress);
+            "OIDC login succeeded for email {Email} (account {AccountId}, {AccountEmail}) from IP {IpAddress}",
+            loginEmail, account.Id, account.Email, HttpContext.Connection.RemoteIpAddress);
         await _auditService.LogAsync(AuditOutcome.Succeeded,
             target: new AuditTarget { Email = account.Email, AccountUid = account.Uid });
 
@@ -283,6 +304,10 @@ public class OidcCallback : PageModel
         // provider, so it is attacker-controllable: never redirect off-site with it.
         return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl! : "/auto");
     }
+
+    /// <summary>Back to the login page with <paramref name="error"/>, ending the Keycloak session on the way.</summary>
+    private IActionResult Reject(string? idToken, string error)
+        => OidcSession.SignOutOfProvider(idToken, $"/login?error={Uri.EscapeDataString(error)}");
 }
 
 internal record AccountPickerToken
@@ -290,5 +315,6 @@ internal record AccountPickerToken
     public required string ProviderSub { get; init; }
     public required string Email { get; init; }
     public IReadOnlyList<string> Roles { get; init; } = [];
+    public string? IdToken { get; init; }
     public string? ReturnUrl { get; init; }
 }

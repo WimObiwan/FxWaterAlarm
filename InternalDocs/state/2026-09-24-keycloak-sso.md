@@ -152,3 +152,8 @@ not yet exercised against Keycloak.
 Still to do: create client role `admin` on `wateralarm-dev` / `wateralarm-prd`, assign it,
 check the `roles` client scope is a default scope on both, deploy, and verify on dev
 (the callback log line now includes `roles=`). Then decide whether `AdminEmails` can shrink.
+
+## 2026-09-28 — Keycloak session outlives a rejected login / logout
+
+Fixed with RP-initiated logout; needs Keycloak config before deploy. See
+[2026-09-28-keycloak-logout](2026-09-28-keycloak-logout.md).
