@@ -1,6 +1,6 @@
 # Rejected or logged-out OIDC login leaves the Keycloak session alive
 
-Status: **commit `6e43f6f`, deployed to dev and prd 2026-09-28 (incl. the email-claim fix below). Post-logout URIs configured; Google `select_account` and the dev test still to do.**
+Status: **commit `6e43f6f`, deployed to dev and prd 2026-09-28 (incl. the email-claim fix below). Keycloak config done (post-logout URIs, Google `select_account`); login/logout tested by Wim. Only the expired-token cases below are still open.**
 Follows [2026-09-24-keycloak-sso](2026-09-24-keycloak-sso.md).
 
 ## Problem
@@ -70,17 +70,20 @@ and, with one Google account signed in, silently hands the same account back. We
 users out of Google itself.
 
 Identity providers → `google` → *Advanced settings* → **Prompt** → `select_account`.
+**Done 2026-09-28.** *Configured by Wim.*
 
 This is realm-wide, so it also applies to the other apps brokering Google (FilmOpTV): users
 will see Google's account chooser on each login that reaches Google. That's one extra click,
 and only when there is no live Keycloak session.
 
-## To verify on dev
+## To verify
 
-- [ ] Unknown Google account → message on `/login`, no Keycloak confirmation page; the next
+Tested by Wim on 2026-09-28 after the prd deploy. *Reported by Wim, not observed by Claude.*
+
+- [x] Unknown Google account → message on `/login`, no Keycloak confirmation page; the next
       "Aanmelden" shows the Keycloak login page, and Google shows the account chooser.
-- [ ] Known account → logout → "Aanmelden" shows the Keycloak login page again.
-- [ ] Logout **after the id_token has expired** (Keycloak access/id token lifespan is minutes,
+- [x] Known account → logout → "Aanmelden" shows the Keycloak login page again.
+- [ ] *(needs hours to pass; not tested yet)* Logout **after the id_token has expired** (Keycloak access/id token lifespan is minutes,
       our cookie lives `TokenLifespan`). I expect Keycloak to accept an expired
       `id_token_hint`, since it checks the signature for logout, but this is *not verified*. If
       it refuses, the user ends up on a Keycloak error page on logout. Fallback then: send
@@ -128,3 +131,5 @@ Tests: `SiteTests/Pages/OidcCallbackTest.cs`.
 
 Sessions issued before the deploy keep the old claim until they expire (`TokenLifespan`),
 unless the data-protection keys are rotated or the users log in again.
+- Sessions issued before the deploy keep the owner's address in `email` until they expire.
+  Accepted: noted, no forced re-login (Wim, 2026-09-28).
