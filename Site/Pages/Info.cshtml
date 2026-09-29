@@ -170,6 +170,16 @@
     </tr>
 </table>
 
+<div class="mt-3" style="max-width: 400px">
+    <svg id="infoClientGraph" viewBox="0 0 400 300" role="img"
+         aria-label="ServerRoundTrip and ConnectionRtt over the last 60 seconds"
+         style="display: block; width: 100%; aspect-ratio: 4 / 3; font-size: 12px"></svg>
+    <div class="small d-flex gap-3">
+        <span><span style="color: var(--bs-primary)">&#9644;</span> ServerRoundTrip (ms)</span>
+        <span><span style="color: var(--bs-orange)">&#9644;</span> ConnectionRtt (ms)</span>
+    </div>
+</div>
+
 <div class="d-none" aria-hidden="true">
     <textarea id="infoTroubleshootingCopy"
               class="form-control"
@@ -209,6 +219,76 @@
 
         let probing = false;
 
+        // Sliding 60 s graph of ServerRoundTrip and ConnectionRtt. A null sample (failed probe,
+        // no rtt) breaks the line. Samples just outside the window are kept so lines enter from
+        // the left edge (clipped) instead of starting mid-graph. Only records while auto-refresh
+        // is on; switching it off clears the graph.
+        const graph = document.getElementById('infoClientGraph');
+        const graphWindowMs = 60000;
+        const series = [
+            { key: 'roundTrip', color: 'var(--bs-primary)' },
+            { key: 'rtt', color: 'var(--bs-orange)' }
+        ];
+        const samples = { roundTrip: [], rtt: [] };
+        let graphActive = false;
+
+        function setGraphActive(active) {
+            graphActive = active;
+            if (!active) { samples.roundTrip = []; samples.rtt = []; }
+            drawGraph();
+        }
+
+        function record(key, value) {
+            if (!graphActive) return;
+            const now = Date.now();
+            const list = samples[key];
+            list.push({ t: now, v: value });
+            while (list.length > 1 && list[1].t < now - graphWindowMs) list.shift();
+            drawGraph();
+        }
+
+        function niceMax(v) {
+            const magnitude = Math.pow(10, Math.floor(Math.log10(v)));
+            for (const step of [1, 2, 5, 10])
+                if (step * magnitude >= v) return step * magnitude;
+        }
+
+        function drawGraph() {
+            const now = Date.now();
+            const left = 45, right = 390, top = 10, bottom = 275;
+            const inWindow = s => s.v !== null && s.t >= now - graphWindowMs;
+            const max = niceMax(Math.max(50, ...series.flatMap(s => samples[s.key].filter(inWindow).map(s => s.v))));
+            const x = t => left + (t - (now - graphWindowMs)) / graphWindowMs * (right - left);
+            const y = v => bottom - v / max * (bottom - top);
+
+            let svg = '<defs><clipPath id="infoClientGraphClip"><rect x="' + left + '" y="0" width="' + (right - left) + '" height="' + (bottom + 1) + '"/></clipPath></defs>';
+            for (let i = 0; i <= 4; i++) {
+                const v = max * i / 4, yy = y(v).toFixed(1);
+                svg += '<line x1="' + left + '" x2="' + right + '" y1="' + yy + '" y2="' + yy + '" stroke="currentColor" stroke-opacity="' + (i === 0 ? 0.6 : 0.15) + '"/>'
+                    + '<text x="' + (left - 5) + '" y="' + yy + '" text-anchor="end" dominant-baseline="middle" fill="currentColor">' + v + '</text>';
+            }
+            for (let s = 60; s >= 0; s -= 15) {
+                const xx = x(now - s * 1000).toFixed(1);
+                svg += '<text x="' + xx + '" y="' + (bottom + 18) + '" text-anchor="' + (s ? 'middle' : 'end') + '" fill="currentColor">' + (s ? '-' + s + 's' : 'now') + '</text>';
+            }
+            svg += '<g clip-path="url(#infoClientGraphClip)" fill="none" stroke-width="2" stroke-linejoin="round">';
+            for (const { key, color } of series) {
+                let d = '', dots = '', pen = 'M';
+                for (const p of samples[key]) {
+                    if (p.v === null) { pen = 'M'; continue; }
+                    const px = x(p.t).toFixed(1), py = y(p.v).toFixed(1);
+                    d += pen + px + ' ' + py + ' ';
+                    dots += '<circle cx="' + px + '" cy="' + py + '" r="2.5" fill="' + color + '" stroke="none"/>';
+                    pen = 'L';
+                }
+                svg += '<path d="' + d + '" stroke="' + color + '"/>' + dots;
+            }
+            graph.innerHTML = svg + '</g>';
+        }
+
+        // Slide the window even when no new samples arrive.
+        setInterval(() => { if (graphActive && !document.hidden) drawGraph(); }, 1000);
+
         async function runProbe() {
             // Auto-refresh fires every second but a probe may take up to probeTimeoutMs: never overlap.
             if (probing) return;
@@ -228,6 +308,7 @@
                 probing = false;
             }
             const elapsed = Math.round(performance.now() - started);
+            record('roundTrip', reachable === 'yes' ? elapsed : null);
             probe = {
                 reachable: reachable,
                 roundTrip: reachable === 'yes' ? elapsed + ' ms' : '-',
@@ -250,6 +331,7 @@
             };
             for (const [key, value] of Object.entries(values))
                 cells[key].textContent = value;
+            record('rtt', c?.rtt ?? null);
 
             // Keep "Copy this information" complete: server text plus the current client values.
             copy.value = serverInfo + '\n'
@@ -281,9 +363,11 @@
             autoRefreshTimer = autoRefresh.checked
                 ? setInterval(() => { if (!document.hidden) onNetworkChange(); }, 1000)
                 : null;
+            setGraphActive(autoRefresh.checked);
             if (autoRefresh.checked) onNetworkChange();
         });
 
+        drawGraph();
         update();
         runProbe();
     })();
