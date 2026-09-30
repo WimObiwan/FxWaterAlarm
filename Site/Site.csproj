@@ -29,7 +29,7 @@
         <!-- Dependency-free QR generator (MIT). Replaced QRCoder-ImageSharp, which dragged in -->
         <!-- SixLabors.ImageSharp: 3.1.12 was the last Apache-2.0 release (4.x requires a paid -->
         <!-- commercial license), so it was pinned and could no longer receive security patches. -->
-        <PackageReference Include="Net.Codecrete.QrCodeGenerator" Version="3.0.0" />
+        <PackageReference Include="Net.Codecrete.QrCodeGenerator" Version="3.1.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.41.0" />
     </ItemGroup>
