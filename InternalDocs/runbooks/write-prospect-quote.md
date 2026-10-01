@@ -81,7 +81,28 @@ Leave out:
   Calibri/Arial 11pt, his Fox Innovations signature (an imported `.eml` gets no
   auto-signature). Copy the customer's `Message-ID` into `In-Reply-To`/`References`.
 * Saving it straight into Thunderbird's `Concept` folder works too and is usually what he
-  wants. Two gotchas: `saveDraft` cannot set `In-Reply-To` (so the draft will not thread,
-  and Thunderbird strips the `Re:` prefix), and **every paragraph must be on one source
-  line** or Thunderbird's editor glues words together across the line breaks.
+  wants. **Every paragraph must be on one source line** or Thunderbird's editor glues words
+  together across the line breaks. Since thunderbird-mcp 0.7.4 `saveDraft` takes
+  `inReplyTo`/`references`, so the draft can thread (it could not before, 2026-10-01); pass
+  the `Re:` subject yourself. With the signature already in the body, pass
+  `includeSignature: false`.
 * Read the saved draft back and check it before reporting done.
+
+## Variant: a mail the customer forwards to neighbours
+
+When a customer's LoRa gateway can serve the neighbours, write a short mail she can forward
+(first done 2026-10-01, see `state/2026-10-01-neighbour-gateway-email.md`):
+
+* A short note to the host on top, then the neighbour text. Greet the neighbours with
+  *"Beste,"*, not *"Beste buur"*.
+* **Same prices as the host, minus the gateway**, and make the free gateway conditional:
+  *"(als het kastje van [host] je metingen kan ontvangen)"*. Do not compare with what the
+  host paid. Installation is per address.
+* The three limitations, briefly: clear view to the water, overflow very high, distance to
+  the gateway. Wim gives the range as *"in principe tot een 100-tal meter"* (unmeasured).
+* Battery: *"gaat in principe vele jaren mee"*. Call the dashboard **"de app"**, and the demo
+  *"demo van echte waterput"*.
+* Wim added the frontpage images `img/front/app.webp` and `img/front/ultrasoon-put.webp`
+  under the text.
+* Wim offered the host **one free subscription year per neighbour installation, up to three**,
+  as payment for hosting the gateway. Whether that is standard is open; ask before offering it.
